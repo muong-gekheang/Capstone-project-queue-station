@@ -6,4 +6,10 @@ void main() {
 
 class QueueStationApp extends StatelessWidget {
   const QueueStationApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
 }
