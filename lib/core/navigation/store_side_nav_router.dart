@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
 import '../constants/enums.dart';
+import '../../ui/store/pages/dashboard_screen.dart';
+import '../../ui/store/pages/analytics_screen.dart';
+import '../../ui/store/pages/store_settings_screen.dart';
 
 class NavRouter {
   static void handleTabSelection(
     BuildContext context,
     NavTab tab,
   ) {
+    Widget destination;
     switch (tab) {
       case NavTab.dashboard:
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        destination = const DashboardScreen();
         break;
       case NavTab.analytics:
-        Navigator.pushReplacementNamed(context, '/analytics');
+        destination = const AnalyticsScreen();
         break;
       case NavTab.settings:
-        Navigator.pushReplacementNamed(context, '/settings');
+        destination = const StoreSettingsScreen();
         break;
     }
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    );
   }
 }
