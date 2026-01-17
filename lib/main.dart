@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/user-setting/settings_screen.dart';
+import 'package:queue_station_app/ui/store/pages/dashboard_screen.dart';
 
 void main() {
   runApp(const QueueStationApp());
@@ -12,8 +12,7 @@ class QueueStationApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SettingsScreen(),
-      
+      home: const DashboardScreen(),
     );
   }
 }

@@ -32,8 +32,8 @@ class BottomNavBar extends StatelessWidget {
             children: [
               _buildNavItem(
                 NavTab.dashboard,
-                Icons.dashboard_outlined,
-                Icons.dashboard,
+                Icons.description_outlined,
+                Icons.description,
                 'Dashboard',
               ),
               _buildNavItem(
@@ -73,14 +73,14 @@ class BottomNavBar extends StatelessWidget {
           children: [
             Icon(
               isSelected ? iconFilled : iconOutlined,
-              color: isSelected ? const Color(0xFFEF4444) : Colors.grey,
+              color: isSelected ? const Color(0xFFFF6835) : Colors.grey,
               size: 26,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? const Color(0xFFEF4444) : Colors.grey,
+                color: isSelected ? const Color(0xFFFF6835) : Colors.grey,
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
