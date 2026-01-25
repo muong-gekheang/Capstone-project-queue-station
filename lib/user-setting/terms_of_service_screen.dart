@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/terms_of_service_mockup.dart';
+import 'package:queue_station_app/user-setting/terms_of_service_mockup.dart';
 
 class TermsOfServiceScreen extends StatelessWidget {
   const TermsOfServiceScreen({super.key});
