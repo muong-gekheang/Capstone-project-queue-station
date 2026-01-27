@@ -20,19 +20,32 @@ class _SearchWidgetState<T> extends State<SearchWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return SearchAnchor.bar(
+    return SearchAnchor(
+      searchController: searchController,
+      viewOnClose: () => searchController.clear(),
+      builder: (context, controller) {
+        return SearchBar(
+          hintText: "Search",
+          hintStyle: WidgetStatePropertyAll(
+            TextStyle(color: Colors.black.withAlpha((255 * 0.5).toInt())),
+          ),
+          leading: Icon(
+            Icons.search,
+            color: Colors.black.withAlpha((255 * 0.5).toInt()),
+          ),
+          constraints: BoxConstraints(maxHeight: 36, minHeight: 36),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          backgroundColor: WidgetStatePropertyAll(Color(0xFFEEEEEE)),
+          onTap: () {
+            controller.openView();
+          },
+        );
+      },
       viewBackgroundColor: Colors.white,
       isFullScreen: true,
-      barHintText: "Search",
-      searchController: searchController,
-      onClose: () {
-        searchController.clear();
-      },
-      constraints: BoxConstraints(maxHeight: 36, minHeight: 36),
-      barShape: WidgetStateProperty.all(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      barBackgroundColor: WidgetStatePropertyAll(Color(0xFFEEEEEE)),
+
       suggestionsBuilder: (context, controller) {
         return widget.filterLogic(controller.text);
       },

@@ -90,6 +90,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                           ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 5,
                             children: [
                               Icon(Icons.location_pin),
                               Expanded(

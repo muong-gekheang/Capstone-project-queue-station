@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   // 1. Define the Hex Colors
   static const Color primaryColor = Color(0xFFFF6835);
-  static const Color secondaryColor = Color(0x000D47A1);
+  static const Color secondaryColor = Color(0xFF0D47A1);
   static const Color accentRed = Color(0xFFB22222);
   static const Color accentYellow = Color(0xFFFFBF00);
   static const Color naturalBlack = Color(0xFF000000);
@@ -17,6 +17,11 @@ class AppTheme {
 
       // Scaffold Background
       scaffoldBackgroundColor: naturalWhite,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: naturalWhite,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+      ),
 
       // Defining the ColorScheme
       colorScheme: const ColorScheme.light(

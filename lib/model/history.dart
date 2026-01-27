@@ -1,8 +1,19 @@
 import 'package:queue_station_app/model/restaurant.dart';
 
-// class History {
-//   final String userId;
-//   final Restaurant rest;
-//   final String queueId;
-//   final
-// }
+enum StatusType { Completed, Pending }
+
+class History {
+  final Restaurant rest;
+  final int guests;
+  final String queueId;
+  final DateTime queueDate;
+  final StatusType status;
+
+  const History({
+    required this.rest,
+    required this.guests,
+    required this.queueId,
+    required this.queueDate,
+    required this.status,
+  });
+}

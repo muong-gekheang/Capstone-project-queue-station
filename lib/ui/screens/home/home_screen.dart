@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/model/restaurant.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
-import 'package:queue_station_app/ui/screens/join_queue_screen.dart';
+import 'package:queue_station_app/ui/screens/home/join_queue_screen.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
 
 List<Restaurant> mockData = [
@@ -21,7 +21,7 @@ List<Restaurant> mockData = [
   ),
   Restaurant(
     name: 'DoriDori Korean Chicken',
-    address: 'AEON MALL SEN SOK asdsds',
+    address: 'AEON MALL SEN SOK',
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
