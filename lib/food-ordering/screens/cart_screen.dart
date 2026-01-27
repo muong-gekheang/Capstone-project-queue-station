@@ -180,7 +180,7 @@ class CartScreen extends StatelessWidget {
                                 label: 'Edit',
                               ),
                               SlidableAction(
-                                onPressed: (context) {
+                                onPressed: (_) {
                                   _confirmDelete(context, cartItem);
                                 },
                                 backgroundColor: const Color(0xFFB22222),
@@ -193,7 +193,11 @@ class CartScreen extends StatelessWidget {
                             name: cartItem.menuItem.name,
                             image: cartItem.menuItem.image,
                             size: cartItem.selectedSize?.name,
-                            addons: cartItem.selectedAddOns.map((e) => e.name).toList(),
+                            addons: {
+                              for (final addon in cartItem.selectedAddOns)
+                                addon.name: addon.price,
+                            },
+
                             price: cartItem.totalItemPrice,
                             quantity: cartItem.quantity,
                             note: cartItem.note.isNotEmpty ? cartItem.note : null,
@@ -327,7 +331,7 @@ class CartScreen extends StatelessWidget {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF28A745),
+        backgroundColor: const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

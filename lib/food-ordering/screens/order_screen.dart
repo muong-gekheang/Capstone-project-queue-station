@@ -16,7 +16,7 @@ class OrderScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text("Current Orders", style: TextStyle(fontWeight: FontWeight.bold),),
+        title: const Text("Your Orders", style: TextStyle(fontWeight: FontWeight.bold),),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -35,6 +35,7 @@ class OrderScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 16,),
 
             Expanded(
               child: confirmedOrders.isEmpty
@@ -48,10 +49,12 @@ class OrderScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Order Header (ID)
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                            child: Text("Order #${order.id.substring(order.id.length - 4)}", 
-                                    style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold))
+                          Text(
+                            "Order #${order.id.substring(order.id.length - 4)}", 
+                            style: TextStyle(
+                              color: Colors.grey[600], 
+                              fontWeight: FontWeight.bold
+                            )
                           ),
                           
                           // The Items in this order
@@ -59,7 +62,7 @@ class OrderScreen extends StatelessWidget {
                               name: item.productName,
                               image: item.image,
                               size: item.sizeLabel,
-                              addons: item.addonNames,
+                              addons: item.addons,
                               price: item.priceAtOrder,
                               quantity: item.quantity,
                               note: item.note,

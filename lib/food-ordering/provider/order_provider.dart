@@ -17,7 +17,10 @@ class OrderProvider with ChangeNotifier {
         productName: cartItem.menuItem.name,
         image: cartItem.menuItem.image,
         sizeLabel: cartItem.selectedSize?.name,
-        addonNames: cartItem.selectedAddOns.map((a) => a.name).toList(),
+        addons: {
+          for (final addon in cartItem.selectedAddOns)
+            addon.name: addon.price,
+        },
         priceAtOrder: cartItem.totalItemPrice / cartItem.quantity,
         quantity: cartItem.quantity,
         note: cartItem.note

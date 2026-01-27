@@ -28,18 +28,6 @@ class MenuItem {
     if (sizes.isEmpty) return null;
     return sizes.firstWhere((size) => size.isDefault, orElse: () => sizes.first);
   }
-
-  // String getCategoryNameById(
-  //   List<Category> categories,
-  //   String categoryId,
-  // ) {
-  //   for (final category in categories) {
-  //     if (category.id == categoryId) {
-  //       return category.name;
-  //     }
-  //   }
-  //   return '';
-  // }
 }
 
 // Common add-ons for burgers and other items

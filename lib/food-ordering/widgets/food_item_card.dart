@@ -4,7 +4,7 @@ class FoodItemCard extends StatelessWidget {
   final String name;
   final String? image;
   final String? size;
-  final List<String> addons;
+  final Map<String, double> addons;
   final double price;
   final int quantity;
   final String? note;
@@ -36,13 +36,14 @@ class FoodItemCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: Colors.grey.shade100, 
+          color: Colors.grey.shade100,
           width: 1,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // TOP ROW
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -73,6 +74,7 @@ class FoodItemCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFFFF6835),
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -90,7 +92,7 @@ class FoodItemCard extends StatelessWidget {
                                 color: Color(0xFF0D47A1),
                               ),
                             ),
-                            const SizedBox(width: 8,),
+                            const SizedBox(width: 8),
                             Text(
                               '${size!} ',
                               style: TextStyle(
@@ -99,7 +101,29 @@ class FoodItemCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
+                          ],
+                        ),
 
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Text(
+                              'Quantity:',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF0D47A1),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '$quantity',
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ],
                         ),
                       ],
@@ -107,7 +131,7 @@ class FoodItemCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 8,),
+                const SizedBox(width: 8),
 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -117,52 +141,63 @@ class FoodItemCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFFF6835),
+                        color: Colors.black,
                       ),
                     ),
 
                     const SizedBox(height: 8),
 
-                    isEditable
-                    ?
-                    Row(
-                       mainAxisSize: MainAxisSize.min,
+                    if (isEditable)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            visualDensity: VisualDensity.compact,
-                            padding: EdgeInsets.zero,         
-                            constraints: BoxConstraints(),
-                            icon: Icon(Icons.remove_circle_outline, size: 24, color: quantity <= 1 ? Colors.grey : Color(0xFFFF6835),),
-                            onPressed: onDecrease,
-                          ),
                           Container(
-                            width: 15,
-                            alignment: Alignment.center,
-                            child: Text(
-                              '$quantity',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            decoration: BoxDecoration(
+                              color: quantity > 1
+                                  ? const Color(0xFFFF6835)
+                                  : Colors.grey.shade300,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                bottomLeft: Radius.circular(8),
                               ),
                             ),
+                            child: IconButton(
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: const Icon(
+                                Icons.remove_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              onPressed: onDecrease,
+                            ),
                           ),
-                          IconButton(
-                            visualDensity: VisualDensity.compact,
-                            padding: EdgeInsets.zero,        
-                            constraints: BoxConstraints(),
-                            icon: Icon(Icons.add_circle_outline, size: 24, color: Color(0xFFFF6835)),
-                            onPressed: onIncrease,
+
+                          const SizedBox(width: 2),
+
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFF6835),
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(8),
+                                bottomRight: Radius.circular(8),
+                              ),
+                            ),
+                            child: IconButton(
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: const Icon(
+                                Icons.add_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              onPressed: onIncrease,
+                            ),
                           ),
                         ],
-                      )
-                    :
-                    Text(
-                      'x $quantity',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
                   ],
                 ),
               ],
@@ -170,43 +205,75 @@ class FoodItemCard extends StatelessWidget {
           ),
 
           if (addons.isNotEmpty || (note != null && note!.isNotEmpty)) ...[
-            const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (addons.isNotEmpty) ...[
-                  Text(
-                    "Add-ons:",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D47A1),
+                    Text(
+                      "Add-ons:",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0D47A1),
+                      ),
                     ),
-                  ),
-                  Text(
-                    " ${addons.join(', ')}",
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
 
-                if (note != null && note!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    "Note:",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D47A1),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: addons.entries
+                          .toList()
+                          .asMap()
+                          .entries
+                          .map((entry) {
+                        final index = entry.key;
+                        final addon = entry.value;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "${index + 1}. ${addon.key}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '+\$${addon.value.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFFFF6835),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                     ),
-                  ),
-                  Text(
-                    "$note",
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
+                  ],
+
+                  if (note != null && note!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      "Note:",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0D47A1),
+                      ),
+                    ),
+                    Text(
+                      "$note",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
                 ],
               ),
             ),

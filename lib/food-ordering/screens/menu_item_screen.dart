@@ -416,10 +416,16 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         ScaffoldMessenger.of(context).showMaterialBanner(
                           MaterialBanner(
                             backgroundColor: const Color(0xFF10B981),
-                            content: Text(
-                              "${widget.menuItem.name} added to cart!",
-                              style: const TextStyle(color: Colors.white),
-                            ),
+                            content: widget.cartItem == null
+                            ? Text(
+                                "${widget.menuItem.name} added to cart!",
+                                style: const TextStyle(color: Colors.white),
+                              )
+                            : Text(
+                                "${widget.menuItem.name} edited successfully",
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            
                             actions: const [
                                SizedBox.shrink(),
                             ],
