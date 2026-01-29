@@ -111,48 +111,58 @@ class _HistoryCardState extends State<HistoryCard> {
                 fit: BoxFit.fitHeight,
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.history.rest.name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.history.rest.name,
+                    softWrap: true,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
 
-                Row(
-                  children: [
-                    Icon(Icons.location_pin),
-                    Text(widget.history.rest.address),
-                  ],
-                ),
-              ],
+                  Row(
+                    children: [
+                      Icon(Icons.location_pin),
+                      Expanded(
+                        child: Text(
+                          widget.history.rest.address,
+                          softWrap: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Spacer(),
-            Column(
-              spacing: 10,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  "Date: ${DateFormat("dd/MM/yyyy").format(widget.history.queueDate)}",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
+            Expanded(
+              child: Column(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "Date: ${DateFormat("dd/MM/yyyy").format(widget.history.queueDate)}",
+                    softWrap: true,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                   ),
-                ),
-                Text(
-                  widget.history.queueId,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                  Text(
+                    widget.history.queueId,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-                Text(
-                  "${widget.history.guests} $guestSuffix",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
+                  Text(
+                    "${widget.history.guests} $guestSuffix",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

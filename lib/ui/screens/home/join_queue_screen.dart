@@ -47,9 +47,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
         : "";
 
     return CustomScreenView(
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: 15,
+      content: ListView(
         children: [
           Container(
             decoration: BoxDecoration(
@@ -151,12 +149,13 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ],
             ),
           ),
+          SizedBox(height: 16),
           ListTile(
             tileColor: Color(0xFFFF6835),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(10),
             ),
-            title: const Text(
+            title: Text(
               "Wait",
               style: TextStyle(
                 fontSize: 20,
@@ -191,10 +190,12 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ],
             ),
           ),
+          SizedBox(height: 16),
           const Text(
             "Queue Type",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
+          SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -220,8 +221,9 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ),
             ],
           ),
+          SizedBox(height: 16),
           const Text("Number of Guest(s)", style: TextStyle(fontSize: 16)),
-          Spacer(),
+          SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 19,
@@ -271,19 +273,17 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ),
             ],
           ),
-          Spacer(),
-          FilledButton(
-            onPressed: () {},
-
-            style: FilledButton.styleFrom(
-              backgroundColor: Color(0xFFFF6835),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadiusGeometry.circular(0),
-              ),
-            ),
-            child: const Text("Join Queue", style: TextStyle(fontSize: 24)),
-          ),
         ],
+      ),
+      bottomNavigationBar: FilledButton(
+        onPressed: () {},
+        style: FilledButton.styleFrom(
+          backgroundColor: Color(0xFFFF6835),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(0),
+          ),
+        ),
+        child: const Text("Join Queue", style: TextStyle(fontSize: 24)),
       ),
     );
   }

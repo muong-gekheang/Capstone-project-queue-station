@@ -6,7 +6,7 @@ class History {
   final Restaurant rest;
   final int guests;
   final String queueId;
-  final DateTime queueDate;
+  final DateTime queueDate; // TODO: Review? Is it the joined Date?
   final StatusType status;
 
   const History({

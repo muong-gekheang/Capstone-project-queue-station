@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CustomScreenView extends StatelessWidget {
-  const CustomScreenView({super.key, required this.content});
+  const CustomScreenView({
+    super.key,
+    required this.content,
+    this.bottomNavigationBar,
+  });
 
-  final Column content;
+  final Widget content;
+  final Widget? bottomNavigationBar;
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +24,9 @@ class CustomScreenView extends StatelessWidget {
           child: content,
         ),
       ),
+      bottomNavigationBar: bottomNavigationBar != null
+          ? SafeArea(child: bottomNavigationBar!)
+          : null,
     );
   }
 }
