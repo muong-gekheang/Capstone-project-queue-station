@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/ui/screens/menu_management.dart';
 import '../../../../services/store_profile_service.dart';
 import 'analytics_screen.dart';
 
@@ -261,6 +262,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
           Icons.restaurant_menu_outlined,
           'Manage\nMenu',
           Color(0xFF0D47A1),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => MenuManagement()));
+          },
+          
         ),
         _ActionCard(
           Icons.access_time,

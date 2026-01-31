@@ -34,6 +34,7 @@ import 'package:queue_station_app/ui/store/pages/store_main_screen.dart';
 //   );
 // }
 
+
 void main() {
   runApp(
     MultiProvider(
@@ -56,4 +57,3 @@ void main() {
     ),
   );
 }
-
