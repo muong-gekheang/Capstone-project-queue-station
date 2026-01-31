@@ -75,7 +75,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Scaffold(
+      // bottomNavigationBar: , //TODO: Add nav bar
+      body: Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
       child: Column(
         spacing: 20,
@@ -128,25 +130,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         ],
       ),
-    );
+    ),
+    )
+    ;
   }
 }
 
-void main() {
-  runApp(
-    MaterialApp(
-      theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "History",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-        ),
-        body: SafeArea(child: HistoryScreen()),
-      ),
-    ),
-  );
-}
+// void main() {
+//   runApp(
+//     MaterialApp(
+//       theme: AppTheme.lightTheme,
+//       debugShowCheckedModeBanner: false,
+//       home: Scaffold(
+//         appBar: AppBar(
+//           title: const Text(
+//             "History",
+//             style: TextStyle(fontWeight: FontWeight.bold),
+//           ),
+//           centerTitle: true,
+//         ),
+//         body: SafeArea(child: HistoryScreen()),
+//       ),
+//     ),
+//   );
+// }

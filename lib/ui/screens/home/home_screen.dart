@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:queue_station_app/food-ordering/screens/menu_screen.dart';
 import 'package:queue_station_app/model/restaurant.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/home/join_queue_screen.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 List<Restaurant> mockData = [
   Restaurant(
@@ -42,12 +45,38 @@ List<Restaurant> mockData = [
   ),
 ];
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int selectedIndex = 0;
+
+  final List<String> iconPaths = [
+    'assets/images/home_icon.svg',
+    'assets/images/map_icon.svg',
+    'assets/images/food_ordering_icon.svg',
+    'assets/images/ticket_confirmation.svg',
+    'assets/images/profile_icon.svg',
+  ];
+
+  final List<String> labels = ['Home', 'Map','Ticket Confirmation', 'Orders', 'Profile'];
+
+  final List<Widget> screens = [
+    HomeScreen(), // this will be your current home body
+    // MapScreen(),         // create this screen separately
+    MenuScreen(),      // create this screen separately
+    // ProfileScreen(),     // create this screen separately
+  ];
+
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Scaffold(
+      body:Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         spacing: 12,
@@ -118,7 +147,9 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
+    )
+    )
+    ;
   }
 }
 
@@ -188,6 +219,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 ),
               ],
             ),
+            
           ],
         ),
       ),
@@ -195,15 +227,4 @@ class _RestaurantCardState extends State<RestaurantCard> {
   }
 }
 
-void main() {
-  runApp(
-    MaterialApp(
-      theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(child: HomeScreen()),
-      ),
-    ),
-  );
-}
+
