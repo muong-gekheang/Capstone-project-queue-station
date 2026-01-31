@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/data/mock_table_data.dart';
+import 'package:queue_station_app/ui/screen/table_management_screen.dart';
 import 'package:queue_station_app/ui/screens/menu_management.dart';
 import 'package:queue_station_app/ui/screens/store_queue_history.dart';
 import '../../../../services/store_profile_service.dart';
@@ -258,6 +260,9 @@ class _ManageStorePageState extends State<ManageStorePage> {
           Icons.description_outlined,
           'Manage\nTable',
           Color(0xFF0D47A1),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TableManagementScreen(tableCategory: tableData)));
+          },
         ),
         _ActionCard(
           Icons.restaurant_menu_outlined,
