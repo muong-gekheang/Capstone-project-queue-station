@@ -7,6 +7,7 @@ import 'package:queue_station_app/store_user_app.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/home/home_screen.dart';
 import 'package:queue_station_app/normal_user_app.dart';
+import 'package:queue_station_app/ui/store/pages/store_main_screen.dart';
 
 // void main() {
 //   runApp(
@@ -47,22 +48,12 @@ void main() {
           backgroundColor: Colors.white,
           body: SafeArea(
             // child: NormalUserApp(),  
-            child: StoreUserApp(),
+            // child: StoreUserApp(),
+            child: StoreMainScreen(),
           ),
         ),
       ),
     ),
   );
 }
-class QueueStationApp extends StatelessWidget {
-  const QueueStationApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MenuScreen(),
-    );
-
-  }
-}
