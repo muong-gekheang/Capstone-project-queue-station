@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/navigation/store_side_bottom_nav.dart';
-import '../../../../core/constants/enums.dart';
-import '../../../../core/navigation/store_side_nav_router.dart';
 
 class StoreSubscriptionScreen extends StatelessWidget {
   const StoreSubscriptionScreen({super.key});
@@ -54,13 +51,6 @@ class StoreSubscriptionScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: NavTab.settings,
-        onTabSelected: (tab) {
-          if (tab == NavTab.settings) return;
-          NavRouter.handleTabSelection(context, tab);
-        },
       ),
     );
   }

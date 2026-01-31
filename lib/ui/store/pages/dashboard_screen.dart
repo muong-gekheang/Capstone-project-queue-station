@@ -1,8 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import '../widgets/navigation/store_side_bottom_nav.dart';
-import '../../../../core/constants/enums.dart';
-import '../../../../core/navigation/store_side_nav_router.dart';
 import '../../../../core/models/dashboard_stats.dart';
 import '../../../../core/repositories/queue_repository.dart';
 import '../../../../services/queue_service.dart';
@@ -64,7 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         title: Row(
           children: const [
-            Icon(Icons.description, color: Color(0xFF2563EB)),
+            Icon(Icons.description, color: Color(0xFF0D47A1)),
             SizedBox(width: 8),
             Text(
               'Dashboard',
@@ -132,7 +128,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
+                        backgroundColor: const Color(0xFF0D47A1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -150,13 +146,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: NavTab.dashboard,
-        onTabSelected: (tab) {
-          if (tab == NavTab.dashboard) return;
-          NavRouter.handleTabSelection(context, tab);
-        },
-      ),
     );
   }
 
@@ -194,7 +183,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2563EB),
+                  color: Color(0xFF0D47A1),
                 ),
               ),
               if (unit.isNotEmpty) ...[

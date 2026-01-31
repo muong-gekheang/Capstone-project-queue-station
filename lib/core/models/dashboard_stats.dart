@@ -4,6 +4,12 @@ class DashboardStats {
   final int activeTables;
   final int averageWaitTimeMinutes;
 
+  var totalOrders;
+
+  var averageQueueLength;
+
+  var tableOccupancy;
+
   DashboardStats({
     required this.queueEntries,
     required this.peopleWaiting,

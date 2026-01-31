@@ -1,8 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import '../widgets/navigation/store_side_bottom_nav.dart';
-import '../../../core/constants/enums.dart';
-import '../../../../core/navigation/store_side_nav_router.dart';
 import '../../../../services/store_profile_service.dart';
 import 'analytics_screen.dart';
 
@@ -14,6 +10,24 @@ class ManageStorePage extends StatefulWidget {
 }
 
 class _ManageStorePageState extends State<ManageStorePage> {
+    late final StoreProfileService _storeService;
+
+    @override
+    void initState() {
+      super.initState();
+      _storeService = StoreProfileService();
+      _storeService.addListener(_onProfileChanged);
+    }
+
+    @override
+    void dispose() {
+      _storeService.removeListener(_onProfileChanged);
+      super.dispose();
+    }
+
+    void _onProfileChanged() {
+      if (mounted) setState(() {});
+    }
   bool isStoreOpen = true;
 
   void _showCloseStoreDialog() {
@@ -66,7 +80,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: const Color(0xFFFF3B30),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -99,13 +113,6 @@ class _ManageStorePageState extends State<ManageStorePage> {
       backgroundColor: const Color(0xFFF7F8FA),
       appBar: _buildAppBar(),
       body: _buildBody(),
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: NavTab.analytics,
-        onTabSelected: (tab) {
-          if (tab == NavTab.analytics) return;
-          NavRouter.handleTabSelection(context, tab);
-        },
-      ),
     );
   }
 
@@ -115,7 +122,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
       elevation: 0,
       title: Row(
         children: const [
-          Icon(Icons.storefront, color: Color(0xFF2563EB)),
+          Icon(Icons.storefront, color: Color(0xFF0D47A1)),
           SizedBox(width: 8),
           Text(
             'Manage',
@@ -220,7 +227,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
           ),
           Switch(
             value: isStoreOpen,
-            activeColor: const Color(0xFF2563EB),
+            activeColor: const Color(0xFF0D47A1),
             onChanged: (value) {
               if (value == false) {
                 // Show warning dialog when trying to close store
@@ -248,22 +255,22 @@ class _ManageStorePageState extends State<ManageStorePage> {
         _ActionCard(
           Icons.description_outlined,
           'Manage\nTable',
-          Color(0xFF2563EB),
+          Color(0xFF0D47A1),
         ),
         _ActionCard(
           Icons.restaurant_menu_outlined,
           'Manage\nMenu',
-          Color(0xFF2563EB),
+          Color(0xFF0D47A1),
         ),
         _ActionCard(
           Icons.access_time,
           'Queue\nhistory',
-          Color(0xFF2563EB),
+          Color(0xFF0D47A1),
         ),
         _ActionCard(
           Icons.bar_chart,
           'Analytics',
-          Color(0xFF2563EB),
+          Color(0xFF0D47A1),
           onTap: () {
             Navigator.push(
               context,
@@ -283,7 +290,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
       height: 52,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2563EB), // Changed to blue
+          backgroundColor: const Color(0xFF0D47A1),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -306,10 +313,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
   }
 
   Widget _buildStoreProfileImage() {
-    final storeService = StoreProfileService();
-    final profileImage = storeService.storeProfileImage;
-    final storeName = storeService.storeName;
-
+    final profileImage = _storeService.storeProfileImage;
     return Container(
       margin: const EdgeInsets.only(right: 8),
       child: profileImage != null
@@ -325,12 +329,12 @@ class _ManageStorePageState extends State<ManageStorePage> {
           : Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withOpacity(0.1),
+                color: const Color(0xFFFF3B30).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.storefront,
-                color: Color(0xFFEF4444),
+                color: Color(0xFFFF3B30),
                 size: 20,
               ),
             ),

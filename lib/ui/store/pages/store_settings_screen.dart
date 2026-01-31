@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import '../widgets/navigation/store_side_bottom_nav.dart';
-import '../../../../core/constants/enums.dart';
-import '../../../../core/navigation/store_side_nav_router.dart';
 import 'edit_store_screen.dart';
 import 'store_security_screen.dart';
 import 'store_subscription_screen.dart';
 import '../../../../user-setting/contact_us_screen.dart';
 import '../../../../user-setting/terms_of_service_screen.dart';
 import '../widgets/setting_card.dart';
+import '../../widgets/custom_success_snackbar.dart';
 
-class StoreSettingsScreen extends StatelessWidget {
+class StoreSettingsScreen extends StatefulWidget {
   const StoreSettingsScreen({super.key});
+
+  @override
+  State<StoreSettingsScreen> createState() => _StoreSettingsScreenState();
+}
+
+class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -115,7 +119,11 @@ class StoreSettingsScreen extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => const EditStoreScreen(),
                         ),
-                      );
+                      ).then((result) {
+                        if (result == true) {
+                          CustomSuccessSnackbar.show(context, "Added Successfully");
+                        }
+                      });
                     },
                   ),
                   ListTile(
@@ -229,13 +237,6 @@ class StoreSettingsScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: NavTab.settings,
-        onTabSelected: (tab) {
-          if (tab == NavTab.settings) return;
-          NavRouter.handleTabSelection(context, tab);
-        },
       ),
     );
   }

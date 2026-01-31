@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/navigation/store_side_bottom_nav.dart';
-import '../../../../core/constants/enums.dart';
-import '../../../../core/navigation/store_side_nav_router.dart';
 
 class StoreSecurityScreen extends StatelessWidget {
   const StoreSecurityScreen({super.key});
@@ -39,7 +36,7 @@ class StoreSecurityScreen extends StatelessWidget {
                     width: 120,
                     height: 120,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF2563EB),
+                      color: Color(0xFF0D47A1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -146,13 +143,6 @@ class StoreSecurityScreen extends StatelessWidget {
             const SizedBox(height: 20),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: NavTab.settings,
-        onTabSelected: (tab) {
-          if (tab == NavTab.settings) return;
-          NavRouter.handleTabSelection(context, tab);
-        },
       ),
     );
   }

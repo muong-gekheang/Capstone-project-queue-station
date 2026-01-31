@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../services/store_profile_service.dart';
+import '../../widgets/custom_success_snackbar.dart';
 
 class EditStoreScreen extends StatefulWidget {
   const EditStoreScreen({super.key});
@@ -75,7 +76,7 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                             height: 200,
                             decoration: BoxDecoration(
                               color: _selectedImage == null 
-                                  ? const Color(0xFF2563EB) 
+                                  ? const Color(0xFF0D47A1) 
                                   : Colors.transparent,
                               shape: BoxShape.circle,
                               border: _selectedImage != null
@@ -149,7 +150,7 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF2563EB),
+                                  color: const Color(0xFF0D47A1),
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: Colors.white,
@@ -275,7 +276,7 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                      side: const BorderSide(color: Color(0xFF0D47A1), width: 2),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -284,12 +285,12 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(Icons.close, color: Color(0xFF2563EB), size: 20),
+                        Icon(Icons.close, color: Color(0xFF0D47A1), size: 20),
                         SizedBox(width: 8),
                         Text(
                           "Cancel",
                           style: TextStyle(
-                            color: Color(0xFF2563EB),
+                            color: Color(0xFF0D47A1),
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -307,10 +308,10 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                       final storeService = StoreProfileService();
                       storeService.setStoreProfileImage(_selectedImage);
                       storeService.setStoreName(_storeNameController.text);
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Store information saved")),
-                      );
+                      CustomSuccessSnackbar.show(context, "Added Successfully");
+                      Future.delayed(const Duration(milliseconds: 800), () {
+                        if (mounted) Navigator.of(context).pop(true); // Indicate success
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF6835),
