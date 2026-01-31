@@ -35,6 +35,10 @@ class _MenuManagementState extends State<MenuManagement> {
       );
   }
 
+
+  void onAddItem(){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewMenu()));
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -60,6 +64,7 @@ class _MenuManagementState extends State<MenuManagement> {
                   ),
                   SizedBox(width: 10),
                   ButtonWidget(leadingIcon: Icons.add, title: "Add Item", onPressed: (){}, backgroundColor: Color.fromRGBO(255, 104, 53, 1), textColor: Colors.white, borderRadius: 50, padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),),
+                  
                 ],
               ),
             ),
@@ -79,7 +84,7 @@ class _MenuManagementState extends State<MenuManagement> {
               ),
             ),
             SizedBox(height: 20),
-            Text("Menu List", style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500),
+            Text("Menu List", style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
             Expanded(child: filteredMenuList())
