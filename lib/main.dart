@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/food-ordering/provider/cart_provider.dart';
 import 'package:queue_station_app/food-ordering/provider/order_provider.dart';
 import 'package:queue_station_app/food-ordering/screens/menu_screen.dart';
+import 'package:queue_station_app/store_user_app.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/home/home_screen.dart';
 import 'package:queue_station_app/normal_user_app.dart';
@@ -45,7 +46,8 @@ void main() {
         home: Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
-            child: NormalUserApp(),
+            // child: NormalUserApp(),  
+            child: StoreUserApp(),
           ),
         ),
       ),
