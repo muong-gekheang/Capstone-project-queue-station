@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/table.dart';
+import 'package:queue_station_app/model/entities/queue_table.dart';
 
 class TableSearchResult extends StatelessWidget {
   const TableSearchResult({
