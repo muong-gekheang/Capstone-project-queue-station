@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-import 'package:queue_station_app/domain/menu.dart';
-import 'package:queue_station_app/domain/menu_category.dart';
+import 'package:queue_station_app/model/entities/menu.dart';
+import 'package:queue_station_app/model/entities/menu_category.dart';
 
 final List<MenuCategory> mockMenuCategories = [
   MenuCategory(categoryId: 1, categoryName: "Burger"),
@@ -12,7 +11,8 @@ final List<Menu> mockMenus = [
   Menu(
     menuId: 1,
     name: "Classic Burger",
-    description: "Classic Italian pizza topped with fresh mozzarella, tomato sauce, and basil leaves.",
+    description:
+        "Classic Italian pizza topped with fresh mozzarella, tomato sauce, and basil leaves.",
     price: 5.99,
     minPreparationTime: 10,
     maxPreparationTime: 15,
@@ -50,4 +50,3 @@ final List<Menu> mockMenus = [
     categoryId: 3,
   ),
 ];
-
