@@ -15,38 +15,94 @@ class StoreSubscriptionScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "My subscription",
+          "My Subscription",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 20,
+            fontSize: 18,
           ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Center(
           child: Container(
             width: double.infinity,
+            constraints: const BoxConstraints(maxWidth: 350),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.grey.shade300,
+                color: Colors.grey.shade400,
                 width: 1,
               ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSubscriptionRow("Current Plan", "Standard"),
-                const Divider(height: 32),
-                _buildSubscriptionRow("Start Date", "10/Dec/2025"),
-                const Divider(height: 32),
-                _buildSubscriptionRow("Renewable Date", "10/Dec - monthly"),
-                const Divider(height: 32),
-                _buildSubscriptionRow("Price", "\$40"),
+                const Text(
+                  'Standard',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      '\$40',
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        '/mo',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'See what your current plan can do',
+                  style: TextStyle(fontSize: 15, color: Colors.black87),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  enabled: false,
+                  decoration: InputDecoration(
+                    hintText: 'Your current plan',
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                const SizedBox(height: 18),
+                const Text('Display your store in the app', style: TextStyle(fontSize: 15)),
+                const SizedBox(height: 8),
+                const Text('User can join your store queue', style: TextStyle(fontSize: 15)),
+                const SizedBox(height: 8),
+                const Text('Manage your store in the app', style: TextStyle(fontSize: 15)),
+                const SizedBox(height: 8),
+                const Text('Get analytics and store history', style: TextStyle(fontSize: 15)),
+                const SizedBox(height: 8),
+                const Text('business improvement.', style: TextStyle(fontSize: 15)),
               ],
             ),
           ),
@@ -55,27 +111,4 @@ class StoreSubscriptionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSubscriptionRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFFFF6835),
-          ),
-        ),
-      ],
-    );
-  }
 }

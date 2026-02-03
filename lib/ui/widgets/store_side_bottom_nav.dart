@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -32,20 +34,23 @@ class BottomNavBar extends StatelessWidget {
             children: [
               _buildNavItem(
                 NavTab.dashboard,
-                Icons.description_outlined,
-                Icons.description,
+                'assets/icons/Dashboard.svg',
+                'assets/icons/Dashboard_orange.svg',
+                null,
                 'Dashboard',
               ),
               _buildNavItem(
                 NavTab.analytics,
-                Icons.storefront_outlined,
-                Icons.storefront,
+                'assets/icons/Store_Management.svg',
+                'assets/icons/Store_Management_orange.svg',
+                null,
                 'Manage',
               ),
               _buildNavItem(
                 NavTab.settings,
-                Icons.settings_outlined,
-                Icons.settings,
+                'assets/icons/Setting.svg',
+                'assets/icons/Setting_orange.svg',
+                null,
                 'Settings',
               ),
             ],
@@ -57,12 +62,14 @@ class BottomNavBar extends StatelessWidget {
 
   Widget _buildNavItem(
     NavTab tab,
-    IconData iconOutlined,
-    IconData iconFilled,
+    String iconAsset,
+    String iconAssetOrange,
+    String? iconAssetBlue,
     String label,
   ) {
     final isSelected = selectedTab == tab;
-
+    String assetToUse = isSelected ? iconAssetOrange : iconAsset;
+    Color? iconColor = isSelected ? null : Colors.black;
     return GestureDetector(
       onTap: () => onTabSelected(tab),
       behavior: HitTestBehavior.opaque,
@@ -71,11 +78,7 @@ class BottomNavBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              isSelected ? iconFilled : iconOutlined,
-              color: isSelected ? const Color(0xFFFF6835) : Colors.grey,
-              size: 26,
-            ),
+            _buildSvgOrIcon(assetToUse, iconColor),
             const SizedBox(height: 4),
             Text(
               label,
@@ -88,6 +91,17 @@ class BottomNavBar extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSvgOrIcon(String assetPath, Color? color) {
+    // Try to load SVG, fallback to a default icon if it fails
+    return SvgPicture.asset(
+      assetPath,
+      width: 26,
+      height: 26,
+      color: color,
+      placeholderBuilder: (context) => Icon(Icons.circle, size: 26, color: Colors.grey),
     );
   }
 }

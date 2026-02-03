@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/model/entities/dashboard_stats.dart';
 import 'package:queue_station_app/model/services/queue_service.dart';
@@ -59,10 +60,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Row(
-          children: const [
-            Icon(Icons.description, color: Color(0xFF0D47A1)),
-            SizedBox(width: 8),
-            Text(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/Dashboard_blue.svg',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            const Text(
               'Dashboard',
               style: TextStyle(
                 color: Colors.black,
@@ -210,41 +215,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildStoreProfileImage() {
-    final storeService = StoreProfileService();
-    final profileImage = storeService.storeProfileImage;
-    final storeName = storeService.storeName;
-
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: profileImage != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                profileImage,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Container(
-              width: 40,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
-                  style: const TextStyle(
-                    color: Color(0xFFFF6835),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: CircleAvatar(
+        radius: 18,
+        backgroundColor: Colors.grey[300],
+        child: const Icon(Icons.person, color: Colors.white),
+      ),
     );
   }
 }

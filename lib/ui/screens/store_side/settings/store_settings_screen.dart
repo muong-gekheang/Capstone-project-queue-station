@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../store_management/edit_store_screen.dart';
-import 'store_security_screen.dart';
+import '../../user_side/setting/change_password_screen.dart';
 import 'store_subscription_screen.dart';
 import '../../user_side/setting/contact_us_screen.dart';
 import '../../user_side/setting/terms_of_service_screen.dart';
@@ -126,7 +126,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       color: Colors.black,
                     ),
                     title: const Text(
-                      "security",
+                      "Change Password",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -137,7 +137,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const StoreSecurityScreen(),
+                          builder: (context) => const ChangePasswordScreen(),
                         ),
                       );
                     },

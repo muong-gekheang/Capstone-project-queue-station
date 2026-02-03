@@ -6,6 +6,7 @@ import 'package:queue_station_app/model/entities/dashboard_stats.dart';
 import 'package:queue_station_app/model/entities/order_summary.dart';
 import 'package:queue_station_app/model/services/queue_service.dart';
 import 'package:queue_station_app/model/services/store_profile_service.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -15,6 +16,18 @@ class AnalyticsScreen extends StatefulWidget {
 }
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
+
+    // Placeholder for store profile image widget
+    Widget _buildStoreProfileImage() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: CircleAvatar(
+          radius: 18,
+          backgroundColor: Colors.grey[300],
+          child: const Icon(Icons.person, color: Colors.white),
+        ),
+      );
+    }
   final QueueService _queueService = QueueService(QueueRepository());
   final QueueRepository _repository = QueueRepository();
 
@@ -98,72 +111,30 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     });
   }
 
-  void _showTimeframeSelector(
-    String chartType,
-    String currentTimeframe,
-    Function(String) onSelected,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: _timeframeOptions.map((timeframe) {
-            return ListTile(
-              title: Text(timeframe),
-              trailing: currentTimeframe == timeframe
-                  ? const Icon(Icons.check, color: Color(0xFFFF6835))
-                  : null,
-              onTap: () {
-                onSelected(timeframe);
-                Navigator.pop(context);
-                _loadAnalyticsData();
-              },
-            );
-          }).toList(),
-        ),
+ void _showTimeframeSelector(
+  String chartType,
+  String currentTimeframe,
+  Function(String) onSelected,
+) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) => Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: _timeframeOptions.map((timeframe) {
+          return ListTile(
+            title: Text(timeframe),
+            onTap: () {
+              onSelected(timeframe);
+              Navigator.pop(context);
+            },
+          );
+        }).toList(),
       ),
-    );
-  }
-
-  Widget _buildStoreProfileImage() {
-    final storeService = StoreProfileService();
-    final profileImage = storeService.storeProfileImage;
-    final storeName = storeService.storeName;
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: profileImage != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                profileImage,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Container(
-              width: 40,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
-                  style: const TextStyle(
-                    color: Color(0xFFFF6835),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -173,10 +144,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Row(
-          children: const [
-            Icon(Icons.bar_chart, color: Color(0xFF0D47A1)),
-            SizedBox(width: 8),
-            Text(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/Analytics_blue.svg',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            const Text(
               'Analytic',
               style: TextStyle(
                 color: Colors.black,

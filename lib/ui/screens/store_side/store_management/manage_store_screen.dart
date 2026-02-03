@@ -3,6 +3,7 @@ import 'package:queue_station_app/data/mock_table_data.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../model/services/store_profile_service.dart';
 import 'analytics_screen.dart';
 
@@ -120,10 +121,14 @@ class _ManageStorePageState extends State<ManageStorePage> {
       backgroundColor: Colors.white,
       elevation: 0,
       title: Row(
-        children: const [
-          Icon(Icons.storefront, color: Color(0xFF0D47A1)),
-          SizedBox(width: 8),
-          Text(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/Store_Management_blue.svg',
+            width: 24,
+            height: 24,
+          ),
+          const SizedBox(width: 8),
+          const Text(
             'Manage',
             style: TextStyle(
               color: Colors.black,
@@ -248,10 +253,9 @@ class _ManageStorePageState extends State<ManageStorePage> {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 1.1,
       children: [
-        _ActionCard(
-          Icons.description_outlined,
+        _SvgActionCard(
+          'assets/icons/Manage_table.svg',
           'Manage\nTable',
-          Color(0xFF0D47A1),
           onTap: () {
             Navigator.push(
               context,
@@ -262,10 +266,9 @@ class _ManageStorePageState extends State<ManageStorePage> {
             );
           },
         ),
-        _ActionCard(
-          Icons.restaurant_menu_outlined,
+        _SvgActionCard(
+          'assets/icons/Manage_menu.svg',
           'Manage\nMenu',
-          Color(0xFF0D47A1),
           onTap: () {
             Navigator.push(
               context,
@@ -273,10 +276,9 @@ class _ManageStorePageState extends State<ManageStorePage> {
             );
           },
         ),
-        _ActionCard(
-          Icons.access_time,
+        _SvgActionCard(
+          'assets/icons/Queue_history.svg',
           'Queue\nhistory',
-          Color(0xFF0D47A1),
           onTap: () {
             Navigator.push(
               context,
@@ -284,10 +286,9 @@ class _ManageStorePageState extends State<ManageStorePage> {
             );
           },
         ),
-        _ActionCard(
-          Icons.bar_chart,
+        _SvgActionCard(
+          'assets/icons/Analytics_blue.svg',
           'Analytics',
-          Color(0xFF0D47A1),
           onTap: () {
             Navigator.push(
               context,
@@ -327,32 +328,62 @@ class _ManageStorePageState extends State<ManageStorePage> {
     );
   }
 
+  // Placeholder for store profile image widget
   Widget _buildStoreProfileImage() {
-    final profileImage = _storeService.storeProfileImage;
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: profileImage != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                profileImage,
-                width: 36,
-                height: 36,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF3B30).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.storefront,
-                color: Color(0xFFFF3B30),
-                size: 20,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: CircleAvatar(
+        radius: 18,
+        backgroundColor: Colors.grey[300],
+        child: const Icon(Icons.person, color: Colors.white),
+      ),
+    );
+  }
+}
+
+// Moved outside the state class
+class _SvgActionCard extends StatelessWidget {
+  final String svgAsset;
+  final String label;
+  final VoidCallback? onTap;
+
+  const _SvgActionCard(this.svgAsset, this.label, {this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(svgAsset, width: 40, height: 40),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+                height: 1.2,
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 }
