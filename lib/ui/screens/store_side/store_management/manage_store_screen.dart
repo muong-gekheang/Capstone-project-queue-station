@@ -3,7 +3,7 @@ import 'package:queue_station_app/data/mock_table_data.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history.dart';
-import '../../../../model/services/store_profile_service.dart';
+import '../../../../services/store_profile_service.dart';
 import 'analytics_screen.dart';
 
 class ManageStorePage extends StatefulWidget {

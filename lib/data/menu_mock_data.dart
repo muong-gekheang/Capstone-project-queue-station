@@ -1,5 +1,5 @@
-import 'package:queue_station_app/model/entities/menu.dart';
-import 'package:queue_station_app/model/entities/menu_category.dart';
+import 'package:queue_station_app/model/menu.dart';
+import 'package:queue_station_app/model/menu_category.dart';
 
 final List<MenuCategory> mockMenuCategories = [
   MenuCategory(categoryId: 1, categoryName: "Burger"),

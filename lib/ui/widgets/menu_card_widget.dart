@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:queue_station_app/model/entities/menu.dart';
-import 'package:queue_station_app/model/entities/menu_category.dart';
+import 'package:queue_station_app/model/menu.dart';
+import 'package:queue_station_app/model/menu_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
 
 class MenuCardWidget extends StatelessWidget {

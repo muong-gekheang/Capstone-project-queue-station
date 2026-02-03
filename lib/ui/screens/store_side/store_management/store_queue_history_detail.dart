@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/store_queue_history.dart';
+import 'package:queue_station_app/model/store_queue_history.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
