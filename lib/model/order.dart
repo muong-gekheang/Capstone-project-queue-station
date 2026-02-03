@@ -1,4 +1,4 @@
-import 'package:queue_station_app/model/entities/order_item.dart';
+import 'package:queue_station_app/model/order_item.dart';
 
 class Order {
   final String id;

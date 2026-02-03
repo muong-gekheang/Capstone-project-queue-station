@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/store_queue_history.dart';
+import 'package:queue_station_app/model/store_queue_history.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history_detail.dart';
 
 class StoreQueueHistoryCard extends StatelessWidget {

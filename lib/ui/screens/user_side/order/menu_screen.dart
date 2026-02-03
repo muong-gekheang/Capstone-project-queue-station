@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/entities/cart_item.dart';
-import 'package:queue_station_app/model/services/cart_provider.dart';
+import 'package:queue_station_app/model/cart_item.dart';
+import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/cart_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
-import '../../../../model/entities/menu_item.dart';
-import '../../../../model/entities/category.dart';
+import '../../../../model/menu_item.dart';
+import '../../../../model/category.dart';
 import '../../../widgets/menu_item_card.dart';
 
 class MenuScreen extends StatefulWidget {

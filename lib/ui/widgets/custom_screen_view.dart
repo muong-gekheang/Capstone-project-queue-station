@@ -5,8 +5,12 @@ class CustomScreenView extends StatelessWidget {
     super.key,
     required this.content,
     this.bottomNavigationBar,
+    this.title,
+    this.isTitleCenter,
   });
 
+  final String? title;
+  final bool? isTitleCenter;
   final Widget content;
   final Widget? bottomNavigationBar;
 
@@ -15,8 +19,10 @@ class CustomScreenView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Get Queue", style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
+        title: title != null
+            ? Text(title!, style: TextStyle(fontWeight: FontWeight.bold))
+            : null,
+        centerTitle: isTitleCenter,
       ),
       body: SafeArea(
         child: Padding(

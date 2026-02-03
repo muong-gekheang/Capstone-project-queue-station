@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/queue_table.dart';
-import 'package:queue_station_app/model/entities/table_category.dart';
+import 'package:queue_station_app/model/queue_table.dart';
+import 'package:queue_station_app/model/table_category.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/search_bar.dart';
 import 'package:queue_station_app/ui/widgets/table_chip_category.dart';
