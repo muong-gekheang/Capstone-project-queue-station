@@ -106,8 +106,8 @@ class _AddNewMenuState extends State<AddNewMenu> {
                   DropdownButtonFormField<MenuCategory>(
                     items: mockMenuCategories.map((category) {
                       return DropdownMenuItem(
-                        child: Text(category.categoryName),
                         value: category,
+                        child: Text(category.categoryName),
                       );
                     }).toList(),
                     onChanged: (value) {

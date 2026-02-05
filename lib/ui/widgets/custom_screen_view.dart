@@ -7,10 +7,12 @@ class CustomScreenView extends StatelessWidget {
     this.bottomNavigationBar,
     this.title,
     this.isTitleCenter,
+    this.automaticImplyLeading,
   });
 
   final String? title;
   final bool? isTitleCenter;
+  final bool? automaticImplyLeading;
   final Widget content;
   final Widget? bottomNavigationBar;
 
@@ -23,6 +25,7 @@ class CustomScreenView extends StatelessWidget {
             ? Text(title!, style: TextStyle(fontWeight: FontWeight.bold))
             : null,
         centerTitle: isTitleCenter,
+        automaticallyImplyLeading: automaticImplyLeading ?? true,
       ),
       body: SafeArea(
         child: Padding(

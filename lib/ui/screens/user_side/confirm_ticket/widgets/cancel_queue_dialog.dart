@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 
 enum CancelReasonType { tooLong, changePlan, other }
@@ -12,6 +16,14 @@ class CancelQueueDialog extends StatefulWidget {
 
 class _CancelQueueDialogState extends State<CancelQueueDialog> {
   CancelReasonType? reason;
+
+  void onCancelTap() {
+    User? user = context.read<UserProvider>().currentUser;
+    if (user != null) {
+      user.restaurant = null;
+      context.go("/");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,12 +111,7 @@ class _CancelQueueDialogState extends State<CancelQueueDialog> {
                         borderRadius: BorderRadius.circular(7),
                       ),
                     ),
-                    onPressed: () {
-                      // TODO: Implement go-router in the future
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
+                    onPressed: onCancelTap,
                     child: Text("Yes, Cancel"),
                   ),
                 ],

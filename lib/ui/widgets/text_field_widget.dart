@@ -7,11 +7,19 @@ class TextFieldWidget extends StatelessWidget {
   Color? color;
   final String? Function(String?)? validator;
   final TextEditingController textController;
-  final String? initialValue; 
+  final String? initialValue;
 
-
-  TextFieldWidget({super.key, required this.title, this.prefixText ,this.hintText, this.color, this.validator, required this.textController, this.initialValue}){
-    if(initialValue != null){
+  TextFieldWidget({
+    super.key,
+    required this.title,
+    this.prefixText,
+    this.hintText,
+    this.color,
+    this.validator,
+    required this.textController,
+    this.initialValue,
+  }) {
+    if (initialValue != null) {
       textController.text = initialValue!;
     }
   }
@@ -21,28 +29,34 @@ class TextFieldWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        ),
         SizedBox(height: 10),
         TextFormField(
           validator: validator,
           controller: textController,
           decoration: InputDecoration(
-            hintText: hintText != null ? hintText : null,
-            prefix: prefixText != null ? Padding(
-              padding: EdgeInsets.only(right: 4),
-              child: Text(prefixText!),) : null,
-              isDense: true,
+            hintText: hintText,
+            prefix: prefixText != null
+                ? Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: Text(prefixText!),
+                  )
+                : null,
+            isDense: true,
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 width: 0.5,
                 color: color == null ? Color.fromRGBO(0, 0, 0, 0.5) : color!,
-              )
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 width: 1,
                 color: color == null ? Color.fromRGBO(0, 0, 0, 0.5) : color!,
-              )
+              ),
             ),
           ),
         ),

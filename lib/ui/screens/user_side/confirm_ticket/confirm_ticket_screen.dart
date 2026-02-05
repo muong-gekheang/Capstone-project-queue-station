@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+import 'package:queue_station_app/model/restaurant.dart';
+import 'package:queue_station_app/model/user.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/widgets/cancel_queue_dialog.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/widgets/ticket_queue_info.dart';
-import 'package:queue_station_app/ui/screens/user_side/join_queue/join_queue_screen.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
-import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class ConfirmTicketScreen extends StatefulWidget {
-  const ConfirmTicketScreen({super.key, required this.widget});
+  const ConfirmTicketScreen({
+    super.key,
+    required this.user,
+    required this.rest,
+  });
 
-  final JoinQueueScreen widget;
+  final User user;
+  final Restaurant rest;
 
   @override
   State<ConfirmTicketScreen> createState() => _ConfirmTicketScreenState();
@@ -31,10 +36,11 @@ class _ConfirmTicketScreenState extends State<ConfirmTicketScreen> {
     return CustomScreenView(
       title: "Queue Information",
       isTitleCenter: true,
+      automaticImplyLeading: false,
       content: Column(
         spacing: 20,
         children: [
-          TicketQueueInfo(widget: widget),
+          TicketQueueInfo(rest: widget.rest),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
@@ -56,9 +62,7 @@ class _ConfirmTicketScreenState extends State<ConfirmTicketScreen> {
       bottomNavigationBar: FullWidthFilledButton(
         label: "Back to Home",
         onPress: () {
-          // TODO: Implement GO ROUTER
-          Navigator.pop(context);
-          Navigator.pop(context);
+          context.go("/");
         },
       ),
     );

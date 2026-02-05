@@ -223,7 +223,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
           ),
           Switch(
             value: isStoreOpen,
-            activeColor: const Color(0xFF0D47A1),
+            activeThumbColor: const Color(0xFF0D47A1),
             onChanged: (value) {
               if (value == false) {
                 // Show warning dialog when trying to close store

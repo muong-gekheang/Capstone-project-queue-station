@@ -1,6 +1,5 @@
 import 'package:queue_station_app/model/dashboard_stats.dart';
 import 'package:queue_station_app/model/queue_entry.dart';
-import 'package:queue_station_app/model/queue_table.dart';
 import 'package:queue_station_app/model/table.dart';
 import '../data/queue_repository.dart';
 
