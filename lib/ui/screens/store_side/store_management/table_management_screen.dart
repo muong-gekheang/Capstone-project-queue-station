@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/queue_table.dart';
-import 'package:queue_station_app/model/entities/table_category.dart';
+import 'package:queue_station_app/model/queue_table.dart';
+import 'package:queue_station_app/model/table_category.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/search_bar.dart';
 import 'package:queue_station_app/ui/widgets/table_chip_category.dart';
@@ -157,7 +157,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         ),
         actions: [
           SizedBox(
-            width: (MediaQuery.of(context).size.width * 0.7).clamp(0.0, 310.0),
+            width: (MediaQuery.of(context).size.width * 0.6).clamp(0.0, 450.0),
             child: Column(
               spacing: 0,
               mainAxisSize: MainAxisSize.min,
@@ -168,7 +168,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(4),
                         child: CustomRecButton(
                           title: "Available",
                           color: Color(0xFF0D47A1),
@@ -182,7 +182,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
 
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(4),
                         child: CustomRecButton(
                           title: "Occupied",
                           color: Color(0xFFFF6835),
@@ -344,8 +344,10 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    hint: Text("Select a category"),
+                    hint: Text("Category"),
                     decoration: InputDecoration(border: OutlineInputBorder()),
+                    isDense: true,
+                    isExpanded: true,
                     items: categoryTable
                         .map(
                           (c) => DropdownMenuItem<String>(
@@ -767,9 +769,9 @@ class CustomRecButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(120, 48),
+        padding: EdgeInsets.all(8),
         backgroundColor: color,
-        // side: BorderSide.none,
+        side: BorderSide.none,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
       onPressed: onPressed,
@@ -780,6 +782,7 @@ class CustomRecButton extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),
+        textScaler: MediaQuery.textScalerOf(context),
       ),
     );
   }

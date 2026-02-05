@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/model/user.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/change_password_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/contact_us_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/edit_account_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/setting_card.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/terms_of_service_screen.dart';
 
-class User {
-  final String name;
-  final String email;
-  final String phone;
-
-  User({required this.name, required this.email, required this.phone});
-}
-
 class SettingsScreen extends StatelessWidget {
   User user = User(
     name: "Monica",
     email: "monica@gmail.com",
     phone: "0987654321",
+    userType: UserType.normal,
   );
   SettingsScreen({super.key});
 

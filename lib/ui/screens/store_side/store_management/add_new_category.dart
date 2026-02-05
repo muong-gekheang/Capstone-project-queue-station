@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/category.dart';
-import 'package:queue_station_app/model/entities/menu_category.dart';
+import 'package:queue_station_app/model/menu_category.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 

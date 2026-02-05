@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/settings_screen.dart';
+import 'package:queue_station_app/model/user.dart';
 
 class EditAccountScreen extends StatefulWidget {
   final User user;

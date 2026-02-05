@@ -1,13 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model/entities/menu.dart';
+import 'package:queue_station_app/model//menu.dart';
+
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_menu.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/category_card_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_card_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
-import 'package:flutter/services.dart';
+
 
 class MenuManagement extends StatefulWidget {
   const MenuManagement({super.key});

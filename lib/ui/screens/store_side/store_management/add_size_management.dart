@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model/entities/menu.dart';
-import 'package:queue_station_app/model/entities/menu_size.dart';
-import 'package:queue_station_app/model/entities/size.dart';
+import 'package:queue_station_app/model//menu.dart';
+import 'package:queue_station_app/model//menu_size.dart';
+import 'package:queue_station_app/model//size.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/option_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';

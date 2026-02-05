@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/history.dart';
+import 'package:queue_station_app/model/history.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_list_view.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';

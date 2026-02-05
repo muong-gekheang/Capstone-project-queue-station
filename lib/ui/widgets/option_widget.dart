@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/add_on.dart';
-import 'package:queue_station_app/model/entities/menu.dart';
-import 'package:queue_station_app/model/entities/menu_item.dart';
+import 'package:queue_station_app/model//menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 
 class OptionWidget<T> extends StatefulWidget {
