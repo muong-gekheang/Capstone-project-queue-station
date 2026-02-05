@@ -16,9 +16,12 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
 
-  Widget FilteredQueueHistory() {
-    final results = mockQueueHistories.where((history) => history.customerName.toLowerCase().contains(searchQuery)).toList();
+  // Widget FilteredQueueHistory() {
+  //   final results = mockQueueHistories.where((history) => history.customerName.toLowerCase().contains(searchQuery)).toList();
     
+  //   String searchValue = '';
+    Widget FilteredQueueHistory(){
+    final results = mockQueueHistories;
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) =>
@@ -37,7 +40,9 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Expanded(child: SearchbarWidget(hintText: "search...")),
+                  Expanded(child: SearchbarWidget(hintText: "search...", onChanged: (value) {
+                    
+                  },)),
                   SizedBox(width: 10),
                   ButtonWidget(
                     title: "Sort by",
