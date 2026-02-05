@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-
-import '../../../widgets/store_side_bottom_nav.dart';
-import 'dashboard_screen.dart';
-import 'manage_store_screen.dart';
-import 'store_settings_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/dashboard/dashboard_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/settings/store_settings_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store_screen.dart';
+import 'package:queue_station_app/ui/widgets/store_side_bottom_nav.dart';
+import 'package:queue_station_app/ui/normal_user_app.dart';
 
 enum NavTab { dashboard, analytics, settings }
 

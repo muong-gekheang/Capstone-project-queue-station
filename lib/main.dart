@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/model/services/cart_provider.dart';
 import 'package:queue_station_app/model/services/order_provider.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
+import 'package:queue_station_app/ui/normal_user_app.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 
 void main() {

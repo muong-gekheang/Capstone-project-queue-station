@@ -13,7 +13,7 @@ class StoreQueueHistory extends StatefulWidget {
 }
 
 class _StoreQueueHistoryState extends State<StoreQueueHistory> {
-  
+  String searchValue = '';
   Widget FilteredQueueHistory(){
     final results = mockQueueHistories;
     return ListView.builder(
@@ -33,7 +33,11 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
               child: Row(
                 children: [
                   Expanded(
-                    child: SearchbarWidget(hintText: "search...",),
+                    child: SearchbarWidget(hintText: "search...", onChanged: (String value) { 
+                      setState(() {
+                        searchValue = value;
+                      });
+                     },),
                   ),
                   SizedBox(width: 10),
                   ButtonWidget(
