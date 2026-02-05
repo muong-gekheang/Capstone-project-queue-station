@@ -18,8 +18,7 @@ void main() {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           backgroundColor: Colors.white,
-          // body: SafeArea(child: LoginScreen()),
-          body: SafeArea(child: StoreMainScreen()),
+          body: SafeArea(child: LoginScreen()),
         ),
       ),
     ),
