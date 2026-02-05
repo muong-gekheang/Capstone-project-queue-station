@@ -49,7 +49,7 @@ class CategoryChips extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     label: Text(
                       tableData[index].type,
                       style: TextStyle(
@@ -79,7 +79,7 @@ class CategoryChips extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: ChoiceChip(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 label: Text(
                   tableData[index].type,
                   style: TextStyle(
