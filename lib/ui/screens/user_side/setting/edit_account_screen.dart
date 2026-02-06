@@ -77,6 +77,10 @@ class _EditAccountState extends State<EditAccountScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(5),
+          child: Divider(thickness: 5, height: 5, color: Colors.grey.shade400),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -103,7 +107,7 @@ class _EditAccountState extends State<EditAccountScreen> {
                   ),
                   Positioned(
                     bottom: 10,
-                    right: 5,
+                    right: 14,
                     child: InkWell(
                       onTap: _editAvatar,
                       child: Container(
@@ -113,7 +117,7 @@ class _EditAccountState extends State<EditAccountScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.edit,
+                          Icons.edit_outlined,
                           size: 16,
                           color: Colors.white,
                         ),

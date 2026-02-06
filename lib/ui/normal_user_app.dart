@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/instruction.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/settings_screen.dart';
@@ -22,9 +24,9 @@ class _NormalUserAppState extends State<NormalUserApp> {
   final List<Widget> screens = [
     HomeScreen(),
     Placeholder(), // MAP
-    MenuScreen(),
+    Instruction(),
     Placeholder(), // TICKET
-    SettingsScreen(),
+    Account(),
   ];
 
 

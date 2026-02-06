@@ -47,14 +47,14 @@ class MenuItemCard extends StatelessWidget {
 
             Text(
               item.name,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 16),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
             Text(
               '\$${item.basePrice.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18),
             ),
           ],
         ),
