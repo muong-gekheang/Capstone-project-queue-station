@@ -184,7 +184,7 @@ class OrderScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
           content: Column(
@@ -195,33 +195,39 @@ class OrderScreen extends StatelessWidget {
                 "Please proceed to check out and provide your table number to the cashier.",
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.black12,
+                  color: Colors.black,
                   height: 1.4,
                 ),
               ),
               SizedBox(height: 12),
-              Text(
-                "B202",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFFF6835),
-                  letterSpacing: 1.2,
+              Center(
+                child: Text(
+                  "B202",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFFF6835),
+                    letterSpacing: 1.2,
+                  ),
                 ),
-              ),
+              )
+              
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: const Text(
-                "Return",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+              style: TextButton.styleFrom(backgroundColor: Color(0xFF0D47A1)),
+              child: Center(
+                child: const Text(
+                  "Return",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+              )
+              
               ),
             ),
           ],
