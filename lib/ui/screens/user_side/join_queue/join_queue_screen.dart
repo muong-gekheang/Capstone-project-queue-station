@@ -34,8 +34,8 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
     UserProvider userProvider = context.read<UserProvider>();
     User? user = userProvider.currentUser;
     if (user != null) {
-      user.restaurant = widget.rest;
-      userProvider.updateUser(user);
+      userProvider.updateUser(user.copyWith(restaurant: widget.rest));
+      Navigator.pop(context);
       context.go("/ticket");
     } else {
       const snackBar = SnackBar(

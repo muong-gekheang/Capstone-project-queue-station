@@ -7,7 +7,7 @@ class User {
   final String email;
   final String phone;
   final UserType userType;
-  Restaurant? restaurant; // TODO: Change implementation later
+  final Restaurant? restaurant; // TODO: Change implementation later
 
   User({
     required this.name,
@@ -18,4 +18,19 @@ class User {
   });
 
   bool get isJoinedQueue => restaurant != null;
+
+  User copyWith({
+    String? name,
+    String? email,
+    String? phone,
+    UserType? userType,
+    Restaurant? restaurant,
+    bool noRestaurant = false,
+  }) => User(
+    name: name ?? this.name,
+    email: email ?? this.email,
+    phone: phone ?? this.phone,
+    userType: userType ?? this.userType,
+    restaurant: restaurant ?? (noRestaurant ? null : this.restaurant),
+  );
 }

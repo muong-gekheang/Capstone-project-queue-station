@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:queue_station_app/model//add_on.dart';
-import 'package:queue_station_app/model//menu_add_on.dart';
 import 'package:queue_station_app/model//menu_size.dart';
 
 class Menu {
@@ -14,7 +12,7 @@ class Menu {
   final Uint8List? menuImage;
   final bool isAvailable;
   final int categoryId;
-  final List<MenuSize> sizes ;
+  final List<MenuSize> sizes;
   final List<int> addOnIds;
 
   Menu({
@@ -27,9 +25,10 @@ class Menu {
     required this.categoryId,
     required this.minPreparationTime,
     required this.maxPreparationTime,
-    List<MenuSize>? sizes, 
+    List<MenuSize>? sizes,
     List<int>? addOnIds,
-  }) : sizes = sizes ?? [], addOnIds = addOnIds ?? [];
+  }) : sizes = sizes ?? [],
+       addOnIds = addOnIds ?? [];
 
   void addSize(MenuSize size) {
     sizes.add(size);

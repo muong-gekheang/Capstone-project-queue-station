@@ -18,9 +18,10 @@ class _CancelQueueDialogState extends State<CancelQueueDialog> {
   CancelReasonType? reason;
 
   void onCancelTap() {
-    User? user = context.read<UserProvider>().currentUser;
+    UserProvider userProvider = context.read<UserProvider>();
+    User? user = userProvider.currentUser;
     if (user != null) {
-      user.restaurant = null;
+      userProvider.updateUser(user.copyWith(noRestaurant: true));
       context.go("/");
     }
   }
