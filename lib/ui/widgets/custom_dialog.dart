@@ -16,7 +16,7 @@ class CustomDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       constraints: BoxConstraints(
-        maxWidth: (MediaQuery.of(context).size.width * 0.7).clamp(0.0, 400.0),
+        maxWidth: (MediaQuery.of(context).size.width * 0.8).clamp(0.0, 500.0),
       ),
       surfaceTintColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

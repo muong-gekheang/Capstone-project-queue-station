@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
+import 'package:queue_station_app/model//menu.dart';
+
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_menu.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/category_card_widget.dart';
@@ -16,6 +18,7 @@ class MenuManagement extends StatefulWidget {
 class _MenuManagementState extends State<MenuManagement> {
   int selectedIndex = 0;
   int selectedCategoryId = -1;
+  String searchValue = '';
 
   @override
   void initState() {
@@ -24,12 +27,27 @@ class _MenuManagementState extends State<MenuManagement> {
   }
 
   Widget filteredMenuList() {
-    final result = mockMenus
-        .where((m) => m.categoryId == selectedCategoryId)
-        .toList();
+    final result = mockMenus.where((m) {
+      if (searchValue.isNotEmpty) {
+        return m.name.toLowerCase().contains(searchValue.toLowerCase());
+      } else {
+        return m.categoryId == selectedCategoryId;
+      }
+    }).toList();
+
     return ListView.builder(
       itemCount: result.length,
-      itemBuilder: (context, index) => MenuCardWidget(menu: result[index]),
+      itemBuilder: (context, index) {
+        final menu = mockMenus[index];
+        return MenuCardWidget(
+          menu: menu,
+          onDelete: () {
+            setState(() {
+              mockMenus.removeAt(index);
+            });
+          },
+        );
+      },
     );
   }
 
@@ -53,7 +71,7 @@ class _MenuManagementState extends State<MenuManagement> {
         title: Text(
           "Menu Management",
           style: TextStyle(
-            color: Color.fromRGBO(255, 104, 53, 1),
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
@@ -68,12 +86,32 @@ class _MenuManagementState extends State<MenuManagement> {
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Expanded(child: SearchbarWidget(hintText: "search...")),
+                  Expanded(
+                    child: SearchbarWidget(
+                      hintText: "search...",
+                      onChanged: (String value) {
+                        setState(() {
+                          searchValue = value;
+                        });
+                      },
+                    ),
+                  ),
                   SizedBox(width: 10),
                   ButtonWidget(
                     leadingIcon: Icons.add,
                     title: "Add Item",
-                    onPressed: () {},
+                    onPressed: () async {
+                      final newMenu = await Navigator.push<Menu>(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddNewMenu()),
+                      );
+                      if (newMenu != null) {
+                        print("Returned menu: ${newMenu.name}");
+                        setState(() {
+                          mockMenus.add(newMenu);
+                        });
+                      }
+                    },
                     backgroundColor: Color.fromRGBO(255, 104, 53, 1),
                     textColor: Colors.white,
                     borderRadius: 50,
@@ -86,25 +124,29 @@ class _MenuManagementState extends State<MenuManagement> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [
-                  ...List.generate(
-                    mockMenuCategories.length,
-                    (index) => CategoryCardWidget(
-                      name: mockMenuCategories[index].categoryName,
-                      isSelected: selectedIndex == index,
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                          selectedCategoryId =
-                              mockMenuCategories[index].categoryId!;
-                          print(
-                            "The selectedCategoryId is $selectedCategoryId",
-                          );
-                        });
-                      },
-                    ),
-                  ),
-                ],
+                children: List.generate(mockMenuCategories.length, (index) {
+                  return Row(
+                    children: [
+                      CategoryCardWidget(
+                        name: mockMenuCategories[index].categoryName,
+                        isSelected: selectedIndex == index,
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                            selectedCategoryId =
+                                mockMenuCategories[index].categoryId!;
+                            print(
+                              "The selectedCategoryId is $selectedCategoryId",
+                            );
+                          });
+                        },
+                      ),
+                      // Add spacing after each card except the last one
+                      if (index != mockMenuCategories.length - 1)
+                        SizedBox(width: 10),
+                    ],
+                  );
+                }),
               ),
             ),
             SizedBox(height: 20),

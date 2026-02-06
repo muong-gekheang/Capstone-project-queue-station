@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/menu.dart';
+import 'package:queue_station_app/data/menu_mock_data.dart';
+import 'package:queue_station_app/model//menu.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
+import 'package:queue_station_app/ui/widgets/delete-menu-pop-up.dart';
 
 class MenuCardWidget extends StatelessWidget {
   final Menu menu;
-  const MenuCardWidget({super.key, required this.menu});
+  final VoidCallback? onDelete;
+  const MenuCardWidget({super.key, required this.menu, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
+    final menuCategory = mockMenuCategories.firstWhere(
+      (c) => c.categoryId == menu.categoryId,
+    );
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -54,7 +61,7 @@ class MenuCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "Dessert",
+                        menuCategory.categoryName,
                         style: TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                       SizedBox(width: 5),
@@ -86,16 +93,34 @@ class MenuCardWidget extends StatelessWidget {
               Row(
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditMenuScreen(existingMenu: menu),
+                        ),
+                      );
+                    },
                     icon: Icon(Icons.create_outlined),
                     color: Color.fromRGBO(13, 71, 161, 1),
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(),
                   ),
-
                   SizedBox(width: 5),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final deleteConfirmation = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => DeleteMenuPopUp(
+                          message: 'Are you sure you want to delete ',
+                          menu: menu,
+                        ),
+                      );
+                      if (deleteConfirmation == true && onDelete != null) {
+                        onDelete!();
+                      }
+                    },
                     icon: Icon(
                       Icons.delete,
                       color: Color.fromRGBO(230, 57, 70, 1),

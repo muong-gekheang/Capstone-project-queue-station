@@ -8,6 +8,7 @@ class TextFieldWidget extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextEditingController textController;
   final String? initialValue;
+  final void Function(String)? onChanged;
 
   TextFieldWidget({
     super.key,
@@ -18,6 +19,7 @@ class TextFieldWidget extends StatelessWidget {
     this.validator,
     required this.textController,
     this.initialValue,
+    this.onChanged,
   }) {
     if (initialValue != null) {
       textController.text = initialValue!;
@@ -37,8 +39,9 @@ class TextFieldWidget extends StatelessWidget {
         TextFormField(
           validator: validator,
           controller: textController,
+          onChanged: onChanged,
           decoration: InputDecoration(
-            hintText: hintText,
+            hintText: hintText != null ? hintText : null,
             prefix: prefixText != null
                 ? Padding(
                     padding: EdgeInsets.only(right: 4),
