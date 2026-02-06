@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/model/restaurant.dart';
+import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
-import 'package:queue_station_app/ui/screens/user_side/join_queue/join_queue_screen.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
 
 List<Restaurant> mockData = [
@@ -50,26 +53,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int selectedIndex = 0;
+  List<Restaurant> restaurants = [];
 
-  final List<String> iconPaths = [
-    'assets/images/home_icon.svg',
-    'assets/images/map_icon.svg',
-    'assets/images/food_ordering_icon.svg',
-    'assets/images/ticket_confirmation.svg',
-    'assets/images/profile_icon.svg',
-  ];
-
-  final List<String> labels = [
-    'Home',
-    'Map',
-    'Ticket Confirmation',
-    'Orders',
-    'Profile',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    restaurants = [...mockData];
+  }
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
+    User user = userProvider.currentUser!;
+    if (user.isJoinedQueue) {
+      restaurants.remove(user.restaurant);
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -124,19 +122,39 @@ class _HomeScreenState extends State<HomeScreen> {
             "Restaurants",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
+
           Expanded(
-            child: ListView.separated(
-              itemCount: mockData.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 2,
+            child: CustomScrollView(
+              slivers: [
+                if (user.isJoinedQueue)
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 2,
+                          ),
+                          child: RestaurantJoinedTile(user: user),
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    ),
                   ),
-                  child: RestaurantTile(rest: mockData[index]),
-                );
-              },
-              separatorBuilder: (context, index) => SizedBox(height: 10),
+                SliverList.separated(
+                  itemCount: mockData.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 2,
+                      ),
+                      child: RestaurantTile(rest: mockData[index]),
+                    );
+                  },
+                  separatorBuilder: (context, index) => SizedBox(height: 10),
+                ),
+              ],
             ),
           ),
         ],

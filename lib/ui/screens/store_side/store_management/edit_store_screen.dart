@@ -325,8 +325,9 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                       storeService.setStoreName(_storeNameController.text);
                       CustomSuccessSnackbar.show(context, "Added Successfully");
                       Future.delayed(const Duration(milliseconds: 800), () {
-                        if (mounted)
+                        if (mounted) {
                           Navigator.of(context).pop(true); // Indicate success
+                        }
                       });
                     },
                     style: ElevatedButton.styleFrom(

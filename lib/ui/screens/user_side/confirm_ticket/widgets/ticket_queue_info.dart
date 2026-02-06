@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
+import 'package:queue_station_app/model/restaurant.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class TicketQueueInfo extends StatelessWidget {
-  const TicketQueueInfo({super.key, required this.widget});
+  const TicketQueueInfo({super.key, required this.rest});
 
-  final ConfirmTicketScreen widget;
+  final Restaurant rest;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class TicketQueueInfo extends StatelessWidget {
                   spacing: 10,
                   children: [
                     Text(
-                      widget.widget.rest.name,
+                      rest.name,
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -42,7 +42,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            widget.widget.rest.address,
+                            rest.address,
                             softWrap: true,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,

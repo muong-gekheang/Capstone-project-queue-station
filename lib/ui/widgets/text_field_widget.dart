@@ -19,7 +19,7 @@ class TextFieldWidget extends StatelessWidget {
     this.validator,
     required this.textController,
     this.initialValue,
-    this.onChanged
+    this.onChanged,
   }) {
     if (initialValue != null) {
       textController.text = initialValue!;

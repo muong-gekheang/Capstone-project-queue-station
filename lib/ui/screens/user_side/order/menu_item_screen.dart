@@ -24,7 +24,7 @@ class MenuItemScreen extends StatefulWidget {
 
 class _MenuItemScreenState extends State<MenuItemScreen> {
   SizeOption? _selectedSize;
-  Map<AddOn, bool> _selectedAddOns = {};
+  final Map<AddOn, bool> _selectedAddOns = {};
   int _quantity = 1;
   final TextEditingController _noteController = TextEditingController();
   double _totalPrice = 0;

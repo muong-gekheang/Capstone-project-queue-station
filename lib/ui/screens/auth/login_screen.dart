@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/model/user.dart';
 import 'package:queue_station_app/services/auth_service.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/normal_user_app.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 import 'register_screen.dart';
@@ -19,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
 
-  void _handleLogin() async {
+  Future<void> _handleLogin() async {
     setState(() => _isLoading = true);
 
     final user = await _authService.login(
@@ -36,23 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text(success ? "Login successful" : "Login failed")),
       );
       if (user != null) {
-        user.userType == UserType.normal
-            ? Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return NormalUserApp();
-                  },
-                ),
-              )
-            : Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return StoreMainScreen();
-                  },
-                ),
-              );
+        context.read<UserProvider>().updateUser(user);
+        context.go("/");
       }
     }
   }

@@ -7,7 +7,7 @@ class FullWidthFilledButton extends StatelessWidget {
     required this.label,
   });
 
-  final VoidCallback onPress;
+  final VoidCallback? onPress;
   final String label;
 
   @override

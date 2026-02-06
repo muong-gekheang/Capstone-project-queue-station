@@ -8,7 +8,6 @@ import 'package:queue_station_app/ui/widgets/category_card_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_card_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 
-
 class MenuManagement extends StatefulWidget {
   const MenuManagement({super.key});
 
@@ -125,29 +124,29 @@ class _MenuManagementState extends State<MenuManagement> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: List.generate(
-                  mockMenuCategories.length,
-                  (index) {
-                    return Row(
-                      children: [
-                        CategoryCardWidget(
-                          name: mockMenuCategories[index].categoryName,
-                          isSelected: selectedIndex == index,
-                          onTap: () {
-                            setState(() {
-                              selectedIndex = index;
-                              selectedCategoryId = mockMenuCategories[index].categoryId!;
-                              print("The selectedCategoryId is $selectedCategoryId");
-                            });
-                          },
-                        ),
-                        // Add spacing after each card except the last one
-                        if (index != mockMenuCategories.length - 1) 
-                          SizedBox(width: 10),
-                      ],
-                    );
-                  },
-                ),
+                children: List.generate(mockMenuCategories.length, (index) {
+                  return Row(
+                    children: [
+                      CategoryCardWidget(
+                        name: mockMenuCategories[index].categoryName,
+                        isSelected: selectedIndex == index,
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                            selectedCategoryId =
+                                mockMenuCategories[index].categoryId!;
+                            print(
+                              "The selectedCategoryId is $selectedCategoryId",
+                            );
+                          });
+                        },
+                      ),
+                      // Add spacing after each card except the last one
+                      if (index != mockMenuCategories.length - 1)
+                        SizedBox(width: 10),
+                    ],
+                  );
+                }),
               ),
             ),
             SizedBox(height: 20),
