@@ -8,4 +8,4 @@ class AuthService {
     await Future.delayed(const Duration(seconds: 1));
     return email.isNotEmpty && password.isNotEmpty;
   }
-}
+} 
