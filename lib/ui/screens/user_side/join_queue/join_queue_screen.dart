@@ -1,10 +1,16 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:queue_station_app/model/entities/restaurant.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/model/restaurant.dart';
+import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
+import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
 
 class JoinQueueScreen extends StatefulWidget {
   const JoinQueueScreen({super.key, required this.rest});
@@ -24,13 +30,29 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
     });
   }
 
-  void increPeople() {
+  Future<void> onJoinQueue() async {
+    UserProvider userProvider = context.read<UserProvider>();
+    User? user = userProvider.currentUser;
+    if (user != null) {
+      userProvider.updateUser(user.copyWith(restaurant: widget.rest));
+      Navigator.pop(context);
+      context.go("/ticket");
+    } else {
+      const snackBar = SnackBar(
+        content: Text('You must have an account to join queue!'),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  void incrPeople() {
     setState(() {
       numPeople = min(numPeople + 1, widget.rest.biggestTableSize);
     });
   }
 
-  void decrePeople() {
+  void decrPeople() {
     setState(() {
       numPeople = max(numPeople - 1, 0);
     });
@@ -46,8 +68,14 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
           })
         : "";
 
+    UserProvider userProvider = context.read<UserProvider>();
+    User? user = userProvider.currentUser;
+
     return CustomScreenView(
+      title: "Get Queue",
+      isTitleCenter: true,
       content: ListView(
+        padding: EdgeInsets.all(3),
         children: [
           Container(
             decoration: BoxDecoration(
@@ -229,7 +257,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
             spacing: 19,
             children: [
               IconButton(
-                onPressed: numPeople == 0 ? null : decrePeople,
+                onPressed: numPeople == 0 ? null : decrPeople,
                 color: Colors.white,
                 disabledColor: Colors.white,
                 style: IconButton.styleFrom(
@@ -266,7 +294,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                 ),
               ),
               IconButton(
-                onPressed: increPeople,
+                onPressed: incrPeople,
                 color: Colors.white,
                 style: IconButton.styleFrom(backgroundColor: Color(0xFFFF6835)),
                 icon: const Icon(Icons.add),
@@ -275,61 +303,9 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: FilledButton(
-        onPressed: () {},
-        style: FilledButton.styleFrom(
-          backgroundColor: Color(0xFFFF6835),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(0),
-          ),
-        ),
-        child: const Text("Join Queue", style: TextStyle(fontSize: 24)),
-      ),
-    );
-  }
-}
-
-class TableTypeWidget extends StatelessWidget {
-  const TableTypeWidget({
-    super.key,
-    required this.value,
-    required this.selectedType,
-    required this.onTap,
-  });
-
-  final int value;
-  final int selectedType;
-  final ValueChanged<int> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    bool isSelected = value == selectedType;
-    Color boxColor = isSelected ? Color(0xFFFF6835) : Color(0xFF0D47A1);
-    String tableText = value > 1 ? "$value People" : "$value Person";
-    return GestureDetector(
-      onTap: () => onTap(value),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected ? boxColor : Colors.white,
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-        child: Column(
-          children: [
-            Icon(Symbols.dine_lamp, color: boxColor, size: 30),
-            Text(
-              tableText,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: boxColor,
-              ),
-            ),
-          ],
-        ),
+      bottomNavigationBar: FullWidthFilledButton(
+        onPress: user != null && !user.isJoinedQueue ? onJoinQueue : null,
+        label: "Join Queue",
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/store_queue_history.dart';
+import 'package:queue_station_app/model/store_queue_history.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -129,15 +129,66 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: [
-                        Row(children: [Text('Join Queue Method')]),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Join Queue Method'),
+                            Text(
+                              storeQueueHistory.joinedMethod == JoinedMethod.remotely
+                                  ? 'Remotely'
+                                  : 'Walk-in',
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Joined Queue Time')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Joined Queue Time'),
+                            Text(
+                              DateFormat('dd MMM yyyy, h:mm a')
+                                  .format(storeQueueHistory.joinedQueueTime),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Serving Time')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Serving Time'),
+                            Text(
+                              DateFormat('h:mm a')
+                                  .format(storeQueueHistory.seatedTime),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Serving End')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Serving End'),
+                            Text(
+                              DateFormat('h:mm a')
+                                  .format(storeQueueHistory.endedTime),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Waiting Duration')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Waiting Duration'),
+                            Text(
+                              storeQueueHistory.formatMMSS(
+                                storeQueueHistory.waitingTime(),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

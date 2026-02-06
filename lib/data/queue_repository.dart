@@ -1,10 +1,9 @@
-import 'package:queue_station_app/model/entities/analytics_data.dart';
-import 'package:queue_station_app/model/entities/dashboard_stats.dart';
-import 'package:queue_station_app/model/entities/order.dart';
-import 'package:queue_station_app/model/entities/order_summary.dart';
-import 'package:queue_station_app/model/entities/queue_entry.dart';
-import 'package:queue_station_app/model/entities/store_order.dart';
-import 'package:queue_station_app/model/entities/table.dart';
+import 'package:queue_station_app/model/analytics_data.dart';
+import 'package:queue_station_app/model/dashboard_stats.dart';
+import 'package:queue_station_app/model/order_summary.dart';
+import 'package:queue_station_app/model/queue_entry.dart';
+import 'package:queue_station_app/model/store_order.dart';
+import 'package:queue_station_app/model/table.dart';
 
 class QueueRepository {
   // In-memory storage using Maps for fast lookup

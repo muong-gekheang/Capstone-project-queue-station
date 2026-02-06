@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/menu_item.dart';
+import 'package:queue_station_app/model/menu_item.dart';
 
 class MenuItemCard extends StatelessWidget {
   final MenuItem item;

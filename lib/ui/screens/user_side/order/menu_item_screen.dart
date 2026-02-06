@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/entities/add_on.dart';
-import 'package:queue_station_app/model/entities/cart_item.dart';
-import 'package:queue_station_app/model/entities/menu_item.dart';
-import 'package:queue_station_app/model/entities/size_option.dart';
-import 'package:queue_station_app/model/services/cart_provider.dart';
+import 'package:queue_station_app/model/add_on.dart';
+import 'package:queue_station_app/model/cart_item.dart';
+import 'package:queue_station_app/model/menu_item.dart';
+import 'package:queue_station_app/model/size_option.dart';
+import 'package:queue_station_app/services/cart_provider.dart';
 
 class MenuItemScreen extends StatefulWidget {
   final MenuItem? item;
@@ -24,7 +24,7 @@ class MenuItemScreen extends StatefulWidget {
 
 class _MenuItemScreenState extends State<MenuItemScreen> {
   SizeOption? _selectedSize;
-  Map<AddOn, bool> _selectedAddOns = {};
+  final Map<AddOn, bool> _selectedAddOns = {};
   int _quantity = 1;
   final TextEditingController _noteController = TextEditingController();
   double _totalPrice = 0;

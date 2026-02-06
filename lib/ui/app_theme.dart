@@ -9,6 +9,7 @@ class AppTheme {
   static const Color naturalBlack = Color(0xFF000000);
   static const Color naturalWhite = Color(0xFFFFFFFF);
   static const Color naturalGrey = Color(0xFFD4D8D6);
+  static const Color naturalTextGrey = Color(0xFF6C6C6C);
 
   static ThemeData get lightTheme {
     return ThemeData(
