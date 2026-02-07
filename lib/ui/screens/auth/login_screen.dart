@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/user.dart';
 import 'package:queue_station_app/services/auth_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
-import 'package:queue_station_app/ui/normal_user_app.dart';
-import 'package:queue_station_app/ui/store_main_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -21,7 +21,9 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _minTimeController = TextEditingController();
   final TextEditingController _maxTimeController = TextEditingController();
-  MenuCategory selectedCategory = mockMenuCategories.firstWhere((c) => c.categoryName.toLowerCase().contains('Add-Ons'.toLowerCase()));
+  MenuCategory selectedCategory = mockMenuCategories.firstWhere(
+    (c) => c.categoryName.toLowerCase().contains('Add-Ons'.toLowerCase()),
+  );
 
   String? _nullValidtor(String? value) {
     if (value != null && value.trim().isEmpty) {
@@ -65,17 +67,16 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
       print('All fields are valid!');
 
       Menu newMenu = Menu(
-        name: name, 
-        description: description, 
-        price: double.tryParse(price)!, 
-        isAvailable: true, 
-        categoryId: selectedCategory.categoryId!, 
-        minPreparationTime: int.tryParse(minTime)!, 
+        name: name,
+        description: description,
+        price: double.tryParse(price)!,
+        isAvailable: true,
+        categoryId: selectedCategory.categoryId!,
+        minPreparationTime: int.tryParse(minTime)!,
         maxPreparationTime: int.tryParse(maxTime)!,
       );
 
       Navigator.pop(context, newMenu);
-      
     } else {
       print('Please fix the errors in the form');
     }
@@ -125,22 +126,27 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                           textController: _priceController,
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Category',
-                              style: TextStyle(fontSize:12, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             SizedBox(height: 10),
                             DropdownButtonFormField<MenuCategory>(
-                              value: selectedCategory,
-                              items: [DropdownMenuItem(
-                                child: Text(selectedCategory.categoryName),
-                                value: selectedCategory,
-                              ),],
+                              initialValue: selectedCategory,
+                              items: [
+                                DropdownMenuItem(
+                                  value: selectedCategory,
+                                  child: Text(selectedCategory.categoryName),
+                                ),
+                              ],
                               onChanged: null,
                               decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
@@ -9,14 +8,16 @@ class OrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final orderProvider = context.watch<OrderProvider>();
     final confirmedOrders = orderProvider.orders;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text("Your Orders", style: TextStyle(fontWeight: FontWeight.bold),),
+        title: const Text(
+          "Your Orders",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -30,83 +31,91 @@ class OrderScreen extends StatelessWidget {
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Table No. B202", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text("Start Time: 8:40 PM", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    "Table No. B202",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Start Time: 8:40 PM",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 16,),
+            const SizedBox(height: 16),
 
             Expanded(
               child: confirmedOrders.isEmpty
                   ? _buildEmptyState(context)
                   : ListView.builder(
-                    itemCount: orderProvider.orders.length,
-                    itemBuilder: (context, index) {
-                      final order = confirmedOrders[index];
-                      
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Order Header (ID)
-                          Text(
-                            "Order #${order.id.substring(order.id.length - 4)}", 
-                            style: TextStyle(
-                              color: Colors.grey[600], 
-                              fontWeight: FontWeight.bold
-                            )
-                          ),
-                          
-                          // The Items in this order
-                          ...order.items.map((item) => FoodItemCard(
-                              name: item.productName,
-                              image: item.image,
-                              size: item.sizeLabel,
-                              addons: item.addons,
-                              price: item.priceAtOrder,
-                              quantity: item.quantity,
-                              note: item.note,
-                              isEditable: false,
-                            )),
-                          
-                          const Divider(indent: 20, endIndent: 20),
-                        ],
-                      );
-                    },
-                  )
+                      itemCount: orderProvider.orders.length,
+                      itemBuilder: (context, index) {
+                        final order = confirmedOrders[index];
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Order Header (ID)
+                            Text(
+                              "Order #${order.id.substring(order.id.length - 4)}",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            // The Items in this order
+                            ...order.items.map(
+                              (item) => FoodItemCard(
+                                name: item.productName,
+                                image: item.image,
+                                size: item.sizeLabel,
+                                addons: item.addons,
+                                price: item.priceAtOrder,
+                                quantity: item.quantity,
+                                note: item.note,
+                                isEditable: false,
+                              ),
+                            ),
+
+                            const Divider(indent: 20, endIndent: 20),
+                          ],
+                        );
+                      },
+                    ),
             ),
           ],
         ),
       ),
-      bottomSheet: confirmedOrders.isEmpty 
-        ? null 
-        : Padding(
-          padding: EdgeInsets.all(20),
-          child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _handleCheckout(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF6835),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                child: Text(
-                      'Checkout',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+      bottomSheet: confirmedOrders.isEmpty
+          ? null
+          : Padding(
+              padding: EdgeInsets.all(20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _handleCheckout(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6835),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    'Checkout',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               ),
             ),
-      )
     );
   }
 
@@ -144,10 +153,7 @@ class OrderScreen extends StatelessWidget {
             icon: const Icon(Icons.restaurant_menu, size: 20),
             label: const Text(
               'Go to Menu',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF6835),
@@ -164,8 +170,7 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  void _handleCheckout(BuildContext context) {  
-
+  void _handleCheckout(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
@@ -209,15 +214,13 @@ class OrderScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.black,
-              ),
+              style: TextButton.styleFrom(foregroundColor: Colors.black),
               child: const Text(
                 "Return",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white
+                  color: Colors.white,
                 ),
               ),
             ),

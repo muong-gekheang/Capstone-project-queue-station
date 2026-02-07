@@ -36,7 +36,7 @@ class _ConfirmTicketScreenState extends State<ConfirmTicketScreen> {
     return CustomScreenView(
       title: "Queue Information",
       isTitleCenter: true,
-      automaticImplyLeading: false,
+      automaticImplyLeading: true,
       content: Column(
         spacing: 20,
         children: [

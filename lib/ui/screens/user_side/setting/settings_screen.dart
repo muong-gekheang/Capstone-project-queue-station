@@ -28,10 +28,10 @@ class SettingsScreen extends StatelessWidget {
         ),
         content: const Text(
           "You will need to enter your password to sign back in",
-          textAlign: TextAlign.center, 
+          textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16),
         ),
-        actionsAlignment: MainAxisAlignment.center, 
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           ElevatedButton(
             onPressed: () {
@@ -43,7 +43,7 @@ class SettingsScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              overlayColor: const Color.fromARGB(255, 111, 110, 110)
+              overlayColor: const Color.fromARGB(255, 111, 110, 110),
             ),
             child: const Text(
               "Cancel",
@@ -79,7 +79,6 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-
 
   void _showDeleteAccountDialog(BuildContext context) {
     final TextEditingController passwordController = TextEditingController();
@@ -165,7 +164,12 @@ class SettingsScreen extends StatelessWidget {
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFB22222),
-                    disabledBackgroundColor: const Color.fromARGB(255,200,200,200),
+                    disabledBackgroundColor: const Color.fromARGB(
+                      255,
+                      200,
+                      200,
+                      200,
+                    ),
                     overlayColor: const Color.fromARGB(255, 109, 20, 20),
                   ),
                   child: const Text(
@@ -183,7 +187,6 @@ class SettingsScreen extends StatelessWidget {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

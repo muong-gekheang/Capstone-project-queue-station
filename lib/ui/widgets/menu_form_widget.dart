@@ -24,9 +24,10 @@ class MenuForm extends StatefulWidget {
 
 class _MenuFormState extends State<MenuForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController = TextEditingController();
-  late TextEditingController _descriptionController = TextEditingController();
-  late TextEditingController _priceController = TextEditingController();
+  late final TextEditingController _nameController = TextEditingController();
+  late final TextEditingController _descriptionController =
+      TextEditingController();
+  late final TextEditingController _priceController = TextEditingController();
   late TextEditingController _minTimeController = TextEditingController();
   late TextEditingController _maxTimeController = TextEditingController();
 
@@ -227,16 +228,16 @@ class _MenuFormState extends State<MenuForm> {
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<MenuCategory>(
-                        value: selectedCategory,
+                        initialValue: selectedCategory,
                         items: [
                           DropdownMenuItem(
-                            child: const Text("+ Add"),
                             value: addCategory,
+                            child: const Text("+ Add"),
                           ),
                           ...mockMenuCategories.map((category) {
                             return DropdownMenuItem(
-                              child: Text(category.categoryName),
                               value: category,
+                              child: Text(category.categoryName),
                             );
                           }),
                         ],
