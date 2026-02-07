@@ -1,7 +1,7 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
 class RestaurantJoinedTile extends StatefulWidget {
@@ -123,7 +123,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                     ),
                   ),
                   Text(
-                    widget.user.restaurant!.curWait.toString(),
+                    widget.user.currentHistory!.rest.curWait.toString(),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,

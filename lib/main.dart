@@ -39,13 +39,16 @@ void main() {
               bool isLoggedIn = user != null;
 
               if (!isLoggedIn) return "/login";
-              if (user.currentQueue == null) return "/";
+              if (user.currentHistory == null) return "/";
               return null;
             },
             builder: (context, state) {
               UserProvider userProvider = context.read<UserProvider>();
               User? user = userProvider.currentUser;
-              return ConfirmTicketScreen(user: user!, rest: user.currentQueue!);
+              return ConfirmTicketScreen(
+                user: user!,
+                history: user.currentHistory!,
+              );
             },
           ),
         ],

@@ -120,7 +120,9 @@ class HistoryViewScreen extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       Text(
-                        DateFormat("dd / MMM/ yyyy").format(history.queueDate),
+                        DateFormat(
+                          "dd / MMM/ yyyy",
+                        ).format(history.queue.joinTime),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
@@ -138,7 +140,7 @@ class HistoryViewScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        DateFormat("h:mm:ss a").format(history.queueDate),
+                        DateFormat("h:mm:ss a").format(history.queue.joinTime),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
@@ -156,7 +158,7 @@ class HistoryViewScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "${history.guests.toString()} $guestSuffix",
+                        "${history.queue.partySize.toString()} $guestSuffix",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),

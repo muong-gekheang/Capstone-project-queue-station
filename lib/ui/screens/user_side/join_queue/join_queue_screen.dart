@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/old_model/restaurant.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
+import 'package:uuid/uuid.dart';
 
 class JoinQueueScreen extends StatefulWidget {
   const JoinQueueScreen({super.key, required this.rest});
@@ -33,7 +36,22 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
     UserProvider userProvider = context.read<UserProvider>();
     User? user = userProvider.currentUser;
     if (user != null) {
-      userProvider.updateUser(user.copyWith(restaurant: widget.rest));
+      userProvider.updateUser(
+        user.copyWith(
+          currentHistory: History(
+            rest: widget.rest,
+            queue: QueueEntry(
+              id: Uuid().v4(),
+              partySize: numPeople,
+              joinTime: DateTime.now(),
+              status: QueueStatus.waiting,
+              customerId: user.id,
+            ),
+            id: Uuid().v4(),
+            userId: user.id,
+          ),
+        ),
+      );
       Navigator.pop(context);
       context.go("/ticket");
     } else {
@@ -303,7 +321,9 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
         ],
       ),
       bottomNavigationBar: FullWidthFilledButton(
-        onPress: user != null && !user.isJoinedQueue ? onJoinQueue : null,
+        onPress: user != null && user.currentHistory != null
+            ? onJoinQueue
+            : null,
         label: "Join Queue",
       ),
     );

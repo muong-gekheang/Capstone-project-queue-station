@@ -36,7 +36,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
         selectedTab = tab;
       });
     } else {
-      if (user != null && user.currentQueue != null) {
+      if (user != null && user.currentHistory != null) {
         context.go("/ticket");
       } else {
         await showDialog(

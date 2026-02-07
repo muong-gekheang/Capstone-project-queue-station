@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/old_model/restaurant.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
@@ -14,6 +14,10 @@ List<Restaurant> mockData = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
+    items: [],
+    tables: [],
+    globalAddOns: [],
+    globalSizeOptions: [],
   ),
   Restaurant(
     name: 'Angle Hai',
@@ -21,6 +25,10 @@ List<Restaurant> mockData = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
+    items: [],
+    tables: [],
+    globalAddOns: [],
+    globalSizeOptions: [],
   ),
   Restaurant(
     name: 'DoriDori Korean Chicken',
@@ -28,6 +36,10 @@ List<Restaurant> mockData = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
+    items: [],
+    tables: [],
+    globalAddOns: [],
+    globalSizeOptions: [],
   ),
   Restaurant(
     name: 'Kungfu Kitchen',
@@ -35,6 +47,10 @@ List<Restaurant> mockData = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
+    items: [],
+    tables: [],
+    globalAddOns: [],
+    globalSizeOptions: [],
   ),
   Restaurant(
     name: 'Kungfu Kitchen',
@@ -42,6 +58,10 @@ List<Restaurant> mockData = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
+    items: [],
+    tables: [],
+    globalAddOns: [],
+    globalSizeOptions: [],
   ),
 ];
 
@@ -65,8 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
     User user = userProvider.currentUser!;
-    if (user.isJoinedQueue) {
-      restaurants.remove(user.restaurant);
+    if (user.currentHistory != null) {
+      restaurants.remove(user.currentHistory!.rest);
     }
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -126,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: CustomScrollView(
               slivers: [
-                if (user.isJoinedQueue)
+                if (user.currentHistory != null)
                   SliverToBoxAdapter(
                     child: Column(
                       children: [
