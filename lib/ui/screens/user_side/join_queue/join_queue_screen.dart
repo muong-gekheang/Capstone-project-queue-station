@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/model/restaurant.dart';
 import 'package:queue_station_app/model/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
-import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';

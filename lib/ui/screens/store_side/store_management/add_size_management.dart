@@ -4,7 +4,6 @@ import 'package:queue_station_app/model//menu.dart';
 import 'package:queue_station_app/model//menu_size.dart';
 import 'package:queue_station_app/model//size.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
-import 'package:queue_station_app/ui/widgets/option_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class AddSizeScreen extends StatefulWidget {
@@ -70,7 +69,6 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   }
 
   Widget existingSize() {
-
     final globalMenuSizes = globalSizes;
 
     if (globalMenuSizes.isEmpty) {
@@ -100,7 +98,9 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
               ),
               Expanded(
                 child: Text(
-                  globalMenuSize.name, style: TextStyle(fontSize: 16)),
+                  globalMenuSize.name,
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -109,9 +109,9 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     );
   }
 
-void onAdd() {
+  void onAdd() {
     // Just return the selected sizes (MenuSizeOption)
-    Navigator.pop(context,selectedSizes,); 
+    Navigator.pop(context, selectedSizes);
   }
 
   @override

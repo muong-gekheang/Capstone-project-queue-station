@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model//add_on.dart';
 import 'package:queue_station_app/model//menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
-import 'package:queue_station_app/ui/widgets/delete-menu-pop-up.dart';
 
 class MenuDetail extends StatefulWidget {
   final Menu menu;
@@ -23,6 +21,7 @@ class _MenuDetailState extends State<MenuDetail> {
     super.initState();
     menu = widget.menu; // initialize once
   }
+
   @override
   Widget build(BuildContext context) {
     final MenuCategory = mockMenuCategories.firstWhere(
@@ -132,8 +131,7 @@ class _MenuDetailState extends State<MenuDetail> {
                       "Size Options",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    if (menu.sizes.isEmpty)
-                      Text('This menu has no size'),
+                    if (menu.sizes.isEmpty) Text('This menu has no size'),
                     SizedBox(height: 10),
                     ...menu.sizes.map((size) {
                       final totalPrice = menu.price + size.price;
@@ -230,7 +228,6 @@ class _MenuDetailState extends State<MenuDetail> {
                           vertical: 5,
                         ),
                       ),
-
 
                       ButtonWidget(
                         leadingIcon: Icons.create_outlined,

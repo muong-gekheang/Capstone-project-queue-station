@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
-import 'package:queue_station_app/ui/screens/user_side/order/instruction.dart';
-import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/settings_screen.dart';
-import 'package:queue_station_app/ui/store_main_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/instruction.dart';
+import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/norml_user_buttom_nav.dart';
 
 enum NormalUserNavTab { home, map, foodOrdering, ticket, profile }
+
+final List<Widget> screens = [
+  HomeScreen(),
+  Placeholder(), // MAP
+  Instruction(),
+  Placeholder(), // TICKET
+  Account(),
+];
 
 class NormalUserApp extends StatefulWidget {
   const NormalUserApp({super.key});
@@ -21,19 +30,34 @@ class NormalUserApp extends StatefulWidget {
 class _NormalUserAppState extends State<NormalUserApp> {
   NormalUserNavTab selectedTab = NormalUserNavTab.home;
 
-  final List<Widget> screens = [
-    HomeScreen(),
-    Placeholder(), // MAP
-    Instruction(),
-    Placeholder(), // TICKET
-    Account(),
-  ];
-
-
-  void onTabSelected(NormalUserNavTab tab) {
-    setState(() {
-      selectedTab = tab;
-    });
+  Future<void> onTabSelected(NormalUserNavTab tab) async {
+    User? user = context.read<UserProvider>().currentUser;
+    if (tab != NormalUserNavTab.ticket) {
+      setState(() {
+        selectedTab = tab;
+      });
+    } else {
+      if (user != null && user.isJoinedQueue) {
+        context.go("/ticket");
+      } else {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return CustomDialog(
+              title: "Oops, A problem!",
+              content: Column(
+                children: [
+                  Text(
+                    "Please make sure to join a queue first, so you can see your ticket.",
+                  ),
+                ],
+              ),
+              actions: [],
+            );
+          },
+        );
+      }
+    }
   }
 
   int getIndex(NormalUserNavTab tab) {
@@ -54,13 +78,13 @@ class _NormalUserAppState extends State<NormalUserApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: getIndex(selectedTab),
-        children: screens,
+      body: SafeArea(
+        child: IndexedStack(index: getIndex(selectedTab), children: screens),
       ),
       bottomNavigationBar: NormalUserButtomNav(
-        selectedTab: selectedTab, 
-        onTabSelected: onTabSelected)
+        selectedTab: selectedTab,
+        onTabSelected: onTabSelected,
+      ),
     );
   }
 }
