@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/old_model/restaurant.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class TicketQueueInfo extends StatelessWidget {
-  const TicketQueueInfo({super.key, required this.rest});
+  const TicketQueueInfo({super.key, required this.history});
 
-  final Restaurant rest;
+  final History history;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class TicketQueueInfo extends StatelessWidget {
                   spacing: 10,
                   children: [
                     Text(
-                      rest.name,
+                      history.rest.name,
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -42,7 +43,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            rest.address,
+                            history.rest.address,
                             softWrap: true,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -73,7 +74,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "ABC",
+                        history.queue.id.substring(0, 4),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,
@@ -100,7 +101,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "15",
+                        history.queue.currentSpot(history.rest).toString(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,
@@ -125,7 +126,7 @@ class TicketQueueInfo extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onPrimary,
               ),
               Text(
-                DateFormat("dd / MMM/ yyyy").format(DateTime.now()),
+                DateFormat("dd / MMM/ yyyy").format(history.queue.joinTime),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
@@ -143,7 +144,7 @@ class TicketQueueInfo extends StatelessWidget {
                 ),
               ),
               Text(
-                DateFormat("h:mm:ss a").format(DateTime.now()),
+                DateFormat("h:mm:ss a").format(history.queue.joinTime),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
@@ -161,7 +162,7 @@ class TicketQueueInfo extends StatelessWidget {
                 ),
               ),
               Text(
-                "4 people",
+                history.queue.partySize.toString(),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),

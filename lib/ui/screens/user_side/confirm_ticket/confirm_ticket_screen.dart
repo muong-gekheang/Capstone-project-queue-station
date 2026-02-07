@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:queue_station_app/old_model/restaurant.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/widgets/cancel_queue_dialog.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/widgets/ticket_queue_info.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
 
 class ConfirmTicketScreen extends StatefulWidget {
-  const ConfirmTicketScreen({
-    super.key,
-    required this.user,
-    required this.rest,
-  });
+  const ConfirmTicketScreen({super.key, required this.history});
 
-  final User user;
-  final Restaurant rest;
+  final History history;
 
   @override
   State<ConfirmTicketScreen> createState() => _ConfirmTicketScreenState();
@@ -40,7 +35,7 @@ class _ConfirmTicketScreenState extends State<ConfirmTicketScreen> {
       content: Column(
         spacing: 20,
         children: [
-          TicketQueueInfo(rest: widget.rest),
+          TicketQueueInfo(history: widget.history),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,

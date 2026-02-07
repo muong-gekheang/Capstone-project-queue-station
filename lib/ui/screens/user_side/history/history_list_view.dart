@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/old_model/history.dart';
+import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_view_screen.dart';
 
@@ -25,7 +25,7 @@ class HistoryListView extends StatelessWidget {
 
     for (var h in historyList) {
       if (currentSortType != SortType.recent) {
-        currentGroup = DateFormat(dateDisplayFormat).format(h.queueDate);
+        currentGroup = DateFormat(dateDisplayFormat).format(h.queue.joinTime);
         if (currentGroup != lastGroup) {
           widgetList.add(HistoryTitle(currentGroup: currentGroup));
           lastGroup = currentGroup;
@@ -90,7 +90,9 @@ class _HistoryCardState extends State<HistoryCard> {
 
   @override
   Widget build(BuildContext context) {
-    String guestSuffix = widget.history.guests > 1 ? "People" : "Person";
+    String guestSuffix = widget.history.queue.partySize > 1
+        ? "People"
+        : "Person";
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () => onHistoryTab(widget.history),
@@ -141,14 +143,14 @@ class _HistoryCardState extends State<HistoryCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    "Date: ${DateFormat("dd/MM/yyyy").format(widget.history.queueDate)}",
+                    "Date: ${DateFormat("dd/MM/yyyy").format(widget.history.queue.joinTime)}",
                     softWrap: true,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                   Text(
-                    widget.history.queueId,
+                    widget.history.queue.id.substring(0, 4),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                       fontWeight: FontWeight.bold,
@@ -156,7 +158,7 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                   ),
                   Text(
-                    "${widget.history.guests} $guestSuffix",
+                    "${widget.history.queue.partySize} $guestSuffix",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                     ),

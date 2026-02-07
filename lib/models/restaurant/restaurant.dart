@@ -1,3 +1,7 @@
+import 'package:queue_station_app/models/restaurant/add_on.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
+
 import 'queue_table.dart';
 import 'menu_item.dart';
 
@@ -10,8 +14,11 @@ class Restaurant {
   final String phone;
   final List<MenuItem> items;
   final List<QueueTable> tables;
+  final List<AddOn> globalAddOns;
+  final List<SizeOption> globalSizeOptions;
+  final List<QueueEntry> currentInQueue = [];
 
-  const Restaurant({
+  Restaurant({
     required this.name,
     required this.address,
     required this.logoLink,
@@ -20,11 +27,27 @@ class Restaurant {
     required this.phone,
     required this.items,
     required this.tables,
+    required this.globalAddOns,
+    required this.globalSizeOptions,
   });
 
+  void enqueue(QueueEntry queue) {
+    if (!currentInQueue.contains(queue)) {
+      currentInQueue.add(queue);
+    }
+  }
+
+  void dequeue(QueueEntry queue) {
+    currentInQueue.remove(queue);
+  }
+
+  int getQueueSpot(QueueEntry queue) {
+    return currentInQueue.indexOf(queue) + 1; // BC it counts from 0
+  }
+
   Duration get averageWaitingTime => Duration(hours: 1);
-  // TO DO
-  int get curWait => 10;
+
+  int get curWait => currentInQueue.length;
 
   @override
   bool operator ==(Object other) {

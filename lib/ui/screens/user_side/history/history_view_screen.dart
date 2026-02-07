@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/old_model/history.dart';
+import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/ui/widgets/order_card.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
@@ -11,7 +11,7 @@ class HistoryViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenSize = MediaQuery.sizeOf(context).width;
-    String guestSuffix = history.guests > 1 ? "People" : "Person";
+    String guestSuffix = history.queue.partySize > 1 ? "People" : "Person";
 
     return Scaffold(
       appBar: AppBar(
@@ -85,7 +85,7 @@ class HistoryViewScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    history.queueId,
+                    history.queue.id.substring(0, 4),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 40,
@@ -103,7 +103,7 @@ class HistoryViewScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    history.status.name,
+                    history.queue.status.name,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 40,

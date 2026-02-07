@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/old_model/history.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_list_view.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
@@ -7,44 +10,6 @@ import 'package:queue_station_app/ui/widgets/search_widget.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/sort_button.dart';
 
 enum SortType { recent, byMonth, byYear }
-
-List<History> mockHistsoryData = [
-  History(
-    rest: mockData[0],
-    guests: 4,
-    queueId: "D057",
-    queueDate: DateTime.now(),
-    status: StatusType.Completed,
-  ),
-  History(
-    rest: mockData[1],
-    guests: 4,
-    queueId: "D057",
-    queueDate: DateTime.now().subtract(Duration(hours: 10)),
-    status: StatusType.Completed,
-  ),
-  History(
-    rest: mockData[2],
-    guests: 4,
-    queueId: "D057",
-    queueDate: DateTime.now().subtract(Duration(days: 10)),
-    status: StatusType.Completed,
-  ),
-  History(
-    rest: mockData[3],
-    guests: 4,
-    queueId: "D057",
-    queueDate: DateTime.now().subtract(Duration(days: 20)),
-    status: StatusType.Completed,
-  ),
-  History(
-    rest: mockData[4],
-    guests: 4,
-    queueId: "D057",
-    queueDate: DateTime.now().subtract(Duration(days: 30)),
-    status: StatusType.Completed,
-  ),
-];
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -60,8 +25,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-    List<History> sortedList = [...mockHistsoryData];
-    sortedList.sort((a, b) => b.queueDate.compareTo(a.queueDate));
+    User user = context.read<UserProvider>().currentUser!;
+    List<History> sortedList = [...user.histories];
+    sortedList.sort((a, b) => b.queue.joinTime.compareTo(a.queue.joinTime));
     historyList = sortedList;
   }
 
@@ -75,6 +41,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
+    User user = userProvider.currentUser!;
     return CustomScreenView(
       title: "History",
       isTitleCenter: true,
@@ -83,7 +51,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
           SearchWidget<History>(
             filterLogic: (String search) {
-              Set<History> filteredList = mockHistsoryData
+              Set<History> filteredList = user.histories
                   .where(
                     (e) => e.rest.name.toLowerCase().startsWith(
                       search.toLowerCase(),

@@ -1,5 +1,4 @@
 import 'history.dart';
-import 'queue_entry.dart';
 
 enum UserType { normal, store }
 
@@ -10,15 +9,36 @@ class User {
   final String phone;
   final UserType userType;
   final List<History> histories;
-  final QueueEntry? currentQueue;
+  final History? currentHistory;
 
   User({
     required this.name,
     required this.email,
     required this.phone,
     required this.userType,
-    this.currentQueue,
+    this.currentHistory,
     required this.id,
     required this.histories,
   });
+
+  User copyWith({
+    String? name,
+    String? id,
+    String? email,
+    String? phone,
+    UserType? userType,
+    List<History>? histories,
+    History? currentHistory,
+    bool? isNoQueue,
+  }) => User(
+    name: name ?? this.name,
+    email: email ?? this.email,
+    phone: phone ?? this.phone,
+    userType: userType ?? this.userType,
+    id: id ?? this.id,
+    histories: histories ?? this.histories,
+    currentHistory: isNoQueue != null
+        ? (isNoQueue ? null : currentHistory ?? this.currentHistory)
+        : currentHistory ?? this.currentHistory,
+  );
 }

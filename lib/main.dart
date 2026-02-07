@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
@@ -39,13 +39,13 @@ void main() {
               bool isLoggedIn = user != null;
 
               if (!isLoggedIn) return "/login";
-              if (!user.isJoinedQueue) return "/";
+              if (user.currentQueue == null) return "/";
               return null;
             },
             builder: (context, state) {
               UserProvider userProvider = context.read<UserProvider>();
               User? user = userProvider.currentUser;
-              return ConfirmTicketScreen(user: user!, rest: user.restaurant!);
+              return ConfirmTicketScreen(user: user!, rest: user.currentQueue!);
             },
           ),
         ],

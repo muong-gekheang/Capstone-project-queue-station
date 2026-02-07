@@ -1,6 +1,7 @@
+import 'package:queue_station_app/models/restaurant/size.dart';
+
 import 'add_on.dart';
-import 'category.dart';
-import 'size_option.dart';
+import 'menu_item_category.dart';
 
 class MenuItem {
   final String id;
@@ -9,7 +10,7 @@ class MenuItem {
   final String description;
   final int? prepTimeMinutes;
   final MenuItemCategory category;
-  final List<SizeOption> sizes = []; // SizeOption handles the pricing
+  final List<Size> sizes = []; // Sizes handles the pricing
   final List<AddOn> addOns = [];
 
   MenuItem({

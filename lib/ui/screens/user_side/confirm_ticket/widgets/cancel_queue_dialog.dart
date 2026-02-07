@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 
@@ -21,7 +21,7 @@ class _CancelQueueDialogState extends State<CancelQueueDialog> {
     UserProvider userProvider = context.read<UserProvider>();
     User? user = userProvider.currentUser;
     if (user != null) {
-      userProvider.updateUser(user.copyWith(noRestaurant: true));
+      userProvider.updateUser(user.copyWith(isNoQueue: true));
       context.go("/");
     }
   }
