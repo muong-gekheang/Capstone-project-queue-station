@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/old_model/user.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/change_password_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/contact_us_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/edit_account_screen.dart';

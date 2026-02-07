@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/restaurant.dart';
+import 'package:queue_station_app/old_model/restaurant.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/join_queue_screen.dart';
 
 class RestaurantTile extends StatefulWidget {

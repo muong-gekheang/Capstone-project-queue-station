@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:queue_station_app/model//menu_size.dart';
+import 'package:queue_station_app/old_model/menu_size.dart';
 
 class Menu {
   final int? menuId;

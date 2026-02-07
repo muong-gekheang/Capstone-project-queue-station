@@ -1,4 +1,4 @@
-import 'package:queue_station_app/model/restaurant.dart';
+import 'package:queue_station_app/old_model/restaurant.dart';
 
 enum UserType { normal, store }
 

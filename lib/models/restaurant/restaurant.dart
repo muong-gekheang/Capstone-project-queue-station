@@ -1,3 +1,6 @@
+import 'queue_table.dart';
+import 'menu_item.dart';
+
 class Restaurant {
   final String name;
   final String address;
@@ -5,14 +8,19 @@ class Restaurant {
   final String policy;
   final int biggestTableSize;
   final String phone;
+  final List<MenuItem> items;
+  final List<QueueTable> tables;
+
   const Restaurant({
     required this.name,
     required this.address,
     required this.logoLink,
-    String? policy,
+    this.policy = "",
     required this.biggestTableSize,
     required this.phone,
-  }) : policy = policy ?? "";
+    required this.items,
+    required this.tables,
+  });
 
   Duration get averageWaitingTime => Duration(hours: 1);
   // TO DO

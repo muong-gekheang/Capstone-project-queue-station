@@ -1,5 +1,5 @@
-import 'package:queue_station_app/model/add_on.dart';
-import 'package:queue_station_app/model/size_option.dart';
+import 'package:queue_station_app/old_model/add_on.dart';
+import 'package:queue_station_app/old_model/size_option.dart';
 
 class MenuItem {
   final String id;

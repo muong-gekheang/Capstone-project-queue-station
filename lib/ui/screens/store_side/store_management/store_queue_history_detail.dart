@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/store_queue_history.dart';
+import 'package:queue_station_app/old_model/store_queue_history.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -134,7 +134,8 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Join Queue Method'),
                             Text(
-                              storeQueueHistory.joinedMethod == JoinedMethod.remotely
+                              storeQueueHistory.joinedMethod ==
+                                      JoinedMethod.remotely
                                   ? 'Remotely'
                                   : 'Walk-in',
                             ),
@@ -147,8 +148,9 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Joined Queue Time'),
                             Text(
-                              DateFormat('dd MMM yyyy, h:mm a')
-                                  .format(storeQueueHistory.joinedQueueTime),
+                              DateFormat(
+                                'dd MMM yyyy, h:mm a',
+                              ).format(storeQueueHistory.joinedQueueTime),
                             ),
                           ],
                         ),
@@ -159,8 +161,9 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Serving Time'),
                             Text(
-                              DateFormat('h:mm a')
-                                  .format(storeQueueHistory.seatedTime),
+                              DateFormat(
+                                'h:mm a',
+                              ).format(storeQueueHistory.seatedTime),
                             ),
                           ],
                         ),
@@ -171,8 +174,9 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Serving End'),
                             Text(
-                              DateFormat('h:mm a')
-                                  .format(storeQueueHistory.endedTime),
+                              DateFormat(
+                                'h:mm a',
+                              ).format(storeQueueHistory.endedTime),
                             ),
                           ],
                         ),

@@ -1,5 +1,4 @@
-
-import 'package:queue_station_app/model//size.dart';
+import 'package:queue_station_app/old_model/size.dart';
 
 class MenuSize {
   final MenuSizeOption size;

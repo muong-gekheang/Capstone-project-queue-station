@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/model/history.dart';
+import 'package:queue_station_app/old_model/history.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_view_screen.dart';
 

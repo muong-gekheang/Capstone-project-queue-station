@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/cart_item.dart';
+import 'package:queue_station_app/old_model/cart_item.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';

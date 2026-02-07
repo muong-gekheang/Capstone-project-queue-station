@@ -1,4 +1,4 @@
-import 'package:queue_station_app/model/store_queue_history.dart';
+import 'package:queue_station_app/old_model/store_queue_history.dart';
 
 final order1 = OrderDetail(menuName: 'Americano', quantity: 2, unitPrice: 2.50);
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/table_category.dart';
+import 'package:queue_station_app/old_model/table_category.dart';
 
 class CategoryChips extends StatelessWidget {
   final List<TableCategory> tableData;

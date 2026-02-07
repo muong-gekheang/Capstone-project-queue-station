@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model//menu.dart';
+import 'package:queue_station_app/old_model/menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_add_on_menu.dart';
 
 import 'package:queue_station_app/ui/widgets/option_widget.dart';

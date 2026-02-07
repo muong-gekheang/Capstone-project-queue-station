@@ -1,5 +1,5 @@
-import 'package:queue_station_app/model/table_category.dart';
-import 'package:queue_station_app/model/queue_table.dart';
+import 'package:queue_station_app/old_model/table_category.dart';
+import 'package:queue_station_app/old_model/queue_table.dart';
 
 List<TableCategory> tableData = [
   TableCategory(

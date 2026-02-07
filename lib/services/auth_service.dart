@@ -1,4 +1,4 @@
-import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/old_model/user.dart';
 
 class AuthService {
   Future<User?> login(String email, String password) async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/cart_item.dart';
-import 'package:queue_station_app/model/order.dart';
-import 'package:queue_station_app/model/order_item.dart';
+import 'package:queue_station_app/old_model/cart_item.dart';
+import 'package:queue_station_app/old_model/order.dart';
+import 'package:queue_station_app/old_model/order_item.dart';
 
 class OrderProvider with ChangeNotifier {
   final List<Order> _orders = [];

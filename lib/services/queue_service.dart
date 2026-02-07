@@ -1,6 +1,6 @@
-import 'package:queue_station_app/model/dashboard_stats.dart';
-import 'package:queue_station_app/model/queue_entry.dart';
-import 'package:queue_station_app/model/table.dart';
+import 'package:queue_station_app/old_model/dashboard_stats.dart';
+import 'package:queue_station_app/old_model/queue_entry.dart';
+import 'package:queue_station_app/old_model/table.dart';
 import '../data/queue_repository.dart';
 
 class QueueService {

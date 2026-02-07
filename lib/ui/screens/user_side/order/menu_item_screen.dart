@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/add_on.dart';
-import 'package:queue_station_app/model/cart_item.dart';
-import 'package:queue_station_app/model/menu_item.dart';
-import 'package:queue_station_app/model/size_option.dart';
+import 'package:queue_station_app/old_model/add_on.dart';
+import 'package:queue_station_app/old_model/cart_item.dart';
+import 'package:queue_station_app/old_model/menu_item.dart';
+import 'package:queue_station_app/old_model/size_option.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 
 class MenuItemScreen extends StatefulWidget {
@@ -163,7 +163,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFFF6835)
+                                color: Color(0xFFFF6835),
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -172,7 +172,13 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
 
                           const SizedBox(width: 12),
 
-                          Text("From", style: TextStyle(fontSize: 16, color: Color(0xFF0D47A1))),
+                          Text(
+                            "From",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF0D47A1),
+                            ),
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             '\$${widget.menuItem.basePrice.toStringAsFixed(2)}',
@@ -201,7 +207,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
-                                fontWeight: FontWeight.bold
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                         ],
@@ -355,7 +361,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                       SizedBox(height: 30),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),

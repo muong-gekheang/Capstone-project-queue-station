@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/old_model/user.dart';
 
 class UserProvider extends ChangeNotifier {
   User? _currentUser;

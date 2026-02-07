@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/cart_item.dart';
+import 'package:queue_station_app/old_model/cart_item.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];

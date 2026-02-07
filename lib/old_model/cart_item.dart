@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/add_on.dart';
-import 'package:queue_station_app/model/menu_item.dart';
-import 'package:queue_station_app/model/size_option.dart';
+import 'package:queue_station_app/old_model/add_on.dart';
+import 'package:queue_station_app/old_model/menu_item.dart';
+import 'package:queue_station_app/old_model/size_option.dart';
 
 class CartItem {
   final String id;

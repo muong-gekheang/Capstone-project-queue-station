@@ -1,8 +1,8 @@
-import 'package:queue_station_app/model//menu.dart';
-import 'package:queue_station_app/model//menu_add_on.dart';
-import 'package:queue_station_app/model//menu_size.dart';
-import 'package:queue_station_app/model//size.dart';
-import 'package:queue_station_app/model/menu_category.dart';
+import 'package:queue_station_app/old_model/menu.dart';
+import 'package:queue_station_app/old_model/menu_add_on.dart';
+import 'package:queue_station_app/old_model/menu_size.dart';
+import 'package:queue_station_app/old_model/size.dart';
+import 'package:queue_station_app/old_model/menu_category.dart';
 
 /// ----------------------------
 /// GLOBAL SIZES

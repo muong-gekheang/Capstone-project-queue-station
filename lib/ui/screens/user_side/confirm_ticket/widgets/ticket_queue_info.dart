@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/model/restaurant.dart';
+import 'package:queue_station_app/old_model/restaurant.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class TicketQueueInfo extends StatelessWidget {
