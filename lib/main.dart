@@ -7,13 +7,10 @@ import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/normal_user_app.dart';
-<<<<<<< HEAD
-=======
 import 'package:queue_station_app/ui/screens/auth/login_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/register_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
->>>>>>> 3ed1f8a1dd8af21245af00c3ebaeefbeddfd84cc
 import 'package:queue_station_app/ui/store_main_screen.dart';
 
 void main() {
@@ -67,17 +64,7 @@ void main() {
       child: MaterialApp.router(
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
-<<<<<<< HEAD
-        home: Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: NormalUserApp(),
-            //child: StoreMainScreen(),
-          ),
-        ),
-=======
         routerConfig: goRouter,
->>>>>>> 3ed1f8a1dd8af21245af00c3ebaeefbeddfd84cc
       ),
     ),
   );

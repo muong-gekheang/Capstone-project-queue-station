@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:flutter_svg/svg.dart';
-=======
 import 'package:queue_station_app/model/user.dart';
->>>>>>> 3ed1f8a1dd8af21245af00c3ebaeefbeddfd84cc
 import 'package:queue_station_app/ui/screens/user_side/setting/change_password_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/contact_us_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/edit_account_screen.dart';
