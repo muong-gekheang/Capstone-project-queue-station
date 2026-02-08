@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 
 class EditAccountScreen extends StatefulWidget {
   final User user;
@@ -89,43 +89,7 @@ class _EditAccountState extends State<EditAccountScreen> {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 90,
-                    backgroundColor: Colors.grey.shade100,
-                    backgroundImage: _selectedImage != null
-                        ? FileImage(_selectedImage!)
-                        : null,
-                    child: _selectedImage == null
-                        ? const Icon(
-                            Icons.person,
-                            size: 120,
-                            color: Colors.grey,
-                          )
-                        : null,
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    right: 14,
-                    child: InkWell(
-                      onTap: _editAvatar,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF0D47A1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.edit_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              ProfileEditorWidget(onEdit: _editAvatar, selectedImage: _selectedImage),
               const SizedBox(height: 32),
               TextFormField(
                 controller: nameController,

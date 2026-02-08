@@ -1,13 +1,16 @@
-class MenuItemCategory {
-  final String id;
-  final String name;
+import 'package:uuid/uuid.dart';
 
-  MenuItemCategory({required this.id, required this.name});
+class MenuItemCategory {
+  final String id = Uuid().v4();
+  final String name;
+  String? imageLink;
+
+  MenuItemCategory({ required this.name, this.imageLink});
 }
 
 final categories = [
-  MenuItemCategory(id: 'c1', name: 'Burgers'),
-  MenuItemCategory(id: 'c2', name: 'Pizza'),
-  MenuItemCategory(id: 'c3', name: 'Drinks'),
-  MenuItemCategory(id: 'c4', name: 'Desserts'),
+  MenuItemCategory(name: 'Burgers'),
+  MenuItemCategory(name: 'Pizza'),
+  MenuItemCategory(name: 'Drinks'),
+  MenuItemCategory(name: 'Desserts'),
 ];

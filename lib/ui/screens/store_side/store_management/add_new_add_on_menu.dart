@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/old_model/menu.dart';
-import 'package:queue_station_app/old_model/menu_category.dart';
+import 'package:queue_station_app/models/restaurant/add_on.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
+import 'package:queue_station_app/ui/widgets/menu_item_card.dart';
+import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class AddNewAddOnMenu extends StatefulWidget {
@@ -17,15 +20,12 @@ class AddNewAddOnMenu extends StatefulWidget {
 class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _minTimeController = TextEditingController();
-  final TextEditingController _maxTimeController = TextEditingController();
-  MenuCategory selectedCategory = mockMenuCategories.firstWhere(
-    (c) => c.categoryName.toLowerCase().contains('Add-Ons'.toLowerCase()),
+  MenuItemCategory selectedCategory = mockMenuCategories.firstWhere(
+    (c) => c.name.toLowerCase().contains('Add-Ons'.toLowerCase()),
   );
 
-  String? _nullValidtor(String? value) {
+  String? _nullvalidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
     } else {
@@ -59,24 +59,17 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   void onSave() {
     if (_formKey.currentState!.validate()) {
       String name = _nameController.text;
-      String description = _descriptionController.text;
-      String price = _priceController.text;
-      String minTime = _minTimeController.text;
-      String maxTime = _maxTimeController.text;
+      double parsedPrice = double.tryParse(_priceController.text)!;
+
 
       print('All fields are valid!');
 
-      Menu newMenu = Menu(
-        name: name,
-        description: description,
-        price: double.tryParse(price)!,
-        isAvailable: true,
-        categoryId: selectedCategory.categoryId!,
-        minPreparationTime: int.tryParse(minTime)!,
-        maxPreparationTime: int.tryParse(maxTime)!,
-      );
+      AddOn newAddOn = AddOn(
+        name: name, 
+        price: parsedPrice, 
+        image: image);
 
-      Navigator.pop(context, newMenu);
+      Navigator.pop(context, newAddOn);
     } else {
       print('Please fix the errors in the form');
     }
@@ -98,11 +91,14 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ProfileEditorWidget(
+                    onEdit: onEdit, 
+                    selectedImage: selectedImage),
                   TextFieldWidget(
                     title: 'Name',
                     hintText: 'e.g. Item name',
                     color: Color.fromRGBO(13, 71, 161, 0.5),
-                    validator: _nullValidtor,
+                    validator: _nullvalidator,
                     textController: _nameController,
                   ),
                   SizedBox(height: 10),
@@ -122,7 +118,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                           hintText: '9.9',
                           prefixText: '\$',
                           color: Color.fromRGBO(13, 71, 161, 0.5),
-                          validator: _nullValidtor,
+                          validator: _nullvalidator,
                           textController: _priceController,
                         ),
                       ),
@@ -139,7 +135,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            DropdownButtonFormField<MenuCategory>(
+                            DropdownButtonFormField<MenuItemCategory>(
                               initialValue: selectedCategory,
                               items: [
                                 DropdownMenuItem(

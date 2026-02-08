@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/old_model/menu.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_form_widget.dart';
 
@@ -14,7 +14,7 @@ class AddNewMenu extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: MenuForm(
           initialMenu: null, // null = we are adding
-          onSubmit: (Menu newMenu) {
+          onSubmit: (MenuItem newMenu) {
             Navigator.pop(context, newMenu); // close the page
           },
         ),

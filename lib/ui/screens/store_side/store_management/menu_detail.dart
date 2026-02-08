@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/old_model/menu.dart';
+import 'package:queue_station_app/models/restaurant/add_on.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 
 class MenuDetail extends StatefulWidget {
-  final Menu menu;
+  final MenuItem menu;
   final VoidCallback? onDelete;
   const MenuDetail({super.key, required this.menu, this.onDelete});
 
@@ -15,21 +17,31 @@ class MenuDetail extends StatefulWidget {
 }
 
 class _MenuDetailState extends State<MenuDetail> {
-  late Menu menu;
+  late MenuItem menu;
   @override
   void initState() {
     super.initState();
     menu = widget.menu; // initialize once
   }
 
+  double defaultPrice() {
+    double cheapest = menu.sizes.first.price;
+    for (var size in menu.sizes) {
+      if (size.price < cheapest) {
+        cheapest = size.price;
+      }
+    }
+    return cheapest;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final MenuCategory = mockMenuCategories.firstWhere(
-      (c) => c.categoryId == menu.categoryId,
+    final menuCategory = mockMenuCategories.firstWhere(
+      (c) => c.id == menu.category.id,
     );
 
     void onEdit() async {
-      Menu? newMenu = await Navigator.push<Menu>(
+      MenuItem? newMenu = await Navigator.push<MenuItem>(
         context,
         MaterialPageRoute(
           builder: (context) => EditMenuScreen(existingMenu: menu),
@@ -52,7 +64,7 @@ class _MenuDetailState extends State<MenuDetail> {
     }
 
     final menuAddOns = globalAddOns
-        .where((addOn) => menu.addOnIds.contains(addOn.id))
+        .where((addOn) => menu.addOns.contains(addOn))
         .toList();
 
     return Scaffold(
@@ -63,7 +75,7 @@ class _MenuDetailState extends State<MenuDetail> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Column(
               children: [
-                if (menu.menuImage == null)
+                if (menu.image == null)
                   CircleAvatar(radius: 120, backgroundColor: Colors.white),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -78,7 +90,7 @@ class _MenuDetailState extends State<MenuDetail> {
                             fontSize: 22,
                           ),
                         ),
-                        Text(MenuCategory.categoryName),
+                        Text(menu.category.name),
                       ],
                     ),
                     Text(
@@ -106,7 +118,7 @@ class _MenuDetailState extends State<MenuDetail> {
                     ),
                     SizedBox(width: 80),
                     Text(
-                      '\$${menu.price.toStringAsFixed(2)}',
+                      '\$${defaultPrice().toStringAsFixed(2)}',
                       style: TextStyle(
                         color: Color.fromRGBO(255, 104, 53, 1),
                         fontSize: 25,
@@ -120,7 +132,7 @@ class _MenuDetailState extends State<MenuDetail> {
                     Icon(Icons.access_time),
                     SizedBox(width: 5),
                     Text(
-                      '${menu.minPreparationTime} - ${menu.maxPreparationTime} min',
+                      '${menu.minPrepTimeMinutes} - ${menu.maxPrepTimeMinutes} min',
                     ),
                   ],
                 ),
@@ -134,26 +146,18 @@ class _MenuDetailState extends State<MenuDetail> {
                     if (menu.sizes.isEmpty) Text('This menu has no size'),
                     SizedBox(height: 10),
                     ...menu.sizes.map((size) {
-                      final totalPrice = menu.price + size.price;
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
                         child: Row(
                           children: [
                             Expanded(
                               flex: 2, // more space for name
-                              child: Text(size.size.name),
-                            ),
-                            Expanded(
-                              flex: 1, // smaller space for extra price
-                              child: Text(
-                                '+ \$${size.price.toStringAsFixed(2)}',
-                                textAlign: TextAlign.right,
-                              ),
+                              child: Text(size.sizeOption.name),
                             ),
                             Expanded(
                               flex: 1, // smaller space for total price
                               child: Text(
-                                '\$${totalPrice.toStringAsFixed(2)}',
+                                '\$${size.price.toStringAsFixed(2)}',
                                 textAlign: TextAlign.right,
                               ),
                             ),
@@ -170,16 +174,14 @@ class _MenuDetailState extends State<MenuDetail> {
                       "Add-On Options",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    if (menu.addOnIds.isEmpty)
+                    if (menu.addOns.isEmpty)
                       Text('This menu has no add-on option'),
                     SizedBox(height: 10),
-                    ...menu.addOnIds.map((addOnId) {
+                    ...menu.addOns.map((AddOn) {
                       // Find the actual add-on object
                       final addOn = globalAddOns.firstWhere(
-                        (a) => a.id == addOnId,
+                        (a) => a.id == AddOn.id,
                       );
-
-                      final totalPrice = menu.price + addOn.price;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
@@ -196,13 +198,7 @@ class _MenuDetailState extends State<MenuDetail> {
                                 textAlign: TextAlign.right,
                               ),
                             ),
-                            Expanded(
-                              flex: 1, // smaller space for total price
-                              child: Text(
-                                '\$${totalPrice.toStringAsFixed(2)}',
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
+                            
                           ],
                         ),
                       );
@@ -233,7 +229,7 @@ class _MenuDetailState extends State<MenuDetail> {
                         leadingIcon: Icons.create_outlined,
                         title: 'Edit',
                         onPressed: () async {
-                          final editedMenu = await Navigator.push<Menu>(
+                          final editedMenu = await Navigator.push<MenuItem>(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>

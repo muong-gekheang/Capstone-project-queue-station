@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/old_model/menu.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
 import 'package:queue_station_app/ui/widgets/delete-menu-pop-up.dart';
 
 class MenuCardWidget extends StatelessWidget {
-  final Menu menu;
+  final MenuItem menu;
   final VoidCallback? onDelete;
   const MenuCardWidget({super.key, required this.menu, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     final menuCategory = mockMenuCategories.firstWhere(
-      (c) => c.categoryId == menu.categoryId,
+      (c) => c.id == menu.category.id,
     );
     return GestureDetector(
       onTap: () {
@@ -41,10 +41,10 @@ class MenuCardWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (menu.menuImage != null)
+              if (menu.image != null)
                 Container(
                   decoration: BoxDecoration(
-                    image: DecorationImage(image: MemoryImage(menu.menuImage!)),
+                    // image: DecorationImage(image: MemoryImage(menu.image!)), // - will implement later
                   ),
                 ),
               Column(
@@ -61,7 +61,7 @@ class MenuCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        menuCategory.categoryName,
+                        menuCategory.name,
                         style: TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                       SizedBox(width: 5),
@@ -71,7 +71,7 @@ class MenuCardWidget extends StatelessWidget {
                       ),
                       SizedBox(width: 5),
                       Text(
-                        "\$${menu.price}",
+                        "\$${menu.sizes.price}",
                         style: TextStyle(
                           color: const Color.fromRGBO(255, 104, 53, 1),
                           fontSize: 12,

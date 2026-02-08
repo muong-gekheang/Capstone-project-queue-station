@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/old_model/menu.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 
 class OptionWidget<T> extends StatefulWidget {
@@ -36,8 +36,8 @@ class _OptionWidgetState extends State<OptionWidget> {
                 }, // checkbox also triggers parent
               ),
               const SizedBox(width: 4),
-              if (widget.optionModel is Menu &&
-                  (widget.optionModel as Menu).menuImage != null)
+              if (widget.optionModel is MenuItem &&
+                  (widget.optionModel as MenuItem).image != null)
                 CircleAvatar(
                   radius: 30,
                   backgroundImage: MemoryImage(widget.optionModel.menuImage!),

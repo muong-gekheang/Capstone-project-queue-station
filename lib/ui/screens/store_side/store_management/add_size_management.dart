@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/old_model/menu.dart';
-import 'package:queue_station_app/old_model/menu_size.dart';
-import 'package:queue_station_app/old_model/size.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
+
 class AddSizeScreen extends StatefulWidget {
-  final Menu? existingMenu;
+  final MenuItem? existingMenu;
   const AddSizeScreen({super.key, this.existingMenu});
 
   @override
@@ -18,9 +19,9 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  List<MenuSizeOption> selectedSizes = [];
+  List<SizeOption> selectedSizes = [];
 
-  String? _nullValidtor(String? value) {
+  String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
     } else {
@@ -49,7 +50,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       return;
     }
 
-    MenuSizeOption? existingSize;
+    SizeOption? existingSize;
     try {
       existingSize = globalSizes.firstWhere(
         (s) => s.name.toLowerCase() == sizeName.toLowerCase(),
@@ -59,11 +60,11 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     }
 
     if (existingSize == null) {
-      existingSize = MenuSizeOption(id: globalSizes.length + 1, name: sizeName);
+      existingSize = SizeOption(id: globalSizes.length + 1, name: sizeName);
       globalSizes.add(existingSize);
     }
 
-    final menuSizesToAdd = MenuSize(size: existingSize, price: parsedPrice);
+    final menuSizesToAdd = Size(size: existingSize, price: parsedPrice, sizeOption: null);
 
     Navigator.pop(context, menuSizesToAdd);
   }
@@ -155,7 +156,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
                       color: Theme.of(
                         context,
                       ).colorScheme.secondary.withAlpha(127),
-                      validator: _nullValidtor,
+                      validator: _nullValidator,
                       textController: _sizeController,
                     ),
                     SizedBox(height: 10),

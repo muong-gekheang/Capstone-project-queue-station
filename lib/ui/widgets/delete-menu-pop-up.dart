@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/old_model/menu.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 
 class DeleteMenuPopUp extends StatelessWidget {
   final String message;
-  final Menu menu;
+  final MenuItem menu;
   const DeleteMenuPopUp({super.key, required this.message, required this.menu});
 
   @override
@@ -31,10 +31,10 @@ class DeleteMenuPopUp extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            if (menu.menuImage != null)
+            if (menu.image != null)
               CircleAvatar(
                 radius: 60,
-                backgroundImage: MemoryImage(menu.menuImage!),
+                // backgroundImage: MemoryImage(menu.image!), will implement later
               ),
 
             Row(
