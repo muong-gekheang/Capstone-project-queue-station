@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 class ProfileEditorWidget extends StatelessWidget {
   final VoidCallback onEdit;
   final File? selectedImage;
-
   const ProfileEditorWidget({super.key, required this.onEdit, required this.selectedImage});
 
 

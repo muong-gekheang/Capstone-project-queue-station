@@ -1,5 +1,4 @@
 class SizeOption {
   final String name;
-
-  SizeOption({required this.name,});
+  const SizeOption({required this.name});
 }

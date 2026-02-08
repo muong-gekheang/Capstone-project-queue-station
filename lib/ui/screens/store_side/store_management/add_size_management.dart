@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
-
 
 class AddSizeScreen extends StatefulWidget {
   final MenuItem? existingMenu;
@@ -38,17 +36,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       );
       return;
     }
-
     final sizeName = _sizeController.text.trim();
-    final price = _priceController.text.trim();
-    final double? parsedPrice = double.tryParse(price);
-
-    if (parsedPrice == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter valid numbers")),
-      );
-      return;
-    }
 
     SizeOption? existingSize;
     try {
@@ -60,13 +48,14 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     }
 
     if (existingSize == null) {
-      existingSize = SizeOption(id: globalSizes.length + 1, name: sizeName);
+      existingSize = SizeOption(name: sizeName);
       globalSizes.add(existingSize);
     }
 
-    final menuSizesToAdd = Size(size: existingSize, price: parsedPrice, sizeOption: null);
+    final newGlobalSizeOption = SizeOption(name: sizeName);
+    globalSizes.add(newGlobalSizeOption);
 
-    Navigator.pop(context, menuSizesToAdd);
+    Navigator.pop(context, newGlobalSizeOption);
   }
 
   Widget existingSize() {

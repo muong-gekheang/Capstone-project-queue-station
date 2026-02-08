@@ -1,31 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/ui/screens/user_side/history/history_view_screen.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/store_queue_history_card_widget.dart';
 
 class StoreQueueHistory extends StatefulWidget {
-  const StoreQueueHistory({super.key});
+  final Restaurant restaurant;
+  const StoreQueueHistory({super.key, required this.restaurant});
 
   @override
   State<StoreQueueHistory> createState() => _StoreQueueHistoryState();
 }
 
 class _StoreQueueHistoryState extends State<StoreQueueHistory> {
+  late Restaurant restaurant;
+  @override
+  void initState() {
+    super.initState();
+    restaurant = widget.restaurant;
+  }
+
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
 
-  // Widget FilteredQueueHistory() {
-  //   final results = mockQueueHistories.where((history) => history.customerName.toLowerCase().contains(searchQuery)).toList();
-    
+  List<History> getHistoriesForRestaurant(List<User> allUsers) {
+    List<History> filteredHistories = [];
+    for (var user in allUsers) {
+      for (var history in user.histories) {
+        if (history.rest.id == restaurant.id) {
+          filteredHistories.add(history);
+        }
+      }
+    }
+    return filteredHistories;
+  }
+
   //   String searchValue = '';
-    Widget FilteredQueueHistory(){
-    final results = mockQueueHistories;
+  Widget FilteredQueueHistory() {
+    final results = getHistoriesForRestaurant(mockUsers);
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) =>
-          StoreQueueHistoryCard(storeQueueHistory: results[index]),
+          StoreQueueHistoryCard(history: results[index],),
     );
   }
 
@@ -40,9 +61,12 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Expanded(child: SearchbarWidget(hintText: "search...", onChanged: (value) {
-                    
-                  },)),
+                  Expanded(
+                    child: SearchbarWidget(
+                      hintText: "search...",
+                      onChanged: (value) {},
+                    ),
+                  ),
                   SizedBox(width: 10),
                   ButtonWidget(
                     title: "Sort by",

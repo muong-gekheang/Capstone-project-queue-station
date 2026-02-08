@@ -22,6 +22,6 @@ class MenuItem {
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
     required this.category,
-    required this.isAvailable,
+    this.isAvailable = true,
   });
 }
