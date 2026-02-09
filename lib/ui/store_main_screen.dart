@@ -4,10 +4,7 @@ import '../ui/widgets/store_side_bottom_nav.dart';
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/store_management/manage_store_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/dashboard/dashboard_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/settings/store_settings_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store_screen.dart';
-import 'package:queue_station_app/ui/widgets/store_side_bottom_nav.dart';
+
 
 enum NavTab { dashboard, analytics, settings }
 
