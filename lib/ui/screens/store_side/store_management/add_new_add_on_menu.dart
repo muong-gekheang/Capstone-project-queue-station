@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model//menu.dart';
-import 'package:queue_station_app/model/menu_category.dart';
+import 'package:queue_station_app/models/restaurant/add_on.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
+import 'package:queue_station_app/ui/widgets/menu_item_card.dart';
+import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class AddNewAddOnMenu extends StatefulWidget {
@@ -17,15 +23,14 @@ class AddNewAddOnMenu extends StatefulWidget {
 class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _minTimeController = TextEditingController();
-  final TextEditingController _maxTimeController = TextEditingController();
-  MenuCategory selectedCategory = mockMenuCategories.firstWhere(
-    (c) => c.categoryName.toLowerCase().contains('Add-Ons'.toLowerCase()),
+  final ImagePicker _imagePicker = ImagePicker();
+  File? _selectedImage;
+  MenuItemCategory selectedCategory = mockMenuCategories.firstWhere(
+    (c) => c.name.toLowerCase().contains('Add-Ons'.toLowerCase()),
   );
 
-  String? _nullValidtor(String? value) {
+  String? _nullvalidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
     } else {
@@ -33,50 +38,34 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
     }
   }
 
-  String? _descriptionValidator(String? value) {
-    if (value != null && value.length > 200) {
-      return 'The description should be less than 200';
-    } else {
-      return null;
-    }
-  }
 
-  String? _preparationTimeValidator(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-    final int? minutes = int.tryParse(value);
-    if (minutes == null) {
-      return 'preparation time must be a number';
-    }
-    if (minutes < 0 || minutes > 60) {
-      return 'preparation must be in the range of 0 and 60';
-    }
+  Future<void> onEdit() async {
+    final XFile? pickedFile = await _imagePicker.pickImage(
+      source: ImageSource.gallery, // open gallery
+      maxHeight: 500,
+      maxWidth: 500,
+      imageQuality: 80, // compress image a bit
+    );
 
-    return null;
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    } 
   }
 
   void onSave() {
     if (_formKey.currentState!.validate()) {
       String name = _nameController.text;
-      String description = _descriptionController.text;
-      String price = _priceController.text;
-      String minTime = _minTimeController.text;
-      String maxTime = _maxTimeController.text;
+      double parsedPrice = double.tryParse(_priceController.text)!;
+      String? selectedImagePath = _selectedImage?.path; 
 
       print('All fields are valid!');
 
-      Menu newMenu = Menu(
-        name: name,
-        description: description,
-        price: double.tryParse(price)!,
-        isAvailable: true,
-        categoryId: selectedCategory.categoryId!,
-        minPreparationTime: int.tryParse(minTime)!,
-        maxPreparationTime: int.tryParse(maxTime)!,
+      AddOn newAddOn = AddOn(name: name, price: parsedPrice, image: selectedImagePath,
       );
 
-      Navigator.pop(context, newMenu);
+      Navigator.pop(context, newAddOn);
     } else {
       print('Please fix the errors in the form');
     }
@@ -98,89 +87,27 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ProfileEditorWidget(
+                    onEdit: onEdit,
+                    selectedImage: _selectedImage,
+                  ),
                   TextFieldWidget(
                     title: 'Name',
                     hintText: 'e.g. Item name',
                     color: Color.fromRGBO(13, 71, 161, 0.5),
-                    validator: _nullValidtor,
+                    validator: _nullvalidator,
                     textController: _nameController,
                   ),
                   SizedBox(height: 10),
-                  TextFieldWidget(
-                    title: 'Description',
-                    hintText: 'Add details customers should know ',
-                    color: Color.fromRGBO(13, 71, 161, 0.5),
-                    validator: _descriptionValidator,
-                    textController: _descriptionController,
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFieldWidget(
-                          title: 'Price',
-                          hintText: '9.9',
-                          prefixText: '\$',
-                          color: Color.fromRGBO(13, 71, 161, 0.5),
-                          validator: _nullValidtor,
-                          textController: _priceController,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Category',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            DropdownButtonFormField<MenuCategory>(
-                              initialValue: selectedCategory,
-                              items: [
-                                DropdownMenuItem(
-                                  value: selectedCategory,
-                                  child: Text(selectedCategory.categoryName),
-                                ),
-                              ],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    width: 0.5,
-                                    color: Color.fromRGBO(13, 71, 161, 0.5),
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color: Color.fromRGBO(13, 71, 161, 0.5),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  TextFieldWidget(
-                    title: 'Min preparation time',
-                    color: Color.fromRGBO(13, 71, 161, 0.5),
-                    validator: _preparationTimeValidator,
-                    textController: _minTimeController,
-                  ),
-                  SizedBox(height: 10),
-                  TextFieldWidget(
-                    title: 'Max preparation time',
-                    color: Color.fromRGBO(13, 71, 161, 0.5),
-                    validator: _preparationTimeValidator,
-                    textController: _maxTimeController,
+                  Expanded(
+                    child: TextFieldWidget(
+                      title: 'Price',
+                      hintText: '9.9',
+                      prefixText: '\$',
+                      color: Color.fromRGBO(13, 71, 161, 0.5),
+                      validator: _nullvalidator,
+                      textController: _priceController,
+                    ),
                   ),
                   SizedBox(height: 10),
                   Padding(

@@ -1,36 +1,44 @@
-import 'package:queue_station_app/model/restaurant.dart';
+import 'history.dart';
 
 enum UserType { normal, store }
 
 class User {
+  final String id;
   final String name;
   final String email;
   final String phone;
   final UserType userType;
-  final Restaurant? restaurant; // TODO: Change implementation later
+  final List<History> histories;
+  final History? currentHistory;
 
   User({
     required this.name,
     required this.email,
     required this.phone,
     required this.userType,
-    this.restaurant,
+    this.currentHistory,
+    required this.id,
+    required this.histories,
   });
-
-  bool get isJoinedQueue => restaurant != null;
 
   User copyWith({
     String? name,
+    String? id,
     String? email,
     String? phone,
     UserType? userType,
-    Restaurant? restaurant,
-    bool noRestaurant = false,
+    List<History>? histories,
+    History? currentHistory,
+    bool? isNoQueue,
   }) => User(
     name: name ?? this.name,
     email: email ?? this.email,
     phone: phone ?? this.phone,
     userType: userType ?? this.userType,
-    restaurant: restaurant ?? (noRestaurant ? null : this.restaurant),
+    id: id ?? this.id,
+    histories: histories ?? this.histories,
+    currentHistory: isNoQueue != null
+        ? (isNoQueue ? null : currentHistory ?? this.currentHistory)
+        : currentHistory ?? this.currentHistory,
   );
 }

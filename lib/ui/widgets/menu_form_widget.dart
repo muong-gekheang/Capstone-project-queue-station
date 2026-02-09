@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model//menu.dart';
-import 'package:queue_station_app/model//menu_add_on.dart';
-import 'package:queue_station_app/model//menu_size.dart';
-import 'package:queue_station_app/model//size.dart';
-import 'package:queue_station_app/model/menu_category.dart';
+import 'package:queue_station_app/models/restaurant/add_on.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_size_management.dart';
@@ -13,8 +12,8 @@ import 'package:queue_station_app/ui/widgets/price_list.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class MenuForm extends StatefulWidget {
-  final Menu? initialMenu; // null = Add, not null = Edit
-  final void Function(Menu menu) onSubmit;
+  final MenuItem? initialMenu; // null = Add, not null = Edit
+  final void Function(MenuItem menu) onSubmit;
 
   const MenuForm({super.key, this.initialMenu, required this.onSubmit});
 
@@ -31,15 +30,15 @@ class _MenuFormState extends State<MenuForm> {
   late TextEditingController _minTimeController = TextEditingController();
   late TextEditingController _maxTimeController = TextEditingController();
 
-  List<MenuSize> menuSizes = [];
-  List<MenuAddOn> addOns = [];
+  List<Size> menuSizes = [];
+  List<AddOn> addOns = [];
   List<int> addOnIds = [];
-  MenuCategory? selectedCategory;
-  final addCategory = MenuCategory(categoryId: -1, categoryName: ' + Add New');
+  MenuItemCategory? selectedCategory;
+  final addCategory = MenuItemCategory(id: '-1', name: ' + Add New');
 
   // Controllers for SizesPriceList
-  final Map<MenuSize, TextEditingController> menuSizeController = {};
-  final Map<MenuAddOn, TextEditingController> addOnController = {};
+  final Map<Size, TextEditingController> menuSizeController = {};
+  final Map<AddOn, TextEditingController> addOnController = {};
 
   @override
   void initState() {
@@ -48,36 +47,35 @@ class _MenuFormState extends State<MenuForm> {
 
     _nameController.text = menu?.name ?? '';
     _descriptionController.text = menu?.description ?? '';
-    _priceController.text = menu?.price.toString() ?? '';
     _minTimeController = TextEditingController(
-      text: menu?.minPreparationTime.toString() ?? '',
+      text: menu?.minPrepTimeMinutes.toString() ?? '',
     );
     _maxTimeController = TextEditingController(
-      text: menu?.maxPreparationTime.toString() ?? '',
+      text: menu?.maxPrepTimeMinutes.toString() ?? '',
     );
 
     if (menu != null) {
       selectedCategory = mockMenuCategories.firstWhere(
-        (c) => c.categoryId == menu.categoryId,
+        (c) => c.id == menu.category.id,
         orElse: () => mockMenuCategories.isNotEmpty
             ? mockMenuCategories.first
-            : MenuCategory(categoryId: -1, categoryName: 'Unknown'),
+            : MenuItemCategory(id: '-1', name: 'Unknown'),
       );
     } else {
       selectedCategory = mockMenuCategories.isNotEmpty
           ? mockMenuCategories.first
-          : MenuCategory(categoryId: -1, categoryName: 'Unknown');
+          : MenuItemCategory(id: '-1', name: 'Unknown');
     }
 
     menuSizes = menu?.sizes.toList() ?? [];
     addOns = menu == null
         ? []
         : globalAddOns
-              .where((addOn) => menu.addOnIds.contains(addOn.id))
+              .where((addOn) => menu.addOns.contains(addOn.id))
               .toList();
   }
 
-  String? _nullValidtor(String? value) {
+  String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
     } else {
@@ -129,7 +127,7 @@ class _MenuFormState extends State<MenuForm> {
       return;
     }
 
-    if (selectedCategory == null || selectedCategory!.categoryId == -1) {
+    if (selectedCategory == null || selectedCategory!.id == "-1") {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select a valid category")),
       );
@@ -188,7 +186,7 @@ class _MenuFormState extends State<MenuForm> {
               title: 'Name',
               hintText: 'e.g. Item name',
               color: Theme.of(context).colorScheme.secondary.withAlpha(127),
-              validator: _nullValidtor,
+              validator: _nullValidator,
               textController: _nameController,
             ),
             const SizedBox(height: 10),
@@ -202,18 +200,18 @@ class _MenuFormState extends State<MenuForm> {
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(
-                  child: TextFieldWidget(
-                    title: 'Price',
-                    hintText: '9.9',
-                    prefixText: '\$',
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.secondary.withAlpha(127),
-                    validator: _nullValidtor,
-                    textController: _priceController,
-                  ),
-                ),
+                // Expanded(
+                //   child: TextFieldWidget(
+                //     title: 'Price',
+                //     hintText: '9.9',
+                //     prefixText: '\$',
+                //     color: Theme.of(
+                //       context,
+                //     ).colorScheme.secondary.withAlpha(127),
+                //     validator: _nullValidator,
+                //     textController: _priceController,
+                //   ),
+                // ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -227,7 +225,7 @@ class _MenuFormState extends State<MenuForm> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      DropdownButtonFormField<MenuCategory>(
+                      DropdownButtonFormField<MenuItemCategory>(
                         initialValue: selectedCategory,
                         items: [
                           DropdownMenuItem(
@@ -237,15 +235,15 @@ class _MenuFormState extends State<MenuForm> {
                           ...mockMenuCategories.map((category) {
                             return DropdownMenuItem(
                               value: category,
-                              child: Text(category.categoryName),
+                              child: Text(category.name),
                             );
                           }),
                         ],
                         onChanged: (value) async {
                           if (value == null) return;
-                          if (value.categoryId == -1) {
+                          if (value.id == '-1') {
                             final newCategory =
-                                await showModalBottomSheet<MenuCategory>(
+                                await showModalBottomSheet<MenuItemCategory>(
                                   context: context,
                                   builder: (context) => Padding(
                                     padding: EdgeInsets.only(
@@ -334,7 +332,7 @@ class _MenuFormState extends State<MenuForm> {
               title: 'Add Size',
               onPressed: () async {
                 final returnedMenuSizes =
-                    await showModalBottomSheet<List<MenuSizeOption>>(
+                    await showModalBottomSheet<List<SizeOption>>(
                       context: context,
                       builder: (context) {
                         return AddSizeScreen(existingMenu: widget.initialMenu);
@@ -345,7 +343,7 @@ class _MenuFormState extends State<MenuForm> {
                   setState(() {
                     // Convert MenuSizeOption -> MenuSize with default price 0
                     menuSizes.addAll(
-                      returnedMenuSizes.map((e) => MenuSize(size: e, price: 0)),
+                      returnedMenuSizes.map((e) => Size(size: e, price: 0)),
                     );
                   });
                 }
@@ -362,7 +360,7 @@ class _MenuFormState extends State<MenuForm> {
               'Add-Ons',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
-            PriceList<MenuAddOn>(
+            PriceList<AddOn>(
               items: addOns,
               controllers: addOnController,
               getName: (item) => item.name,

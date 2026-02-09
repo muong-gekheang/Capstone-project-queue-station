@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model//menu.dart';
-
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_menu.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/category_card_widget.dart';
@@ -17,33 +16,33 @@ class MenuManagement extends StatefulWidget {
 
 class _MenuManagementState extends State<MenuManagement> {
   int selectedIndex = 0;
-  int selectedCategoryId = -1;
+  String selectedCategoryId = '';
   String searchValue = '';
 
   @override
   void initState() {
     super.initState();
-    selectedCategoryId = mockMenuCategories[selectedIndex].categoryId!;
+    selectedCategoryId = mockMenuCategories[selectedIndex].id;
   }
 
   Widget filteredMenuList() {
-    final result = mockMenus.where((m) {
+    final result = allMenuItems.where((m) {
       if (searchValue.isNotEmpty) {
         return m.name.toLowerCase().contains(searchValue.toLowerCase());
       } else {
-        return m.categoryId == selectedCategoryId;
+        return m.category.name == selectedCategoryId;
       }
     }).toList();
 
     return ListView.builder(
       itemCount: result.length,
       itemBuilder: (context, index) {
-        final menu = mockMenus[index];
+        final menu = allMenuItems[index];
         return MenuCardWidget(
           menu: menu,
           onDelete: () {
             setState(() {
-              mockMenus.removeAt(index);
+              allMenuItems.removeAt(index);
             });
           },
         );
@@ -101,14 +100,14 @@ class _MenuManagementState extends State<MenuManagement> {
                     leadingIcon: Icons.add,
                     title: "Add Item",
                     onPressed: () async {
-                      final newMenu = await Navigator.push<Menu>(
+                      final newMenu = await Navigator.push<MenuItem>(
                         context,
                         MaterialPageRoute(builder: (context) => AddNewMenu()),
                       );
                       if (newMenu != null) {
                         print("Returned menu: ${newMenu.name}");
                         setState(() {
-                          mockMenus.add(newMenu);
+                          allMenuItems.add(newMenu);
                         });
                       }
                     },
@@ -128,13 +127,13 @@ class _MenuManagementState extends State<MenuManagement> {
                   return Row(
                     children: [
                       CategoryCardWidget(
-                        name: mockMenuCategories[index].categoryName,
+                        name: mockMenuCategories[index].name,
                         isSelected: selectedIndex == index,
                         onTap: () {
                           setState(() {
                             selectedIndex = index;
                             selectedCategoryId =
-                                mockMenuCategories[index].categoryId!;
+                                mockMenuCategories[index].id;
                             print(
                               "The selectedCategoryId is $selectedCategoryId",
                             );

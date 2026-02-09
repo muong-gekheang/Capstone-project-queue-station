@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
 
 class FoodItemCard extends StatelessWidget {
   final String name;
   final String? image;
-  final String? size;
+  final SizeOption? size;
   final Map<String, double> addons;
   final double price;
   final int quantity;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/models/order/order.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
@@ -9,7 +10,9 @@ import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/normal_user_app.dart';
 import 'package:queue_station_app/ui/screens/auth/login_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/register_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 
@@ -30,8 +33,19 @@ void main() {
           return null;
         },
         routes: <RouteBase>[
+          GoRoute(
+            path: "menu",
+            builder: (context, state) => const MenuScreen(),
+          ),
           GoRoute(path: "map", builder: (context, state) => Placeholder()),
-          GoRoute(path: "order", builder: (context, state) => OrderScreen()),
+          GoRoute(
+            path: "order",
+            builder: (context, state) => const OrderScreen(),
+          ),
+          GoRoute(
+            path: "account",
+            builder: (context, state) => const Account(),
+          ),
           GoRoute(
             path: "ticket",
             redirect: (context, state) {
@@ -39,13 +53,16 @@ void main() {
               bool isLoggedIn = user != null;
 
               if (!isLoggedIn) return "/login";
-              if (!user.isJoinedQueue) return "/";
+              if (user.currentHistory == null) return "/";
               return null;
             },
             builder: (context, state) {
               UserProvider userProvider = context.read<UserProvider>();
               User? user = userProvider.currentUser;
-              return ConfirmTicketScreen(user: user!, rest: user.restaurant!);
+              return ConfirmTicketScreen(
+                user: user!,
+                history: user.currentHistory!,
+              );
             },
           ),
         ],
@@ -57,8 +74,14 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProxyProvider<OrderProvider, CartProvider>(
+          create: (_) => CartProvider(
+            currentOrder: Order(id: '', timestamp: DateTime.now()),
+          ),
+          update: (_, orderProvider, __) =>
+              CartProvider(currentOrder: orderProvider.currentOrder),
+        ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp.router(

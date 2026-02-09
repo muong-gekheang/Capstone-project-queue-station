@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/user.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
@@ -36,7 +36,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
         selectedTab = tab;
       });
     } else {
-      if (user != null && user.isJoinedQueue) {
+      if (user != null && user.currentHistory != null) {
         context.go("/ticket");
       } else {
         await showDialog(

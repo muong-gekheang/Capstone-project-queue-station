@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 
 class MenuItemCard extends StatelessWidget {
   final MenuItem item;
@@ -53,7 +53,9 @@ class MenuItemCard extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              '\$${item.basePrice.toStringAsFixed(2)}',
+              item.sizes.isNotEmpty
+                  ? '\$${item.sizes.first.price.toStringAsFixed(2)}'
+                  : '\$0.00',
               style: TextStyle(fontSize: 18),
             ),
           ],

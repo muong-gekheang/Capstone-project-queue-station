@@ -1,65 +1,136 @@
-import 'package:queue_station_app/model/store_queue_history.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/user.dart';
+import 'package:uuid/uuid.dart';
 
-final order1 = OrderDetail(menuName: 'Americano', quantity: 2, unitPrice: 2.50);
+final Uuid uuid = Uuid();
 
-final order2 = OrderDetail(menuName: 'Croissant', quantity: 1, unitPrice: 1.80);
+// Example Restaurants
+final restaurant1 = Restaurant(
+  name: "Pizza Place",
+  address: "123 Main St",
+  logoLink: "https://example.com/logo1.png",
+  biggestTableSize: 6,
+  phone: "111-222-3333",
+  items: [],
+  tables: [],
+  globalAddOns: [],
+  globalSizeOptions: [],
+);
 
-final order3 = OrderDetail(menuName: 'Latte', quantity: 1, unitPrice: 3.20);
+final restaurant2 = Restaurant(
+  name: "Burger Hub",
+  address: "456 Elm St",
+  logoLink: "https://example.com/logo2.png",
+  biggestTableSize: 4,
+  phone: "222-333-4444",
+  items: [],
+  tables: [],
+  globalAddOns: [],
+  globalSizeOptions: [],
+);
 
-final List<StoreQueueHistory> mockQueueHistories = [
-  StoreQueueHistory(
-      customerName: 'Alex Tan',
-      currentStatus: Status.serving,
-      queueNumber: 'A12',
-      joinedMethod: JoinedMethod.walkIn,
-      numberOfGuests: 2,
-      joinedQueueTime: DateTime(2026, 1, 26, 10, 15, 30),
-      seatedTime: DateTime(2026, 1, 26, 10, 22, 10),
-      endedTime: DateTime(2026, 1, 26, 11, 0, 0),
-    )
-    ..addNewOrder(order1)
-    ..addNewOrder(order2)
-    ..addNewOrder(order3),
+final restaurant3 = Restaurant(
+  name: "Sushi Spot",
+  address: "789 Oak St",
+  logoLink: "https://example.com/logo3.png",
+  biggestTableSize: 8,
+  phone: "333-444-5555",
+  items: [],
+  tables: [],
+  globalAddOns: [],
+  globalSizeOptions: [],
+);
 
-  StoreQueueHistory(
-      customerName: 'Sokha Lim',
-      currentStatus: Status.completed,
-      queueNumber: 'B03',
-      joinedMethod: JoinedMethod.remotely,
-      numberOfGuests: 4,
-      joinedQueueTime: DateTime(2026, 1, 26, 11, 5, 0),
-      seatedTime: DateTime(2026, 1, 26, 11, 12, 30),
-      endedTime: DateTime(2026, 1, 26, 12, 0, 0),
-    )
-    ..addNewOrder(order1)
-    ..addNewOrder(order2)
-    ..addNewOrder(order3),
+// Example QueueEntries
+final queue1 = QueueEntry(
+  id: uuid.v4(),
+  customerId: "user1",
+  partySize: 2,
+  joinTime: DateTime(2026, 1, 26, 10, 15),
+  servedTime: DateTime(2026, 1, 26, 10, 22),
+  status: QueueStatus.completed, queueNumber: 'A101',
+   joinedMethod: JoinedMethod.walkIn
+);
 
-  StoreQueueHistory(
-      customerName: 'Dara Chen',
-      currentStatus: Status.noShow,
-      queueNumber: 'C08',
-      joinedMethod: JoinedMethod.walkIn,
-      numberOfGuests: 1,
-      joinedQueueTime: DateTime(2026, 1, 26, 12, 20, 0),
-      seatedTime: DateTime(2026, 1, 26, 12, 20, 0),
-      endedTime: DateTime(2026, 1, 26, 12, 35, 0),
-    )
-    ..addNewOrder(order1)
-    ..addNewOrder(order2)
-    ..addNewOrder(order3),
+final queue2 = QueueEntry(
+  id: uuid.v4(),
+  customerId: "user1",
+  partySize: 2,
+  joinTime: DateTime(2026, 1, 26, 11, 0),
+  servedTime: DateTime(2026, 1, 26, 11, 10),
+  status: QueueStatus.serving, queueNumber: 'B107',
+   joinedMethod: JoinedMethod.remote
+);
 
-  StoreQueueHistory(
-      customerName: 'Mina Park',
-      currentStatus: Status.cancelled,
-      queueNumber: 'D01',
-      joinedMethod: JoinedMethod.remotely,
-      numberOfGuests: 3,
-      joinedQueueTime: DateTime(2026, 1, 26, 13, 0, 0),
-      seatedTime: DateTime(2026, 1, 26, 13, 0, 0),
-      endedTime: DateTime(2026, 1, 26, 13, 10, 0),
-    )
-    ..addNewOrder(order1)
-    ..addNewOrder(order2)
-    ..addNewOrder(order3),
-];
+final queue3 = QueueEntry(
+  id: uuid.v4(),
+  customerId: "user2",
+  partySize: 3,
+  joinTime: DateTime(2026, 1, 26, 11, 5),
+  servedTime: DateTime(2026, 1, 26, 11, 20),
+  status: QueueStatus.completed, queueNumber: 'A102',
+   joinedMethod: JoinedMethod.walkIn
+);
+
+final queue4 = QueueEntry(
+  id: uuid.v4(),
+  customerId: "user3",
+  partySize: 1,
+  joinTime: DateTime(2026, 1, 26, 12, 0),
+  servedTime: null,
+  status: QueueStatus.waiting, queueNumber: 'C202',
+  joinedMethod: JoinedMethod.remote
+);
+
+final queue5 = QueueEntry(
+  id: uuid.v4(),
+  customerId: "user3",
+  partySize: 4,
+  joinTime: DateTime(2026, 1, 26, 12, 30),
+  servedTime: DateTime(2026, 1, 26, 12, 50),
+  status: QueueStatus.completed, queueNumber: 'B102',
+  joinedMethod: JoinedMethod.remote
+);
+
+// Example Histories
+final history1 = History(rest: restaurant1, queue: queue1, userId: "user1");
+final history2 = History(rest: restaurant1, queue: queue2, userId: "user1");
+final history3 = History(rest: restaurant2, queue: queue3, userId: "user2");
+final history4 = History(rest: restaurant1, queue: queue4, userId: "user3");
+final history5 = History(rest: restaurant3, queue: queue5, userId: "user3");
+
+// Example Users
+final user1 = User(
+  id: "user1",
+  name: "Alice",
+  email: "alice@example.com",
+  phone: "1234567890",
+  userType: UserType.normal,
+  currentHistory: history2,
+  histories: [history1, history2],
+);
+
+final user2 = User(
+  id: "user2",
+  name: "Bob",
+  email: "bob@example.com",
+  phone: "0987654321",
+  userType: UserType.normal,
+  currentHistory: null,
+  histories: [history3],
+);
+
+final user3 = User(
+  id: "user3",
+  name: "Charlie",
+  email: "charlie@example.com",
+  phone: "1122334455",
+  userType: UserType.normal,
+  currentHistory: history4,
+  histories: [history4, history5],
+);
+
+// List of all users
+final List<User> mockUsers = [user1, user2, user3];

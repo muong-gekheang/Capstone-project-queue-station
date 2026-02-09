@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
-import 'package:queue_station_app/model/dashboard_stats.dart';
+import '../../../../models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store_profile_service.dart';
 

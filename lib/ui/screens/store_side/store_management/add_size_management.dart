@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/model//menu.dart';
-import 'package:queue_station_app/model//menu_size.dart';
-import 'package:queue_station_app/model//size.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class AddSizeScreen extends StatefulWidget {
-  final Menu? existingMenu;
+  final MenuItem? existingMenu;
   const AddSizeScreen({super.key, this.existingMenu});
 
   @override
@@ -18,9 +17,9 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  List<MenuSizeOption> selectedSizes = [];
+  List<SizeOption> selectedSizes = [];
 
-  String? _nullValidtor(String? value) {
+  String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
     } else {
@@ -37,19 +36,9 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       );
       return;
     }
-
     final sizeName = _sizeController.text.trim();
-    final price = _priceController.text.trim();
-    final double? parsedPrice = double.tryParse(price);
 
-    if (parsedPrice == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter valid numbers")),
-      );
-      return;
-    }
-
-    MenuSizeOption? existingSize;
+    SizeOption? existingSize;
     try {
       existingSize = globalSizes.firstWhere(
         (s) => s.name.toLowerCase() == sizeName.toLowerCase(),
@@ -59,13 +48,14 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     }
 
     if (existingSize == null) {
-      existingSize = MenuSizeOption(id: globalSizes.length + 1, name: sizeName);
+      existingSize = SizeOption(name: sizeName);
       globalSizes.add(existingSize);
     }
 
-    final menuSizesToAdd = MenuSize(size: existingSize, price: parsedPrice);
+    final newGlobalSizeOption = SizeOption(name: sizeName);
+    globalSizes.add(newGlobalSizeOption);
 
-    Navigator.pop(context, menuSizesToAdd);
+    Navigator.pop(context, newGlobalSizeOption);
   }
 
   Widget existingSize() {
@@ -155,7 +145,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
                       color: Theme.of(
                         context,
                       ).colorScheme.secondary.withAlpha(127),
-                      validator: _nullValidtor,
+                      validator: _nullValidator,
                       textController: _sizeController,
                     ),
                     SizedBox(height: 10),

@@ -1,14 +1,22 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/store_queue_history.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history_detail.dart';
 
 class StoreQueueHistoryCard extends StatelessWidget {
-  final StoreQueueHistory storeQueueHistory;
-  const StoreQueueHistoryCard({super.key, required this.storeQueueHistory});
+  final History history;
+  const StoreQueueHistoryCard({super.key, required this.history});
 
   String formattedtime(DateTime date) {
     return DateFormat('hh:mm a').format(date);
+  }
+
+  String getUserName() {
+    return mockUsers
+        .firstWhere((user) => user.id == history.userId)
+        .name;
   }
 
   @override
@@ -19,8 +27,7 @@ class StoreQueueHistoryCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  StoreQueueHistoryDetail(storeQueueHistory: storeQueueHistory),
+              builder: (context) => StoreQueueHistoryDetail(history: history),
             ),
           );
         },
@@ -35,13 +42,13 @@ class StoreQueueHistoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      storeQueueHistory.customerName,
+                      getUserName(),
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Joined: ${formattedtime(storeQueueHistory.joinedQueueTime)} | Seated: ${formattedtime(storeQueueHistory.seatedTime)}',
+                      'Joined: ${formattedtime(history.queue.joinTime)} | Seated: ${history.queue.servedTime != null ? formattedtime(history.queue.servedTime!) : '-'}',
                     ),
-                    Text(storeQueueHistory.currentStatus.name),
+                    Text(history.queue.status.name),
                   ],
                 ),
 
