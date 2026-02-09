@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../model/services/store_profile_service.dart';
+import '../../../../services/store_profile_service.dart';
 import '../../../widgets/custom_success_snackbar.dart';
 
 class EditStoreScreen extends StatefulWidget {
@@ -325,8 +325,9 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                       storeService.setStoreName(_storeNameController.text);
                       CustomSuccessSnackbar.show(context, "Added Successfully");
                       Future.delayed(const Duration(milliseconds: 800), () {
-                        if (mounted)
+                        if (mounted) {
                           Navigator.of(context).pop(true); // Indicate success
+                        }
                       });
                     },
                     style: ElevatedButton.styleFrom(

@@ -1,4 +1,4 @@
-import 'package:queue_station_app/model/entities/restaurant.dart';
+import 'package:queue_station_app/model/restaurant.dart';
 
 enum StatusType { Completed, Pending }
 

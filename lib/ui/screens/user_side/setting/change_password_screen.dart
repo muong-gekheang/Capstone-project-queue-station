@@ -19,16 +19,12 @@ class _EditAccountState extends State<ChangePasswordScreen> {
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Passoword updated successfully'),
+          content: Text('Password updated successfully'),
           backgroundColor: Colors.green,
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
       );
-
-      // Future.delayed(const Duration(seconds: 2), () {
-      //   Navigator.pop(context);
-      // });
     }
   }
 
@@ -50,6 +46,10 @@ class _EditAccountState extends State<ChangePasswordScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(5),
+          child: Divider(thickness: 5, height: 5, color: Colors.grey.shade400),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -142,7 +142,15 @@ class _EditAccountState extends State<ChangePasswordScreen> {
                     ),
                   );
                 },
-                child: const Text("Forgot Passowrd?"),
+                child: const Text(
+                  "Forgot Passowrd?",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey, 
+                    decoration: TextDecoration.underline
+                  ),
+                ),
               ),
             ],
           ),

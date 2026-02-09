@@ -17,4 +17,15 @@ class Restaurant {
   Duration get averageWaitingTime => Duration(hours: 1);
   // TO DO
   int get curWait => 10;
+
+  @override
+  bool operator ==(Object other) {
+    return (other is Restaurant) &&
+        (other.name == name &&
+            other.address == address &&
+            other.phone == phone);
+  }
+
+  @override
+  int get hashCode => Object.hash(name, address, phone);
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/model/entities/history.dart';
+import 'package:queue_station_app/model/history.dart';
 import 'package:queue_station_app/ui/widgets/order_card.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 

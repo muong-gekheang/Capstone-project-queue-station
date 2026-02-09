@@ -13,18 +13,26 @@ class StoreQueueHistory extends StatefulWidget {
 }
 
 class _StoreQueueHistoryState extends State<StoreQueueHistory> {
-  
-  Widget FilteredQueueHistory(){
+  TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+
+  // Widget FilteredQueueHistory() {
+  //   final results = mockQueueHistories.where((history) => history.customerName.toLowerCase().contains(searchQuery)).toList();
+    
+  //   String searchValue = '';
+    Widget FilteredQueueHistory(){
     final results = mockQueueHistories;
     return ListView.builder(
       itemCount: results.length,
-      itemBuilder: (context, index) => StoreQueueHistoryCard(storeQueueHistory: results[index]) );
+      itemBuilder: (context, index) =>
+          StoreQueueHistoryCard(storeQueueHistory: results[index]),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(title: 'Queue History', color: Colors.black,),
+      appBar: AppBarWidget(title: 'Queue History', color: Colors.black),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
@@ -32,25 +40,23 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Expanded(
-                    child: SearchbarWidget(hintText: "search...",),
-                  ),
+                  Expanded(child: SearchbarWidget(hintText: "search...", onChanged: (value) {
+                    
+                  },)),
                   SizedBox(width: 10),
                   ButtonWidget(
-                    title: "Sort by", 
-                    onPressed: (){}, 
-                    backgroundColor: Color.fromRGBO(255, 104, 53, 1), 
-                    textColor: Colors.white, 
-                    borderRadius: 50, 
+                    title: "Sort by",
+                    onPressed: () {},
+                    backgroundColor: Color.fromRGBO(255, 104, 53, 1),
+                    textColor: Colors.white,
+                    borderRadius: 50,
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 10),
-            Expanded(
-              child: FilteredQueueHistory(),
-            ),
+            Expanded(child: FilteredQueueHistory()),
           ],
         ),
       ),

@@ -1,7 +1,5 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:queue_station_app/model/entities/history.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
 class TicketWidget extends StatelessWidget {

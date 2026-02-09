@@ -6,7 +6,6 @@ import 'package:queue_station_app/model/entities/dashboard_stats.dart';
 import 'package:queue_station_app/model/entities/order_summary.dart';
 import 'package:queue_station_app/model/services/queue_service.dart';
 import 'package:queue_station_app/model/services/store_profile_service.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});

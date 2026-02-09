@@ -49,13 +49,17 @@ class StoreQueueHistory {
     return grandTotal;
   }
 
-  String waitingTime(){
-    int totalSeconds = seatedTime.difference(joinedQueueTime).inSeconds;
+  Duration waitingTime() {
+    return seatedTime.difference(joinedQueueTime);
+  }
 
-    int minutes = totalSeconds ~/ 60;
-    int seconds = totalSeconds % 60;
-    return '$minutes:$seconds';
-  } 
+  String formatMMSS(Duration d) {
+    final minutes = d.inMinutes % 60; 
+    final seconds = d.inSeconds % 60;
+
+    return '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')} min';
+  }
 
   void addNewOrder(OrderDetail orderDetail){
     orderDetails.add(orderDetail);

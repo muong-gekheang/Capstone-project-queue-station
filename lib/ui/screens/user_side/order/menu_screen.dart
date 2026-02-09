@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/entities/cart_item.dart';
-import 'package:queue_station_app/model/services/cart_provider.dart';
+import 'package:queue_station_app/model/cart_item.dart';
+import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/cart_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
-import '../../../../model/entities/menu_item.dart';
-import '../../../../model/entities/category.dart';
+import '../../../../model/menu_item.dart';
+import '../../../../model/category.dart';
 import '../../../widgets/menu_item_card.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -246,7 +246,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         maxCrossAxisExtent: 200, // max width of each card
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
-                        childAspectRatio: 0.7,
+                        childAspectRatio: 0.75,
                       ),
                       itemCount: filteredMenuItems.length,
                       itemBuilder: (context, index) {
@@ -274,8 +274,8 @@ class _MenuScreenState extends State<MenuScreen> {
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               color: const Color(0xFFFF6835),
               shape: BoxShape.circle,
@@ -300,9 +300,9 @@ class _MenuScreenState extends State<MenuScreen> {
                 borderRadius: BorderRadius.circular(28),
                 child: const Center(
                   child: Icon(
-                    Icons.shopping_cart,
+                    Icons.shopping_cart_outlined,
                     color: Colors.white,
-                    size: 24,
+                    size: 28,
                   ),
                 ),
               ),

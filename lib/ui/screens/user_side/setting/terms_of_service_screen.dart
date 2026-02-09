@@ -14,6 +14,10 @@ class TermsOfServiceScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(5),
+          child: Divider(thickness: 5, height: 5, color: Colors.grey.shade400),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -56,7 +60,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 "If you have any questions, contact us at: support@queuestation.com",
-                style: TextStyle(fontSize: 16, color: Color(0xFF0D47A1)),
+                style: TextStyle(fontSize: 16),
               ),
             ),
           ],

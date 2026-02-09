@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -24,10 +23,12 @@ class StoreProfileService extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
   void addListener(void Function() onProfileChanged) {
     super.addListener(onProfileChanged);
   }
 
+  @override
   void removeListener(void Function() onProfileChanged) {
     super.removeListener(onProfileChanged);
   }
