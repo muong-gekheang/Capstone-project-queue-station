@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:queue_station_app/old_model/user.dart';
+import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/change_password_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/contact_us_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/edit_account_screen.dart';
@@ -9,10 +9,12 @@ import 'package:queue_station_app/ui/screens/user_side/setting/terms_of_service_
 
 class SettingsScreen extends StatelessWidget {
   User user = User(
+    id: "1",
     name: "Monica",
     email: "monica@gmail.com",
     phone: "0987654321",
     userType: UserType.normal,
+    histories: [],
   );
   SettingsScreen({super.key});
 

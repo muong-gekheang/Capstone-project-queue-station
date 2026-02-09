@@ -4,12 +4,14 @@ import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
 
 class OrderScreen extends StatelessWidget {
+
   const OrderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final orderProvider = context.watch<OrderProvider>();
-    final confirmedOrders = orderProvider.orders;
+    final orderProvider = context.watch()<OrderProvider>();
+    final order = orderProvider.currentOrder;
+    final confirmedItems = order.ordered;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -22,100 +24,95 @@ class OrderScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              color: Colors.grey[50],
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+      body: confirmedItems.isEmpty
+          ? _buildEmptyState(context)
+          : Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
                 children: [
-                  Text(
-                    "Table No. B202",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Start Time: 8:40 PM",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  _buildOrderHeader(),
+                  const SizedBox(height: 16),
+
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: confirmedItems.length,
+                      separatorBuilder: (_, __) =>
+                          const Divider(indent: 20, endIndent: 20),
+                      itemBuilder: (context, index) {
+                        final item = confirmedItems[index];
+                        final addOnsTotal = item.addOns.values.fold(
+                          0.0,
+                          (a, b) => a + b,
+                        );
+
+                        return FoodItemCard(
+                          name: item.item.name,
+                          image: item.item.image,
+                          size: item.size,
+                          addons: item.addOns,
+                          quantity: item.quantity,
+                          note: item.note,
+                          isEditable: false,
+                          price:
+                              (item.menuItemPrice + addOnsTotal) *
+                              item.quantity,
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
 
-            Expanded(
-              child: confirmedOrders.isEmpty
-                  ? _buildEmptyState(context)
-                  : ListView.builder(
-                      itemCount: orderProvider.orders.length,
-                      itemBuilder: (context, index) {
-                        final order = confirmedOrders[index];
+      bottomSheet: confirmedItems.isEmpty
+          ? null
+          : _buildCheckoutButton(context),
+    );
+  }
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Order Header (ID)
-                            Text(
-                              "Order #${order.id.substring(order.id.length - 4)}",
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+  Widget _buildOrderHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      color: Colors.grey[50],
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Table No. B202",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            "Start Time: 8:40 PM",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
 
-                            // The Items in this order
-                            ...order.items.map(
-                              (item) => FoodItemCard(
-                                name: item.productName,
-                                image: item.image,
-                                size: item.sizeLabel,
-                                addons: item.addons,
-                                price: item.priceAtOrder,
-                                quantity: item.quantity,
-                                note: item.note,
-                                isEditable: false,
-                              ),
-                            ),
-
-                            const Divider(indent: 20, endIndent: 20),
-                          ],
-                        );
-                      },
-                    ),
+  Widget _buildCheckoutButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () => _handleCheckout(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFF6835),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
+            elevation: 2,
+          ),
+          child: const Text(
+            'Checkout',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
         ),
       ),
-      bottomSheet: confirmedOrders.isEmpty
-          ? null
-          : Padding(
-              padding: EdgeInsets.all(20),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _handleCheckout(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF6835),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                  ),
-                  child: Text(
-                    'Checkout',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
     );
   }
 
@@ -139,21 +136,15 @@ class OrderScreen extends StatelessWidget {
           const SizedBox(height: 24),
           const Text(
             'No orders yet',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A1A),
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
-
           const SizedBox(height: 32),
-
           ElevatedButton.icon(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.restaurant_menu, size: 20),
+            icon: const Icon(Icons.restaurant_menu),
             label: const Text(
               'Go to Menu',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF6835),
@@ -162,7 +153,6 @@ class OrderScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              elevation: 2,
             ),
           ),
         ],
@@ -173,66 +163,37 @@ class OrderScreen extends StatelessWidget {
   void _handleCheckout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            "Proceed to check out",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          "Proceed to check out",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Please proceed to check out and provide your table number to the cashier.",
+              textAlign: TextAlign.center,
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Please proceed to check out and provide your table number to the cashier.",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  height: 1.4,
-                ),
-              ),
-              SizedBox(height: 12),
-              Center(
-                child: Text(
-                  "B202",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFFF6835),
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              )
-              
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(backgroundColor: Color(0xFF0D47A1)),
-              child: Center(
-                child: const Text(
-                  "Return",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-              )
-              
+            SizedBox(height: 12),
+            Text(
+              "B202",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFFF6835),
               ),
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Return"),
+          ),
+        ],
+      ),
     );
   }
 }

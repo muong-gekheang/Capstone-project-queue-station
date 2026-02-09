@@ -1,37 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/old_model/cart_item.dart';
-import 'package:queue_station_app/old_model/order.dart';
-import 'package:queue_station_app/old_model/order_item.dart';
+import 'package:queue_station_app/models/order/order.dart';
 
 class OrderProvider with ChangeNotifier {
+  Order? _currentOrder;
   final List<Order> _orders = [];
 
-  List<Order> get orders => [..._orders];
+  Order get currentOrder {
+    _currentOrder ??= _createNewOrder();
+    return _currentOrder!;
+  }
 
-  void addOrder(List<CartItem> cartItems, double total) {
-    final newOrder = Order(
+  Order _createNewOrder() {
+    final order = Order(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       timestamp: DateTime.now(),
-      totalAmount: total,
-      items: cartItems
-          .map(
-            (cartItem) => OrderItem(
-              productName: cartItem.menuItem.name,
-              image: cartItem.menuItem.image,
-              sizeLabel: cartItem.selectedSize?.name,
-              addons: {
-                for (final addon in cartItem.selectedAddOns)
-                  addon.name: addon.price,
-              },
-              priceAtOrder: cartItem.totalItemPrice / cartItem.quantity,
-              quantity: cartItem.quantity,
-              note: cartItem.note,
-            ),
-          )
-          .toList(),
     );
+    _orders.add(order);
+    return order;
+  }
 
-    _orders.insert(0, newOrder); // Newest order at the top
+  void confirmCurrentOrder() {
+    if (_currentOrder == null) return;
+
+    _currentOrder!.ordered.addAll(_currentOrder!.inCart);
+    _currentOrder!.inCart.clear();
+
+    _currentOrder = _createNewOrder();
     notifyListeners();
   }
 }

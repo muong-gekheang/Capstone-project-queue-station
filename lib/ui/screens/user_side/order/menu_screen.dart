@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/old_model/cart_item.dart';
+import 'package:queue_station_app/data/menu_mock_data.dart';
+import 'package:queue_station_app/models/order/order_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/cart_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
-import '../../../../old_model/menu_item.dart';
-import '../../../../old_model/category.dart';
 import '../../../widgets/menu_item_card.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -17,14 +17,14 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  String selectedCategoryId = categories[0].id;
+  String selectedCategoryId = mockMenuCategories[0].id;
   String searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
   //must match both search and category
   List<MenuItem> get filteredMenuItems {
-    return menuItems.where((item) {
-      final matchesCategory = item.categoryId == selectedCategoryId;
+    return allMenuItems.where((item) {
+      final matchesCategory = item.category.id == selectedCategoryId;
       final matchesSearch =
           searchQuery.isEmpty ||
           item.name.toLowerCase().contains(searchQuery.toLowerCase());
@@ -170,9 +170,9 @@ class _MenuScreenState extends State<MenuScreen> {
               color: Colors.white,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
+                itemCount: mockMenuCategories.length,
                 itemBuilder: (context, index) {
-                  final category = categories[index];
+                  final category = mockMenuCategories[index];
                   final isSelected = category.id == selectedCategoryId;
 
                   return Padding(
@@ -253,7 +253,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         final item = filteredMenuItems[index];
                         return GestureDetector(
                           onTap: () {
-                            Navigator.push<CartItem>(
+                            Navigator.push<OrderItem>(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => MenuItemScreen(item: item),
@@ -292,7 +292,7 @@ class _MenuScreenState extends State<MenuScreen> {
               shape: const CircleBorder(),
               child: InkWell(
                 onTap: () {
-                  Navigator.push<CartItem>(
+                  Navigator.push<OrderItem>(
                     context,
                     MaterialPageRoute(builder: (_) => CartScreen()),
                   );

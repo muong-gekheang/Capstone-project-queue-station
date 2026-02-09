@@ -1,48 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/old_model/add_on.dart';
-import 'package:queue_station_app/old_model/cart_item.dart';
-import 'package:queue_station_app/old_model/menu_item.dart';
-import 'package:queue_station_app/old_model/size_option.dart';
+import 'package:queue_station_app/models/order/order_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 
 class MenuItemScreen extends StatefulWidget {
   final MenuItem? item;
-  final CartItem? cartItem;
+  final OrderItem? cartItem;
 
-  const MenuItemScreen({super.key, this.item, this.cartItem})
-    : assert(
-        item != null || cartItem != null,
-        'Either item or cartItem must be provided',
-      );
+  const MenuItemScreen({super.key, this.item, this.cartItem});
 
-  MenuItem get menuItem => item ?? cartItem!.menuItem;
+  MenuItem get menuItem => item ?? cartItem!.item;
 
   @override
   State<MenuItemScreen> createState() => _MenuItemScreenState();
 }
 
 class _MenuItemScreenState extends State<MenuItemScreen> {
-  SizeOption? _selectedSize;
-  final Map<AddOn, bool> _selectedAddOns = {};
+  MenuSize? _selectedSize;
+  final Map<String, bool> _selectedAddOns = {};
   int _quantity = 1;
-  final TextEditingController _noteController = TextEditingController();
-  double _totalPrice = 0;
+  TextEditingController _noteController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    _initializeAddOns();
-
-    if (widget.cartItem != null) {
-      _loadFromCartItem(widget.cartItem!);
-    } else if (widget.item != null) {
-      _selectedSize = widget.item!.defaultSize;
-      _quantity = 1;
+    // init add-ons
+    for (final addOn in widget.menuItem.addOns) {
+      _selectedAddOns[addOn.id] = false;
     }
 
-    _calculateTotal();
+    if (widget.cartItem != null) {
+      _loadFromOrderItem(widget.cartItem!);
+    } else {
+      _selectDefaultSize();
+    }
+  }
+
+  void _selectDefaultSize() {
+    if (widget.menuItem.sizes.isEmpty) return;
+    _selectedSize = widget.menuItem.sizes.first;
   }
 
   @override
@@ -51,73 +50,87 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     super.dispose();
   }
 
-  void _initializeAddOns() {
-    for (var addOn in widget.menuItem.addOns) {
-      _selectedAddOns[addOn] = false;
+  void _loadFromOrderItem(OrderItem orderItem) {
+    _quantity = orderItem.quantity;
+    _noteController.text = orderItem.note ?? "";
+
+    _selectedSize = widget.menuItem.sizes.firstWhere(
+      (s) => s.sizeOption.name == orderItem.size.name,
+      orElse: () => widget.menuItem.sizes.first,
+    );
+
+    for (final entry in orderItem.addOns.entries) {
+      _selectedAddOns[entry.key] = true;
     }
   }
 
-  void _loadFromCartItem(CartItem cartItem) {
-    _selectedSize = cartItem.selectedSize;
-    _quantity = cartItem.quantity;
-    _noteController.text = cartItem.note;
+  double get _totalPrice {
+    final basePrice = _selectedSize?.price ?? 0.0;
 
-    for (var addOn in cartItem.selectedAddOns) {
-      _selectedAddOns[addOn] = true;
+    final addOnsPrice = widget.menuItem.addOns
+        .where((a) => _selectedAddOns[a.id] == true)
+        .fold(0.0, (sum, a) => sum + a.price);
+
+    return (basePrice + addOnsPrice) * _quantity;
+  }
+
+  double _getStartingPrice() {
+    if (widget.menuItem.sizes.isEmpty) return 0.0;
+
+    return widget.menuItem.sizes
+        .map((s) => s.price)
+        .reduce((a, b) => a < b ? a : b);
+  }
+
+  void _saveItem(BuildContext context) {
+    final cart = context.read<CartProvider>();
+    if (_selectedSize == null) return;
+
+    final selectedAddOns = widget.menuItem.addOns
+        .where((a) => _selectedAddOns[a.id] == true)
+        .toList();
+
+    final Map<String, double> addOnsMap = {
+      for (final a in selectedAddOns) a.id: a.price,
+    };
+
+    final orderItem = OrderItem(
+      menuItemId: widget.menuItem.id,
+      item: widget.menuItem,
+      size: _selectedSize!.sizeOption,
+      menuItemPrice: _selectedSize!.price, // snapshot
+      addOns: addOnsMap,
+      quantity: _quantity,
+      note: _noteController.text.isNotEmpty ? _noteController.text : null,
+    );
+
+    if (widget.cartItem == null) {
+      cart.addToCart(orderItem);
+    } else {
+      cart.updateCartItem(orderItem);
     }
+
+    Navigator.pop(context);
   }
 
-  void _calculateTotal() {
-    final double mainPrice = _selectedSize?.price ?? widget.menuItem.basePrice;
-
-    double addOnsPrice = 0;
-
-    _selectedAddOns.forEach((addOn, isSelected) {
-      if (isSelected) {
-        addOnsPrice += addOn.price;
-      }
-    });
-
-    setState(() {
-      _totalPrice = (mainPrice + addOnsPrice) * _quantity;
-    });
-  }
-
-  void _incrementQuantity() {
-    setState(() {
-      _quantity++;
-      _calculateTotal();
-    });
-  }
+  void _incrementQuantity() => setState(() => _quantity++);
 
   void _decrementQuantity() {
-    if (_quantity > 1) {
-      setState(() {
-        _quantity--;
-        _calculateTotal();
-      });
-    }
+    if (_quantity > 1) setState(() => _quantity--);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.grey[200],
-        // title: Text(
-        //   widget.menuItem.name,
-        //   style: TextStyle(fontWeight: FontWeight.bold),
-        // ),
-        // centerTitle: true,
-      ),
+      appBar: AppBar(backgroundColor: Colors.grey[200]),
       body: Stack(
         children: [
           SingleChildScrollView(
-            //padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 120),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Image section
                 Container(
                   width: double.infinity,
                   height: 250,
@@ -141,26 +154,22 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           ),
                         ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
+                // Content section
                 Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                  ),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Name and price
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Text(
                               widget.menuItem.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFFFF6835),
@@ -169,10 +178,8 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-
                           const SizedBox(width: 12),
-
-                          Text(
+                          const Text(
                             "From",
                             style: TextStyle(
                               fontSize: 16,
@@ -181,8 +188,8 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '\$${widget.menuItem.basePrice.toStringAsFixed(2)}',
-                            style: TextStyle(
+                            '\$${_getStartingPrice().toStringAsFixed(2)}',
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF0D47A1),
@@ -193,18 +200,19 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
 
                       const SizedBox(height: 15),
 
+                      // Preparation time
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.access_time,
                             color: Colors.black,
                             size: 20,
                           ),
-                          SizedBox(width: 8),
-                          if (widget.menuItem.prepTimeMinutes != null)
+                          const SizedBox(width: 8),
+                          if (widget.menuItem.maxPrepTimeMinutes != null)
                             Text(
-                              'Preparation Time: ${widget.menuItem.prepTimeMinutes} minutes',
-                              style: TextStyle(
+                              'Maximum Prep Time: ${widget.menuItem.maxPrepTimeMinutes} minutes',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -214,9 +222,10 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                       ),
                       const SizedBox(height: 15),
 
+                      // Description
                       Text(
                         widget.menuItem.description,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
                           height: 1.5,
@@ -224,30 +233,31 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                       ),
                       const SizedBox(height: 20),
 
+                      // Sizes section
                       if (widget.menuItem.sizes.isNotEmpty) ...[
                         Text(
                           'Sizes',
                           style: TextStyle(
-                            color: Color(0xFF0D47A1),
+                            color: const Color(0xFF0D47A1),
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Column(
                           children: widget.menuItem.sizes.map((size) {
-                            return RadioListTile<SizeOption>(
+                            return RadioListTile<MenuSize>(
                               title: Row(
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      size.name,
-                                      style: TextStyle(fontSize: 16),
+                                      size.sizeOption.name,
+                                      style: const TextStyle(fontSize: 16),
                                     ),
                                   ),
                                   Text(
                                     '\$${size.price.toStringAsFixed(2)}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -258,29 +268,27 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               onChanged: (value) {
                                 setState(() {
                                   _selectedSize = value;
-                                  _calculateTotal();
                                 });
                               },
-                              controlAffinity: ListTileControlAffinity
-                                  .trailing, // radio on right
-                              activeColor: Color(0xFFFF6835),
+                              controlAffinity: ListTileControlAffinity.trailing,
+                              activeColor: const Color(0xFFFF6835),
                             );
                           }).toList(),
                         ),
-
-                        SizedBox(height: 25),
+                        const SizedBox(height: 25),
                       ],
 
+                      // Add-ons section
                       if (widget.menuItem.addOns.isNotEmpty) ...[
                         Text(
                           'Add-ons',
                           style: TextStyle(
-                            color: Color(0xFF0D47A1),
+                            color: const Color(0xFF0D47A1),
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Column(
                           children: widget.menuItem.addOns
                               .map(
@@ -292,12 +300,14 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                           Expanded(
                                             child: Text(
                                               addOn.name,
-                                              style: TextStyle(fontSize: 16),
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
                                             ),
                                           ),
                                           Text(
                                             '+\$${addOn.price.toStringAsFixed(2)}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -306,22 +316,28 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                       value: _selectedAddOns[addOn] ?? false,
                                       onChanged: (value) {
                                         setState(() {
-                                          _selectedAddOns[addOn] =
+                                          _selectedAddOns[addOn.id] =
                                               value ?? false;
-                                          _calculateTotal();
                                         });
                                       },
                                       checkboxShape: const CircleBorder(),
-                                      secondary: addOn.image != null
+                                      secondary:
+                                          addOn.image != null &&
+                                              addOn.image!.isNotEmpty
                                           ? CircleAvatar(
-                                              backgroundImage: AssetImage(
-                                                addOn.image!,
-                                              ),
                                               radius: 20,
                                               backgroundColor:
                                                   Colors.grey.shade200,
+                                              backgroundImage: AssetImage(
+                                                addOn.image!,
+                                              ),
                                             )
-                                          : null,
+                                          : const Icon(
+                                              Icons.add_circle_outline,
+                                              size: 28,
+                                              color: Colors.grey,
+                                            ),
+
                                       activeColor: Colors.blue,
                                     ),
                                     const SizedBox(height: 8),
@@ -330,19 +346,19 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               )
                               .toList(),
                         ),
-
-                        SizedBox(height: 25),
+                        const SizedBox(height: 25),
                       ],
 
+                      // Note section
                       Text(
                         'Note',
                         style: TextStyle(
-                          color: Color(0xFF0D47A1),
+                          color: const Color(0xFF0D47A1),
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       TextField(
                         controller: _noteController,
                         maxLines: 3,
@@ -352,13 +368,13 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 100), // Space for fixed button
                     ],
                   ),
                 ),
@@ -366,16 +382,17 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
             ),
           ),
 
+          // Fixed bottom button
           Positioned(
             left: 20,
             right: 20,
             bottom: 20,
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 10,
@@ -386,10 +403,11 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
               ),
               child: Row(
                 children: [
+                  // Quantity controls
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove_circle_outline, size: 24),
+                        icon: const Icon(Icons.remove_circle_outline, size: 24),
                         onPressed: _decrementQuantity,
                       ),
                       Container(
@@ -397,72 +415,31 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         alignment: Alignment.center,
                         child: Text(
                           '$_quantity',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.add_circle_outline, size: 24),
+                        icon: const Icon(Icons.add_circle_outline, size: 24),
                         onPressed: _incrementQuantity,
                       ),
                     ],
                   ),
 
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
+                  // Add/Update button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        final cart = context.read<CartProvider>();
-                        List<AddOn> selectedAddOnsList = _selectedAddOns.entries
-                            .where((entry) => entry.value == true)
-                            .map((entry) => entry.key)
-                            .toList();
-                        CartItem newItem = CartItem(
-                          id: widget.cartItem?.id,
-                          menuItem: widget.menuItem,
-                          selectedSize:
-                              _selectedSize ?? widget.menuItem.defaultSize,
-                          selectedAddOns: selectedAddOnsList,
-                          quantity: _quantity,
-                          note: _noteController.text,
-                        );
-
-                        widget.cartItem == null
-                            ? cart.addToCart(newItem)
-                            : cart.updateCartItem(newItem);
-
-                        // ScaffoldMessenger.of(context).showMaterialBanner(
-                        //   MaterialBanner(
-                        //     backgroundColor: const Color(0xFF10B981),
-                        //     content: widget.cartItem == null
-                        //         ? Text(
-                        //             "${widget.menuItem.name} added to cart!",
-                        //             style: const TextStyle(color: Colors.white),
-                        //           )
-                        //         : Text(
-                        //             "${widget.menuItem.name} edited successfully",
-                        //             style: const TextStyle(color: Colors.white),
-                        //           ),
-
-                        //     actions: const [SizedBox.shrink()],
-                        //     padding: const EdgeInsets.symmetric(
-                        //       horizontal: 16,
-                        //       vertical: 12,
-                        //     ),
-                        //   ),
-                        // );
-
-                        Future.delayed(const Duration(seconds: 1), () {
-                          Navigator.pop(context);
-                        });
+                        _saveItem(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFFF6835),
+                        backgroundColor: const Color(0xFFFF6835),
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -471,28 +448,19 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(width: 8),
-                          widget.cartItem == null
-                              ? Text(
-                                  'Add',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                              : Text(
-                                  'Update',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-
-                          SizedBox(width: 8),
-                          Icon(Icons.shopping_cart, size: 20),
-                          SizedBox(width: 8),
+                          Text(
+                            widget.cartItem == null ? 'Add' : 'Update',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.shopping_cart, size: 20),
+                          const SizedBox(width: 8),
                           Text(
                             '\$${_totalPrice.toStringAsFixed(2)}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
