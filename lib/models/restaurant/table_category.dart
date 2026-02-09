@@ -1,6 +1,20 @@
+import 'queue_table.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = Uuid();
+
 class TableCategory {
   final String id;
-  final String name;
+  final String type;
+  final List<QueueTable> tables;
+  final int seatAmount;
 
-  const TableCategory({required this.id, required this.name});
+  TableCategory({
+    String? categoryId,
+    required this.type,
+    required this.tables,
+    required this.seatAmount,
+  }) : id = categoryId ?? uuid.v4();
+
+  int get numofTable => tables.length;
 }

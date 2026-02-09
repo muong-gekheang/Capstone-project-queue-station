@@ -1,20 +1,32 @@
 import '../user/user.dart';
 import 'table_category.dart';
+import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
+final uuid = Uuid();
 
 enum TableStatus { available, occupied }
 
 class QueueTable {
+  final String id;
   final List<User> customers;
   final String tableNum;
-  final int seatSize;
-  final TableStatus tableStatus;
-  final TableCategory category;
+  TableStatus tableStatus;
 
-  const QueueTable({
-    required this.customers,
+  QueueTable({
+    String? tableId,
     required this.tableNum,
-    required this.seatSize,
     required this.tableStatus,
-    required this.category,
-  });
+    List<User>? consumers,
+  }) : id = tableId ?? uuid.v4(),
+       customers = consumers ?? [];
+
+  // Copy method for creating updated instances
+  QueueTable copyWith({String? tableNum, int? seat, TableStatus? tableStatus}) {
+    return QueueTable(
+      tableId: id,
+      tableNum: tableNum ?? this.tableNum,
+      tableStatus: tableStatus ?? this.tableStatus,
+    );
+  }
 }

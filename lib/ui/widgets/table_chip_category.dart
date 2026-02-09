@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/old_model/table_category.dart';
+import 'package:queue_station_app/models/restaurant/table_category.dart';
+import 'package:queue_station_app/ui/app_theme.dart';
 
 class CategoryChips extends StatelessWidget {
   final List<TableCategory> tableData;
@@ -19,15 +20,15 @@ class CategoryChips extends StatelessWidget {
 
   Color getChipColor({required bool isSelected, required bool isText}) {
     if (isText) {
-      return isSelected ? Colors.white : Colors.black;
+      return isSelected ? AppTheme.naturalWhite : AppTheme.naturalBlack;
     }
-    return isSelected ? Color(0xFFFF6835) : Color(0xFFF1F1F1);
+    return isSelected ? AppTheme.primaryColor : AppTheme.naturalGrey;
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 35,
+      height: AppTheme.spacingXL,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: tableData.length,
@@ -39,28 +40,33 @@ class CategoryChips extends StatelessWidget {
             return Row(
               children: [
                 Padding(
-                  padding: EdgeInsetsGeometry.only(right: 8),
+                  padding: EdgeInsetsGeometry.only(right: AppTheme.spacingS),
                   child: IconButton(
                     onPressed: onAddChip,
-                    icon: Icon(Icons.add),
+                    icon: const Icon(Icons.add),
                   ),
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.only(right: AppTheme.spacingS),
                   child: ChoiceChip(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    side: BorderSide(color: AppTheme.naturalGrey),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacingS,
+                    ),
                     label: Text(
                       tableData[index].type,
                       style: TextStyle(
                         color: getChipColor(isSelected: isPicked, isText: true),
                       ),
                     ),
-                    selectedColor: const Color(0xFFFF6835),
-                    backgroundColor: const Color(0xFFF1F1F1),
+                    selectedColor: AppTheme.primaryColor,
+                    backgroundColor: AppTheme.naturalGrey,
                     showCheckmark: false,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(
+                        AppTheme.borderRadiusL,
+                      ),
                     ),
                     selected: isPicked,
                     onSelected: (_) => onSelectedChip(index),
@@ -77,20 +83,23 @@ class CategoryChips extends StatelessWidget {
           } else {
             bool isPicked = selectedChipIndex == index;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppTheme.spacingS),
               child: ChoiceChip(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                side: BorderSide(color: AppTheme.naturalGrey),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingS,
+                ),
                 label: Text(
                   tableData[index].type,
                   style: TextStyle(
                     color: getChipColor(isSelected: isPicked, isText: true),
                   ),
                 ),
-                selectedColor: const Color(0xFFFF6835),
-                backgroundColor: const Color(0xFFF1F1F1),
+                selectedColor: AppTheme.primaryColor,
+                backgroundColor: AppTheme.naturalGrey,
                 showCheckmark: false,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadiusL),
                 ),
                 selected: isPicked,
                 onSelected: (_) => onSelectedChip(index),

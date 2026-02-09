@@ -1,33 +1,36 @@
-import 'package:queue_station_app/old_model/table_category.dart';
-import 'package:queue_station_app/old_model/queue_table.dart';
+import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/restaurant/table_category.dart';
 
 List<TableCategory> tableData = [
   TableCategory(
-    type: "VIP Room",
+    type: "Type A",
+    seatAmount: 2,
     tables: [
-      QueueTable(tableNum: "V1", seat: 8, isTableStatus: true),
-      QueueTable(tableNum: "V2", seat: 10, isTableStatus: false),
-      QueueTable(tableNum: "V3", seat: 6, isTableStatus: true),
-      QueueTable(tableNum: "V4", seat: 4, isTableStatus: true),
-      QueueTable(tableNum: "V5", seat: 2, isTableStatus: false),
-      QueueTable(tableNum: "V6", seat: 1, isTableStatus: true),
+      QueueTable(tableNum: "A1", tableStatus: TableStatus.available),
+      QueueTable(tableNum: "A2", tableStatus: TableStatus.occupied),
+      QueueTable(tableNum: "A3", tableStatus: TableStatus.available),
+      QueueTable(tableNum: "A4", tableStatus: TableStatus.available),
+      QueueTable(tableNum: "A5", tableStatus: TableStatus.occupied),
+      QueueTable(tableNum: "A6", tableStatus: TableStatus.available),
     ],
   ),
   TableCategory(
-    type: "Indoor Standard",
+    type: "Type B",
+    seatAmount: 4,
     tables: [
-      QueueTable(tableNum: "A1", seat: 4, isTableStatus: true),
-      QueueTable(tableNum: "A2", seat: 2, isTableStatus: true),
-      QueueTable(tableNum: "A3", seat: 4, isTableStatus: false),
-      QueueTable(tableNum: "A4", seat: 6, isTableStatus: true),
+      QueueTable(tableNum: "A1", tableStatus: TableStatus.available),
+      QueueTable(tableNum: "A2", tableStatus: TableStatus.available),
+      QueueTable(tableNum: "A3", tableStatus: TableStatus.occupied),
+      QueueTable(tableNum: "A4", tableStatus: TableStatus.available),
     ],
   ),
   TableCategory(
-    type: "Terrace / Outdoor",
+    type: "Type C",
+    seatAmount: 6,
     tables: [
-      QueueTable(tableNum: "T1", seat: 2, isTableStatus: false),
-      QueueTable(tableNum: "T2", seat: 2, isTableStatus: false),
-      QueueTable(tableNum: "T3", seat: 4, isTableStatus: true),
+      QueueTable(tableNum: "T1", tableStatus: TableStatus.occupied),
+      QueueTable(tableNum: "T2", tableStatus: TableStatus.occupied),
+      QueueTable(tableNum: "T3", tableStatus: TableStatus.available),
     ],
   ),
 ];
