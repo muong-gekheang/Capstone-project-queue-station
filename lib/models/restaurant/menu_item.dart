@@ -11,8 +11,8 @@ class MenuItem {
   final int? minPrepTimeMinutes;
   final int? maxPrepTimeMinutes;
   final MenuItemCategory category;
-  final List<MenuSize> sizes = []; // Sizes handles the pricing
-  final List<AddOn> addOns = [];
+  final List<MenuSize> sizes; // Sizes handles the pricing
+  final List<AddOn> addOns;
   bool isAvailable;
 
   MenuItem({
@@ -22,6 +22,14 @@ class MenuItem {
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
     required this.category,
+    List<MenuSize>? sizes, 
+    List<AddOn>? addOns,
     this.isAvailable = true,
-  });
+  }): sizes = sizes ?? [], addOns = addOns ?? [];
+
+  double cheapestPrice() {
+    if (sizes.isEmpty) return 0.0;
+    return sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);
+  }
+
 }

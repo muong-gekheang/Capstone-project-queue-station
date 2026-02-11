@@ -71,7 +71,7 @@ class MenuCardWidget extends StatelessWidget {
                       ),
                       SizedBox(width: 5),
                       Text(
-                        "\$${menu.sizes.price}",
+                        "\$${menu.cheapestPrice().toStringAsFixed(2)}",
                         style: TextStyle(
                           color: const Color.fromRGBO(255, 104, 53, 1),
                           fontSize: 12,

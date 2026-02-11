@@ -73,10 +73,6 @@ final MenuItem classicBurger =
         name: "Classic Burger",
         description:
             "Classic burger with fresh lettuce, tomato, and beef patty.",
-<<<<<<< HEAD
-        minPrepTimeMinutes: 10,
-=======
->>>>>>> 31dd5c0 (Refactor implementation to match with new models)
         maxPrepTimeMinutes: 15,
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/burger.png",
@@ -95,10 +91,6 @@ final MenuItem cheeseBurger =
         name: "Cheese Burger",
         description:
             "Beef patty with melted cheddar cheese, pickles, and special sauce.",
-<<<<<<< HEAD
-        minPrepTimeMinutes: 9,
-=======
->>>>>>> 31dd5c0 (Refactor implementation to match with new models)
         maxPrepTimeMinutes: 12,
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/cheeseburger.png",
@@ -118,12 +110,7 @@ final MenuItem pepperoniPizza =
         name: "Pepperoni Pizza",
         description:
             "Classic pepperoni with mozzarella cheese on tomato sauce base.",
-<<<<<<< HEAD
-        minPrepTimeMinutes: 20,
-        maxPrepTimeMinutes: 25,
-=======
         maxPrepTimeMinutes: 20,
->>>>>>> 31dd5c0 (Refactor implementation to match with new models)
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza.png",
         isAvailable: true
@@ -142,12 +129,7 @@ final MenuItem margheritaPizza =
         name: "Margherita Pizza",
         description:
             "Simple yet delicious with fresh mozzarella, tomatoes, and basil.",
-<<<<<<< HEAD
-        minPrepTimeMinutes: 20,
-        maxPrepTimeMinutes: 25,
-=======
         maxPrepTimeMinutes: 18,
->>>>>>> 31dd5c0 (Refactor implementation to match with new models)
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza(1).png",
         isAvailable: true
@@ -166,12 +148,7 @@ final MenuItem cola =
     MenuItem(
         name: "Cola",
         description: "Chilled soft drink, perfect with any meal.",
-<<<<<<< HEAD
-        minPrepTimeMinutes: 2,
-        maxPrepTimeMinutes: 5,
-=======
         maxPrepTimeMinutes: 2,
->>>>>>> 31dd5c0 (Refactor implementation to match with new models)
         category: mockMenuCategories[2], // Drinks category
         image: "assets/images/energy-drink.png",
         isAvailable: true
@@ -185,12 +162,7 @@ final MenuItem veggieWrap =
         name: "Veggie Wrap",
         description:
             "A healthy wrap with fresh vegetables, hummus, and whole wheat tortilla.",
-<<<<<<< HEAD
-        minPrepTimeMinutes: 10,
-        maxPrepTimeMinutes: 15,
-=======
         maxPrepTimeMinutes: 10,
->>>>>>> 31dd5c0 (Refactor implementation to match with new models)
         category:
             mockMenuCategories[0], // Burger category (or you can create a new category 'Wraps')
         image: "assets/images/burger()1.png",
