@@ -1,8 +1,8 @@
+import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-
-import '../data/queue_repository.dart';
 
 class QueueService {
   final QueueRepository _repository;
@@ -24,11 +24,11 @@ class QueueService {
     required int partySize,
   }) async {
     final entry = QueueEntry(
-      queueNumber: "001",
+      queueNumber: DateTime.now().millisecondsSinceEpoch.toString(),
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       partySize: partySize,
       joinTime: DateTime.now(),
-      status: QueueStatus.waiting,
+      status: QueueStatus.waiting, // This is correct - using enum
       customerId: '',
       joinedMethod: JoinedMethod.remote,
     );
@@ -40,31 +40,32 @@ class QueueService {
     final entry = await _repository.getQueueEntryById(queueEntryId);
     if (entry != null) {
       final updatedEntry = entry.copyWith(
-        status: 'served',
+        status: QueueStatus.served, 
         servedTime: DateTime.now(),
         tableNumber: tableNumber,
       );
       await _repository.updateQueueEntry(updatedEntry);
 
       // Update table status
-      final tables = await _repository.getAllTables();
-      final table = tables.firstWhere(
-        (t) => t == tableNumber,
-        orElse: () => tables.first,
-      );
-      final updatedTable = table.copyWith(
-        status: 'occupied',
-        currentQueueEntryId: queueEntryId,
-        occupiedSince: DateTime.now(),
-      );
-      await _repository.updateTable(updatedTable);
+      final table = await _repository.getTableByNumber(tableNumber);
+      if (table != null) {
+        final updatedTable = table.copyWith(
+          tableStatus: TableStatus.occupied,
+          currentQueueEntryId: queueEntryId,
+          occupiedSince: DateTime.now(),
+        );
+        await _repository.updateTable(updatedTable);
+      }
     }
   }
 
   Future<void> cancelQueueEntry(String queueEntryId) async {
     final entry = await _repository.getQueueEntryById(queueEntryId);
     if (entry != null) {
-      final updatedEntry = entry.copyWith(status: 'cancelled');
+      final updatedEntry = entry.copyWith(
+        status: QueueStatus.cancelled, // FIXED: Using enum instead of string
+        servedTime: DateTime.now(),
+      );
       await _repository.updateQueueEntry(updatedEntry);
     }
   }
@@ -79,14 +80,15 @@ class QueueService {
   }
 
   Future<void> freeTable(String tableNumber) async {
-    final tables = await _repository.getAllTables();
-    final table = tables.firstWhere((t) => t == tableNumber);
-    final updatedTable = table.copyWith(
-      status: 'available',
-      currentQueueEntryId: null,
-      occupiedSince: null,
-    );
-    await _repository.updateTable(updatedTable);
+    final table = await _repository.getTableByNumber(tableNumber);
+    if (table != null) {
+      final updatedTable = table.copyWith(
+        tableStatus: TableStatus.available,
+        currentQueueEntryId: null,
+        occupiedSince: null,
+      );
+      await _repository.updateTable(updatedTable);
+    }
   }
 
   // Dashboard Stats
@@ -97,10 +99,10 @@ class QueueService {
   // Calculate estimated wait time for a new customer
   Future<int> calculateEstimatedWaitTime(int partySize) async {
     final stats = await getDashboardStats();
-    final activeTables = await getActiveTables();
+    final allTables = await getAllTables();
 
     // Simple estimation: average wait time + (people ahead / tables available)
-    final availableTables = activeTables
+    final availableTables = allTables
         .where((table) => table.tableStatus == TableStatus.available)
         .length;
 
@@ -109,7 +111,7 @@ class QueueService {
     } else {
       // If no available tables, estimate based on average service time
       return stats.averageWaitTimeMinutes +
-          (stats.peopleWaiting ~/ stats.activeTables);
+          (stats.peopleWaiting ~/ (stats.activeTables + 1));
     }
   }
 }

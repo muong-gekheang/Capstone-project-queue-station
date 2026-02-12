@@ -262,7 +262,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    TableManagementScreen(tableCategory: tableData),
+                    TableManagementScreen(tableCategory: [], initialTables: tableData,),
               ),
             );
           },

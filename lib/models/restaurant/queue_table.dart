@@ -2,42 +2,47 @@ import '../user/user.dart';
 import 'table_category.dart';
 import 'package:uuid/uuid.dart';
 
-import '../user/user.dart';
-
 final uuid = Uuid();
 
 enum TableStatus { available, occupied }
 
 class QueueTable {
   final String id;
-  final List<User> customers;
   final String tableNum;
   TableStatus tableStatus;
   final TableCategory tableCategory;
+  final List<User> customers;
+  final String? currentQueueEntryId;
+  final DateTime? occupiedSince;
 
   QueueTable({
-    String? tableId,
+    String? id,
     required this.tableNum,
     required this.tableStatus,
-    List<User>? consumers,
     required this.tableCategory,
-  }) : id = tableId ?? uuid.v4(),
-       customers = consumers ?? [];
+    List<User>? customers,
+    this.currentQueueEntryId,
+    this.occupiedSince,
+  }) : id = id ?? uuid.v4(),
+       customers = customers ?? [];
 
-  // Copy method for creating updated instances
+  // Copy method with ALL fields
   QueueTable copyWith({
     String? tableNum,
     TableStatus? tableStatus,
     TableCategory? tableCategory,
-    List<User>? consumers, // Added this to the parameters
+    List<User>? customers,
+    String? currentQueueEntryId,
+    DateTime? occupiedSince,
   }) {
     return QueueTable(
-      tableId: id, // Always keep the same ID
+      id: this.id, // Keep same ID
       tableNum: tableNum ?? this.tableNum,
       tableStatus: tableStatus ?? this.tableStatus,
       tableCategory: tableCategory ?? this.tableCategory,
-      consumers:
-          consumers ?? this.customers, // Pass existing customers if not updated
+      customers: customers ?? this.customers,
+      currentQueueEntryId: currentQueueEntryId ?? this.currentQueueEntryId,
+      occupiedSince: occupiedSince ?? this.occupiedSince,
     );
   }
 }

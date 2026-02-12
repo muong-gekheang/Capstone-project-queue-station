@@ -1,8 +1,15 @@
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
-
 import '../order/order.dart';
 
-enum QueueStatus { waiting, serving, completed, cancelled, noShow }
+enum QueueStatus {
+  waiting,
+  serving,
+  completed,
+  cancelled,
+  noShow,
+  notified,
+  served,
+}
 
 enum JoinedMethod { remote, walkIn }
 
@@ -17,6 +24,7 @@ class QueueEntry {
   final QueueStatus status;
   final Order? order;
   final JoinedMethod joinedMethod;
+  final String? tableNumber; // Added missing field
 
   int currentSpot(Restaurant rest) {
     return rest.getQueueSpot(this);
@@ -33,8 +41,9 @@ class QueueEntry {
     required this.customerId,
     this.order,
     required this.joinedMethod,
+    this.tableNumber, // Added to constructor
   });
-  
+
   Duration? get waitingTime {
     if (servedTime == null) return null;
     return servedTime!.difference(joinTime);
@@ -60,8 +69,35 @@ class QueueEntry {
         (other.customerId == customerId));
   }
 
-
-
   @override
   int get hashCode => Object.hash(id, customerId);
+
+
+  QueueEntry copyWith({
+    String? id,
+    String? queueNumber,
+    String? customerId,
+    int? partySize,
+    DateTime? joinTime,
+    DateTime? servedTime,
+    DateTime? endedTime,
+    QueueStatus? status, // Using enum, not String
+    Order? order,
+    JoinedMethod? joinedMethod,
+    String? tableNumber,
+  }) {
+    return QueueEntry(
+      id: id ?? this.id,
+      queueNumber: queueNumber ?? this.queueNumber,
+      customerId: customerId ?? this.customerId,
+      partySize: partySize ?? this.partySize,
+      joinTime: joinTime ?? this.joinTime,
+      servedTime: servedTime ?? this.servedTime,
+      endedTime: endedTime ?? this.endedTime,
+      status: status ?? this.status, // Using enum
+      order: order ?? this.order,
+      joinedMethod: joinedMethod ?? this.joinedMethod,
+      tableNumber: tableNumber ?? this.tableNumber,
+    );
+  }
 }

@@ -1,11 +1,17 @@
+import 'package:flutter/widgets.dart';
+import 'package:queue_station_app/models/analytic/analytics_data.dart';
+import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
+import 'package:queue_station_app/models/analytic/order_summary.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueRepository {
   // In-memory storage using Maps for fast lookup
   final Map<String, QueueEntry> _queueEntriesById = {};
-  final Map<String, QueueTable> _tablesById = {};
-  // final Map<String, > _ordersById = {};
+  final Map<String, QueueTable> _tablesByNumber = {};
+  final Map<String, dynamic> _ordersById =
+      {}; // Using dynamic until StoreOrder is defined
 
   QueueRepository() {
     _initializeSampleData();
@@ -112,100 +118,85 @@ class QueueRepository {
       _queueEntriesById[entry.id] = entry;
     }
 
-    // Tables
+    // Create standard table category
+    final standardCategory = TableCategory(type: 'Standard', seatAmount: 4);
+
+    // Tables - Using QueueTable consistently
     final tables = [
-      QueueTable(tableNum: '', tableStatus: TableStatus.available),
-      Table(
-        id: 't2',
-        tableNumber: '2',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: '2',
+      QueueTable(
+        tableNum: '1',
+        tableStatus: TableStatus.available,
+        tableCategory: standardCategory,
+        currentQueueEntryId: null,
+        occupiedSince: null,
+      ),
+      QueueTable(
+        tableNum: '2',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
+        currentQueueEntryId: '102',
         occupiedSince: now.subtract(const Duration(minutes: 15)),
       ),
-      Table(
-        id: 't3',
-        tableNumber: '3',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: '3',
+      QueueTable(
+        tableNum: '3',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
+        currentQueueEntryId: '103',
         occupiedSince: now.subtract(const Duration(minutes: 12)),
       ),
-      Table(
-        id: 't4',
-        tableNumber: '4',
-        capacity: 2,
-        status: 'occupied',
-        currentQueueEntryId: '4',
+      QueueTable(
+        tableNum: '4',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
+        currentQueueEntryId: '104',
         occupiedSince: now.subtract(const Duration(minutes: 10)),
       ),
-      Table(
-        id: 't5',
-        tableNumber: '5',
-        capacity: 6,
-        status: 'occupied',
-        currentQueueEntryId: '5',
+      QueueTable(
+        tableNum: '5',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
+        currentQueueEntryId: '105',
         occupiedSince: now.subtract(const Duration(minutes: 8)),
       ),
-      Table(
-        id: 't6',
-        tableNumber: '6',
-        capacity: 2,
-        status: 'occupied',
-        currentQueueEntryId: '6',
+      QueueTable(
+        tableNum: '6',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
+        currentQueueEntryId: '106',
         occupiedSince: now.subtract(const Duration(minutes: 5)),
       ),
-      Table(
-        id: 't7',
-        tableNumber: '7',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: '7',
+      QueueTable(
+        tableNum: '7',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
+        currentQueueEntryId: '107',
         occupiedSince: now.subtract(const Duration(minutes: 3)),
       ),
-      Table(id: 't8', tableNumber: '8', capacity: 4, status: 'available'),
-      Table(id: 't9', tableNumber: '9', capacity: 2, status: 'available'),
-      Table(
-        id: 't10',
-        tableNumber: '10',
-        capacity: 4,
-        status: 'occupied',
+      QueueTable(
+        tableNum: '8',
+        tableStatus: TableStatus.available,
+        tableCategory: standardCategory,
+        currentQueueEntryId: null,
+        occupiedSince: null,
+      ),
+      QueueTable(
+        tableNum: '9',
+        tableStatus: TableStatus.available,
+        tableCategory: standardCategory,
+        currentQueueEntryId: null,
+        occupiedSince: null,
+      ),
+      QueueTable(
+        tableNum: '10',
+        tableStatus: TableStatus.occupied,
+        tableCategory: standardCategory,
         currentQueueEntryId: null,
         occupiedSince: now.subtract(const Duration(minutes: 25)),
       ),
     ];
 
     for (var table in tables) {
-      _tablesById[table.id] = table;
-    }
-
-    // Orders
-    final orders = [
-      StoreOrder(
-        id: 'o1',
-        tableNumber: '1',
-        totalAmount: 45.50,
-        orderTime: now.subtract(const Duration(hours: 2)),
-        status: 'completed',
-      ),
-      StoreOrder(
-        id: 'o2',
-        tableNumber: '2',
-        totalAmount: 78.00,
-        orderTime: now.subtract(const Duration(hours: 1)),
-        status: 'completed',
-      ),
-      StoreOrder(
-        id: 'o3',
-        tableNumber: '3',
-        totalAmount: 32.25,
-        orderTime: now.subtract(const Duration(minutes: 30)),
-        status: 'completed',
-      ),
-    ];
-
-    for (var order in orders) {
-      _ordersById[order.id] = order;
+      _tablesByNumber[table.tableNum] = table;
     }
   }
 
@@ -218,7 +209,7 @@ class QueueRepository {
   Future<List<QueueEntry>> getWaitingQueueEntries() async {
     await Future.delayed(const Duration(milliseconds: 50));
     return _queueEntriesById.values
-        .where((e) => e.status == 'waiting')
+        .where((e) => e.status == QueueStatus.waiting)
         .toList();
   }
 
@@ -244,43 +235,41 @@ class QueueRepository {
   Future<void> removeQueueEntry(String id) async {
     _queueEntriesById.remove(id);
     // Also remove references from tables
-    for (var table in _tablesById.values) {
+    for (var table in _tablesByNumber.values) {
       if (table.currentQueueEntryId == id) {
-        // Table.currentQueueEntryId must not be final for this assignment to work
-        table = Table(
-          id: table.id,
-          tableNumber: table.tableNumber,
-          capacity: table.capacity,
-          status: 'available',
+        final updatedTable = table.copyWith(
+          tableStatus: TableStatus.available,
           currentQueueEntryId: null,
-          occupiedSince: table.occupiedSince,
+          occupiedSince: null,
         );
-        _tablesById[table.id] = table;
+        _tablesByNumber[updatedTable.tableNum] = updatedTable;
       }
     }
   }
 
   // ================= Table Methods =================
-  Future<List<Table>> getAllTables() async {
+  Future<List<QueueTable>> getAllTables() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _tablesById.values.toList();
+    return _tablesByNumber.values.toList();
   }
 
-  Future<List<Table>> getActiveTables() async {
+  Future<List<QueueTable>> getActiveTables() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _tablesById.values.where((t) => t.status == 'occupied').toList();
+    return _tablesByNumber.values
+        .where((t) => t.tableStatus == TableStatus.occupied)
+        .toList();
   }
 
-  Future<Table?> getTableById(String id) async {
+  Future<QueueTable?> getTableByNumber(String tableNum) async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _tablesById[id];
+    return _tablesByNumber[tableNum];
   }
 
-  Future<void> updateTable(Table table) async {
-    if (!_tablesById.containsKey(table.id)) {
-      throw Exception('Table with id ${table.id} does not exist.');
+  Future<void> updateTable(QueueTable table) async {
+    if (!_tablesByNumber.containsKey(table.tableNum)) {
+      throw Exception('Table with number ${table.tableNum} does not exist.');
     }
-    _tablesById[table.id] = table;
+    _tablesByNumber[table.tableNum] = table;
   }
 
   // ================= Dashboard Stats =================
@@ -311,29 +300,14 @@ class QueueRepository {
   }
 
   // ================= Orders =================
-  Future<List<StoreOrder>> getAllOrders() async {
+  Future<List<dynamic>> getAllOrders() async {
     await Future.delayed(const Duration(milliseconds: 50));
     return _ordersById.values.toList();
   }
 
-  Future<List<StoreOrder>> getOrdersByDateRange(
-    DateTime start,
-    DateTime end,
-  ) async {
+  Future<int> getTotalOrdersCount() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _ordersById.values
-        .where(
-          (order) =>
-              order.orderTime.isAfter(start) && order.orderTime.isBefore(end),
-        )
-        .toList();
-  }
-
-  Future<void> addOrder(StoreOrder order) async {
-    if (_ordersById.containsKey(order.id)) {
-      throw Exception('Order with id ${order.id} already exists.');
-    }
-    _ordersById[order.id] = order;
+    return _ordersById.length;
   }
 
   // ================= Analytics =================
@@ -344,12 +318,13 @@ class QueueRepository {
     final now = DateTime.now();
     final List<QueueLengthDataPoint> dataPoints = [];
 
-    // Example: queue length based on current waiting entries (simplified)
     if (timeframe == 'Today') {
       for (int hour = 8; hour <= 19; hour++) {
         final time = DateTime(now.year, now.month, now.day, hour);
         final count = _queueEntriesById.values
-            .where((e) => e.joinTime.hour <= hour && e.status == 'waiting')
+            .where(
+              (e) => e.joinTime.hour <= hour && e.status == QueueStatus.waiting,
+            )
             .length;
         dataPoints.add(QueueLengthDataPoint(time: time, queueLength: count));
       }
@@ -362,47 +337,21 @@ class QueueRepository {
     String timeframe,
   ) async {
     await Future.delayed(const Duration(milliseconds: 50));
-    final activeCount = _tablesById.values
-        .where((t) => t.status == 'occupied')
+    final activeCount = _tablesByNumber.values
+        .where((t) => t.tableStatus == TableStatus.occupied)
         .length;
-    final totalCount = _tablesById.length;
+    final totalCount = _tablesByNumber.length;
     return [
       TableOccupancyDataPoint(
         day: timeframe,
-        occupancyPercentage: ((activeCount / totalCount) * 100),
+        occupancyPercentage: totalCount > 0
+            ? ((activeCount / totalCount) * 100)
+            : 0,
       ),
     ];
   }
 
-  Future<List<OrderValueDataPoint>> getAverageOrderValueData(
-    String timeframe,
-  ) async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    if (_ordersById.isEmpty) return [];
-    final average =
-        _ordersById.values
-            .map((o) => o.totalAmount)
-            .fold(0.0, (a, b) => a + b) /
-        _ordersById.length;
-    return [OrderValueDataPoint(day: timeframe, averageOrderValue: average)];
-  }
+  Future<dynamic> getAverageOrderValueData(String orderValueTimeframe) async {}
 
-  Future<int> getTotalOrdersCount() async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    return _ordersById.length;
-  }
-
-  Future<List<OrderSummary>> getOrderSummary(String timeframe) async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    return _ordersById.values.map((order) {
-      return OrderSummary(
-        order.id,
-        int.parse(order.tableNumber),
-        time: order.orderTime.toIso8601String(),
-        tableNumber: order.tableNumber,
-        amount: order.totalAmount,
-        id: '',
-      );
-    }).toList();
-  }
+  Future<dynamic> getOrderSummary(String ordersTimeframe) async {}
 }

@@ -17,8 +17,7 @@ class TableManagementScreen extends StatefulWidget {
   });
 
   final List<TableCategory> tableCategory;
-  final List<QueueTable>
-  initialTables; // Added to receive the flat list of tables
+  final List<QueueTable> initialTables;
 
   @override
   State<TableManagementScreen> createState() => _TableManagementScreenState();
@@ -31,8 +30,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
 
   // State for currently viewed data
   late TableCategory currentCategoryTable;
-  late List<QueueTable>
-  filteredTables; // Tables currently shown after filters/search
+  late List<QueueTable> filteredTables;
 
   late List<String> categoryNames;
   int selectedChipIndex = 0;
@@ -41,21 +39,42 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   bool isFiltered = false;
   bool isEditMode = false;
 
+  // Controllers
+  final TextEditingController _textController = TextEditingController();
+  final TextEditingController _seatController = TextEditingController();
+  String? selectedCategory;
+
   @override
   void initState() {
     super.initState();
     tableCategories = List.from(widget.tableCategory);
     allTables = List.from(widget.initialTables);
 
-    currentCategoryTable = tableCategories.first;
-    categoryNames = tableCategories.map((c) => c.type).toList();
+    if (tableCategories.isNotEmpty) {
+      currentCategoryTable = tableCategories.first;
+      categoryNames = tableCategories.map((c) => c.type).toList();
+    } else {
+      // Create default category if none exists
+      final defaultCategory = TableCategory(type: 'Standard', seatAmount: 4);
+      tableCategories = [defaultCategory];
+      currentCategoryTable = defaultCategory;
+      categoryNames = [defaultCategory.type];
+    }
+
     _applyFilters();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _seatController.dispose();
+    super.dispose();
   }
 
   // Central logic to update what is shown on screen
   void _applyFilters() {
     setState(() {
-      // 1. Filter by the selected Category Chip
+      // 1. Filter by the selected Category
       var result = allTables
           .where((t) => t.tableCategory.id == currentCategoryTable.id)
           .toList();
@@ -72,9 +91,14 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
 
       // 3. Filter by Status
       if (isFiltered && currentFilter != FilterOption.clear) {
-        result = result
-            .where((t) => t.tableStatus.name == currentFilter.name)
-            .toList();
+        result = result.where((t) {
+          if (currentFilter == FilterOption.available) {
+            return t.tableStatus == TableStatus.available;
+          } else if (currentFilter == FilterOption.occupied) {
+            return t.tableStatus == TableStatus.occupied;
+          }
+          return true;
+        }).toList();
       }
 
       filteredTables = result;
@@ -185,6 +209,8 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         tableNum: tableNum,
         tableStatus: TableStatus.available,
         tableCategory: categoryObj,
+        currentQueueEntryId: null,
+        occupiedSince: null,
       );
       allTables.add(newTable);
       _applyFilters();
@@ -198,7 +224,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     String newCategoryName,
   ) {
     setState(() {
-      // 1. Find the table in the list
       final index = allTables.indexWhere(
         (t) =>
             t.tableNum == oldTableNum &&
@@ -206,20 +231,17 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       );
 
       if (index != -1) {
-        //Find the Category Object
         final newCategoryObj = tableCategories.firstWhere(
           (c) => c.type == newCategoryName,
         );
 
-        //Update the table
         allTables[index] = allTables[index].copyWith(
           tableNum: newTableNum,
           tableCategory: newCategoryObj,
         );
 
-        //Refresh the UI
         _applyFilters();
-        _showSnackBar("Table moved to $newCategoryName");
+        _showSnackBar("Table updated and moved to $newCategoryName");
       }
     });
   }
@@ -231,8 +253,17 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
             t.tableNum == tableNum &&
             t.tableCategory.id == currentCategoryTable.id,
       );
+
       if (index != -1) {
-        allTables[index].tableStatus = newStatus;
+        allTables[index] = allTables[index].copyWith(
+          tableStatus: newStatus,
+          currentQueueEntryId: newStatus == TableStatus.occupied
+              ? allTables[index].currentQueueEntryId
+              : null,
+          occupiedSince: newStatus == TableStatus.occupied
+              ? DateTime.now()
+              : null,
+        );
         _applyFilters();
         _showSnackBar("Table $tableNum is ${newStatus.name}");
       }
@@ -272,7 +303,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     int amountOfSeat,
   ) {
     setState(() {
-      //Find the category index
       final index = tableCategories.indexWhere(
         (c) => c.type == oldCategoryName,
       );
@@ -284,27 +314,24 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
           seatAmount: amountOfSeat,
         );
 
-        //Update the list of categories
         tableCategories[index] = updatedCategory;
 
-        //Update the table list
+        // Update all tables with this category
         for (int i = 0; i < allTables.length; i++) {
-          if (allTables[i].tableCategory.id == updatedCategory.id) {
+          if (allTables[i].tableCategory.id == tableCategories[index].id) {
             allTables[i] = allTables[i].copyWith(
               tableCategory: updatedCategory,
             );
           }
         }
-        // Sync the name list for dropdowns
+
         categoryNames = tableCategories.map((c) => c.type).toList();
 
         if (selectedChipIndex == index) {
           currentCategoryTable = updatedCategory;
         }
 
-        //Re-run filter to show the updated
         _applyFilters();
-
         _showSnackBar("Category updated: $newCategoryName");
       }
     });
@@ -320,7 +347,15 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         selectedChipIndex = 0;
         currentCategoryTable = tableCategories[0];
         _applyFilters();
+      } else {
+        // Create default category if all are deleted
+        final defaultCategory = TableCategory(type: 'Standard', seatAmount: 4);
+        tableCategories = [defaultCategory];
+        currentCategoryTable = defaultCategory;
+        categoryNames = [defaultCategory.type];
+        filteredTables = [];
       }
+
       _showSnackBar(
         "Category and its tables deleted",
         backgroundColor: AppTheme.accentRed,
@@ -328,18 +363,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     });
   }
 
-  // --- Dialogs & UI Helpers (Maintained exactly as requested) ---
-
-  final _textController = TextEditingController();
-  final _seatController = TextEditingController();
-  String? selectedCategory;
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _seatController.dispose();
-    super.dispose();
-  }
+  // --- Dialogs & UI Helpers ---
 
   void _showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -523,6 +547,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       builder: (_) => CustomDialog(
         title: "Table Status",
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               tableNum,
@@ -587,7 +612,10 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                   child: CustomRecButton(
                     title: "Order on behalf",
                     color: AppTheme.secondaryColor,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // TODO: Implement order on behalf
+                    },
                   ),
                 ),
                 Padding(
@@ -595,7 +623,10 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                   child: CustomRecButton(
                     title: "View order",
                     color: AppTheme.secondaryColor,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // TODO: Implement view order
+                    },
                   ),
                 ),
               ],
@@ -704,7 +735,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         content: Text(
           isTable
               ? "Delete Table ($tableNum)"
-              : "This action will delete every table in this ($categoryName) category",
+              : "This action will delete every table in the ($categoryName) category",
           style: const TextStyle(
             color: AppTheme.primaryColor,
             fontSize: AppTheme.heading3,
@@ -744,7 +775,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     String? tableNum,
     String? tableCategory,
   }) {
-    bool isUpdate = tableNum != null && tableCategory != null;
+    final bool isUpdate = tableNum != null && tableCategory != null;
     selectedCategory = isUpdate
         ? tableCategory
         : (categoryTable.isNotEmpty ? categoryTable.first : null);
@@ -753,7 +784,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        // Added to handle dropdown selection inside dialog
         builder: (context, setDialogState) => CustomDialog(
           title: isUpdate ? "Update table" : "Add new table",
           content: Column(
@@ -790,7 +820,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                     _textController.text.isNotEmpty) {
                   if (isUpdate) {
                     _updateTable(
-                      tableNum,
+                      tableNum!,
                       _textController.text,
                       selectedCategory!,
                     );
@@ -808,7 +838,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   }
 
   void showAddNewUpdateCategoryDialog({String? tableCategory}) {
-    bool isUpdate = tableCategory != null;
+    final bool isUpdate = tableCategory != null;
     _textController.text = isUpdate ? tableCategory : "";
     _seatController.text = isUpdate
         ? currentCategoryTable.seatAmount.toString()
@@ -847,7 +877,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
               if (_textController.text.isNotEmpty) {
                 if (isUpdate) {
                   _updateCategory(
-                    tableCategory,
+                    tableCategory!,
                     _textController.text,
                     int.tryParse(_seatController.text) ?? 2,
                   );
@@ -867,7 +897,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   }
 }
 
-// CustomRecButton remains same as your original
+// CustomRecButton
 class CustomRecButton extends StatelessWidget {
   const CustomRecButton({
     super.key,
@@ -876,10 +906,12 @@ class CustomRecButton extends StatelessWidget {
     required this.onPressed,
     this.textColor = AppTheme.naturalWhite,
   });
+
   final String title;
   final Color color;
   final Color textColor;
   final VoidCallback onPressed;
+
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
