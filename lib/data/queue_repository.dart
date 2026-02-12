@@ -1,15 +1,11 @@
-import 'package:queue_station_app/old_model/analytics_data.dart';
-import 'package:queue_station_app/old_model/dashboard_stats.dart';
-import 'package:queue_station_app/old_model/order_summary.dart';
-import 'package:queue_station_app/old_model/queue_entry.dart';
-import 'package:queue_station_app/old_model/store_order.dart';
-import 'package:queue_station_app/old_model/table.dart';
+import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueRepository {
   // In-memory storage using Maps for fast lookup
   final Map<String, QueueEntry> _queueEntriesById = {};
-  final Map<String, Table> _tablesById = {};
-  final Map<String, StoreOrder> _ordersById = {};
+  final Map<String, QueueTable> _tablesById = {};
+  // final Map<String, > _ordersById = {};
 
   QueueRepository() {
     _initializeSampleData();
@@ -21,60 +17,94 @@ class QueueRepository {
     // Queue entries
     final queueEntries = [
       QueueEntry(
-        id: '1',
-        customerName: 'John Doe',
-        customerPhone: '012345678',
-        partySize: 2,
-        joinTime: now.subtract(const Duration(minutes: 20)),
-        status: 'waiting',
-      ),
-      QueueEntry(
-        id: '2',
-        customerName: 'Jane Smith',
-        customerPhone: '012345679',
+        id: '101',
         partySize: 4,
-        joinTime: now.subtract(const Duration(minutes: 15)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 45)),
+        status: QueueStatus.waiting,
+        queueNumber: 'A-001',
+        customerId: 'user_789',
+        joinedMethod: JoinedMethod.remote,
       ),
       QueueEntry(
-        id: '3',
-        customerName: 'Bob Johnson',
-        customerPhone: '012345680',
+        id: '102',
+        partySize: 2,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 32)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-012',
+        customerId: 'user_456',
+        joinedMethod: JoinedMethod.walkIn,
+      ),
+      QueueEntry(
+        id: '103',
+        partySize: 1,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 28)),
+        status: QueueStatus.notified,
+        queueNumber: 'S-005',
+        customerId: 'user_112',
+        joinedMethod: JoinedMethod.remote,
+      ),
+      QueueEntry(
+        id: '104',
+        partySize: 6,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 25)),
+        status: QueueStatus.waiting,
+        queueNumber: 'L-002',
+        customerId: 'user_990',
+        joinedMethod: JoinedMethod.walkIn,
+      ),
+      QueueEntry(
+        id: '105',
+        partySize: 2,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 18)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-013',
+        customerId: 'user_334',
+        joinedMethod: JoinedMethod.remote,
+      ),
+      QueueEntry(
+        id: '106',
         partySize: 3,
-        joinTime: now.subtract(const Duration(minutes: 12)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 15)),
+        status: QueueStatus.waiting,
+        queueNumber: 'C-021',
+        customerId: 'user_221',
+        joinedMethod: JoinedMethod.remote,
       ),
       QueueEntry(
-        id: '4',
-        customerName: 'Alice Brown',
-        customerPhone: '012345681',
+        id: '107',
         partySize: 2,
-        joinTime: now.subtract(const Duration(minutes: 10)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 10)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-014',
+        customerId: 'user_554',
+        joinedMethod: JoinedMethod.walkIn,
       ),
       QueueEntry(
-        id: '5',
-        customerName: 'Charlie Wilson',
-        customerPhone: '012345682',
-        partySize: 5,
-        joinTime: now.subtract(const Duration(minutes: 8)),
-        status: 'waiting',
+        id: '108',
+        partySize: 8,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 8)),
+        status: QueueStatus.waiting,
+        queueNumber: 'XL-001',
+        customerId: 'user_667',
+        joinedMethod: JoinedMethod.remote,
       ),
       QueueEntry(
-        id: '6',
-        customerName: 'Diana Lee',
-        customerPhone: '012345683',
+        id: '109',
         partySize: 2,
-        joinTime: now.subtract(const Duration(minutes: 5)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 5)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-015',
+        customerId: 'user_882',
+        joinedMethod: JoinedMethod.remote,
       ),
       QueueEntry(
-        id: '7',
-        customerName: 'Frank Miller',
-        customerPhone: '012345684',
+        id: '110',
         partySize: 4,
-        joinTime: now.subtract(const Duration(minutes: 3)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 2)),
+        status: QueueStatus.waiting,
+        queueNumber: 'A-002',
+        customerId: 'user_003',
+        joinedMethod: JoinedMethod.walkIn,
       ),
     ];
 
@@ -84,14 +114,7 @@ class QueueRepository {
 
     // Tables
     final tables = [
-      Table(
-        id: 't1',
-        tableNumber: '1',
-        capacity: 2,
-        status: 'occupied',
-        currentQueueEntryId: '1',
-        occupiedSince: now.subtract(const Duration(minutes: 20)),
-      ),
+      QueueTable(tableNum: '', tableStatus: TableStatus.available),
       Table(
         id: 't2',
         tableNumber: '2',

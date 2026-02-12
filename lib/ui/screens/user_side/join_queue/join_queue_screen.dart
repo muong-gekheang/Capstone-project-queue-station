@@ -46,6 +46,8 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               joinTime: DateTime.now(),
               status: QueueStatus.waiting,
               customerId: user.id,
+              queueNumber: '',
+              joinedMethod: JoinedMethod.remote,
             ),
             id: Uuid().v4(),
             userId: user.id,
