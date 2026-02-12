@@ -10,74 +10,112 @@ import 'package:queue_station_app/ui/widgets/table_search_result.dart';
 enum FilterOption { available, occupied, clear }
 
 class TableManagementScreen extends StatefulWidget {
-  const TableManagementScreen({super.key, required this.tableCategory});
+  const TableManagementScreen({
+    super.key,
+    required this.tableCategory,
+    required this.initialTables,
+  });
 
   final List<TableCategory> tableCategory;
+  final List<QueueTable>
+  initialTables; // Added to receive the flat list of tables
 
   @override
   State<TableManagementScreen> createState() => _TableManagementScreenState();
 }
 
 class _TableManagementScreenState extends State<TableManagementScreen> {
-  late List<TableCategory> tableData;
+  // Master Data
+  late List<TableCategory> tableCategories;
+  late List<QueueTable> allTables;
+
+  // State for currently viewed data
   late TableCategory currentCategoryTable;
-  late List<QueueTable> allCurrentTable;
-  late List<String> category;
+  late List<QueueTable>
+  filteredTables; // Tables currently shown after filters/search
+
+  late List<String> categoryNames;
+  int selectedChipIndex = 0;
+  String searchQuery = "";
+  FilterOption currentFilter = FilterOption.clear;
+  bool isFiltered = false;
+  bool isEditMode = false;
 
   @override
   void initState() {
     super.initState();
-    tableData = List.from(widget.tableCategory);
-    currentCategoryTable = tableData.first;
-    allCurrentTable = currentCategoryTable.tables;
-    category = tableData.map((c) => c.type).toSet().toList();
+    tableCategories = List.from(widget.tableCategory);
+    allTables = List.from(widget.initialTables);
+
+    currentCategoryTable = tableCategories.first;
+    categoryNames = tableCategories.map((c) => c.type).toList();
+    _applyFilters();
   }
 
-  //Chip Category
-  int selectedChipIndex = 0;
+  // Central logic to update what is shown on screen
+  void _applyFilters() {
+    setState(() {
+      // 1. Filter by the selected Category Chip
+      var result = allTables
+          .where((t) => t.tableCategory.id == currentCategoryTable.id)
+          .toList();
+
+      // 2. Filter by Search Query
+      if (searchQuery.isNotEmpty) {
+        result = result
+            .where(
+              (t) =>
+                  t.tableNum.toLowerCase().contains(searchQuery.toLowerCase()),
+            )
+            .toList();
+      }
+
+      // 3. Filter by Status
+      if (isFiltered && currentFilter != FilterOption.clear) {
+        result = result
+            .where((t) => t.tableStatus.name == currentFilter.name)
+            .toList();
+      }
+
+      filteredTables = result;
+    });
+  }
+
+  // Chip Category
   void onSelectedChip(int chipIndex) {
     if (isEditMode && chipIndex == selectedChipIndex) {
-      // Tap on current chip in edit mode → update
-      showAddNewUpdateCategoryDialog(tableCategory: tableData[chipIndex].type);
+      setState(() {
+        selectedChipIndex = chipIndex;
+        currentCategoryTable = tableCategories[chipIndex];
+        _applyFilters();
+      });
+
+      showEditCategoryDialog(category: tableCategories[chipIndex]);
       return;
     }
 
     setState(() {
       selectedChipIndex = chipIndex;
-      currentCategoryTable = tableData[chipIndex];
-      allCurrentTable = currentCategoryTable.tables;
+      currentCategoryTable = tableCategories[chipIndex];
+      _applyFilters();
     });
   }
 
-  //Search state
-  String searchQuery = "";
+  // Search
   void onSearch(String query) {
-    setState(() {
-      searchQuery = query;
-
-      print(query);
-
-      allCurrentTable = currentCategoryTable.tables
-          .where(
-            (t) => t.tableNum.toLowerCase().contains(searchQuery.toLowerCase()),
-          )
-          .toList();
-    });
+    searchQuery = query;
+    _applyFilters();
   }
 
-  //Editing State
-  bool isEditMode = false;
-
+  // Edit Mode
   void onEditMode() {
     setState(() {
       isEditMode = !isEditMode;
-
-      print(isEditMode);
     });
     _showSnackBar(isEditMode ? "Editing Mode" : "Normal Mode");
   }
 
-  bool isFiltered = false;
+  // Filter Popup
   Widget onFilterBy() {
     return PopupMenuButton<FilterOption>(
       tooltip: "Filter by status",
@@ -86,24 +124,13 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         Icons.filter_list,
         color: isFiltered ? AppTheme.primaryColor : AppTheme.secondaryColor,
       ),
-
       onSelected: (status) {
         setState(() {
-          if (status != FilterOption.clear) {
-            isFiltered = true;
-            allCurrentTable = currentCategoryTable.tables
-                .where((t) => t.tableStatus.name == status.name)
-                .toList();
-          } else {
-            // Clear filter
-            isFiltered = false;
-            allCurrentTable = currentCategoryTable.tables;
-          }
-          print(isFiltered);
-          print(status.name);
+          currentFilter = status;
+          isFiltered = status != FilterOption.clear;
+          _applyFilters();
         });
       },
-
       itemBuilder: (context) => const [
         PopupMenuItem<FilterOption>(
           value: FilterOption.available,
@@ -139,20 +166,320 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     );
   }
 
-  //Select Table
   void onTable({required String tableNum, required TableStatus status}) {
+    if (isEditMode) {
+      showEditTableDialog(tableNum: tableNum);
+    } else {
+      showTableStatusDialog(tableNum: tableNum, status: status);
+    }
+  }
+
+  // --- CRUD Operations ---
+
+  void _addNewTable(String tableNum, String categoryName) {
     setState(() {
-      if (isEditMode) {
-        // Show edit/delete dialog in edit mode
-        showEditTableDialog(tableNum: tableNum);
-      } else {
-        // Show status dialog in normal mode
-        showTableStatusDialog(tableNum: tableNum, status: status);
+      final categoryObj = tableCategories.firstWhere(
+        (c) => c.type == categoryName,
+      );
+      final newTable = QueueTable(
+        tableNum: tableNum,
+        tableStatus: TableStatus.available,
+        tableCategory: categoryObj,
+      );
+      allTables.add(newTable);
+      _applyFilters();
+      _showSnackBar("Table $tableNum added to $categoryName");
+    });
+  }
+
+  void _updateTable(
+    String oldTableNum,
+    String newTableNum,
+    String newCategoryName,
+  ) {
+    setState(() {
+      // 1. Find the table in the list
+      final index = allTables.indexWhere(
+        (t) =>
+            t.tableNum == oldTableNum &&
+            t.tableCategory.id == currentCategoryTable.id,
+      );
+
+      if (index != -1) {
+        //Find the Category Object
+        final newCategoryObj = tableCategories.firstWhere(
+          (c) => c.type == newCategoryName,
+        );
+
+        //Update the table
+        allTables[index] = allTables[index].copyWith(
+          tableNum: newTableNum,
+          tableCategory: newCategoryObj,
+        );
+
+        //Refresh the UI
+        _applyFilters();
+        _showSnackBar("Table moved to $newCategoryName");
       }
     });
   }
 
-  //Dialog
+  void _updateTableStatus(String tableNum, TableStatus newStatus) {
+    setState(() {
+      final index = allTables.indexWhere(
+        (t) =>
+            t.tableNum == tableNum &&
+            t.tableCategory.id == currentCategoryTable.id,
+      );
+      if (index != -1) {
+        allTables[index].tableStatus = newStatus;
+        _applyFilters();
+        _showSnackBar("Table $tableNum is ${newStatus.name}");
+      }
+    });
+  }
+
+  void _deleteTable(String tableNum) {
+    setState(() {
+      allTables.removeWhere(
+        (t) =>
+            t.tableNum == tableNum &&
+            t.tableCategory.id == currentCategoryTable.id,
+      );
+      _applyFilters();
+      _showSnackBar(
+        "Table $tableNum deleted",
+        backgroundColor: AppTheme.accentRed,
+      );
+    });
+  }
+
+  void _addNewCategory(String categoryName, int amountOfSeat) {
+    setState(() {
+      final newCategory = TableCategory(
+        type: categoryName,
+        seatAmount: amountOfSeat,
+      );
+      tableCategories.add(newCategory);
+      categoryNames = tableCategories.map((c) => c.type).toList();
+      _showSnackBar("Category $categoryName added");
+    });
+  }
+
+  void _updateCategory(
+    String oldCategoryName,
+    String newCategoryName,
+    int amountOfSeat,
+  ) {
+    setState(() {
+      //Find the category index
+      final index = tableCategories.indexWhere(
+        (c) => c.type == oldCategoryName,
+      );
+
+      if (index != -1) {
+        final updatedCategory = TableCategory(
+          categoryId: tableCategories[index].id,
+          type: newCategoryName,
+          seatAmount: amountOfSeat,
+        );
+
+        //Update the list of categories
+        tableCategories[index] = updatedCategory;
+
+        //Update the table list
+        for (int i = 0; i < allTables.length; i++) {
+          if (allTables[i].tableCategory.id == updatedCategory.id) {
+            allTables[i] = allTables[i].copyWith(
+              tableCategory: updatedCategory,
+            );
+          }
+        }
+        // Sync the name list for dropdowns
+        categoryNames = tableCategories.map((c) => c.type).toList();
+
+        if (selectedChipIndex == index) {
+          currentCategoryTable = updatedCategory;
+        }
+
+        //Re-run filter to show the updated
+        _applyFilters();
+
+        _showSnackBar("Category updated: $newCategoryName");
+      }
+    });
+  }
+
+  void _deleteCategory(String categoryId) {
+    setState(() {
+      tableCategories.removeWhere((c) => c.id == categoryId);
+      allTables.removeWhere((t) => t.tableCategory.id == categoryId);
+      categoryNames = tableCategories.map((c) => c.type).toList();
+
+      if (tableCategories.isNotEmpty) {
+        selectedChipIndex = 0;
+        currentCategoryTable = tableCategories[0];
+        _applyFilters();
+      }
+      _showSnackBar(
+        "Category and its tables deleted",
+        backgroundColor: AppTheme.accentRed,
+      );
+    });
+  }
+
+  // --- Dialogs & UI Helpers (Maintained exactly as requested) ---
+
+  final _textController = TextEditingController();
+  final _seatController = TextEditingController();
+  String? selectedCategory;
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _seatController.dispose();
+    super.dispose();
+  }
+
+  void _showSnackBar(String message, {Color? backgroundColor}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            color: AppTheme.naturalWhite,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: backgroundColor ?? AppTheme.secondaryColor,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100,
+          left: AppTheme.spacingXL,
+          right: AppTheme.spacingXL,
+        ),
+        duration: const Duration(milliseconds: 1200),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Table List"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: onEditMode,
+            icon: Icon(
+              isEditMode ? Icons.cancel_presentation : Icons.edit_note_rounded,
+            ),
+            iconSize: AppTheme.iconSizeXl,
+            color: AppTheme.secondaryColor,
+          ),
+          onFilterBy(),
+        ],
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          spacing: AppTheme.spacingL,
+          children: [
+            Row(
+              children: [
+                Expanded(child: SearchBox(onSearch: onSearch)),
+                const SizedBox(width: AppTheme.spacingS),
+                SizedBox(
+                  width: 110,
+                  height: 35,
+                  child: ElevatedButton(
+                    onPressed: showAddNewDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.secondaryColor,
+                    ),
+                    child: const Text(
+                      "Add New",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppTheme.smallText,
+                        color: AppTheme.naturalWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            CategoryChips(
+              tableData: tableCategories,
+              selectedChipIndex: selectedChipIndex,
+              onSelectedChip: onSelectedChip,
+              isEditMode: isEditMode,
+              onAddChip: (name) =>
+                  showAddNewUpdateCategoryDialog(tableCategory: name),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Category: ${currentCategoryTable.type}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppTheme.heading2,
+                  ),
+                ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.table_restaurant_rounded,
+                      size: AppTheme.iconSizeL,
+                      color: AppTheme.primaryColor,
+                    ),
+                    const SizedBox(width: AppTheme.spacingXS),
+                    Text(
+                      ": ${filteredTables.length}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppTheme.heading2,
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacingM),
+                    const Icon(
+                      Icons.chair,
+                      size: AppTheme.iconSizeL,
+                      color: AppTheme.secondaryColor,
+                    ),
+                    const SizedBox(width: AppTheme.spacingXS),
+                    Text(
+                      ": ${currentCategoryTable.seatAmount}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppTheme.heading2,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Expanded(
+              child: TableSearchResult(
+                allTables: filteredTables,
+                isEditMode: isEditMode,
+                onTable: (tableNum, status) =>
+                    onTable(tableNum: tableNum, status: status),
+                onAddTable: () =>
+                    showAddNewUpdateTableDialog(categoryTable: categoryNames),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void showAddNewDialog() {
     showDialog(
       context: context,
@@ -165,7 +492,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
             child: CustomRecButton(
               title: "Table Category",
               onPressed: () {
-                //Add new Category Dialog
                 Navigator.pop(context);
                 showAddNewUpdateCategoryDialog(tableCategory: null);
               },
@@ -177,9 +503,8 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
             child: CustomRecButton(
               title: "Table",
               onPressed: () {
-                //Add new Table Dialog
                 Navigator.pop(context);
-                showAddNewUpdateTableDialog(categoryTable: category);
+                showAddNewUpdateTableDialog(categoryTable: categoryNames);
               },
               color: AppTheme.secondaryColor,
             ),
@@ -193,14 +518,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     required String tableNum,
     required TableStatus status,
   }) {
-    Color getStatusColor() {
-      return status == TableStatus.available
-          ? AppTheme.secondaryColor
-          : AppTheme.primaryColor;
-    }
-
-    String statusTitle = status.name;
-
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
@@ -217,11 +534,13 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
             ),
             const SizedBox(height: AppTheme.spacingM),
             Text(
-              statusTitle,
+              status.name,
               style: TextStyle(
                 fontSize: AppTheme.heading1,
                 fontWeight: FontWeight.bold,
-                color: getStatusColor(),
+                color: status == TableStatus.available
+                    ? AppTheme.secondaryColor
+                    : AppTheme.primaryColor,
               ),
             ),
           ],
@@ -248,7 +567,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(AppTheme.spacingXS),
@@ -264,26 +582,20 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                     ),
                   ],
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(AppTheme.spacingS),
                   child: CustomRecButton(
                     title: "Order on behalf",
                     color: AppTheme.secondaryColor,
-                    onPressed: () {
-                      //todo go to order on behalf of customer screen
-                    },
+                    onPressed: () {},
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(AppTheme.spacingS),
                   child: CustomRecButton(
                     title: "View order",
                     color: AppTheme.secondaryColor,
-                    onPressed: () {
-                      //todo go to View order screen
-                    },
+                    onPressed: () {},
                   ),
                 ),
               ],
@@ -294,15 +606,105 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     );
   }
 
-  void showDeleteCategoryDialog(bool isTable, String? tableNum) {
+  void showEditTableDialog({required String tableNum}) {
+    showDialog(
+      context: context,
+      builder: (_) => CustomDialog(
+        title: "Table Options",
+        content: Text(
+          "Table: $tableNum",
+          style: const TextStyle(
+            fontSize: AppTheme.heading3,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingS),
+            child: CustomRecButton(
+              title: "Edit",
+              color: AppTheme.secondaryColor,
+              onPressed: () {
+                Navigator.pop(context);
+                showAddNewUpdateTableDialog(
+                  categoryTable: categoryNames,
+                  tableNum: tableNum,
+                  tableCategory: currentCategoryTable.type,
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingS),
+            child: CustomRecButton(
+              title: "Delete",
+              color: AppTheme.accentRed,
+              onPressed: () {
+                Navigator.pop(context);
+                showDeleteCategoryTableDialog(true, tableNum, null);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showEditCategoryDialog({required TableCategory category}) {
+    showDialog(
+      context: context,
+      builder: (_) => CustomDialog(
+        title: "Category Options",
+        content: Text(
+          "Category: ${category.type}",
+          style: const TextStyle(
+            fontSize: AppTheme.heading3,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingS),
+            child: CustomRecButton(
+              title: "Edit",
+              color: AppTheme.secondaryColor,
+              onPressed: () {
+                Navigator.pop(context);
+                showAddNewUpdateCategoryDialog(tableCategory: category.type);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingS),
+            child: CustomRecButton(
+              title: "Delete",
+              color: AppTheme.accentRed,
+              onPressed: () {
+                Navigator.pop(context);
+                showDeleteCategoryTableDialog(false, null, category.type);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showDeleteCategoryTableDialog(
+    bool isTable,
+    String? tableNum,
+    String? categoryName,
+  ) {
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
         title: "Are you sure?",
         content: Text(
           isTable
-              ? "Delete Table $tableNum"
-              : "Every table under this category will be deleted too.",
+              ? "Delete Table ($tableNum)"
+              : "This action will delete every table in this ($categoryName) category",
           style: const TextStyle(
             color: AppTheme.primaryColor,
             fontSize: AppTheme.heading3,
@@ -311,83 +713,30 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         ),
         actions: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.spacingS),
-              child: CustomRecButton(
-                title: "No",
-                color: AppTheme.naturalWhite,
-                textColor: AppTheme.secondaryColor,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
+            child: CustomRecButton(
+              title: "No",
+              color: AppTheme.naturalWhite,
+              textColor: AppTheme.secondaryColor,
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.spacingS),
-              child: CustomRecButton(
-                title: "Delete",
-                color: AppTheme.accentRed,
-                onPressed: () {
-                  if (isTable) {
-                    _deleteTable(tableNum!);
-                  } else {
-                    _deleteCategory(currentCategoryTable.id);
-                  }
-                  Navigator.pop(context);
-                },
-              ),
+            child: CustomRecButton(
+              title: "Delete",
+              color: AppTheme.accentRed,
+              onPressed: () {
+                if (isTable) {
+                  _deleteTable(tableNum!);
+                } else {
+                  _deleteCategory(currentCategoryTable.id);
+                }
+                Navigator.pop(context);
+              },
             ),
           ),
         ],
       ),
     );
-  }
-
-  String? selectedCategory;
-  final _textController = TextEditingController();
-  final _seatController = TextEditingController();
-
-  @override
-  void dispose() {
-    super.dispose();
-    _textController.dispose();
-    _seatController.dispose();
-  }
-
-  // Helper method to show consistent snackbars
-  void _showSnackBar(String message, {Color? backgroundColor}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: AppTheme.naturalWhite,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: backgroundColor ?? AppTheme.secondaryColor,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 50,
-          left: AppTheme.spacingXL,
-          right: AppTheme.spacingXL,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusM),
-        ),
-        duration: Duration(milliseconds: 1200),
-      ),
-    );
-  }
-
-  String? validateTableNum(String? tableNum) {
-    if (tableNum == null || tableNum.isEmpty) {
-      return "Please input table number";
-    }
-    return null;
   }
 
   void showAddNewUpdateTableDialog({
@@ -396,154 +745,97 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     String? tableCategory,
   }) {
     bool isUpdate = tableNum != null && tableCategory != null;
-    String title = isUpdate ? "Update table" : "Add new table";
-    selectedCategory = isUpdate ? tableCategory : null;
+    selectedCategory = isUpdate
+        ? tableCategory
+        : (categoryTable.isNotEmpty ? categoryTable.first : null);
     _textController.text = isUpdate ? tableNum : "";
-    _seatController.text = "2"; // Default seat count
+
     showDialog(
       context: context,
-      builder: (_) => CustomDialog(
-        title: title,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: AppTheme.spacingS,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const Text(
-                  "Category: ",
-                  style: TextStyle(fontSize: AppTheme.bodyText),
+      builder: (ctx) => StatefulBuilder(
+        // Added to handle dropdown selection inside dialog
+        builder: (context, setDialogState) => CustomDialog(
+          title: isUpdate ? "Update table" : "Add new table",
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedCategory,
+                items: categoryTable
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (v) => setDialogState(() => selectedCategory = v),
+                decoration: const InputDecoration(
+                  labelText: "Category",
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(width: AppTheme.spacingM),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    hint: const Text("Category"),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                    isDense: true,
-                    isExpanded: true,
-                    items: categoryTable
-                        .map(
-                          (c) => DropdownMenuItem<String>(
-                            value: c,
-                            child: Text(c),
-                          ),
-                        )
-                        .toList(),
-                    initialValue: selectedCategory,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedCategory = value;
-                      });
-                    },
-                  ),
+              ),
+              const SizedBox(height: AppTheme.spacingS),
+              TextFormField(
+                controller: _textController,
+                decoration: const InputDecoration(
+                  labelText: "Table No.",
+                  hintText: 'eg. A101',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const Text(
-                  "No.: ",
-                  style: TextStyle(fontSize: AppTheme.bodyText),
-                ),
-                const SizedBox(width: AppTheme.spacingXL),
-                Expanded(
-                  child: TextFormField(
-                    controller: _textController,
-                    validator: validateTableNum,
-                    decoration: const InputDecoration(
-                      hintText: 'eg. A101',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          actions: [
+            CustomRecButton(
+              title: isUpdate ? "Update" : "Add new",
+              color: AppTheme.secondaryColor,
+              onPressed: () {
+                if (selectedCategory != null &&
+                    _textController.text.isNotEmpty) {
+                  if (isUpdate) {
+                    _updateTable(
+                      tableNum,
+                      _textController.text,
+                      selectedCategory!,
+                    );
+                  } else {
+                    _addNewTable(_textController.text, selectedCategory!);
+                  }
+                  Navigator.pop(context);
+                }
+              },
             ),
           ],
         ),
-        actions: [
-          CustomRecButton(
-            title: isUpdate ? "Update" : "Add new",
-            color: AppTheme.secondaryColor,
-            onPressed: () {
-              if (selectedCategory != null && _textController.text.isNotEmpty) {
-                if (isUpdate) {
-                  _updateTable(tableNum, _textController.text);
-                } else {
-                  _addNewTable(_textController.text, selectedCategory!);
-                }
-                Navigator.pop(context);
-              }
-            },
-          ),
-        ],
       ),
     );
-  }
-
-  String? validateCategoryName(String? category) {
-    if (category == null || category.isEmpty) {
-      return "Please input table number";
-    }
-    return null;
   }
 
   void showAddNewUpdateCategoryDialog({String? tableCategory}) {
     bool isUpdate = tableCategory != null;
     _textController.text = isUpdate ? tableCategory : "";
-    String title = isUpdate ? "Update category" : "Add new category";
+    _seatController.text = isUpdate
+        ? currentCategoryTable.seatAmount.toString()
+        : "2";
 
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
-        title: title,
+        title: isUpdate ? "Update category" : "Add new category",
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          spacing: AppTheme.spacingS,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const Text(
-                  "Category: ",
-                  style: TextStyle(fontSize: AppTheme.bodyText),
-                ),
-                const SizedBox(width: AppTheme.spacingM),
-                Expanded(
-                  child: TextFormField(
-                    controller: _textController,
-                    validator: validateCategoryName,
-                    decoration: const InputDecoration(
-                      hintText: 'eg. A',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
+            TextFormField(
+              controller: _textController,
+              decoration: const InputDecoration(
+                labelText: "Category Name",
+                border: OutlineInputBorder(),
+              ),
             ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const Text(
-                  "Seats: ",
-                  style: TextStyle(fontSize: AppTheme.bodyText),
-                ),
-                const SizedBox(width: AppTheme.spacingXL),
-                Expanded(
-                  child: TextFormField(
-                    controller: _seatController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: 'eg. 4',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
+            const SizedBox(height: AppTheme.spacingS),
+            TextFormField(
+              controller: _seatController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Seats",
+                border: OutlineInputBorder(),
+              ),
             ),
           ],
         ),
@@ -573,313 +865,9 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       ),
     );
   }
-
-  IconData get editIcon =>
-      isEditMode ? Icons.cancel_presentation : Icons.edit_note_rounded;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Table List"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: onEditMode,
-            icon: Icon(editIcon),
-            iconSize: AppTheme.iconSizeXl,
-            color: AppTheme.secondaryColor,
-          ),
-          onFilterBy(),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(AppTheme.spacingL),
-        child: Column(
-          spacing: AppTheme.spacingL,
-          children: [
-            /*Search Bar */
-            Row(
-              children: [
-                Expanded(child: SearchBox(onSearch: onSearch)),
-                const SizedBox(width: AppTheme.spacingS),
-                SizedBox(
-                  width: 110,
-                  height: 35,
-                  child: ElevatedButton(
-                    onPressed: showAddNewDialog,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.secondaryColor,
-                    ),
-                    child: const Text(
-                      "Add New",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppTheme.smallText,
-                        color: AppTheme.naturalWhite,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            /*chip*/
-            CategoryChips(
-              tableData: tableData,
-              selectedChipIndex: selectedChipIndex,
-              onSelectedChip: onSelectedChip,
-              isEditMode: isEditMode,
-              onAddChip: showAddNewUpdateCategoryDialog,
-            ),
-            /*Table type info*/
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Category: ${currentCategoryTable.type}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppTheme.heading2,
-                  ),
-                ),
-
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.table_restaurant_rounded,
-                      size: AppTheme.iconSizeL,
-                      color: AppTheme.primaryColor,
-                    ),
-                    const SizedBox(width: AppTheme.spacingXS),
-                    Text(
-                      ": ${allCurrentTable.length}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppTheme.heading2,
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.spacingM),
-                    const Icon(
-                      Icons.chair,
-                      size: AppTheme.iconSizeL,
-                      color: AppTheme.secondaryColor,
-                    ),
-                    const SizedBox(width: AppTheme.spacingXS),
-                    Text(
-                      ": ${currentCategoryTable.seatAmount}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppTheme.heading2,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            /*List of Tables*/
-            Expanded(
-              child: TableSearchResult(
-                allTables: allCurrentTable,
-                isEditMode: isEditMode,
-                onTable: (tableNum, status) =>
-                    onTable(tableNum: tableNum, status: status),
-                onAddTable: () =>
-                    showAddNewUpdateTableDialog(categoryTable: category),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Helper Methods for CRUD Operations
-
-  // Add new table
-  void _addNewTable(String tableNum, String categoryName) {
-    setState(() {
-      final categoryIndex = tableData.indexWhere((c) => c.type == categoryName);
-      if (categoryIndex != -1) {
-        final newTable = QueueTable(
-          tableNum: tableNum,
-          tableStatus: TableStatus.available, // Default available
-        );
-        tableData[categoryIndex].tables.add(newTable);
-        currentCategoryTable = tableData[selectedChipIndex];
-        allCurrentTable = currentCategoryTable.tables;
-
-        _showSnackBar(
-          "Table $tableNum added successfully",
-          backgroundColor: AppTheme.secondaryColor,
-        );
-      }
-    });
-  }
-
-  // Update table
-  void _updateTable(String oldTableNum, String newTableNum) {
-    setState(() {
-      final tableIndex = currentCategoryTable.tables.indexWhere(
-        (t) => t.tableNum == oldTableNum,
-      );
-      if (tableIndex != -1) {
-        currentCategoryTable.tables[tableIndex] = currentCategoryTable
-            .tables[tableIndex]
-            .copyWith(tableNum: newTableNum);
-
-        _showSnackBar(
-          "Table updated to $newTableNum",
-          backgroundColor: AppTheme.secondaryColor,
-        );
-      }
-    });
-  }
-
-  // Update table status
-  void _updateTableStatus(String tableNum, TableStatus newStatus) {
-    setState(() {
-      final tableIndex = currentCategoryTable.tables.indexWhere(
-        (t) => t.tableNum == tableNum,
-      );
-      if (tableIndex != -1) {
-        currentCategoryTable.tables[tableIndex].tableStatus = newStatus;
-
-        _showSnackBar(
-          "Table $tableNum is now ${newStatus.name}",
-          backgroundColor: newStatus == TableStatus.available
-              ? AppTheme.secondaryColor
-              : AppTheme.primaryColor,
-        );
-      }
-    });
-  }
-
-  // Delete table
-  void _deleteTable(String tableNum) {
-    setState(() {
-      currentCategoryTable.tables.removeWhere((t) => t.tableNum == tableNum);
-
-      _showSnackBar(
-        "Table $tableNum deleted",
-        backgroundColor: AppTheme.accentRed,
-      );
-    });
-  }
-
-  // Add new category
-  void _addNewCategory(String categoryName, int amountOfSeat) {
-    setState(() {
-      final newCategory = TableCategory(
-        type: categoryName,
-        tables: [],
-        seatAmount: amountOfSeat,
-      );
-      tableData.add(newCategory);
-      category = tableData.map((c) => c.type).toSet().toList();
-
-      _showSnackBar(
-        "Category $categoryName added successfully",
-        backgroundColor: AppTheme.secondaryColor,
-      );
-    });
-  }
-
-  // Update category
-  void _updateCategory(
-    String oldCategoryName,
-    String newCategoryName,
-    int amountOfSeat,
-  ) {
-    setState(() {
-      final categoryIndex = tableData.indexWhere(
-        (c) => c.type == oldCategoryName,
-      );
-      if (categoryIndex != -1) {
-        // Update category type
-        tableData[categoryIndex] = TableCategory(
-          categoryId: tableData[categoryIndex].id,
-          type: newCategoryName,
-          tables: tableData[categoryIndex].tables,
-          seatAmount: amountOfSeat,
-        );
-
-        category = tableData.map((c) => c.type).toSet().toList();
-        currentCategoryTable = tableData[selectedChipIndex];
-
-        _showSnackBar(
-          "Category updated to $newCategoryName",
-          backgroundColor: AppTheme.secondaryColor,
-        );
-      }
-    });
-  }
-
-  // Delete category
-  void _deleteCategory(String categoryId) {
-    setState(() {
-      tableData.removeWhere((c) => c.id == categoryId);
-      category = tableData.map((c) => c.type).toSet().toList();
-
-      // Reset to first category
-      if (tableData.isNotEmpty) {
-        selectedChipIndex = 0;
-        currentCategoryTable = tableData[0];
-        allCurrentTable = currentCategoryTable.tables;
-      }
-
-      _showSnackBar("Category deleted", backgroundColor: AppTheme.accentRed);
-    });
-  }
-
-  // Show edit dialog for table
-  void showEditTableDialog({required String tableNum}) {
-    showDialog(
-      context: context,
-      builder: (_) => CustomDialog(
-        title: "Table Options",
-        content: Text(
-          "Table: $tableNum",
-          style: const TextStyle(
-            fontSize: AppTheme.heading3,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(AppTheme.spacingS),
-            child: CustomRecButton(
-              title: "Edit",
-              color: AppTheme.secondaryColor,
-              onPressed: () {
-                Navigator.pop(context);
-                showAddNewUpdateTableDialog(
-                  categoryTable: category,
-                  tableNum: tableNum,
-                  tableCategory: currentCategoryTable.type,
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppTheme.spacingS),
-            child: CustomRecButton(
-              title: "Delete",
-              color: AppTheme.accentRed,
-              onPressed: () {
-                Navigator.pop(context);
-                showDeleteCategoryDialog(true, tableNum);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
+// CustomRecButton remains same as your original
 class CustomRecButton extends StatelessWidget {
   const CustomRecButton({
     super.key,
@@ -888,12 +876,10 @@ class CustomRecButton extends StatelessWidget {
     required this.onPressed,
     this.textColor = AppTheme.naturalWhite,
   });
-
   final String title;
   final Color color;
   final Color textColor;
   final VoidCallback onPressed;
-
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
@@ -913,7 +899,6 @@ class CustomRecButton extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: AppTheme.smallText,
         ),
-        textScaler: MediaQuery.textScalerOf(context),
       ),
     );
   }

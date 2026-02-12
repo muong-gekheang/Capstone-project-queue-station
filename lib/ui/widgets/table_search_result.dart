@@ -18,7 +18,7 @@ class TableSearchResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (allTables.isEmpty) {
+    if (allTables.isEmpty && !isEditMode) {
       return const Center(
         child: Text(
           "No Tables have Found",
@@ -42,13 +42,12 @@ class TableSearchResult extends StatelessWidget {
       child: GridView.builder(
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingL),
         shrinkWrap: true,
-        itemCount: allTables.length,
+        itemCount: isEditMode ? allTables.length + 1 : allTables.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossAxisCount,
           crossAxisSpacing: AppTheme.spacingL,
           mainAxisSpacing: AppTheme.spacingL,
-          childAspectRatio:
-              150 / 120, // width / height of your previous container
+          childAspectRatio: 150 / 120,
         ),
         itemBuilder: (context, index) {
           // ADD BOX

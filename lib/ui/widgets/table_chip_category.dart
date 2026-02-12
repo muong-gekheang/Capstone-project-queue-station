@@ -7,7 +7,7 @@ class CategoryChips extends StatelessWidget {
   final int selectedChipIndex;
   final Function(int) onSelectedChip;
   final bool isEditMode;
-  final VoidCallback onAddChip;
+  final Function(String?) onAddChip;
 
   const CategoryChips({
     super.key,
@@ -42,7 +42,7 @@ class CategoryChips extends StatelessWidget {
                 Padding(
                   padding: EdgeInsetsGeometry.only(right: AppTheme.spacingS),
                   child: IconButton(
-                    onPressed: onAddChip,
+                    onPressed: () => onAddChip(null),
                     icon: const Icon(Icons.add),
                   ),
                 ),
