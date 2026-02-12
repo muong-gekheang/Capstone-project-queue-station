@@ -12,6 +12,7 @@ import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_item_card.dart';
 import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class AddNewAddOnMenu extends StatefulWidget {
   const AddNewAddOnMenu({super.key});
@@ -62,7 +63,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
 
       print('All fields are valid!');
 
-      AddOn newAddOn = AddOn(name: name, price: parsedPrice, image: selectedImagePath,
+      AddOn newAddOn = AddOn(id: Uuid().v4(), name: name, price: parsedPrice, image: selectedImagePath,
       );
 
       Navigator.pop(context, newAddOn);

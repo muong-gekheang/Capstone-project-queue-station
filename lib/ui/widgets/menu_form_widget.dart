@@ -11,6 +11,7 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/add_siz
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/price_list.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class MenuForm extends StatefulWidget {
   final MenuItem? initialMenu; // null = Add, not null = Edit
@@ -35,7 +36,7 @@ class _MenuFormState extends State<MenuForm> {
   List<AddOn> addOns = [];
   List<int> addOnIds = [];
   MenuItemCategory? selectedCategory;
-  final addCategory = MenuItemCategory(name: ' + Add New');
+  final addCategory = MenuItemCategory(id: "add_new", name: ' + Add New');
 
   // Controllers for SizesPriceList
   final Map<MenuSize, TextEditingController> menuSizeController = {};
@@ -60,12 +61,12 @@ class _MenuFormState extends State<MenuForm> {
         (c) => c.id == menu.category.id,
         orElse: () => mockMenuCategories.isNotEmpty
             ? mockMenuCategories.first
-            : MenuItemCategory(name: 'Unknown'),
+            : MenuItemCategory(id: Uuid().v4(), name: 'Unknown'),
       );
     } else {
       selectedCategory = mockMenuCategories.isNotEmpty
           ? mockMenuCategories.first
-          : MenuItemCategory(name: 'Unknown');
+          : MenuItemCategory(id: Uuid().v4(), name: 'Unknown');
     }
 
     menuSizes = menu?.sizes.toList() ?? [];
@@ -172,6 +173,7 @@ class _MenuFormState extends State<MenuForm> {
     //   addOnIds: addOnIds,
     // );
     final MenuItem newMenu = MenuItem(
+      id: Uuid().v4(),
       name: name,
       description: description,
       category: selectedCategory!,

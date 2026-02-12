@@ -4,7 +4,7 @@ import 'add_on.dart';
 import 'menu_item_category.dart';
 
 class MenuItem {
-  final String id = Uuid().v4();
+  final String id;
   final String? image;
   final String name;
   final String description;
@@ -16,20 +16,21 @@ class MenuItem {
   bool isAvailable;
 
   MenuItem({
+    required this.id,
     this.image,
     required this.name,
     required this.description,
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
     required this.category,
-    List<MenuSize>? sizes, 
+    List<MenuSize>? sizes,
     List<AddOn>? addOns,
     this.isAvailable = true,
-  }): sizes = sizes ?? [], addOns = addOns ?? [];
+  }) : sizes = sizes ?? [],
+       addOns = addOns ?? [];
 
   double cheapestPrice() {
     if (sizes.isEmpty) return 0.0;
     return sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);
   }
-
 }

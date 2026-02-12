@@ -6,9 +6,13 @@ import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = Uuid();
 
 List<Restaurant> mockData = [
   Restaurant(
+    id: uuid.v4(),
     name: 'Kungfu Kitchen',
     address: "BKK St.57",
     logoLink: '',
@@ -20,6 +24,7 @@ List<Restaurant> mockData = [
     globalSizeOptions: [],
   ),
   Restaurant(
+    id: uuid.v4(),
     name: 'Angle Hai',
     address: "STM St.57",
     logoLink: '',
@@ -31,6 +36,7 @@ List<Restaurant> mockData = [
     globalSizeOptions: [],
   ),
   Restaurant(
+    id: uuid.v4(),
     name: 'DoriDori Korean Chicken',
     address: 'AEON MALL SEN SOK',
     logoLink: '',
@@ -42,6 +48,7 @@ List<Restaurant> mockData = [
     globalSizeOptions: [],
   ),
   Restaurant(
+    id: uuid.v4(),
     name: 'Kungfu Kitchen',
     address: "BKK St.57",
     logoLink: '',
@@ -53,6 +60,7 @@ List<Restaurant> mockData = [
     globalSizeOptions: [],
   ),
   Restaurant(
+    id: uuid.v4(),
     name: 'Kungfu Kitchen',
     address: "BKK St.57",
     logoLink: '',

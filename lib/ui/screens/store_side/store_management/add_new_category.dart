@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class AddNewCategory extends StatefulWidget {
   const AddNewCategory({super.key});
@@ -27,7 +28,7 @@ class _AddNewCategoryState extends State<AddNewCategory> {
       return;
     }
     final categoryName = _categoryNameController.text;
-    final newCategory = MenuItemCategory(name: categoryName); // how about id?
+    final newCategory = MenuItemCategory(id: Uuid().v4(), name: categoryName, ); // how about id?
  
     Navigator.pop(context, newCategory);
   }
