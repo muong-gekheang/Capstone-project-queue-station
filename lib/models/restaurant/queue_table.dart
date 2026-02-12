@@ -2,6 +2,8 @@ import '../user/user.dart';
 import 'table_category.dart';
 import 'package:uuid/uuid.dart';
 
+import '../user/user.dart';
+
 final uuid = Uuid();
 
 enum TableStatus { available, occupied }

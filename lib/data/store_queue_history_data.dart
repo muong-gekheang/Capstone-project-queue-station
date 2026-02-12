@@ -8,6 +8,7 @@ final Uuid uuid = Uuid();
 
 // Example Restaurants
 final restaurant1 = Restaurant(
+  id: uuid.v4(),
   name: "Pizza Place",
   address: "123 Main St",
   logoLink: "https://example.com/logo1.png",
@@ -20,6 +21,7 @@ final restaurant1 = Restaurant(
 );
 
 final restaurant2 = Restaurant(
+  id: uuid.v4(),
   name: "Burger Hub",
   address: "456 Elm St",
   logoLink: "https://example.com/logo2.png",
@@ -32,6 +34,7 @@ final restaurant2 = Restaurant(
 );
 
 final restaurant3 = Restaurant(
+  id: uuid.v4(),
   name: "Sushi Spot",
   address: "789 Oak St",
   logoLink: "https://example.com/logo3.png",
@@ -95,11 +98,11 @@ final queue5 = QueueEntry(
 );
 
 // Example Histories
-final history1 = History(rest: restaurant1, queue: queue1, userId: "user1");
-final history2 = History(rest: restaurant1, queue: queue2, userId: "user1");
-final history3 = History(rest: restaurant2, queue: queue3, userId: "user2");
-final history4 = History(rest: restaurant1, queue: queue4, userId: "user3");
-final history5 = History(rest: restaurant3, queue: queue5, userId: "user3");
+final history1 = History(rest: restaurant1, queue: queue1, userId: "user1", id: Uuid().v4());
+final history2 = History(rest: restaurant1, queue: queue2, userId: "user1", id: Uuid().v4());
+final history3 = History(rest: restaurant2, queue: queue3, userId: "user2", id: Uuid().v4());
+final history4 = History(rest: restaurant1, queue: queue4, userId: "user3", id: Uuid().v4());
+final history5 = History(rest: restaurant3, queue: queue5, userId: "user3", id: Uuid().v4());
 
 // Example Users
 final user1 = User(

@@ -7,7 +7,7 @@ import 'queue_table.dart';
 import 'menu_item.dart';
 
 class Restaurant {
-  final String id = Uuid().v4();
+  final String id;
   final String name;
   final String address;
   final String logoLink;
@@ -21,6 +21,7 @@ class Restaurant {
   final List<QueueEntry> currentInQueue = [];
 
   Restaurant({
+    required this.id,
     required this.name,
     required this.address,
     required this.logoLink,

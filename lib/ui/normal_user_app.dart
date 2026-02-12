@@ -5,7 +5,7 @@ import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
-import 'package:queue_station_app/ui/screens/user_side/order/instruction.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/norml_user_buttom_nav.dart';
 
@@ -14,7 +14,7 @@ enum NormalUserNavTab { home, map, foodOrdering, ticket, profile }
 final List<Widget> screens = [
   HomeScreen(),
   Placeholder(), // MAP
-  Instruction(),
+  OrderScreen(),
   Placeholder(), // TICKET
   Account(),
 ];

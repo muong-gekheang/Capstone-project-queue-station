@@ -3,6 +3,7 @@ import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
@@ -10,6 +11,7 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/add_siz
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/price_list.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class MenuForm extends StatefulWidget {
   final MenuItem? initialMenu; // null = Add, not null = Edit
@@ -30,14 +32,14 @@ class _MenuFormState extends State<MenuForm> {
   late TextEditingController _minTimeController = TextEditingController();
   late TextEditingController _maxTimeController = TextEditingController();
 
-  List<Size> menuSizes = [];
+  List<MenuSize> menuSizes = [];
   List<AddOn> addOns = [];
   List<int> addOnIds = [];
   MenuItemCategory? selectedCategory;
-  final addCategory = MenuItemCategory(id: '-1', name: ' + Add New');
+  final addCategory = MenuItemCategory(id: "add_new", name: ' + Add New');
 
   // Controllers for SizesPriceList
-  final Map<Size, TextEditingController> menuSizeController = {};
+  final Map<MenuSize, TextEditingController> menuSizeController = {};
   final Map<AddOn, TextEditingController> addOnController = {};
 
   @override
@@ -59,12 +61,12 @@ class _MenuFormState extends State<MenuForm> {
         (c) => c.id == menu.category.id,
         orElse: () => mockMenuCategories.isNotEmpty
             ? mockMenuCategories.first
-            : MenuItemCategory(id: '-1', name: 'Unknown'),
+            : MenuItemCategory(id: Uuid().v4(), name: 'Unknown'),
       );
     } else {
       selectedCategory = mockMenuCategories.isNotEmpty
           ? mockMenuCategories.first
-          : MenuItemCategory(id: '-1', name: 'Unknown');
+          : MenuItemCategory(id: Uuid().v4(), name: 'Unknown');
     }
 
     menuSizes = menu?.sizes.toList() ?? [];
@@ -135,12 +137,12 @@ class _MenuFormState extends State<MenuForm> {
     }
 
     // Update menuSizes price from controllers
-    for (var size in menuSizes) {
-      final controller = menuSizeController[size];
+    for (var menuSize in menuSizes) {
+      final controller = menuSizeController[menuSize];
       if (controller != null) {
         final price = double.tryParse(controller.text);
         if (price != null) {
-          size.price = price;
+          menuSize.price = price;
         }
       }
     }
@@ -155,20 +157,30 @@ class _MenuFormState extends State<MenuForm> {
       }
     }
 
-    for (MenuAddOn addOn in addOns) {
-      addOnIds.add(addOn.id!);
+    for (AddOn addOn in addOns) {
+      addOns.add(addOn);
     }
 
-    final Menu newMenu = Menu(
+    // final Menu newMenu = Menu(
+    //   name: name,
+    //   description: description,
+    //   price: parsedPrice,
+    //   isAvailable: true,
+    //   categoryId: selectedCategory!.categoryId!,
+    //   minPreparationTime: minPrep,
+    //   maxPreparationTime: maxPrep,
+    //   sizes: menuSizes,
+    //   addOnIds: addOnIds,
+    // );
+    final MenuItem newMenu = MenuItem(
+      id: Uuid().v4(),
       name: name,
       description: description,
-      price: parsedPrice,
-      isAvailable: true,
-      categoryId: selectedCategory!.categoryId!,
-      minPreparationTime: minPrep,
-      maxPreparationTime: maxPrep,
+      category: selectedCategory!,
+      minPrepTimeMinutes: minPrep,
+      maxPrepTimeMinutes: maxPrep,
       sizes: menuSizes,
-      addOnIds: addOnIds,
+      addOns: addOns,      
     );
 
     Navigator.pop(context, newMenu);
@@ -312,7 +324,7 @@ class _MenuFormState extends State<MenuForm> {
             PriceList<MenuSize>(
               items: menuSizes,
               controllers: menuSizeController,
-              getName: (item) => item.size.name,
+              getName: (item) => item.sizeOption.name,
               getPrice: (item) => item.price,
               onPriceChanged: (item, newPrice) {
                 setState(() {
@@ -343,7 +355,7 @@ class _MenuFormState extends State<MenuForm> {
                   setState(() {
                     // Convert MenuSizeOption -> MenuSize with default price 0
                     menuSizes.addAll(
-                      returnedMenuSizes.map((e) => Size(size: e, price: 0)),
+                      returnedMenuSizes.map((e) => MenuSize(sizeOption: e, price: 0)),
                     );
                   });
                 }

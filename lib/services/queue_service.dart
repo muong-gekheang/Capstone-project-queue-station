@@ -1,6 +1,7 @@
-import 'package:queue_station_app/old_model/dashboard_stats.dart';
-import 'package:queue_station_app/old_model/queue_entry.dart';
-import 'package:queue_station_app/old_model/table.dart';
+import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
+import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
+
 import '../data/queue_repository.dart';
 
 class QueueService {
@@ -23,12 +24,13 @@ class QueueService {
     required int partySize,
   }) async {
     final entry = QueueEntry(
+      queueNumber: "001",
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      customerName: customerName,
-      customerPhone: customerPhone,
       partySize: partySize,
       joinTime: DateTime.now(),
-      status: 'waiting',
+      status: QueueStatus.waiting,
+      customerId: '',
+      joinedMethod: JoinedMethod.remote,
     );
 
     await _repository.addQueueEntry(entry);
@@ -47,7 +49,7 @@ class QueueService {
       // Update table status
       final tables = await _repository.getAllTables();
       final table = tables.firstWhere(
-        (t) => t.tableNumber == tableNumber,
+        (t) => t == tableNumber,
         orElse: () => tables.first,
       );
       final updatedTable = table.copyWith(
@@ -68,17 +70,17 @@ class QueueService {
   }
 
   // Table Operations
-  Future<List<Table>> getActiveTables() async {
+  Future<List<QueueTable>> getActiveTables() async {
     return await _repository.getActiveTables();
   }
 
-  Future<List<Table>> getAllTables() async {
+  Future<List<QueueTable>> getAllTables() async {
     return await _repository.getAllTables();
   }
 
   Future<void> freeTable(String tableNumber) async {
     final tables = await _repository.getAllTables();
-    final table = tables.firstWhere((t) => t.tableNumber == tableNumber);
+    final table = tables.firstWhere((t) => t == tableNumber);
     final updatedTable = table.copyWith(
       status: 'available',
       currentQueueEntryId: null,
@@ -99,9 +101,7 @@ class QueueService {
 
     // Simple estimation: average wait time + (people ahead / tables available)
     final availableTables = activeTables
-        .where(
-          (table) => table.status == 'available' && table.capacity >= partySize,
-        )
+        .where((table) => table.tableStatus == TableStatus.available)
         .length;
 
     if (availableTables > 0) {
