@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../join_queue/widgets/table_type_widget.dart'; 
+import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
+
 
 class AddQueueDialog extends StatefulWidget {
   final Function(String, String, int) onJoin;

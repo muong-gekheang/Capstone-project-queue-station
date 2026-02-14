@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../ui/widgets/search_box.dart';
+import 'package:queue_station_app/ui/widgets/search_box.dart';
 import '../dialogs/add_queue_dialog.dart';
 import '../dialogs/edit_queue_dialog.dart';
-import '../../join_queue/widgets/table_type_widget.dart'; 
+import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
+
 
 class StoreQueueScreen extends StatefulWidget {
   const StoreQueueScreen({super.key});
