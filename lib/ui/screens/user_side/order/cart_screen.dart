@@ -328,6 +328,7 @@ class CartScreen extends StatelessWidget {
       orderProvider.addOrder(cart.items, cart.totalAmount);
     }
     cart.clear();
+<<<<<<< HEAD
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -347,5 +348,10 @@ class CartScreen extends StatelessWidget {
         margin: const EdgeInsets.all(16),
       ),
     );
+=======
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pop(context);
+    });
+>>>>>>> main
   }
 }

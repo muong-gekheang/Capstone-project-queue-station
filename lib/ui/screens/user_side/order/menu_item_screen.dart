@@ -104,28 +104,46 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+<<<<<<< HEAD
         backgroundColor: Colors.white,
         title: Text(
           widget.menuItem.name,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+=======
+        backgroundColor: Colors.grey[200],
+        // title: Text(
+        //   widget.menuItem.name,
+        //   style: TextStyle(fontWeight: FontWeight.bold),
+        // ),
+        // centerTitle: true,
+>>>>>>> main
       ),
       body: Stack(
         children: [
           SingleChildScrollView(
+<<<<<<< HEAD
             padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 120),
+=======
+            //padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 120),
+>>>>>>> main
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: double.infinity,
                   height: 250,
+<<<<<<< HEAD
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.grey[200],
                   ),
+=======
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.grey[200],
+>>>>>>> main
                   child: widget.menuItem.image != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(12),
@@ -146,6 +164,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                 ),
                 SizedBox(height: 20),
 
+<<<<<<< HEAD
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -336,6 +355,221 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                   ),
                 ),
                 SizedBox(height: 30),
+=======
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.menuItem.name,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFFF6835)
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+
+                          const SizedBox(width: 12),
+
+                          Text("From", style: TextStyle(fontSize: 16, color: Color(0xFF0D47A1))),
+                          const SizedBox(width: 6),
+                          Text(
+                            '\$${widget.menuItem.basePrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0D47A1),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          if (widget.menuItem.prepTimeMinutes != null)
+                            Text(
+                              'Preparation Time: ${widget.menuItem.prepTimeMinutes} minutes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+
+                      Text(
+                        widget.menuItem.description,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      if (widget.menuItem.sizes.isNotEmpty) ...[
+                        Text(
+                          'Sizes',
+                          style: TextStyle(
+                            color: Color(0xFF0D47A1),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Column(
+                          children: widget.menuItem.sizes.map((size) {
+                            return RadioListTile<SizeOption>(
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      size.name,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${size.price.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              value: size,
+                              groupValue: _selectedSize,
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedSize = value;
+                                  _calculateTotal();
+                                });
+                              },
+                              controlAffinity: ListTileControlAffinity
+                                  .trailing, // radio on right
+                              activeColor: Color(0xFFFF6835),
+                            );
+                          }).toList(),
+                        ),
+
+                        SizedBox(height: 25),
+                      ],
+
+                      if (widget.menuItem.addOns.isNotEmpty) ...[
+                        Text(
+                          'Add-ons',
+                          style: TextStyle(
+                            color: Color(0xFF0D47A1),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Column(
+                          children: widget.menuItem.addOns
+                              .map(
+                                (addOn) => Column(
+                                  children: [
+                                    CheckboxListTile(
+                                      title: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              addOn.name,
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                          Text(
+                                            '+\$${addOn.price.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      value: _selectedAddOns[addOn] ?? false,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedAddOns[addOn] =
+                                              value ?? false;
+                                          _calculateTotal();
+                                        });
+                                      },
+                                      checkboxShape: const CircleBorder(),
+                                      secondary: addOn.image != null
+                                          ? CircleAvatar(
+                                              backgroundImage: AssetImage(
+                                                addOn.image!,
+                                              ),
+                                              radius: 20,
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                            )
+                                          : null,
+                                      activeColor: Colors.blue,
+                                    ),
+                                    const SizedBox(height: 8),
+                                  ],
+                                ),
+                              )
+                              .toList(),
+                        ),
+
+                        SizedBox(height: 25),
+                      ],
+
+                      Text(
+                        'Note',
+                        style: TextStyle(
+                          color: Color(0xFF0D47A1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: _noteController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText:
+                              'Add special instructions for the kitchen or staff',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                    ],
+                  ),
+                )
+>>>>>>> main
               ],
             ),
           ),
@@ -408,6 +642,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                             ? cart.addToCart(newItem)
                             : cart.updateCartItem(newItem);
 
+<<<<<<< HEAD
                         ScaffoldMessenger.of(context).showMaterialBanner(
                           MaterialBanner(
                             backgroundColor: const Color(0xFF10B981),
@@ -433,6 +668,30 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           ScaffoldMessenger.of(
                             context,
                           ).hideCurrentMaterialBanner();
+=======
+                        // ScaffoldMessenger.of(context).showMaterialBanner(
+                        //   MaterialBanner(
+                        //     backgroundColor: const Color(0xFF10B981),
+                        //     content: widget.cartItem == null
+                        //         ? Text(
+                        //             "${widget.menuItem.name} added to cart!",
+                        //             style: const TextStyle(color: Colors.white),
+                        //           )
+                        //         : Text(
+                        //             "${widget.menuItem.name} edited successfully",
+                        //             style: const TextStyle(color: Colors.white),
+                        //           ),
+
+                        //     actions: const [SizedBox.shrink()],
+                        //     padding: const EdgeInsets.symmetric(
+                        //       horizontal: 16,
+                        //       vertical: 12,
+                        //     ),
+                        //   ),
+                        // );
+
+                        Future.delayed(const Duration(seconds: 1), () {
+>>>>>>> main
                           Navigator.pop(context);
                         });
                       },

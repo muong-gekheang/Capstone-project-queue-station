@@ -21,7 +21,13 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _minTimeController = TextEditingController();
   final TextEditingController _maxTimeController = TextEditingController();
+<<<<<<< HEAD
   MenuCategory selectedCategory = mockMenuCategories.firstWhere((c) => c.categoryName.toLowerCase().contains('Add-Ons'.toLowerCase()));
+=======
+  MenuCategory selectedCategory = mockMenuCategories.firstWhere(
+    (c) => c.categoryName.toLowerCase().contains('Add-Ons'.toLowerCase()),
+  );
+>>>>>>> main
 
   String? _nullValidtor(String? value) {
     if (value != null && value.trim().isEmpty) {
@@ -65,17 +71,29 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
       print('All fields are valid!');
 
       Menu newMenu = Menu(
+<<<<<<< HEAD
         name: name, 
         description: description, 
         price: double.tryParse(price)!, 
         isAvailable: true, 
         categoryId: selectedCategory.categoryId!, 
         minPreparationTime: int.tryParse(minTime)!, 
+=======
+        name: name,
+        description: description,
+        price: double.tryParse(price)!,
+        isAvailable: true,
+        categoryId: selectedCategory.categoryId!,
+        minPreparationTime: int.tryParse(minTime)!,
+>>>>>>> main
         maxPreparationTime: int.tryParse(maxTime)!,
       );
 
       Navigator.pop(context, newMenu);
+<<<<<<< HEAD
       
+=======
+>>>>>>> main
     } else {
       print('Please fix the errors in the form');
     }
@@ -125,13 +143,18 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                           textController: _priceController,
                         ),
                       ),
+<<<<<<< HEAD
                       SizedBox(width: 10,),
+=======
+                      SizedBox(width: 10),
+>>>>>>> main
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Category',
+<<<<<<< HEAD
                               style: TextStyle(fontSize:12, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 10),
@@ -141,6 +164,22 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                                 child: Text(selectedCategory.categoryName),
                                 value: selectedCategory,
                               ),],
+=======
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            DropdownButtonFormField<MenuCategory>(
+                              initialValue: selectedCategory,
+                              items: [
+                                DropdownMenuItem(
+                                  value: selectedCategory,
+                                  child: Text(selectedCategory.categoryName),
+                                ),
+                              ],
+>>>>>>> main
                               onChanged: null,
                               decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(

@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/model//menu.dart';
+<<<<<<< HEAD
 import 'package:queue_station_app/model//menu_add_on.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_add_on_menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_menu.dart';
+=======
+import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_add_on_menu.dart';
+>>>>>>> main
 
 import 'package:queue_station_app/ui/widgets/option_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 
 class AddOnsManagement extends StatefulWidget {
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
   const AddOnsManagement({super.key});
 
   @override
@@ -21,8 +28,11 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
   String searchValue = '';
 
   Widget existingAddOns() {
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> main
     // Filter add-ons: if search is not empty, filter; else show all
     final filteredAddOns = searchValue.trim().isEmpty
         ? globalAddOns
@@ -40,12 +50,19 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
 
     return ListView.builder(
       itemCount: filteredAddOns.length,
+<<<<<<< HEAD
       itemBuilder: (context, index) => OptionWidget(optionModel: filteredAddOns[index]),
     );
   
   
 }
       
+=======
+      itemBuilder: (context, index) =>
+          OptionWidget(optionModel: filteredAddOns[index]),
+    );
+  }
+>>>>>>> main
 
   void onCreate() async {
     Menu? newAddOn = await Navigator.push<Menu>(

@@ -246,7 +246,11 @@ class _MenuScreenState extends State<MenuScreen> {
                         maxCrossAxisExtent: 200, // max width of each card
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
+<<<<<<< HEAD
                         childAspectRatio: 0.7,
+=======
+                        childAspectRatio: 0.75,
+>>>>>>> main
                       ),
                       itemCount: filteredMenuItems.length,
                       itemBuilder: (context, index) {
@@ -274,8 +278,13 @@ class _MenuScreenState extends State<MenuScreen> {
         clipBehavior: Clip.none,
         children: [
           Container(
+<<<<<<< HEAD
             width: 56,
             height: 56,
+=======
+            width: 60,
+            height: 60,
+>>>>>>> main
             decoration: BoxDecoration(
               color: const Color(0xFFFF6835),
               shape: BoxShape.circle,
@@ -300,9 +309,15 @@ class _MenuScreenState extends State<MenuScreen> {
                 borderRadius: BorderRadius.circular(28),
                 child: const Center(
                   child: Icon(
+<<<<<<< HEAD
                     Icons.shopping_cart,
                     color: Colors.white,
                     size: 24,
+=======
+                    Icons.shopping_cart_outlined,
+                    color: Colors.white,
+                    size: 28,
+>>>>>>> main
                   ),
                 ),
               ),

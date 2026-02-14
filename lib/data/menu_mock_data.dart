@@ -2,7 +2,10 @@ import 'package:queue_station_app/model//menu.dart';
 import 'package:queue_station_app/model//menu_add_on.dart';
 import 'package:queue_station_app/model//menu_size.dart';
 import 'package:queue_station_app/model//size.dart';
+<<<<<<< HEAD
 import 'package:queue_station_app/model/menu.dart' hide Menu;
+=======
+>>>>>>> main
 import 'package:queue_station_app/model/menu_category.dart';
 
 /// ----------------------------
@@ -18,6 +21,7 @@ final List<MenuSizeOption> globalSizes = [
 /// GLOBAL SIZES
 /// ----------------------------
 final List<MenuAddOn> globalAddOns = [
+<<<<<<< HEAD
   MenuAddOn(
     id: 1,
     name: 'Extra Cheese',
@@ -51,6 +55,15 @@ final List<MenuAddOn> globalAddOns = [
 ];
 
 
+=======
+  MenuAddOn(id: 1, name: 'Extra Cheese', price: 1.50, image: null),
+  MenuAddOn(id: 2, name: 'Bacon', price: 2.00, image: null),
+  MenuAddOn(id: 3, name: 'Avocado', price: 2.50, image: null),
+  MenuAddOn(id: 4, name: 'Extra Sauce', price: 0.75, image: null),
+  MenuAddOn(id: 5, name: 'Fried Egg', price: 1.25, image: null),
+];
+
+>>>>>>> main
 /// ----------------------------
 /// MENU-SIZE RELATIONS (PRICE PER MENU)
 /// ----------------------------
@@ -116,7 +129,11 @@ final List<Menu> mockMenus = [
     isAvailable: true,
     categoryId: 1,
     sizes: burgerMediumLarge,
+<<<<<<< HEAD
     addOnIds: [1, 4], 
+=======
+    addOnIds: [1, 4],
+>>>>>>> main
   ),
   Menu(
     menuId: 3,
@@ -128,7 +145,11 @@ final List<Menu> mockMenus = [
     isAvailable: true,
     categoryId: 2,
     sizes: pizzaSizes,
+<<<<<<< HEAD
     addOnIds: [2,3],
+=======
+    addOnIds: [2, 3],
+>>>>>>> main
   ),
   Menu(
     menuId: 4,
@@ -142,5 +163,8 @@ final List<Menu> mockMenus = [
     sizes: [], // drinks have no size
   ),
 ];
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> main

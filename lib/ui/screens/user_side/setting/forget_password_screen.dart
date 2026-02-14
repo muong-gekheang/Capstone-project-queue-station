@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'package:flutter_svg/flutter_svg.dart';
+>>>>>>> main
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -39,6 +43,13 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
         title: const Text("Forgot Password", style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
+<<<<<<< HEAD
+=======
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(5),
+          child: Divider(thickness: 5, height: 5, color: Colors.grey.shade400),
+        ),
+>>>>>>> main
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -55,10 +66,21 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(16),
                 ),
+<<<<<<< HEAD
                 child: const Icon(
                   Icons.lock_reset,
                   size: 80,
                   color: Colors.black,
+=======
+                child: SvgPicture.asset(
+                  "assets/images/Vector.svg",
+                  width: 80,
+                  height: 80,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.black,
+                    BlendMode.srcIn,
+                  ),
+>>>>>>> main
                 ),
               ),
 
@@ -70,6 +92,10 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
+<<<<<<< HEAD
+=======
+                  color: Colors.black
+>>>>>>> main
                 ),
               ),
 
@@ -81,6 +107,10 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
+<<<<<<< HEAD
+=======
+                  fontWeight: FontWeight.bold
+>>>>>>> main
                 ),
               ),
 

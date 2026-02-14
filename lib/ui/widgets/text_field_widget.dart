@@ -41,7 +41,11 @@ class TextFieldWidget extends StatelessWidget {
           controller: textController,
           onChanged: onChanged,
           decoration: InputDecoration(
+<<<<<<< HEAD
             hintText: hintText != null ? hintText : null,
+=======
+            hintText: hintText,
+>>>>>>> main
             prefix: prefixText != null
                 ? Padding(
                     padding: EdgeInsets.only(right: 4),
