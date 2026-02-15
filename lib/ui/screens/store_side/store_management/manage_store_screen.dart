@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:queue_station_app/data/mock_table_data.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management.dart';
@@ -325,6 +326,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
         ),
         onPressed: () {
           // Navigate to manage queue page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => StoreQueueScreen()),
+          );
         },
         child: const Text(
           'Manage Queue',
