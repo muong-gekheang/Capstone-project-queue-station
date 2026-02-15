@@ -10,6 +10,7 @@ class CartProvider extends ChangeNotifier {
   List<OrderItem> get items => List.unmodifiable(currentOrder.inCart);
 
   void updateOrder(Order newOrder) {
+    notifyListeners(); 
     currentOrder = newOrder;
   }
 
@@ -55,19 +56,14 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateCartItem(OrderItem updatedItem) {
-    final index = currentOrder.inCart.indexWhere(
-      (item) =>
-          item.menuItemId == updatedItem.menuItemId &&
-          item.size.name == updatedItem.size.name &&
-          _mapEquals(item.addOns, updatedItem.addOns),
-    );
-
+  void updateCartItem(OrderItem oldItem, OrderItem updatedItem) {
+    final index = currentOrder.inCart.indexOf(oldItem);
     if (index != -1) {
       currentOrder.inCart[index] = updatedItem;
       notifyListeners();
     }
   }
+
 
   double get totalAmount {
     return currentOrder.inCart.fold(0.0, (sum, item) {

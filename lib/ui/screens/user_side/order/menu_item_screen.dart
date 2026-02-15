@@ -107,7 +107,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     if (widget.cartItem == null) {
       cart.addToCart(orderItem);
     } else {
-      cart.updateCartItem(orderItem);
+      cart.updateCartItem(widget.cartItem!, orderItem);
     }
 
     Navigator.pop(context);
@@ -313,13 +313,14 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                           ),
                                         ],
                                       ),
-                                      value: _selectedAddOns[addOn] ?? false,
+                                      value: _selectedAddOns[addOn.id] ?? false,
                                       onChanged: (value) {
                                         setState(() {
                                           _selectedAddOns[addOn.id] =
                                               value ?? false;
                                         });
                                       },
+                                      activeColor: const Color(0xFFFF6835),
                                       checkboxShape: const CircleBorder(),
                                       secondary:
                                           addOn.image != null &&
@@ -338,7 +339,6 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                               color: Colors.grey,
                                             ),
 
-                                      activeColor: Colors.blue,
                                     ),
                                     const SizedBox(height: 8),
                                   ],
@@ -407,7 +407,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.remove_circle_outline, size: 24),
+                        icon: Icon(Icons.remove_circle_outline, size: 24, color: _quantity <= 1 ? Colors.grey : Colors.black,),
                         onPressed: _decrementQuantity,
                       ),
                       Container(

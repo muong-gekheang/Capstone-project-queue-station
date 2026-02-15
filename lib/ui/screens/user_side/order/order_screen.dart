@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
@@ -9,8 +10,7 @@ class OrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final orderProvider = context.watch<OrderProvider>();
-    final order = orderProvider.currentOrder;
-    final confirmedItems = order.ordered;
+    final confirmedItems = orderProvider.lastConfirmedOrder?.ordered ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -47,6 +47,7 @@ class OrderScreen extends StatelessWidget {
 
                         return FoodItemCard(
                           name: item.item.name,
+                          item: item.item,
                           image: item.item.image,
                           size: item.size,
                           addons: item.addOns,
@@ -188,7 +189,9 @@ class OrderScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+            },
             child: const Text("Return"),
           ),
         ],

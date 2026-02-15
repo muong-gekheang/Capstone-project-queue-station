@@ -5,18 +5,23 @@ class OrderProvider with ChangeNotifier {
   Order? _currentOrder;
   final List<Order> _orders = [];
 
+  List<Order> get orders => List.unmodifiable(_orders);
+
   Order get currentOrder {
     _currentOrder ??= _createNewOrder();
     return _currentOrder!;
   }
 
+  Order? get lastConfirmedOrder {
+    if (_orders.isEmpty) return null;
+    return _orders.last;
+  }
+
   Order _createNewOrder() {
-    final order = Order(
+    return Order(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       timestamp: DateTime.now(),
     );
-    _orders.add(order);
-    return order;
   }
 
   void confirmCurrentOrder() {
@@ -24,6 +29,8 @@ class OrderProvider with ChangeNotifier {
 
     _currentOrder!.ordered.addAll(_currentOrder!.inCart);
     _currentOrder!.inCart.clear();
+
+    _orders.add(_currentOrder!);
 
     _currentOrder = _createNewOrder();
     notifyListeners();

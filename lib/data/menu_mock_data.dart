@@ -58,10 +58,10 @@ final List<MenuItemCategory> mockMenuCategories = [
 /// ADD-ONS
 /// ----------------------------
 final List<AddOn> mockMenuAddOns = [
-  AddOn(name: 'Extra Cheese', price: 0.99, image: "", id: Uuid().v4()),
-  AddOn(name: 'Bacon Strips', price: 1.49, image: "", id: Uuid().v4()),
-  AddOn(name: 'Avocado', price: 1.29, image: "", id: Uuid().v4()),
-  AddOn(name: 'Extra Sauce', price: 0.59, image: "", id: Uuid().v4()),
+  AddOn(name: 'Extra Cheese', price: 0.99, image: "assets/images/cheese.png", id: Uuid().v4()),
+  AddOn(name: 'Bacon Strips', price: 1.49, image: "assets/images/bacon.png", id: Uuid().v4()),
+  AddOn(name: 'Avocado', price: 1.29, image: "assets/images/avocado.png", id: Uuid().v4()),
+  AddOn(name: 'Extra Sauce', price: 0.59, image: "assets/images/sauces.png", id: Uuid().v4()),
   AddOn(name: 'Onion Rings', price: 1.99, image: "", id: Uuid().v4()),
 ];
 

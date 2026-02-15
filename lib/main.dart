@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
@@ -12,6 +13,7 @@ import 'package:queue_station_app/ui/screens/auth/login_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/register_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/instruction_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
@@ -35,7 +37,25 @@ void main() {
         routes: <RouteBase>[
           GoRoute(
             path: "menu",
-            builder: (context, state) => const MenuScreen(),
+            builder: (context, state) => FutureBuilder<bool>(
+              future: _checkHasSeenInstruction(),
+              builder: (context, snapshot) {
+                final hasSeenInstruction = snapshot.data ?? false;
+
+                if (!hasSeenInstruction) {
+                  // Show instruction if not seen
+                  return Instruction(
+                    onContinue: () async {
+                      await _setHasSeenInstruction();
+                      // Navigate to menu after continue
+                      context.go('/menu');
+                    },
+                  );
+                }
+
+                return const MenuScreen();
+              },
+            ),
           ),
           GoRoute(path: "map", builder: (context, state) => Placeholder()),
           GoRoute(
@@ -80,9 +100,12 @@ void main() {
             currentOrder: Order(id: '', timestamp: DateTime.now()),
           ),
           update: (context, orderProvider, previousCart) {
-            // Update the existing cart with the new order data
-            previousCart!.updateOrder(orderProvider.currentOrder);
-            return previousCart;
+            final cart =
+                previousCart ??
+                CartProvider(currentOrder: orderProvider.currentOrder);
+
+            cart.updateOrder(orderProvider.currentOrder);
+            return cart;
           },
         ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
@@ -94,4 +117,14 @@ void main() {
       ),
     ),
   );
+}
+
+Future<bool> _checkHasSeenInstruction() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('hasSeenFoodInstruction') ?? false;
+}
+
+Future<void> _setHasSeenInstruction() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('hasSeenFoodInstruction', true);
 }

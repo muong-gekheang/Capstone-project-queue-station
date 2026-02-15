@@ -6,19 +6,21 @@ import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/instruction_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/norml_user_buttom_nav.dart';
 
 enum NormalUserNavTab { home, map, foodOrdering, ticket, profile }
 
-final List<Widget> screens = [
-  HomeScreen(),
-  Placeholder(), // MAP
-  OrderScreen(),
-  Placeholder(), // TICKET
-  Account(),
-];
+// final List<Widget> screens = [
+//   HomeScreen(),
+//   Placeholder(), // MAP
+//   OrderScreen(),
+//   Placeholder(), // TICKET
+//   Account(),
+// ];
 
 class NormalUserApp extends StatefulWidget {
   const NormalUserApp({super.key});
@@ -29,6 +31,7 @@ class NormalUserApp extends StatefulWidget {
 
 class _NormalUserAppState extends State<NormalUserApp> {
   NormalUserNavTab selectedTab = NormalUserNavTab.home;
+  bool _hasSeenFoodInstruction = false;
 
   Future<void> onTabSelected(NormalUserNavTab tab) async {
     User? user = context.read<UserProvider>().currentUser;
@@ -60,8 +63,15 @@ class _NormalUserAppState extends State<NormalUserApp> {
       }
     } else if (tab == NormalUserNavTab.foodOrdering) {
       if (user != null && user.currentHistory != null) {
-        // TODO: Checking queue status
-        context.go("/menu");
+        if (!_hasSeenFoodInstruction) {
+          setState(() {
+            selectedTab = NormalUserNavTab.foodOrdering;
+            _hasSeenFoodInstruction = true; // only once
+          });
+        } else {
+          // Already seen instruction, go directly to menu screen
+          context.go("/menu");
+        }
       } else {
         await showDialog(
           context: context,
@@ -101,6 +111,19 @@ class _NormalUserAppState extends State<NormalUserApp> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      HomeScreen(),
+      Placeholder(), // MAP
+      _hasSeenFoodInstruction
+          ? MenuScreen() // Already seen instruction, show menu
+          : Instruction(
+              onContinue: () {
+                setState(() => _hasSeenFoodInstruction = true);
+              },
+            ),
+      Placeholder(), // TICKET
+      Account(),
+    ];
     return Scaffold(
       body: SafeArea(
         child: IndexedStack(index: getIndex(selectedTab), children: screens),

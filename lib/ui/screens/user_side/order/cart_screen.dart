@@ -204,6 +204,7 @@ class CartScreen extends StatelessWidget {
                           ),
                           child: FoodItemCard(
                             name: cartItem.item.name,
+                            item: cartItem.item,
                             image: cartItem.item.image,
                             size: cartItem.size,
                             addons: cartItem.addOns,
@@ -228,7 +229,7 @@ class CartScreen extends StatelessWidget {
                                 addOns: cartItem.addOns,
                                 size: cartItem.size,
                               );
-                              cartProvider.updateCartItem(updatedItem);
+                              cartProvider.updateCartItem(cartItem, updatedItem);
                             },
                             onDecrease: () {
                               if (cartItem.quantity > 1) {
@@ -240,7 +241,7 @@ class CartScreen extends StatelessWidget {
                                   addOns: cartItem.addOns,
                                   size: cartItem.size,
                                 );
-                                cartProvider.updateCartItem(updatedItem);
+                                cartProvider.updateCartItem(cartItem, updatedItem);
                               }
                             },
                           ),
