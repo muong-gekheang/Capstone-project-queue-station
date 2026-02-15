@@ -30,9 +30,9 @@ final List<AddOn> globalAddOns = [
 /// MENU-SIZE RELATIONS (PRICE PER MENU)
 /// ----------------------------
 final List<MenuSize> burgerSizes = [
-  MenuSize(sizeOption: globalSizes[0], price: 0.0), // Small
-  MenuSize(sizeOption: globalSizes[1], price: 1.0), // Medium
-  MenuSize(sizeOption: globalSizes[2], price: 1.25), // Large
+  MenuSize(sizeOption: globalSizes[0], price: 3.0), // Small
+  MenuSize(sizeOption: globalSizes[1], price: 4.0), // Medium
+  MenuSize(sizeOption: globalSizes[2], price: 4.75), // Large
 ];
 
 final List<MenuSize> burgerMediumLarge = [
@@ -172,7 +172,7 @@ final MenuItem veggieWrap =
         maxPrepTimeMinutes: 10,
         category:
             mockMenuCategories[0], // Burger category (or you can create a new category 'Wraps')
-        image: "assets/images/burger()1.png",
+        image: "assets/images/burger.png",
         isAvailable: true
       )
       ..sizes.addAll(burgerMediumLarge)

@@ -6,6 +6,7 @@ import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
+import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
@@ -15,7 +16,7 @@ import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class AddNewAddOnMenu extends StatefulWidget {
-  const AddNewAddOnMenu({super.key});
+  const AddNewAddOnMenu({super.key, });
 
   @override
   State<AddNewAddOnMenu> createState() => _AddNewAddOnMenuState();
@@ -26,10 +27,10 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
-  File? _selectedImage;
-  MenuItemCategory selectedCategory = mockMenuCategories.firstWhere(
-    (c) => c.name.toLowerCase().contains('Add-Ons'.toLowerCase()),
-  );
+  String? _selectedImage;
+  // MenuItemCategory _selectedCategory = mockMenuCategories.firstWhere(
+  //   (c) => c.name.toLowerCase().contains('Add-Ons'.toLowerCase()),
+  // );
 
   String? _nullvalidator(String? value) {
     if (value != null && value.trim().isEmpty) {
@@ -38,7 +39,6 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
       return null;
     }
   }
-
 
   Future<void> onEdit() async {
     final XFile? pickedFile = await _imagePicker.pickImage(
@@ -50,20 +50,22 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
 
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImage = pickedFile.path;
       });
-    } 
+    }
   }
 
   void onSave() {
     if (_formKey.currentState!.validate()) {
       String name = _nameController.text;
       double parsedPrice = double.tryParse(_priceController.text)!;
-      String? selectedImagePath = _selectedImage?.path; 
-
       print('All fields are valid!');
 
-      AddOn newAddOn = AddOn(id: Uuid().v4(), name: name, price: parsedPrice, image: selectedImagePath,
+      AddOn newAddOn = AddOn(
+        id: Uuid().v4(),
+        name: name,
+        price: parsedPrice,
+        image: _selectedImage,
       );
 
       Navigator.pop(context, newAddOn);
@@ -75,7 +77,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(title: "Add Menu Item", color: Colors.black),
+      appBar: AppBarWidget(title: "Add New Add-On", color: Colors.black),
       body: Padding(
         padding: const EdgeInsetsGeometry.symmetric(
           horizontal: 15,
@@ -88,9 +90,12 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfileEditorWidget(
-                    onEdit: onEdit,
-                    selectedImage: _selectedImage,
+                  Container(
+                    alignment: Alignment.center,
+                    child: ProfileEditorWidget(
+                      onEdit: onEdit,
+                      imagePath: _selectedImage,
+                    ),
                   ),
                   TextFieldWidget(
                     title: 'Name',
@@ -100,15 +105,13 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                     textController: _nameController,
                   ),
                   SizedBox(height: 10),
-                  Expanded(
-                    child: TextFieldWidget(
-                      title: 'Price',
-                      hintText: '9.9',
-                      prefixText: '\$',
-                      color: Color.fromRGBO(13, 71, 161, 0.5),
-                      validator: _nullvalidator,
-                      textController: _priceController,
-                    ),
+                  TextFieldWidget(
+                    title: 'Price',
+                    hintText: '9.9',
+                    prefixText: '\$',
+                    color: Color.fromRGBO(13, 71, 161, 0.5),
+                    validator: _nullvalidator,
+                    textController: _priceController,
                   ),
                   SizedBox(height: 10),
                   Padding(
@@ -118,6 +121,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                       children: [
                         ButtonWidget(
                           title: 'Cancel',
+                          borderColor: AppTheme.secondaryColor,
                           onPressed: () {
                             Navigator.pop(context);
                           },

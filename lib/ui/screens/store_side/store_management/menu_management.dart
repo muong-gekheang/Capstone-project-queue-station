@@ -30,14 +30,18 @@ class _MenuManagementState extends State<MenuManagement> {
       if (searchValue.isNotEmpty) {
         return m.name.toLowerCase().contains(searchValue.toLowerCase());
       } else {
-        return m.category.name == selectedCategoryId;
+        return m.category.id == selectedCategoryId;
       }
     }).toList();
+
+    for (var r in result) {
+      print(r.name);
+    }
 
     return ListView.builder(
       itemCount: result.length,
       itemBuilder: (context, index) {
-        final menu = allMenuItems[index];
+        final menu = result[index];
         return MenuCardWidget(
           menu: menu,
           onDelete: () {
@@ -134,9 +138,6 @@ class _MenuManagementState extends State<MenuManagement> {
                             selectedIndex = index;
                             selectedCategoryId =
                                 mockMenuCategories[index].id;
-                            print(
-                              "The selectedCategoryId is $selectedCategoryId",
-                            );
                           });
                         },
                       ),

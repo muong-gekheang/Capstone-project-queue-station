@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
+import 'package:queue_station_app/ui/screens/store_side/notification_screen.dart';
+import 'package:queue_station_app/ui/store_main_screen.dart';
 import '../../../../models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store_profile_service.dart';
@@ -84,7 +86,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
             onPressed: () {
-              // Navigate to notifications
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationScreen()),
+              );
             },
           ),
         ],

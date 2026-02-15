@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
@@ -18,6 +19,15 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   List<SizeOption> selectedSizes = [];
+  @override
+  void initState() {
+    super.initState();
+    selectedSizes =
+        widget.existingMenu?.sizes
+            .map((menuSize) => menuSize.sizeOption)
+            .toList() ??
+        [];
+  }
 
   String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
@@ -34,6 +44,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
           content: Text("Please fill all required fields correctly"),
         ),
       );
+
       return;
     }
     final sizeName = _sizeController.text.trim();
@@ -52,10 +63,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       globalSizes.add(existingSize);
     }
 
-    final newGlobalSizeOption = SizeOption(name: sizeName);
-    globalSizes.add(newGlobalSizeOption);
-
-    Navigator.pop(context, newGlobalSizeOption);
+    Navigator.pop(context, existingSize);
   }
 
   Widget existingSize() {
@@ -69,7 +77,8 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       itemCount: globalMenuSizes.length,
       itemBuilder: (context, index) {
         final globalMenuSize = globalSizes[index];
-        final isSelected = selectedSizes.contains(globalMenuSize);
+        final isSelected = selectedSizes.contains
+        (globalMenuSize);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
@@ -99,8 +108,28 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     );
   }
 
+  bool get isAddDisabled {
+    if (widget.existingMenu?.sizes == null) return false;
+
+    final nonSelected = selectedSizes.isEmpty;
+
+    final existingMenuSizes = widget.existingMenu?.sizes
+        .map((existingSize) => existingSize.sizeOption.name.toLowerCase())
+        .toList() ?? [];
+
+    final hasDuplicate = selectedSizes.any(
+      (size) => existingMenuSizes.contains(size.name.toLowerCase()),
+    );
+
+      final allSelected = existingMenuSizes.every(
+      (existingSizeName) => selectedSizes.any((size) => size.name.toLowerCase() == existingSizeName),
+    );
+
+
+    return nonSelected || hasDuplicate || allSelected;
+  }
+
   void onAdd() {
-    // Just return the selected sizes (MenuSizeOption)
     Navigator.pop(context, selectedSizes);
   }
 
@@ -119,7 +148,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
           SizedBox(height: 10),
           ButtonWidget(
             title: 'Add',
-            onPressed: onAdd,
+            onPressed: isAddDisabled ? null : onAdd,
             backgroundColor: Theme.of(context).colorScheme.primary,
             textColor: Theme.of(context).colorScheme.surface,
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),

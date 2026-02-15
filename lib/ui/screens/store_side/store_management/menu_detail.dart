@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
+import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
@@ -75,11 +78,18 @@ class _MenuDetailState extends State<MenuDetail> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Column(
               children: [
-                if (menu.image == null)
-                  CircleAvatar(radius: 120, backgroundColor: Colors.white),
+                CircleAvatar(
+                  radius: 120,
+                  backgroundColor: AppTheme.accentYellow,
+                  backgroundImage: menu.image != null ? FileImage(File(menu.image!)) : null,
+                  child: menu.image == null
+                      ? Icon(Icons.add_a_photo, size: 40, color: Colors.white)
+                      : null,
+                ),
+                SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                  children: [ 
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

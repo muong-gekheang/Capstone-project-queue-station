@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
 import 'package:queue_station_app/ui/widgets/delete-menu-pop-up.dart';
@@ -12,9 +13,6 @@ class MenuCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menuCategory = mockMenuCategories.firstWhere(
-      (c) => c.id == menu.category.id,
-    );
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -30,7 +28,7 @@ class MenuCardWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.25),
+                color: AppTheme.naturalBlack.withAlpha(64),
                 offset: Offset(0, 0),
                 blurRadius: 4,
                 spreadRadius: 0,
@@ -41,55 +39,68 @@ class MenuCardWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (menu.image != null)
-                Container(
-                  decoration: BoxDecoration(
-                    // image: DecorationImage(image: MemoryImage(menu.image!)), // - will implement later
-                  ),
-                ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text(
-                    menu.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                      fontSize: 18,
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      image: menu.image != null
+                          ? DecorationImage(image: AssetImage(menu.image!))
+                          : DecorationImage(
+                              image: AssetImage(
+                                'assets/images/default_menu.jpg',
+                              ),
+                            ), // - will implement later
                     ),
                   ),
-                  Row(
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        menuCategory.name,
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        "•",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        "\$${menu.cheapestPrice().toStringAsFixed(2)}",
+                        menu.name,
                         style: TextStyle(
-                          color: const Color.fromRGBO(255, 104, 53, 1),
-                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            menu.category.name,
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            "•",
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            "\$${menu.cheapestPrice().toStringAsFixed(2)}",
+                            style: TextStyle(
+                              color: const Color.fromRGBO(255, 104, 53, 1),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        menu.isAvailable ? "Available" : "Not Available",
+                        style: TextStyle(
+                          color: menu.isAvailable
+                              ? Color.fromRGBO(16, 185, 129, 1)
+                              : Color.fromRGBO(230, 57, 70, 1),
+                          fontSize: 13,
                         ),
                       ),
                     ],
                   ),
-                  Text(
-                    menu.isAvailable ? "Available" : "Not Available",
-                    style: TextStyle(
-                      color: menu.isAvailable
-                          ? Color.fromRGBO(16, 185, 129, 1)
-                          : Color.fromRGBO(230, 57, 70, 1),
-                      fontSize: 13,
-                    ),
-                  ),
                 ],
               ),
+
               Row(
                 children: [
                   IconButton(

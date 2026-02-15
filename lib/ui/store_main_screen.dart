@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/ui/screens/store_side/notification_screen.dart';
 
 import '../ui/widgets/store_side_bottom_nav.dart';
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/store_management/manage_store_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
-
 
 enum NavTab { dashboard, analytics, settings }
 
@@ -18,10 +18,11 @@ class StoreMainScreen extends StatefulWidget {
 class _StoreMainScreenState extends State<StoreMainScreen> {
   NavTab _selectedTab = NavTab.dashboard;
 
-  final List<Widget> _screens = const [
+  List<Widget> get _screens => [
     DashboardScreen(),
     ManageStorePage(),
     StoreSettingsScreen(),
+    NotificationScreen(),
   ];
 
   void _onTabSelected(NavTab tab) {

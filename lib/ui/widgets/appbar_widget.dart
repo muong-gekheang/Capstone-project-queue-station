@@ -3,14 +3,22 @@ import 'package:flutter/material.dart';
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   Color? color;
-  AppBarWidget({super.key, required this.title, this.color});
+  final Widget? trailing;
+  final VoidCallback? onBackPressed;
+  AppBarWidget({
+    super.key,
+    required this.title,
+    this.color,
+    this.trailing,
+    this.onBackPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
         onPressed: () {
-          Navigator.pop(context);
+          onBackPressed ?? Navigator.pop(context);
         },
         icon: Icon(Icons.arrow_back),
       ),
@@ -23,6 +31,13 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       centerTitle: true,
+      actions: [
+        if(trailing != null)
+          Center(
+            child: trailing,
+          )
+        
+      ],
     );
   }
 

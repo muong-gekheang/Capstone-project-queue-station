@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
-class PriceList<T> extends StatelessWidget {
+class MenuSizeTileWidget<T> extends StatelessWidget {
   final List<T> items;
   final Map<T, TextEditingController> controllers;
   final String Function(T item) getName;
@@ -9,7 +9,7 @@ class PriceList<T> extends StatelessWidget {
   final void Function(T item, double newPrice)? onPriceChanged;
   final void Function(T item)? onDelete;
 
-  const PriceList({
+  const MenuSizeTileWidget({
     super.key,
     required this.items,
     required this.controllers,

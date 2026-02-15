@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 
 class DeleteMenuPopUp extends StatelessWidget {
@@ -22,6 +23,7 @@ class DeleteMenuPopUp extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(text: message),
+                  TextSpan(text: '\n'),
                   TextSpan(
                     text: menu.name,
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -31,11 +33,17 @@ class DeleteMenuPopUp extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            if (menu.image != null)
-              CircleAvatar(
-                radius: 60,
-                // backgroundImage: MemoryImage(menu.image!), will implement later
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                image: menu.image != null
+                    ? DecorationImage(image: AssetImage(menu.image!))
+                    : DecorationImage(
+                        image: AssetImage('assets/images/default_menu.jpg'),
+                      ), // - will implement later
               ),
+            ),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +52,8 @@ class DeleteMenuPopUp extends StatelessWidget {
                   title: 'Cancel',
                   onPressed: () => Navigator.pop(context),
                   backgroundColor: Colors.white,
-                  textColor: const Color.fromRGBO(13, 71, 161, 1),
+                  textColor: AppTheme.secondaryColor,
+                  borderColor: AppTheme.secondaryColor,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,
                     vertical: 5,
@@ -54,7 +63,7 @@ class DeleteMenuPopUp extends StatelessWidget {
                 ButtonWidget(
                   title: 'Delete',
                   onPressed: () => Navigator.pop(context, true),
-                  backgroundColor: const Color.fromRGBO(230, 57, 70, 1),
+                  backgroundColor: AppTheme.accentRed,
                   textColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,

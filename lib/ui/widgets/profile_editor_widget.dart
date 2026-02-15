@@ -4,23 +4,35 @@ import 'package:image_picker/image_picker.dart';
 
 class ProfileEditorWidget extends StatelessWidget {
   final VoidCallback onEdit;
-  final File? selectedImage;
-  const ProfileEditorWidget({super.key, required this.onEdit, required this.selectedImage});
-
+  final String? imagePath;
+  const ProfileEditorWidget({
+    super.key,
+    required this.onEdit,
+    required this.imagePath,
+  });
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider? imageProvider;
+    if (imagePath != null && imagePath!.isNotEmpty) {
+      if (imagePath!.startsWith('http')) {
+        imageProvider = NetworkImage(imagePath!);
+      } else if (imagePath!.startsWith('assets/')) {
+        imageProvider = AssetImage(imagePath!);
+      } else {
+        final imageFile = File(imagePath!);
+        if (imageFile.existsSync()) {
+          imageProvider = FileImage(imageFile);
+        }
+      }
+    }
     return Stack(
       children: [
         CircleAvatar(
           radius: 90,
           backgroundColor: Colors.grey.shade100,
-          backgroundImage: selectedImage != null
-              ? FileImage(selectedImage!)
-              : null,
-          child: selectedImage == null
-              ? const Icon(Icons.person, size: 120, color: Colors.grey)
-              : null,
+          backgroundImage: imageProvider,
+          child: imageProvider == null ? const Icon(Icons.person, size: 120) : null,
         ),
         Positioned(
           bottom: 10,
