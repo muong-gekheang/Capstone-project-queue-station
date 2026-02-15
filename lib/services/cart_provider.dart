@@ -3,11 +3,15 @@ import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 
 class CartProvider extends ChangeNotifier {
-  final Order currentOrder; 
+  Order currentOrder;
 
   CartProvider({required this.currentOrder});
 
   List<OrderItem> get items => List.unmodifiable(currentOrder.inCart);
+
+  void updateOrder(Order newOrder) {
+    currentOrder = newOrder;
+  }
 
   //add new item to cart or update its quantity if already exist.
   void addToCart(OrderItem newItem) {

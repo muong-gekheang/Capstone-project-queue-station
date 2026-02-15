@@ -323,7 +323,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
         ],
       ),
       bottomNavigationBar: FullWidthFilledButton(
-        onPress: user != null && user.currentHistory != null
+        onPress: user != null && user.currentHistory == null
             ? onJoinQueue
             : null,
         label: "Join Queue",

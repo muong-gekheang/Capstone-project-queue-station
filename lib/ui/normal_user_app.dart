@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
@@ -31,11 +32,12 @@ class _NormalUserAppState extends State<NormalUserApp> {
 
   Future<void> onTabSelected(NormalUserNavTab tab) async {
     User? user = context.read<UserProvider>().currentUser;
-    if (tab != NormalUserNavTab.ticket) {
+    if (tab != NormalUserNavTab.ticket &&
+        tab != NormalUserNavTab.foodOrdering) {
       setState(() {
         selectedTab = tab;
       });
-    } else {
+    } else if (tab == NormalUserNavTab.ticket) {
       if (user != null && user.currentHistory != null) {
         context.go("/ticket");
       } else {
@@ -48,6 +50,29 @@ class _NormalUserAppState extends State<NormalUserApp> {
                 children: [
                   Text(
                     "Please make sure to join a queue first, so you can see your ticket.",
+                  ),
+                ],
+              ),
+              actions: [],
+            );
+          },
+        );
+      }
+    } else if (tab == NormalUserNavTab.foodOrdering) {
+      if (user != null && user.currentHistory != null) {
+        // TODO: Checking queue status
+        context.go("/menu");
+      } else {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return CustomDialog(
+              title: "Oops, A problem!",
+              content: Column(
+                children: [
+                  Text(
+                    "Please make sure you have checked in to the restaurant, so you can see start ordering.",
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

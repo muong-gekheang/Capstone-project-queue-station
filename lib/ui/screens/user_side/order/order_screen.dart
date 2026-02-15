@@ -4,12 +4,11 @@ import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
 
 class OrderScreen extends StatelessWidget {
-
   const OrderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final orderProvider = context.watch()<OrderProvider>();
+    final orderProvider = context.watch<OrderProvider>();
     final order = orderProvider.currentOrder;
     final confirmedItems = order.ordered;
 

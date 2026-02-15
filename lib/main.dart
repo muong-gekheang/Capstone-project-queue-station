@@ -79,8 +79,11 @@ void main() {
           create: (_) => CartProvider(
             currentOrder: Order(id: '', timestamp: DateTime.now()),
           ),
-          update: (_, orderProvider, __) =>
-              CartProvider(currentOrder: orderProvider.currentOrder),
+          update: (context, orderProvider, previousCart) {
+            // Update the existing cart with the new order data
+            previousCart!.updateOrder(orderProvider.currentOrder);
+            return previousCart;
+          },
         ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
