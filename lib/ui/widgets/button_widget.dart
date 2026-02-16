@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class ButtonWidget extends StatelessWidget {
   final IconData? leadingIcon;
   final String title;
+  final String? trailingText;
   final VoidCallback? onPressed;
   final Color backgroundColor;
   final Color? borderColor; 
@@ -13,6 +14,7 @@ class ButtonWidget extends StatelessWidget {
     super.key,
     this.leadingIcon,
     required this.title,
+    this.trailingText,
     required this.onPressed,
     required this.backgroundColor,
     required this.textColor,
@@ -36,16 +38,25 @@ class ButtonWidget extends StatelessWidget {
         ),
       ),
       onPressed: onPressed,
-      child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (leadingIcon != null) Icon(leadingIcon, color: textColor),
-            SizedBox(width: 3),
-            Text(title, style: TextStyle(color: textColor)),
-          ],
-        ),
-      ),
-    );
+      child: trailingText == null
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (leadingIcon != null) ...[
+                Icon(leadingIcon, color: textColor),
+                const SizedBox(width: 5),
+              ],
+              Text(title, style: TextStyle(color: textColor)),
+            ],
+          )
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+              Text(trailingText!, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        );
   }
 }

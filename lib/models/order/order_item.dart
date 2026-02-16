@@ -1,5 +1,9 @@
+import 'package:queue_station_app/models/order/order.dart';
+
 import '../restaurant/menu_item.dart';
 import '../restaurant/size_option.dart';
+
+enum OrderItemStatus { pending, accepted, rejected, cancelled }
 
 class OrderItem {
   final String menuItemId; // For Storing in the DB
@@ -9,6 +13,7 @@ class OrderItem {
   final SizeOption size; // We will use only the name
   final int quantity;
   final String? note;
+  final OrderItemStatus orderItemStatus;
 
   OrderItem({
     required this.quantity,
@@ -18,5 +23,38 @@ class OrderItem {
     required this.menuItemId,
     required this.menuItemPrice,
     required this.size,
+    required this.orderItemStatus,
   });
+
+  OrderItem copyWith({
+    String? menuItemId,
+    MenuItem? item,
+    Map<String, double>? addOns,
+    double? menuItemPrice,
+    SizeOption? size,
+    int? quantity,
+    String? note,
+    OrderItemStatus? orderItemStatus,
+  }) {
+    return OrderItem(
+      quantity: quantity ?? this.quantity,
+      item: item ?? this.item,
+      addOns: addOns != null ? Map.from(addOns) : Map.from(this.addOns),
+      menuItemId: menuItemId ?? this.menuItemId,
+      menuItemPrice: menuItemPrice ?? this.menuItemPrice,
+      size: size ?? this.size,
+      note: note ?? this.note,
+      orderItemStatus: orderItemStatus ?? this.orderItemStatus,
+    );
+  }
+
+  double calculateTotalPrice() {
+    double totalPrice = menuItemPrice; // base price
+    totalPrice += addOns.values.fold(
+      0.0,
+      (sum, price) => sum + price,
+    ); // add-ons
+    totalPrice *= quantity; // quantity
+    return totalPrice;
+  }
 }

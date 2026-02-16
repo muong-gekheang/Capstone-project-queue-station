@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/user.dart';
@@ -109,6 +110,7 @@ void main() {
           },
         ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => StoreOrderNotificationProvider()),
       ],
       child: MaterialApp.router(
         theme: AppTheme.lightTheme,

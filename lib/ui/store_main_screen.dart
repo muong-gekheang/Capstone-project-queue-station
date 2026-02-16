@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/ui/screens/store_side/notification_screen.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 
 import '../ui/widgets/store_side_bottom_nav.dart';
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
