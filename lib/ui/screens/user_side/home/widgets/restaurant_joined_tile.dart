@@ -1,13 +1,13 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
 class RestaurantJoinedTile extends StatefulWidget {
   const RestaurantJoinedTile({super.key, required this.user});
 
-  final User user;
+  final Customer user;
 
   @override
   State<RestaurantJoinedTile> createState() => _RestaurantJoinedTileState();

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/history.dart';
-import 'package:queue_station_app/models/user/user.dart';
-import 'package:queue_station_app/ui/screens/user_side/history/history_view_screen.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
@@ -28,25 +30,28 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
 
-  List<History> getHistoriesForRestaurant(List<User> allUsers) {
+  List<History> getHistoriesForRestaurant(StoreUser user) {
     List<History> filteredHistories = [];
-    for (var user in allUsers) {
-      for (var history in user.histories) {
-        if (history.rest.id == restaurant.id) {
-          filteredHistories.add(history);
-        }
+    for (var history in mockHistories) {
+      if (history.rest == user.rest) {
+        filteredHistories.add(history);
       }
     }
     return filteredHistories;
   }
 
   //   String searchValue = '';
-  Widget FilteredQueueHistory() {
-    final results = getHistoriesForRestaurant(mockUsers);
+  Widget filteredQueueHistory() {
+    StoreUser? user = context.read<UserProvider>().asStoreUser;
+    List<History> histories = [];
+    if (user != null) {
+      histories = getHistoriesForRestaurant(user);
+    }
+
     return ListView.builder(
-      itemCount: results.length,
+      itemCount: histories.length,
       itemBuilder: (context, index) =>
-          StoreQueueHistoryCard(history: results[index],),
+          StoreQueueHistoryCard(history: histories[index]),
     );
   }
 
@@ -80,7 +85,7 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
               ),
             ),
             SizedBox(height: 10),
-            Expanded(child: FilteredQueueHistory()),
+            Expanded(child: filteredQueueHistory()),
           ],
         ),
       ),

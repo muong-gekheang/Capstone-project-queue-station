@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
@@ -34,7 +35,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
 
   Future<void> onJoinQueue() async {
     UserProvider userProvider = context.read<UserProvider>();
-    User? user = userProvider.currentUser;
+    Customer? user = userProvider.asCustomer;
     if (user != null) {
       userProvider.updateUser(
         user.copyWith(
@@ -88,13 +89,13 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
         : "";
 
     UserProvider userProvider = context.read<UserProvider>();
-    User? user = userProvider.currentUser;
+    Customer? user = userProvider.asCustomer;
 
     return CustomScreenView(
       title: "Get Queue",
       isTitleCenter: true,
       content: ListView(
-        padding: EdgeInsets.all(3),
+        padding: const EdgeInsets.all(3),
         children: [
           Container(
             decoration: BoxDecoration(
@@ -107,7 +108,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                 ),
               ],
             ),
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Column(
               spacing: 10,
               children: [
@@ -137,7 +138,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             spacing: 5,
                             children: [
-                              Icon(Icons.location_pin),
+                              const Icon(Icons.location_pin),
                               Expanded(
                                 child: Text(
                                   widget.rest.address,
@@ -196,13 +197,13 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ListTile(
             tileColor: Color(0xFFFF6835),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(10),
             ),
-            title: Text(
+            title: const Text(
               "Wait",
               style: TextStyle(
                 fontSize: 20,
@@ -227,7 +228,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                     color: Colors.white,
                   ),
                 ),
-                Text(
+                const Text(
                   "Entries",
                   style: TextStyle(
                     color: Colors.white,
@@ -237,12 +238,12 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           const Text(
             "Queue Type",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -268,9 +269,9 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           const Text("Number of Guest(s)", style: TextStyle(fontSize: 16)),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 19,
@@ -303,7 +304,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                         height: 1.0,
                       ),
                     ),
-                    Positioned.fill(
+                    const Positioned.fill(
                       child: VerticalDivider(
                         color: Color(0xFF73706E),
                         thickness: 1,
@@ -323,7 +324,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
         ],
       ),
       bottomNavigationBar: FullWidthFilledButton(
-        onPress: user != null && user.currentHistory == null
+        onPress: user != null && user.currentHistory == null && numPeople > 0
             ? onJoinQueue
             : null,
         label: "Join Queue",

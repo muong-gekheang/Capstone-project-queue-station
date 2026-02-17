@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 
@@ -19,9 +20,9 @@ class _CancelQueueDialogState extends State<CancelQueueDialog> {
 
   void onCancelTap() {
     UserProvider userProvider = context.read<UserProvider>();
-    User? user = userProvider.currentUser;
+    Customer? user = userProvider.asCustomer;
     if (user != null) {
-      userProvider.updateUser(user.copyWith(isNoQueue: true));
+      userProvider.updateUser(user.copyWith(noQueue: true));
       context.go("/");
     }
   }
