@@ -10,13 +10,7 @@ import 'package:queue_station_app/ui/widgets/table_search_result.dart';
 enum FilterOption { available, occupied, clear }
 
 class TableManagementScreen extends StatefulWidget {
-  const TableManagementScreen({
-    super.key,
-    required this.tableCategory,
-    required this.initialTables,
-  });
-
-  final List<TableCategory> tableCategory;
+  const TableManagementScreen({super.key, required this.initialTables});
   final List<QueueTable> initialTables;
 
   @override
@@ -47,8 +41,10 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   @override
   void initState() {
     super.initState();
-    tableCategories = List.from(widget.tableCategory);
     allTables = List.from(widget.initialTables);
+    tableCategories = List.from(
+      widget.initialTables.map((t) => t.tableCategory).toSet().toList(),
+    );
 
     if (tableCategories.isNotEmpty) {
       currentCategoryTable = tableCategories.first;
@@ -464,13 +460,13 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                     ),
                     const SizedBox(width: AppTheme.spacingXS),
                     Text(
-                      ": ${filteredTables.length}",
+                      ": ${filteredTables.length} table(s)  |",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: AppTheme.heading2,
                       ),
                     ),
-                    const SizedBox(width: AppTheme.spacingM),
+                    const SizedBox(width: AppTheme.spacingS),
                     const Icon(
                       Icons.chair,
                       size: AppTheme.iconSizeL,
@@ -478,7 +474,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                     ),
                     const SizedBox(width: AppTheme.spacingXS),
                     Text(
-                      ": ${currentCategoryTable.seatAmount}",
+                      ": ${currentCategoryTable.seatAmount} seat(s)",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: AppTheme.heading2,

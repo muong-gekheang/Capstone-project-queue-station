@@ -266,10 +266,8 @@ class _ManageStorePageState extends State<ManageStorePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TableManagementScreen(
-                  tableCategory: [],
-                  initialTables: tableData,
-                ),
+                builder: (context) =>
+                    TableManagementScreen(initialTables: tableData),
               ),
             );
           },
