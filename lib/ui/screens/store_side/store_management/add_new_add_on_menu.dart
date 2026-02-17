@@ -6,7 +6,7 @@ import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
-import 'package:queue_station_app/ui/app_theme.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
@@ -16,7 +16,7 @@ import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class AddNewAddOnMenu extends StatefulWidget {
-  const AddNewAddOnMenu({super.key, });
+  const AddNewAddOnMenu({super.key});
 
   @override
   State<AddNewAddOnMenu> createState() => _AddNewAddOnMenuState();

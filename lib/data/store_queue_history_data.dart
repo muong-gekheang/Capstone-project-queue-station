@@ -151,7 +151,15 @@ final user1 = Customer(
   name: "Alice",
   email: "alice@example.com",
   phone: "1234567890",
-  histories: [history1, history2, history3],
+  histories: [
+    history1,
+    history2,
+    history3,
+    history3,
+    history3,
+    history3,
+    history3,
+  ],
 );
 
 final user2 = StoreUser(

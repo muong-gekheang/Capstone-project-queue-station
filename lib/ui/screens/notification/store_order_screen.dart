@@ -4,7 +4,7 @@ import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
-import 'package:queue_station_app/ui/app_theme.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
@@ -37,8 +37,6 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
     final acceptedItems = allItems
         .where((item) => item.orderItemStatus == OrderItemStatus.accepted)
         .toList();
-
-    
 
     return Scaffold(
       appBar: AppBarWidget(title: '${queueEntry.tableNumber} Order'),
@@ -117,16 +115,17 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
               ),
             ),
             ButtonWidget(
-              title: 'Total', 
-              trailingText: '\$${queueEntry.order?.calculateTotalPrice().toStringAsFixed(2)}',
-              onPressed: (){}, 
-              backgroundColor: AppTheme.primaryColor, 
-              textColor: AppTheme.naturalWhite, 
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5))
+              title: 'Total',
+              trailingText:
+                  '\$${queueEntry.order?.calculateTotalPrice().toStringAsFixed(2)}',
+              onPressed: () {},
+              backgroundColor: AppTheme.primaryColor,
+              textColor: AppTheme.naturalWhite,
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+            ),
           ],
         ),
       ),
-
     );
   }
 }
@@ -164,11 +163,15 @@ class InfoBadge extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: AppTheme.accentYellow),
       ),
-      child: 
-        Text(
-          text, 
-          style: TextStyle(color: AppTheme.accentYellow, fontWeight: FontWeight.bold, fontSize: AppTheme.heading1),
-          textAlign: TextAlign.center,
-    ));
+      child: Text(
+        text,
+        style: TextStyle(
+          color: AppTheme.accentYellow,
+          fontWeight: FontWeight.bold,
+          fontSize: AppTheme.heading1,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 }

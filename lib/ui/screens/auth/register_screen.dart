@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/services/auth_service.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_form_field.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/settings_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,18 +13,29 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  String email = "";
+  String username = "";
+  String phoneNumber = "";
+  String password = "";
+  String confirmPassword = "";
   final AuthService _authService = AuthService();
+
+  final _formKey = GlobalKey<FormState>();
 
   bool _isLoading = false;
 
   void _handleRegister() async {
-    setState(() => _isLoading = true);
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    _formKey.currentState!.save();
 
     final success = await _authService.register(
-      _emailController.text,
-      _passwordController.text,
+      email: email,
+      username: username,
+      phoneNumber: phoneNumber,
+      password: password,
     );
 
     setState(() => _isLoading = false);
@@ -52,104 +67,132 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: AppTheme.naturalWhite,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.account_tree, size: 50, color: Colors.blue),
-              const SizedBox(height: 8),
-              const Text(
-                "Queue Station",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              SizedBox(
+                height: 150,
+                width: 300,
+                child: Image.asset(
+                  "assets/queue_station.png",
+                  fit: BoxFit.cover,
+                ),
               ),
-
-              const SizedBox(height: 30),
 
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
+                      color: Colors.black.withAlpha((255 * 0.25).toInt()),
+                      blurRadius: 8,
+                      offset: Offset(0, 0),
                     ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Register",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    TextField(
-                      controller: _emailController,
-                      decoration: _inputStyle("Email"),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(decoration: _inputStyle("Username")),
-                    const SizedBox(height: 12),
-                    TextField(decoration: _inputStyle("Phone number")),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: _inputStyle("Password"),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      obscureText: true,
-                      decoration: _inputStyle("Confirm password"),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[800],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        "Register",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        onPressed: _isLoading ? null : _handleRegister,
-                        child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text("Register"),
                       ),
-                    ),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Have an account? "),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Text(
-                            "Login",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                      CustomTextFormField(
+                        label: "Email",
+                        onSaved: (newValue) {
+                          email = newValue;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      CustomTextFormField(
+                        label: "Username",
+                        onSaved: (newValue) {
+                          username = newValue;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      CustomTextFormField(
+                        label: "Phone number",
+                        onSaved: (newValue) {
+                          phoneNumber = newValue;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      CustomTextFormField(
+                        label: "Password",
+                        onSaved: (newValue) {
+                          password = newValue;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      CustomTextFormField(
+                        label: "Confirm password",
+                        onSaved: (newValue) {
+                          confirmPassword = newValue;
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[800],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
+                          onPressed: _isLoading ? null : _handleRegister,
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Register",
+                                  style: TextStyle(
+                                    color: AppTheme.naturalWhite,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Have an account? "),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

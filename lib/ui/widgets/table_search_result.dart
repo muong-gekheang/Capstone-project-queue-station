@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
-import 'package:queue_station_app/ui/app_theme.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 
 class TableSearchResult extends StatelessWidget {
   const TableSearchResult({

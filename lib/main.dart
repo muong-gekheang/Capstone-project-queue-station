@@ -3,13 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
+import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
-import 'package:queue_station_app/ui/app_theme.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/normal_user_app.dart';
 import 'package:queue_station_app/ui/screens/auth/login_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/register_screen.dart';
@@ -112,6 +113,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => StoreOrderNotificationProvider()),
       ],
       child: MaterialApp.router(
+        scrollBehavior: GlobalScrollBehavior(),
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         routerConfig: goRouter,

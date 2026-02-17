@@ -6,7 +6,7 @@ import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
-import 'package:queue_station_app/ui/app_theme.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/add_size_management.dart';
@@ -165,7 +165,6 @@ class _MenuFormState extends State<MenuForm> {
         }
       }
     }
-
 
     final MenuItem newMenu = MenuItem(
       id: Uuid().v4(),
@@ -365,7 +364,7 @@ class _MenuFormState extends State<MenuForm> {
                               );
                             },
                           );
-                  
+
                       if (returnedMenuSizes != null &&
                           returnedMenuSizes.isNotEmpty) {
                         setState(() {
@@ -416,7 +415,7 @@ class _MenuFormState extends State<MenuForm> {
                               );
                             },
                           );
-                  
+
                       if (newAddOns != null) {
                         setState(() {
                           for (AddOn addOn in newAddOns) {

@@ -36,7 +36,6 @@ class AppTheme {
   static const double borderRadiusL = 16.0;
   static const double borderRadiusXl = 30.0;
 
-
   // Icon Sizes
   static const double iconSizeXl = 32.0;
   static const double iconSizeL = 26.0;
@@ -57,7 +56,7 @@ class AppTheme {
   static const double menuImage2 = 160.0;
   static const double menuImage3 = 100.0;
   static const double menuImage4 = 50.0;
-  static const double menuImage5 = 35.0;  
+  static const double menuImage5 = 35.0;
 
   // 4. ThemeData with Inter as default font
   static ThemeData get lightTheme {

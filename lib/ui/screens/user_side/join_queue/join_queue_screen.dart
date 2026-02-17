@@ -95,6 +95,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
       title: "Get Queue",
       isTitleCenter: true,
       content: ListView(
+        physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(3),
         children: [
           Container(

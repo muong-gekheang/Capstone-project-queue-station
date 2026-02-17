@@ -92,34 +92,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
           Expanded(
             child: CustomScrollView(
+              clipBehavior: Clip.antiAlias,
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 if (user.currentHistory != null)
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 2,
-                          ),
-                          child: RestaurantJoinedTile(user: user),
-                        ),
-                        SizedBox(height: 10),
-                      ],
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(8, 2, 8, 10),
+                    sliver: SliverToBoxAdapter(
+                      child: RestaurantJoinedTile(user: user),
                     ),
                   ),
-                SliverList.separated(
-                  itemCount: mockRestaurants.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 2,
-                      ),
-                      child: RestaurantTile(rest: mockRestaurants[index]),
-                    );
-                  },
-                  separatorBuilder: (context, index) => SizedBox(height: 10),
+
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 2,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: mockRestaurants.length,
+                    itemBuilder: (context, index) {
+                      return RestaurantTile(rest: mockRestaurants[index]);
+                    },
+                    separatorBuilder: (context, index) => SizedBox(height: 10),
+                  ),
                 ),
               ],
             ),
