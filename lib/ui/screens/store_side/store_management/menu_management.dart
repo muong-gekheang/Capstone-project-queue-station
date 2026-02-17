@@ -136,8 +136,7 @@ class _MenuManagementState extends State<MenuManagement> {
                         onTap: () {
                           setState(() {
                             selectedIndex = index;
-                            selectedCategoryId =
-                                mockMenuCategories[index].id;
+                            selectedCategoryId = mockMenuCategories[index].id;
                           });
                         },
                       ),

@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
-import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
@@ -39,10 +37,6 @@ class _MenuDetailState extends State<MenuDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final menuCategory = mockMenuCategories.firstWhere(
-      (c) => c.id == menu.category.id,
-    );
-
     void onEdit() async {
       MenuItem? newMenu = await Navigator.push<MenuItem>(
         context,
@@ -70,6 +64,26 @@ class _MenuDetailState extends State<MenuDetail> {
         .where((addOn) => menu.addOns.contains(addOn))
         .toList();
 
+    ImageProvider? getImageProvider(String? imagePath) {
+      if (imagePath == null || imagePath.isEmpty) {
+        return null;
+      }
+
+      if (imagePath.startsWith('http')) {
+        return NetworkImage(imagePath);
+      }
+
+      if (imagePath.startsWith('assets/')) {
+        return AssetImage(imagePath);
+      }
+
+      if (File(imagePath).existsSync()) {
+        return FileImage(File(imagePath));
+      }
+
+      return null;
+    }
+
     return Scaffold(
       appBar: AppBarWidget(title: menu.name, color: Colors.black),
       body: SingleChildScrollView(
@@ -80,16 +94,38 @@ class _MenuDetailState extends State<MenuDetail> {
               children: [
                 CircleAvatar(
                   radius: 120,
-                  backgroundColor: AppTheme.accentYellow,
-                  backgroundImage: menu.image != null ? FileImage(File(menu.image!)) : null,
-                  child: menu.image == null
-                      ? Icon(Icons.add_a_photo, size: 40, color: Colors.white)
-                      : null,
+                  backgroundImage:
+                      getImageProvider(menu.image) ??
+                      getImageProvider('assets/images/default.png'),
                 ),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [ 
+                  children: [
+                    Text(
+                      'Menu Availability',
+                      style: TextStyle(fontSize: AppTheme.heading3),
+                    ),
+                    Switch(
+                      value: menu.isAvailable,
+                      onChanged: (bool value) {
+                        setState(() {
+                          // menu = menu.copyWith(isAvailable: value);
+                          menu.isAvailable = value;
+                          final index = allMenuItems.indexWhere(
+                            (m) => m.id == menu.id,
+                          );
+                          if (index != -1) {
+                            allMenuItems[index] = menu;
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -142,7 +178,7 @@ class _MenuDetailState extends State<MenuDetail> {
                     Icon(Icons.access_time),
                     SizedBox(width: 5),
                     Text(
-                      '${menu.minPrepTimeMinutes} - ${menu.maxPrepTimeMinutes} min',
+                      '${menu.minPrepTimeMinutes ?? 0} - ${menu.maxPrepTimeMinutes ?? 0} min',
                     ),
                   ],
                 ),
@@ -208,7 +244,6 @@ class _MenuDetailState extends State<MenuDetail> {
                                 textAlign: TextAlign.right,
                               ),
                             ),
-                            
                           ],
                         ),
                       );

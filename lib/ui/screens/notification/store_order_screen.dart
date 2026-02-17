@@ -75,10 +75,6 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                         context
                             .read<StoreOrderNotificationProvider>()
                             .acceptAllIncomingOrder(queueEntry);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('All items accepted')),
-                        );
                       },
                       backgroundColor: AppTheme.primaryColor,
                       textColor: AppTheme.naturalWhite,
