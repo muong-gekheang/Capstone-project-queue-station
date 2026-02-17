@@ -29,6 +29,32 @@ class MenuItem {
   }) : sizes = sizes ?? [],
        addOns = addOns ?? [];
 
+  MenuItem copyWith({
+    String? id,
+    String? image,
+    String? name,
+    String? description,
+    int? minPrepTimeMinutes,
+    int? maxPrepTimeMinutes,
+    MenuItemCategory? category,
+    List<MenuSize>? sizes,
+    List<AddOn>? addOns,
+    bool? isAvailable,
+  }){
+    return MenuItem(
+      id: id ?? this.id,
+      image: image ?? this.image,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      minPrepTimeMinutes: minPrepTimeMinutes ?? this.minPrepTimeMinutes,
+      maxPrepTimeMinutes: maxPrepTimeMinutes ?? this.maxPrepTimeMinutes,
+      category: category ?? this.category,
+      sizes: sizes ?? List<MenuSize>.from(this.sizes),
+      addOns: addOns ?? List<AddOn>.from(this.addOns),
+      isAvailable: isAvailable ?? this.isAvailable,
+    );
+  }
+
   double cheapestPrice() {
     if (sizes.isEmpty) return 0.0;
     return sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);

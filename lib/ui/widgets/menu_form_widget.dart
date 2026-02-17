@@ -126,14 +126,23 @@ class _MenuFormState extends State<MenuForm> {
     final String name = _nameController.text.trim();
     final String description = _descriptionController.text.trim();
     // final double? parsedPrice = double.tryParse(_priceController.text.trim());
-    final int? minPrep = int.tryParse(_minTimeController.text.trim());
-    final int? maxPrep = int.tryParse(_maxTimeController.text.trim());
+    final int minPrep = int.tryParse(_minTimeController.text.trim()) ?? 0;
+    final int maxPrep = int.tryParse(_maxTimeController.text.trim()) ?? 0;
 
     if (selectedCategory == null || selectedCategory!.id == "-1") {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select a valid category")),
       );
       return;
+    }
+
+    if (minPrep > maxPrep) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Min preparation time cannot be greater than max time"),
+        ),
+      );
+      return; // prevent saving
     }
 
     // Update menuSizes price from controllers
@@ -157,9 +166,6 @@ class _MenuFormState extends State<MenuForm> {
       }
     }
 
-    for (AddOn addOn in addOns) {
-      addOns.add(addOn);
-    }
 
     final MenuItem newMenu = MenuItem(
       id: Uuid().v4(),
@@ -344,39 +350,42 @@ class _MenuFormState extends State<MenuForm> {
                   },
                 ),
 
-                ButtonWidget(
-                  leadingIcon: Icons.add,
-                  title: 'Add Size',
-                  onPressed: () async {
-                    final returnedMenuSizes =
-                        await showModalBottomSheet<List<SizeOption>>(
-                          context: context,
-                          builder: (context) {
-                            return AddSizeScreen(
-                              existingMenu: widget.initialMenu,
-                            );
-                          },
-                        );
-
-                    if (returnedMenuSizes != null &&
-                        returnedMenuSizes.isNotEmpty) {
-                      setState(() {
-                        // Convert MenuSizeOption -> MenuSize with default price 0
-                        menuSizes.addAll(
-                          returnedMenuSizes.map(
-                            (e) => MenuSize(sizeOption: e, price: 0),
-                          ),
-                        );
-                      });
-                    }
-                  },
-                  backgroundColor: AppTheme.secondaryColor.withAlpha(127),
-                  textColor: Theme.of(context).colorScheme.secondary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 5,
+                SizedBox(
+                  width: double.infinity,
+                  child: ButtonWidget(
+                    leadingIcon: Icons.add,
+                    title: 'Add Size',
+                    onPressed: () async {
+                      final returnedMenuSizes =
+                          await showModalBottomSheet<List<SizeOption>>(
+                            context: context,
+                            builder: (context) {
+                              return AddSizeScreen(
+                                existingMenu: widget.initialMenu,
+                              );
+                            },
+                          );
+                  
+                      if (returnedMenuSizes != null &&
+                          returnedMenuSizes.isNotEmpty) {
+                        setState(() {
+                          // Convert MenuSizeOption -> MenuSize with default price 0
+                          menuSizes.addAll(
+                            returnedMenuSizes.map(
+                              (e) => MenuSize(sizeOption: e, price: 0),
+                            ),
+                          );
+                        });
+                      }
+                    },
+                    backgroundColor: AppTheme.secondaryColor.withAlpha(127),
+                    textColor: Theme.of(context).colorScheme.secondary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 5,
+                    ),
+                    borderRadius: 5,
                   ),
-                  borderRadius: 5,
                 ),
                 const SizedBox(height: 10),
                 const Text(
@@ -392,34 +401,35 @@ class _MenuFormState extends State<MenuForm> {
                   },
                 ),
                 const SizedBox(height: 10),
-                ButtonWidget(
-                  leadingIcon: Icons.add,
-                  title: 'Add Add-Ons',
-                  onPressed: () async {
-                    final List<AddOn>? newAddOns =
-                        await showModalBottomSheet<List<AddOn>>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AddOnsManagement(
-                              existingMenu: widget.initialMenu,
-                            );
-                          },
-                        );
-
-                    if (newAddOns != null) {
-                      setState(() {
-                        for (AddOn addOn in newAddOns) {
-                          addOns.add(addOn);
-                        }
-                      });
-                    }
-                  },
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.secondary.withAlpha(127),
-                  textColor: Theme.of(context).colorScheme.secondary,
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-                  borderRadius: 5,
+                SizedBox(
+                  width: double.infinity,
+                  child: ButtonWidget(
+                    leadingIcon: Icons.add,
+                    title: 'Add Add-Ons',
+                    onPressed: () async {
+                      final List<AddOn>? newAddOns =
+                          await showModalBottomSheet<List<AddOn>>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AddOnsManagement(
+                                existingMenu: widget.initialMenu,
+                              );
+                            },
+                          );
+                  
+                      if (newAddOns != null) {
+                        setState(() {
+                          for (AddOn addOn in newAddOns) {
+                            addOns.add(addOn);
+                          }
+                        });
+                      }
+                    },
+                    backgroundColor: AppTheme.secondaryColor.withAlpha(127),
+                    textColor: AppTheme.secondaryColor,
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                    borderRadius: 5,
+                  ),
                 ),
 
                 const SizedBox(height: 10),
@@ -431,8 +441,8 @@ class _MenuFormState extends State<MenuForm> {
                       ButtonWidget(
                         title: 'Cancel',
                         onPressed: () => Navigator.pop(context),
-                        backgroundColor: Theme.of(context).colorScheme.surface,
-                        textColor: Theme.of(context).colorScheme.secondary,
+                        backgroundColor: AppTheme.naturalWhite,
+                        textColor: AppTheme.secondaryColor,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 40,
                           vertical: 5,
@@ -441,8 +451,8 @@ class _MenuFormState extends State<MenuForm> {
                       ButtonWidget(
                         title: 'Save',
                         onPressed: onSave,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        textColor: Theme.of(context).colorScheme.surface,
+                        backgroundColor: AppTheme.primaryColor,
+                        textColor: AppTheme.naturalWhite,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 40,
                           vertical: 5,
