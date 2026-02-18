@@ -362,6 +362,8 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   // --- Dialogs & UI Helpers ---
 
   void _showSnackBar(String message, {Color? backgroundColor}) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double snackBarEstimatedHeight = AppTheme.spacingXL;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -375,10 +377,14 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         backgroundColor: backgroundColor ?? AppTheme.secondaryColor,
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 100,
+          bottom: (screenHeight - 150).clamp(
+            0.0,
+            screenHeight - snackBarEstimatedHeight,
+          ),
           left: AppTheme.spacingXL,
           right: AppTheme.spacingXL,
         ),
+        // margin: const EdgeInsets.all(AppTheme.spacingXL),
         duration: const Duration(milliseconds: 1200),
       ),
     );
@@ -403,8 +409,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         ],
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         padding: const EdgeInsets.all(AppTheme.spacingL),
         child: Column(
           spacing: AppTheme.spacingL,
@@ -441,48 +445,55 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
               onAddChip: (name) =>
                   showAddNewUpdateCategoryDialog(tableCategory: name),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Category: ${currentCategoryTable.type}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppTheme.heading2,
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                runSpacing: 10,
+                children: [
+                  Text(
+                    "Category: ${currentCategoryTable.type}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppTheme.heading2,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.table_restaurant_rounded,
-                      size: AppTheme.iconSizeL,
-                      color: AppTheme.primaryColor,
-                    ),
-                    const SizedBox(width: AppTheme.spacingXS),
-                    Text(
-                      ": ${filteredTables.length} table(s)  |",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppTheme.heading2,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.table_restaurant_rounded,
+                        size: AppTheme.iconSizeL,
+                        color: AppTheme.primaryColor,
                       ),
-                    ),
-                    const SizedBox(width: AppTheme.spacingS),
-                    const Icon(
-                      Icons.chair,
-                      size: AppTheme.iconSizeL,
-                      color: AppTheme.secondaryColor,
-                    ),
-                    const SizedBox(width: AppTheme.spacingXS),
-                    Text(
-                      ": ${currentCategoryTable.seatAmount} seat(s)",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppTheme.heading2,
+                      const SizedBox(width: AppTheme.spacingXS),
+                      Text(
+                        ": ${filteredTables.length} table(s)  |",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.heading2,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: AppTheme.spacingS),
+                      const Icon(
+                        Icons.chair,
+                        size: AppTheme.iconSizeL,
+                        color: AppTheme.secondaryColor,
+                      ),
+                      const SizedBox(width: AppTheme.spacingXS),
+                      Text(
+                        ": ${currentCategoryTable.seatAmount} seat(s)",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.heading2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: TableSearchResult(
