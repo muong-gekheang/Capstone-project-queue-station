@@ -1,15 +1,7 @@
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import '../order/order.dart';
 
-enum QueueStatus {
-  waiting,
-  serving,
-  completed,
-  cancelled,
-  noShow,
-  notified,
-  served,
-}
+enum QueueStatus { waiting, serving, completed, cancelled, noShow }
 
 enum JoinedMethod { remote, walkIn }
 
@@ -71,7 +63,6 @@ class QueueEntry {
 
   @override
   int get hashCode => Object.hash(id, customerId);
-
 
   QueueEntry copyWith({
     String? id,

@@ -42,7 +42,7 @@ class QueueRepository {
         id: '103',
         partySize: 1,
         joinTime: DateTime.now().subtract(const Duration(minutes: 28)),
-        status: QueueStatus.notified,
+        status: QueueStatus.noShow,
         queueNumber: 'S-005',
         customerId: 'user_112',
         joinedMethod: JoinedMethod.remote,
