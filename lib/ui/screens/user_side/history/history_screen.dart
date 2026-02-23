@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/history.dart';
-import 'package:queue_station_app/models/user/user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_list_view.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/history/sort_button.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
-import 'package:queue_station_app/ui/screens/user_side/history/sort_button.dart';
 
 enum SortType { recent, byMonth, byYear }
 
@@ -25,10 +25,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-    User user = context.read<UserProvider>().currentUser!;
-    List<History> sortedList = [...user.histories];
-    sortedList.sort((a, b) => b.queue.joinTime.compareTo(a.queue.joinTime));
-    historyList = sortedList;
+    Customer? user = context.read<UserProvider>().asCustomer;
+    if (user != null) {
+      List<History> sortedList = [...user.histories];
+      sortedList.sort((a, b) => b.queue.joinTime.compareTo(a.queue.joinTime));
+      historyList = sortedList;
+    }
   }
 
   void updateSort(SortType newSortType) {
@@ -42,7 +44,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
-    User user = userProvider.currentUser!;
+    Customer? user = userProvider.asCustomer;
     return CustomScreenView(
       title: "History",
       isTitleCenter: true,
@@ -51,7 +53,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
           SearchWidget<History>(
             filterLogic: (String search) {
-              Set<History> filteredList = user.histories
+              Set<History> filteredList = (user?.histories ?? [])
                   .where(
                     (e) => e.rest.name.toLowerCase().startsWith(
                       search.toLowerCase(),

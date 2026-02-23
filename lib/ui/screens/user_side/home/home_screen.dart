@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/mock_restaurant.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
-import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
@@ -9,69 +11,6 @@ import 'package:queue_station_app/ui/widgets/search_widget.dart';
 import 'package:uuid/uuid.dart';
 
 var uuid = Uuid();
-
-List<Restaurant> mockData = [
-  Restaurant(
-    id: uuid.v4(),
-    name: 'Kungfu Kitchen',
-    address: "BKK St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
-  ),
-  Restaurant(
-    id: uuid.v4(),
-    name: 'Angle Hai',
-    address: "STM St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
-  ),
-  Restaurant(
-    id: uuid.v4(),
-    name: 'DoriDori Korean Chicken',
-    address: 'AEON MALL SEN SOK',
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
-  ),
-  Restaurant(
-    id: uuid.v4(),
-    name: 'Kungfu Kitchen',
-    address: "BKK St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
-  ),
-  Restaurant(
-    id: uuid.v4(),
-    name: 'Kungfu Kitchen',
-    address: "BKK St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
-  ),
-];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -86,13 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    restaurants = [...mockData];
+    restaurants = [...mockRestaurants];
   }
 
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
-    User user = userProvider.currentUser!;
+    Customer user = userProvider.asCustomer!;
     if (user.currentHistory != null) {
       restaurants.remove(user.currentHistory!.rest);
     }
@@ -108,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: SearchWidget<Restaurant>(
                   filterLogic: (String search) {
-                    Set<Restaurant> filteredList = mockData
+                    Set<Restaurant> filteredList = mockRestaurants
                         .where(
                           (e) => e.name.toLowerCase().startsWith(
                             search.toLowerCase(),
@@ -153,34 +92,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
           Expanded(
             child: CustomScrollView(
+              clipBehavior: Clip.antiAlias,
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 if (user.currentHistory != null)
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 2,
-                          ),
-                          child: RestaurantJoinedTile(user: user),
-                        ),
-                        SizedBox(height: 10),
-                      ],
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(8, 2, 8, 10),
+                    sliver: SliverToBoxAdapter(
+                      child: RestaurantJoinedTile(user: user),
                     ),
                   ),
-                SliverList.separated(
-                  itemCount: mockData.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 2,
-                      ),
-                      child: RestaurantTile(rest: mockData[index]),
-                    );
-                  },
-                  separatorBuilder: (context, index) => SizedBox(height: 10),
+
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 2,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: mockRestaurants.length,
+                    itemBuilder: (context, index) {
+                      return RestaurantTile(rest: mockRestaurants[index]);
+                    },
+                    separatorBuilder: (context, index) => SizedBox(height: 10),
+                  ),
                 ),
               ],
             ),

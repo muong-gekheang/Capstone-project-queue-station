@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/auth_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -42,41 +44,25 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  InputDecoration _inputStyle(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: AppTheme.naturalWhite,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /// Logo + App name
-              Column(
-                children: const [
-                  Icon(Icons.account_tree, size: 50, color: Colors.blue),
-                  SizedBox(height: 8),
-                  Text(
-                    "Queue Station",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                ],
+              /// Logo
+              SizedBox(
+                height: 150,
+                width: 300,
+                child: Image.asset(
+                  "assets/queue_station.png",
+                  fit: BoxFit.cover,
+                ),
               ),
-
-              const SizedBox(height: 30),
 
               /// Card
               Container(
@@ -86,9 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
+                      color: Colors.black.withAlpha((255 * 0.25).toInt()),
+                      blurRadius: 8,
+                      offset: Offset(0, 0),
                     ),
                   ],
                 ),
@@ -107,20 +93,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text(
                       "Login to start queueing",
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
                     ),
 
                     const SizedBox(height: 20),
 
-                    TextField(
+                    CustomTextField(
                       controller: _emailController,
-                      decoration: _inputStyle("Email"),
+                      label: "Email",
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    CustomTextField(
                       controller: _passwordController,
+                      label: "Password",
                       obscureText: true,
-                      decoration: _inputStyle("Password"),
                     ),
 
                     const SizedBox(height: 20),
@@ -139,7 +124,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
-                            : const Text("Login"),
+                            : const Text(
+                                "Login",
+                                style: TextStyle(
+                                  color: AppTheme.naturalWhite,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
 
@@ -161,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text(
                             "Register",
                             style: TextStyle(
-                              color: Colors.orange,
+                              color: AppTheme.primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

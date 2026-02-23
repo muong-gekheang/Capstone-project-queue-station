@@ -40,7 +40,7 @@ class QueueService {
     final entry = await _repository.getQueueEntryById(queueEntryId);
     if (entry != null) {
       final updatedEntry = entry.copyWith(
-        status: QueueStatus.served, 
+        status: QueueStatus.serving,
         servedTime: DateTime.now(),
         tableNumber: tableNumber,
       );

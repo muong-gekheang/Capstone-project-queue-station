@@ -1,4 +1,4 @@
-import '../user/user.dart';
+import '../user/abstracts/user.dart';
 import 'table_category.dart';
 import 'package:uuid/uuid.dart';
 

@@ -56,6 +56,7 @@ class Restaurant {
   bool operator ==(Object other) {
     return (other is Restaurant) &&
         (other.name == name &&
+            other.id == id &&
             other.address == address &&
             other.phone == phone);
   }

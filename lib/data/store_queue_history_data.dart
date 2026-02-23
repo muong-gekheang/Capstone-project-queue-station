@@ -1,7 +1,10 @@
+import 'package:queue_station_app/data/mock_restaurant.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/history.dart';
-import 'package:queue_station_app/models/user/user.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:uuid/uuid.dart';
 
 final Uuid uuid = Uuid();
@@ -53,8 +56,9 @@ final queue1 = QueueEntry(
   partySize: 2,
   joinTime: DateTime(2026, 1, 26, 10, 15),
   servedTime: DateTime(2026, 1, 26, 10, 22),
-  status: QueueStatus.completed, queueNumber: 'A101',
-   joinedMethod: JoinedMethod.walkIn
+  status: QueueStatus.completed,
+  queueNumber: 'A101',
+  joinedMethod: JoinedMethod.walkIn,
 );
 
 final queue2 = QueueEntry(
@@ -63,8 +67,9 @@ final queue2 = QueueEntry(
   partySize: 2,
   joinTime: DateTime(2026, 1, 26, 11, 0),
   servedTime: DateTime(2026, 1, 26, 11, 10),
-  status: QueueStatus.serving, queueNumber: 'B107',
-   joinedMethod: JoinedMethod.remote
+  status: QueueStatus.serving,
+  queueNumber: 'B107',
+  joinedMethod: JoinedMethod.remote,
 );
 
 final queue3 = QueueEntry(
@@ -73,8 +78,9 @@ final queue3 = QueueEntry(
   partySize: 3,
   joinTime: DateTime(2026, 1, 26, 11, 5),
   servedTime: DateTime(2026, 1, 26, 11, 20),
-  status: QueueStatus.completed, queueNumber: 'A102',
-   joinedMethod: JoinedMethod.walkIn
+  status: QueueStatus.completed,
+  queueNumber: 'A102',
+  joinedMethod: JoinedMethod.walkIn,
 );
 
 final queue4 = QueueEntry(
@@ -83,8 +89,9 @@ final queue4 = QueueEntry(
   partySize: 1,
   joinTime: DateTime(2026, 1, 26, 12, 0),
   servedTime: null,
-  status: QueueStatus.waiting, queueNumber: 'C202',
-  joinedMethod: JoinedMethod.remote
+  status: QueueStatus.waiting,
+  queueNumber: 'C202',
+  joinedMethod: JoinedMethod.remote,
 );
 
 final queue5 = QueueEntry(
@@ -93,47 +100,86 @@ final queue5 = QueueEntry(
   partySize: 4,
   joinTime: DateTime(2026, 1, 26, 12, 30),
   servedTime: DateTime(2026, 1, 26, 12, 50),
-  status: QueueStatus.completed, queueNumber: 'B102',
-  joinedMethod: JoinedMethod.remote
+  status: QueueStatus.completed,
+  queueNumber: 'B102',
+  joinedMethod: JoinedMethod.remote,
 );
 
 // Example Histories
-final history1 = History(rest: restaurant1, queue: queue1, userId: "user1", id: Uuid().v4());
-final history2 = History(rest: restaurant1, queue: queue2, userId: "user1", id: Uuid().v4());
-final history3 = History(rest: restaurant2, queue: queue3, userId: "user2", id: Uuid().v4());
-final history4 = History(rest: restaurant1, queue: queue4, userId: "user3", id: Uuid().v4());
-final history5 = History(rest: restaurant3, queue: queue5, userId: "user3", id: Uuid().v4());
+final history1 = History(
+  rest: restaurant1,
+  queue: queue1,
+  userId: "user1",
+  id: Uuid().v4(),
+);
+final history2 = History(
+  rest: restaurant1,
+  queue: queue2,
+  userId: "user1",
+  id: Uuid().v4(),
+);
+final history3 = History(
+  rest: restaurant2,
+  queue: queue3,
+  userId: "user2",
+  id: Uuid().v4(),
+);
+final history4 = History(
+  rest: restaurant1,
+  queue: queue4,
+  userId: "user3",
+  id: Uuid().v4(),
+);
+final history5 = History(
+  rest: restaurant3,
+  queue: queue5,
+  userId: "user3",
+  id: Uuid().v4(),
+);
+
+final List<History> mockHistories = [
+  history1,
+  history2,
+  history3,
+  history4,
+  history5,
+];
 
 // Example Users
-final user1 = User(
+final user1 = Customer(
   id: "user1",
   name: "Alice",
   email: "alice@example.com",
   phone: "1234567890",
-  userType: UserType.normal,
-  currentHistory: history2,
-  histories: [history1, history2],
+  histories: [
+    history1,
+    history2,
+    history3,
+    history3,
+    history3,
+    history3,
+    history3,
+  ],
 );
 
-final user2 = User(
+final user2 = StoreUser(
   id: "user2",
   name: "Bob",
   email: "bob@example.com",
   phone: "0987654321",
-  userType: UserType.normal,
-  currentHistory: null,
-  histories: [history3],
+  rest: mockRestaurants[0],
 );
 
-final user3 = User(
-  id: "user3",
-  name: "Charlie",
-  email: "charlie@example.com",
-  phone: "1122334455",
-  userType: UserType.normal,
-  currentHistory: history4,
-  histories: [history4, history5],
-);
+// For admin later
+// final user3 = User(
+//   id: "user3",
+//   name: "Charlie",
+//   email: "charlie@example.com",
+//   phone: "1122334455",
+//   userType: UserType.normal,
+//   currentHistory: history4,
+//   histories: [history4, history5],
+// );
 
 // List of all users
-final List<User> mockUsers = [user1, user2, user3];
+final List<User> mockUsers = [user1, user2];

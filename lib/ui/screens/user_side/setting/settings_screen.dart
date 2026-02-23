@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:queue_station_app/models/user/user.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/customer.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/change_password_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/contact_us_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/edit_account_screen.dart';
@@ -8,15 +11,7 @@ import 'package:queue_station_app/ui/screens/user_side/setting/setting_card.dart
 import 'package:queue_station_app/ui/screens/user_side/setting/terms_of_service_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  User user = User(
-    id: "1",
-    name: "Monica",
-    email: "monica@gmail.com",
-    phone: "0987654321",
-    userType: UserType.normal,
-    histories: [],
-  );
-  SettingsScreen({super.key});
+  const SettingsScreen({super.key});
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -192,6 +187,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Customer user = context.watch<UserProvider>().asCustomer!;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

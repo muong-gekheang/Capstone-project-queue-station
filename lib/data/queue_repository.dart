@@ -1,7 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
-import 'package:queue_station_app/models/analytic/order_summary.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
@@ -44,7 +42,7 @@ class QueueRepository {
         id: '103',
         partySize: 1,
         joinTime: DateTime.now().subtract(const Duration(minutes: 28)),
-        status: QueueStatus.notified,
+        status: QueueStatus.noShow,
         queueNumber: 'S-005',
         customerId: 'user_112',
         joinedMethod: JoinedMethod.remote,
