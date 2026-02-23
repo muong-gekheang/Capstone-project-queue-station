@@ -21,7 +21,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   MenuSize? _selectedSize;
   final Map<String, bool> _selectedAddOns = {};
   int _quantity = 1;
-  TextEditingController _noteController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
 
   @override
   void initState() {
@@ -339,7 +339,6 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                               size: 28,
                                               color: Colors.grey,
                                             ),
-
                                     ),
                                     const SizedBox(height: 8),
                                   ],
@@ -408,7 +407,11 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove_circle_outline, size: 24, color: _quantity <= 1 ? Colors.grey : Colors.black,),
+                        icon: Icon(
+                          Icons.remove_circle_outline,
+                          size: 24,
+                          color: _quantity <= 1 ? Colors.grey : Colors.black,
+                        ),
                         onPressed: _decrementQuantity,
                       ),
                       Container(

@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
-import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class AddOnTileWidget extends StatelessWidget {
   final List<AddOn> addOns;
   final void Function(AddOn addOn)? onDelete;
 
-  const AddOnTileWidget({
-    super.key,
-    required this.addOns,
-    this.onDelete,
-  });
+  const AddOnTileWidget({super.key, required this.addOns, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +47,10 @@ class AddOnTileWidget extends StatelessWidget {
                   child: Text(addOn.name, style: const TextStyle(fontSize: 16)),
                 ),
                 const SizedBox(width: 10),
-                Text('\$${addOn.price.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16)),
-                
+                Text(
+                  '\$${addOn.price.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
           ),

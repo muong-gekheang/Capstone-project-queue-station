@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
-import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/user_provider.dart';

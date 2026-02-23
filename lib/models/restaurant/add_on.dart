@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 class AddOn {
   final String id;
   final String name;

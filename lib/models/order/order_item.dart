@@ -1,5 +1,3 @@
-import 'package:queue_station_app/models/order/order.dart';
-
 import '../restaurant/menu_item.dart';
 import '../restaurant/size_option.dart';
 

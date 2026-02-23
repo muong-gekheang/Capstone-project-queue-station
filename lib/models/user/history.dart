@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 import '../restaurant/restaurant.dart';
 import 'queue_entry.dart';
 

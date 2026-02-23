@@ -3,7 +3,6 @@ import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
-import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:uuid/uuid.dart';
 
 /// ----------------------------
@@ -58,10 +57,30 @@ final List<MenuItemCategory> mockMenuCategories = [
 /// ADD-ONS
 /// ----------------------------
 final List<AddOn> mockMenuAddOns = [
-  AddOn(name: 'Extra Cheese', price: 0.99, image: "assets/images/cheese.png", id: Uuid().v4()),
-  AddOn(name: 'Bacon Strips', price: 1.49, image: "assets/images/bacon.png", id: Uuid().v4()),
-  AddOn(name: 'Avocado', price: 1.29, image: "assets/images/avocado.png", id: Uuid().v4()),
-  AddOn(name: 'Extra Sauce', price: 0.59, image: "assets/images/sauces.png", id: Uuid().v4()),
+  AddOn(
+    name: 'Extra Cheese',
+    price: 0.99,
+    image: "assets/images/cheese.png",
+    id: Uuid().v4(),
+  ),
+  AddOn(
+    name: 'Bacon Strips',
+    price: 1.49,
+    image: "assets/images/bacon.png",
+    id: Uuid().v4(),
+  ),
+  AddOn(
+    name: 'Avocado',
+    price: 1.29,
+    image: "assets/images/avocado.png",
+    id: Uuid().v4(),
+  ),
+  AddOn(
+    name: 'Extra Sauce',
+    price: 0.59,
+    image: "assets/images/sauces.png",
+    id: Uuid().v4(),
+  ),
   AddOn(name: 'Onion Rings', price: 1.99, image: "", id: Uuid().v4()),
 ];
 
@@ -78,7 +97,8 @@ final MenuItem classicBurger =
         maxPrepTimeMinutes: 15,
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/burger.png",
-        isAvailable: true, id: Uuid().v4()
+        isAvailable: true,
+        id: Uuid().v4(),
       )
       ..sizes.addAll(burgerSizes)
       ..addOns.addAll([
@@ -97,7 +117,7 @@ final MenuItem cheeseBurger =
         maxPrepTimeMinutes: 12,
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/cheeseburger.png",
-        isAvailable: true, 
+        isAvailable: true,
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([
@@ -110,14 +130,14 @@ final MenuItem cheeseBurger =
 // 3. Pepperoni Pizza
 final MenuItem pepperoniPizza =
     MenuItem(
-        id: Uuid().v4(),  
+        id: Uuid().v4(),
         name: "Pepperoni Pizza",
         description:
             "Classic pepperoni with mozzarella cheese on tomato sauce base.",
         maxPrepTimeMinutes: 20,
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza.png",
-        isAvailable: true
+        isAvailable: true,
       )
       ..sizes.addAll(pizzaSizes)
       ..addOns.addAll([
@@ -137,7 +157,7 @@ final MenuItem margheritaPizza =
         maxPrepTimeMinutes: 18,
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza(1).png",
-        isAvailable: true
+        isAvailable: true,
       )
       ..sizes.addAll([
         MenuSize(sizeOption: globalSizes[1], price: 1.0), // Medium
@@ -157,7 +177,7 @@ final MenuItem cola =
         maxPrepTimeMinutes: 2,
         category: mockMenuCategories[2], // Drinks category
         image: "assets/images/energy-drink.png",
-        isAvailable: true
+        isAvailable: true,
       )
       ..addOns.addAll([
         AddOn(name: 'Extra Ice', price: 0.25, image: "", id: Uuid().v4()),
@@ -173,7 +193,7 @@ final MenuItem veggieWrap =
         category:
             mockMenuCategories[0], // Burger category (or you can create a new category 'Wraps')
         image: "assets/images/burger.png",
-        isAvailable: true
+        isAvailable: true,
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([

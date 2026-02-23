@@ -1,9 +1,5 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/order/order.dart';
-import 'package:queue_station_app/models/order/order_item.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class OrderProvider with ChangeNotifier {
   Order? _currentOrder;
@@ -39,5 +35,4 @@ class OrderProvider with ChangeNotifier {
     _currentOrder = _createNewOrder();
     notifyListeners();
   }
-
 }

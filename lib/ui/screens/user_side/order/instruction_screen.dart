@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 
 class Instruction extends StatefulWidget {
   final VoidCallback onContinue;
@@ -21,7 +20,7 @@ class _InstructionState extends State<Instruction> {
 
   void _handleNextPressed() {
     if (_formKey.currentState!.validate()) {
-      widget.onContinue(); 
+      widget.onContinue();
     }
   }
 

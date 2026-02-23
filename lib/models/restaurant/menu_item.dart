@@ -1,5 +1,4 @@
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
-import 'package:uuid/uuid.dart';
 import 'add_on.dart';
 import 'menu_item_category.dart';
 
@@ -40,7 +39,7 @@ class MenuItem {
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
     bool? isAvailable,
-  }){
+  }) {
     return MenuItem(
       id: id ?? this.id,
       image: image ?? this.image,
