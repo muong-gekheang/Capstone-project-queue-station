@@ -47,6 +47,12 @@ class BottomNavBar extends StatelessWidget {
                 'Manage',
               ),
               _buildNavItem(
+                NavTab.queue, 
+                'assets/icons/queue_blue.svg', 
+                'assets/icons/queue_orange.svg',
+                null, 
+                'Queue'),
+              _buildNavItem(
                 NavTab.settings,
                 'assets/icons/Setting.svg',
                 'assets/icons/Setting_orange.svg',

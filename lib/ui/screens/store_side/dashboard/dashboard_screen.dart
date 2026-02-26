@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 import '../../../../models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/services/queue_service.dart';
@@ -92,6 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 MaterialPageRoute(builder: (context) => NotificationScreen()),
               );
             },
+            // onPressed: widget.onManageQueuePressed,
           ),
         ],
       ),

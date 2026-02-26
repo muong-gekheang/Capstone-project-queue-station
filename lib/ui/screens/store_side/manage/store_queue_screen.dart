@@ -6,7 +6,8 @@ import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_
 
 
 class StoreQueueScreen extends StatefulWidget {
-  const StoreQueueScreen({super.key});
+  final VoidCallback? onClose; // This is used to back to the parent screen
+  const StoreQueueScreen({super.key, this.onClose});
   @override
   State<StoreQueueScreen> createState() => _StoreQueueScreenState();
 }
@@ -86,6 +87,7 @@ class _StoreQueueScreenState extends State<StoreQueueScreen> {
           const SizedBox(width: 16)
         ],
       ),
+      
       body: Column(
         children: [
           Padding(
@@ -118,15 +120,15 @@ class _StoreQueueScreenState extends State<StoreQueueScreen> {
           child: const Text("Add queue", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard, color: Colors.black), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.store, color: Color(0xFFFF6835)), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.settings, color: Colors.black), label: ""),
-        ],
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   showSelectedLabels: false,
+      //   showUnselectedLabels: false,
+      //   items: const [
+      //     BottomNavigationBarItem(icon: Icon(Icons.dashboard, color: Colors.black), label: ""),
+      //     BottomNavigationBarItem(icon: Icon(Icons.store, color: Color(0xFFFF6835)), label: ""),
+      //     BottomNavigationBarItem(icon: Icon(Icons.settings, color: Colors.black), label: ""),
+      //   ],
+      // ),
     );
   }
 
