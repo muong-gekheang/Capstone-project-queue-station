@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
@@ -77,8 +76,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       itemCount: globalMenuSizes.length,
       itemBuilder: (context, index) {
         final globalMenuSize = globalSizes[index];
-        final isSelected = selectedSizes.contains
-        (globalMenuSize);
+        final isSelected = selectedSizes.contains(globalMenuSize);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
@@ -113,18 +111,21 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
 
     final nonSelected = selectedSizes.isEmpty;
 
-    final existingMenuSizes = widget.existingMenu?.sizes
-        .map((existingSize) => existingSize.sizeOption.name.toLowerCase())
-        .toList() ?? [];
+    final existingMenuSizes =
+        widget.existingMenu?.sizes
+            .map((existingSize) => existingSize.sizeOption.name.toLowerCase())
+            .toList() ??
+        [];
 
     final hasDuplicate = selectedSizes.any(
       (size) => existingMenuSizes.contains(size.name.toLowerCase()),
     );
 
-      final allSelected = existingMenuSizes.every(
-      (existingSizeName) => selectedSizes.any((size) => size.name.toLowerCase() == existingSizeName),
+    final allSelected = existingMenuSizes.every(
+      (existingSizeName) => selectedSizes.any(
+        (size) => size.name.toLowerCase() == existingSizeName,
+      ),
     );
-
 
     return nonSelected || hasDuplicate || allSelected;
   }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/services/auth_service.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
-import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_form_field.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/settings_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

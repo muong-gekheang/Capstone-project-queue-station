@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
-import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
@@ -11,9 +10,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
   const StoreQueueHistoryDetail({super.key, required this.history});
 
   String getUserName() {
-    return mockUsers
-        .firstWhere((user) => user.id == history.userId)
-        .name;
+    return mockUsers.firstWhere((user) => user.id == history.userId).name;
   }
 
   Widget orderDetail() {
@@ -34,7 +31,6 @@ class StoreQueueHistoryDetail extends StatelessWidget {
     } else {
       return const Text('No orders');
     }
-    
   }
 
   @override
@@ -146,8 +142,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Join Queue Method'),
                             Text(
-                              history.queue.joinedMethod ==
-                                      JoinedMethod.remote
+                              history.queue.joinedMethod == JoinedMethod.remote
                                   ? 'Remote'
                                   : 'Walk-in',
                             ),
@@ -178,7 +173,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                                       'h:mm a',
                                     ).format(history.queue.servedTime!)
                                   : '-',
-                            )
+                            ),
                           ],
                         ),
                         SizedBox(height: 5),
@@ -193,7 +188,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                                       'h:mm a',
                                     ).format(history.queue.endedTime!)
                                   : '-',
-                            )
+                            ),
                           ],
                         ),
                         SizedBox(height: 5),
@@ -202,9 +197,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Waiting Duration'),
-                            Text(
-                              history.queue.waitingTimeText,
-                            ),
+                            Text(history.queue.waitingTimeText),
                           ],
                         ),
                       ],

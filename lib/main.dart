@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/firebase_options.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
@@ -21,7 +23,11 @@ import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   final GoRouter goRouter = GoRouter(
     routes: <RouteBase>[
       GoRoute(

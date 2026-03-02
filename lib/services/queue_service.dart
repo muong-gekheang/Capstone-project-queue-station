@@ -1,7 +1,6 @@
 import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
-import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueService {

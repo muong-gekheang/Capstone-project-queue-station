@@ -1,7 +1,6 @@
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:uuid/uuid.dart';
 
 import 'queue_table.dart';
 import 'menu_item.dart';

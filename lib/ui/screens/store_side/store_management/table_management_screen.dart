@@ -797,7 +797,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: selectedCategory,
+                initialValue: selectedCategory,
                 items: categoryTable
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
@@ -827,7 +827,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                     _textController.text.isNotEmpty) {
                   if (isUpdate) {
                     _updateTable(
-                      tableNum!,
+                      tableNum,
                       _textController.text,
                       selectedCategory!,
                     );
@@ -884,7 +884,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
               if (_textController.text.isNotEmpty) {
                 if (isUpdate) {
                   _updateCategory(
-                    tableCategory!,
+                    tableCategory,
                     _textController.text,
                     int.tryParse(_seatController.text) ?? 2,
                   );

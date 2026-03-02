@@ -36,7 +36,7 @@ class QueueTable {
     DateTime? occupiedSince,
   }) {
     return QueueTable(
-      id: this.id, // Keep same ID
+      id: id, // Keep same ID
       tableNum: tableNum ?? this.tableNum,
       tableStatus: tableStatus ?? this.tableStatus,
       tableCategory: tableCategory ?? this.tableCategory,

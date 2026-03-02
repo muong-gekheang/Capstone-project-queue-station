@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileEditorWidget extends StatelessWidget {
   final VoidCallback onEdit;
@@ -32,7 +31,9 @@ class ProfileEditorWidget extends StatelessWidget {
           radius: 90,
           backgroundColor: Colors.grey.shade100,
           backgroundImage: imageProvider,
-          child: imageProvider == null ? const Icon(Icons.person, size: 120) : null,
+          child: imageProvider == null
+              ? const Icon(Icons.person, size: 120)
+              : null,
         ),
         Positioned(
           bottom: 10,
