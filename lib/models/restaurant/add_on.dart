@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'add_on.g.dart';
+
+@JsonSerializable()
 class AddOn {
   final String id;
   final String name;
@@ -10,4 +15,8 @@ class AddOn {
     required this.price,
     this.image,
   });
+
+  factory AddOn.fromJson(Map<String, dynamic> json) => _$AddOnFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AddOnToJson(this);
 }

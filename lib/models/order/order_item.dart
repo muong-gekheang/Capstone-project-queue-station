@@ -1,11 +1,16 @@
+import 'package:json_annotation/json_annotation.dart';
 import '../restaurant/menu_item.dart';
 import '../restaurant/size_option.dart';
 
+part 'order_item.g.dart';
+
 enum OrderItemStatus { pending, accepted, rejected, cancelled }
 
+@JsonSerializable(explicitToJson: true)
 class OrderItem {
   final String menuItemId; // For Storing in the DB
   final MenuItem item; // For using direct in memory
+  @JsonKey(fromJson: _addOnsFromJson, toJson: _addOnsToJson)
   final Map<String, double> addOns; // AddOn ID and current price snapshot
   final double menuItemPrice; // Menu Item price current snapshot
   final SizeOption size; // We will use only the name
@@ -55,4 +60,17 @@ class OrderItem {
     totalPrice *= quantity; // quantity
     return totalPrice;
   }
+
+  factory OrderItem.fromJson(Map<String, dynamic> json) =>
+      _$OrderItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrderItemToJson(this);
+}
+
+Map<String, double> _addOnsFromJson(Map<String, dynamic> json) {
+  return json.map((key, value) => MapEntry(key, (value as num).toDouble()));
+}
+
+Map<String, dynamic> _addOnsToJson(Map<String, double> addOns) {
+  return addOns;
 }

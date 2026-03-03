@@ -1,3 +1,4 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
@@ -5,6 +6,9 @@ import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'queue_table.dart';
 import 'menu_item.dart';
 
+part 'restaurant.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Restaurant {
   final String id;
   final String name;
@@ -17,7 +21,7 @@ class Restaurant {
   final List<QueueTable> tables;
   final List<AddOn> globalAddOns;
   final List<SizeOption> globalSizeOptions;
-  final List<QueueEntry> currentInQueue = [];
+  final List<QueueEntry> currentInQueue;
 
   Restaurant({
     required this.id,
@@ -31,7 +35,8 @@ class Restaurant {
     required this.tables,
     required this.globalAddOns,
     required this.globalSizeOptions,
-  });
+    List<QueueEntry>? currentInQueue,
+  }) : currentInQueue = currentInQueue ?? [];
 
   void enqueue(QueueEntry queue) {
     if (!currentInQueue.contains(queue)) {
@@ -62,4 +67,9 @@ class Restaurant {
 
   @override
   int get hashCode => Object.hash(name, address, phone);
+
+  factory Restaurant.fromJson(Map<String, dynamic> json) =>
+      _$RestaurantFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RestaurantToJson(this);
 }

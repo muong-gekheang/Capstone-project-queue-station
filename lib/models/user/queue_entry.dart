@@ -1,10 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import '../order/order.dart';
+
+part 'queue_entry.g.dart';
 
 enum QueueStatus { waiting, serving, completed, cancelled, noShow }
 
 enum JoinedMethod { remote, walkIn }
 
+@JsonSerializable(explicitToJson: true)
 class QueueEntry {
   final String id;
   final String queueNumber;
@@ -91,4 +95,9 @@ class QueueEntry {
       tableNumber: tableNumber ?? this.tableNumber,
     );
   }
+
+  factory QueueEntry.fromJson(Map<String, dynamic> json) =>
+      _$QueueEntryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QueueEntryToJson(this);
 }

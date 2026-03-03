@@ -1,7 +1,11 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'add_on.dart';
 import 'menu_item_category.dart';
 
+part 'menu_item.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class MenuItem {
   final String id;
   final String? image;
@@ -58,4 +62,9 @@ class MenuItem {
     if (sizes.isEmpty) return 0.0;
     return sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);
   }
+
+  factory MenuItem.fromJson(Map<String, dynamic> json) =>
+      _$MenuItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MenuItemToJson(this);
 }

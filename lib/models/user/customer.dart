@@ -1,7 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 
+part 'customer.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Customer extends User {
+  @JsonKey(includeFromJson: false, includeToJson: true)
+  final String userType = 'customer';
   final List<History> histories;
   final History? currentHistory;
 
@@ -34,4 +40,10 @@ class Customer extends User {
           : currentHistory ?? this.currentHistory,
     );
   }
+
+  factory Customer.fromJson(Map<String, dynamic> json) =>
+      _$CustomerFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$CustomerToJson(this);
 }

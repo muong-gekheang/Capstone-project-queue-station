@@ -10,4 +10,6 @@ abstract class User {
     required this.phone,
     required this.id,
   });
+
+  Map<String, dynamic> toJson();
 }
