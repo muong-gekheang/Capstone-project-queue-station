@@ -3,11 +3,9 @@ import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/history.dart';
-import 'package:queue_station_app/ui/screens/user_side/history/history_view_screen.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
-import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/store_queue_history_card_widget.dart';
 
@@ -36,12 +34,12 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
 
-  List<History> getHistoriesForRestaurant(List<User> allUsers) {
-    List<History> filteredHistories = [];
+  List<QueueEntry> getHistoriesForRestaurant(List<User> allUsers) {
+    List<QueueEntry> filteredHistories = [];
     for (var user in allUsers) {
       if (user is Customer) {
         for (var history in user.histories) {
-          if (history.rest.id == restaurant.id) {
+          if (history.restId == restaurant.id) {
             filteredHistories.add(history);
           }
         }
@@ -57,14 +55,14 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
 
     final filteredResults = results.where((history) {
       // 🔎 1️⃣ Filter by user name
-      final user = mockUsers.firstWhere((u) => u.id == history.userId);
+      final user = mockUsers.firstWhere((u) => u.id == history.customerId);
       final matchesSearch = user.name.toLowerCase().contains(
         searchQuery.toLowerCase(),
       );
 
       if (!matchesSearch) return false;
 
-      final joinTime = history.queue.joinTime;
+      final joinTime = history.joinTime;
 
       // 0️⃣ ALL → return everything
       if (selectedIndex == 0) {
@@ -96,9 +94,9 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
       filteredResults.sort((a, b) {
         switch (selectedSortOption!) {
           case SortOption.oldest:
-            return a.queue.joinTime.compareTo(b.queue.joinTime);
+            return a.joinTime.compareTo(b.joinTime);
           case SortOption.newest:
-            return b.queue.joinTime.compareTo(a.queue.joinTime);
+            return b.joinTime.compareTo(a.joinTime);
         }
       });
     }
@@ -106,7 +104,7 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
     return ListView.builder(
       itemCount: filteredResults.length,
       itemBuilder: (context, index) =>
-          StoreQueueHistoryCard(history: filteredResults[index]),
+          StoreQueueHistoryCard(queueEntry: filteredResults[index]),
     );
   }
 

@@ -2,7 +2,6 @@ import 'package:queue_station_app/data/mock_restaurant.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:uuid/uuid.dart';
@@ -51,6 +50,7 @@ final restaurant3 = Restaurant(
 
 // Example QueueEntries
 final queue1 = QueueEntry(
+  restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user1",
   partySize: 2,
@@ -62,6 +62,7 @@ final queue1 = QueueEntry(
 );
 
 final queue2 = QueueEntry(
+  restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user1",
   partySize: 2,
@@ -73,6 +74,7 @@ final queue2 = QueueEntry(
 );
 
 final queue3 = QueueEntry(
+  restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user2",
   partySize: 3,
@@ -84,6 +86,7 @@ final queue3 = QueueEntry(
 );
 
 final queue4 = QueueEntry(
+  restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user3",
   partySize: 1,
@@ -95,6 +98,7 @@ final queue4 = QueueEntry(
 );
 
 final queue5 = QueueEntry(
+  restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user3",
   partySize: 4,
@@ -106,38 +110,13 @@ final queue5 = QueueEntry(
 );
 
 // Example Histories
-final history1 = History(
-  rest: restaurant1,
-  queue: queue1,
-  userId: "user1",
-  id: Uuid().v4(),
-);
-final history2 = History(
-  rest: restaurant1,
-  queue: queue2,
-  userId: "user1",
-  id: Uuid().v4(),
-);
-final history3 = History(
-  rest: restaurant2,
-  queue: queue3,
-  userId: "user2",
-  id: Uuid().v4(),
-);
-final history4 = History(
-  rest: restaurant1,
-  queue: queue4,
-  userId: "user3",
-  id: Uuid().v4(),
-);
-final history5 = History(
-  rest: restaurant3,
-  queue: queue5,
-  userId: "user3",
-  id: Uuid().v4(),
-);
+final history1 = queue1;
+final history2 = queue2;
+final history3 = queue3;
+final history4 = queue4;
+final history5 = queue5;
 
-final List<History> mockHistories = [
+final List<QueueEntry> mockHistories = [
   history1,
   history2,
   history3,
