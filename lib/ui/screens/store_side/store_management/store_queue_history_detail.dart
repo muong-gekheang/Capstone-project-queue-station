@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
-import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
 class StoreQueueHistoryDetail extends StatelessWidget {
-  final History history;
-  const StoreQueueHistoryDetail({super.key, required this.history});
+  final QueueEntry queueEntry;
+  const StoreQueueHistoryDetail({super.key, required this.queueEntry});
 
   String getUserName() {
-    return mockUsers.firstWhere((user) => user.id == history.userId).name;
+    return mockUsers
+        .firstWhere((user) => user.id == queueEntry.customerId)
+        .name;
   }
 
   Widget orderDetail() {
-    if (history.queue.order != null &&
-        history.queue.order!.ordered.isNotEmpty) {
+    if (queueEntry.order != null && queueEntry.order!.ordered.isNotEmpty) {
       return Column(
-        children: history.queue.order!.ordered.map((orderItem) {
+        children: queueEntry.order!.ordered.map((orderItem) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -63,7 +63,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        history.queue.queueNumber,
+                        queueEntry.queueNumber,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -77,7 +77,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        history.queue.status.name,
+                        queueEntry.status.name,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -91,7 +91,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        history.queue.partySize.toString(),
+                        queueEntry.partySize.toString(),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -104,7 +104,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       Text(
                         DateFormat(
                           'dd/ MMM / yyyy, hh:mm a',
-                        ).format(history.queue.joinTime),
+                        ).format(queueEntry.joinTime),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -142,7 +142,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Join Queue Method'),
                             Text(
-                              history.queue.joinedMethod == JoinedMethod.remote
+                              queueEntry.joinedMethod == JoinedMethod.remote
                                   ? 'Remote'
                                   : 'Walk-in',
                             ),
@@ -157,7 +157,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                             Text(
                               DateFormat(
                                 'dd MMM yyyy, h:mm a',
-                              ).format(history.queue.joinTime),
+                              ).format(queueEntry.joinTime),
                             ),
                           ],
                         ),
@@ -168,10 +168,10 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Serving Time'),
                             Text(
-                              history.queue.servedTime != null
+                              queueEntry.servedTime != null
                                   ? DateFormat(
                                       'h:mm a',
-                                    ).format(history.queue.servedTime!)
+                                    ).format(queueEntry.servedTime!)
                                   : '-',
                             ),
                           ],
@@ -183,10 +183,10 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           children: [
                             Text('Serving End'),
                             Text(
-                              history.queue.servedTime != null
+                              queueEntry.servedTime != null
                                   ? DateFormat(
                                       'h:mm a',
-                                    ).format(history.queue.endedTime!)
+                                    ).format(queueEntry.endedTime!)
                                   : '-',
                             ),
                           ],
@@ -197,7 +197,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Waiting Duration'),
-                            Text(history.queue.waitingTimeText),
+                            Text(queueEntry.waitingTimeText),
                           ],
                         ),
                       ],

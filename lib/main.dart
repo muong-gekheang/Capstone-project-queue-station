@@ -88,7 +88,7 @@ void main() async {
               Customer? user = userProvider.asCustomer;
               return ConfirmTicketScreen(
                 user: user!,
-                history: user.currentHistory!,
+                queueEntry: user.currentHistory!,
               );
             },
           ),

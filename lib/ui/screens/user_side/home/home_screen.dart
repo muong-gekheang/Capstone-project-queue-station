@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     UserProvider userProvider = context.watch<UserProvider>();
     Customer user = userProvider.asCustomer!;
     if (user.currentHistory != null) {
-      restaurants.remove(user.currentHistory!.rest);
+      restaurants.removeWhere((rest) => rest.id == user.currentHistory!.restId);
     }
     return Padding(
       padding: const EdgeInsets.all(16.0),

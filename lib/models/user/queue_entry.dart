@@ -8,6 +8,7 @@ enum JoinedMethod { remote, walkIn }
 class QueueEntry {
   final String id;
   final String queueNumber;
+  final String restId;
   final String customerId;
   final int partySize;
   final DateTime joinTime;
@@ -33,7 +34,8 @@ class QueueEntry {
     required this.customerId,
     this.order,
     required this.joinedMethod,
-    this.tableNumber, // Added to constructor
+    this.tableNumber,
+    required this.restId, // Added to constructor
   });
 
   Duration? get waitingTime {
@@ -68,6 +70,7 @@ class QueueEntry {
     String? id,
     String? queueNumber,
     String? customerId,
+    String? restId,
     int? partySize,
     DateTime? joinTime,
     DateTime? servedTime,
@@ -89,6 +92,7 @@ class QueueEntry {
       order: order ?? this.order,
       joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,
+      restId: restId ?? this.restId,
     );
   }
 }

@@ -132,7 +132,10 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                       ),
                     ),
                     Text(
-                      widget.user.currentHistory!.rest.curWait.toString(),
+                      widget
+                          .user
+                          .currentHistory!
+                          .restId, // TODO: Use Repos in VM to fetch and create Rest obj (Current Wait)
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,
