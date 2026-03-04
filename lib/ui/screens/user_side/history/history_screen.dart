@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_list_view.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/sort_button.dart';
@@ -19,15 +19,15 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   SortType currentSortType = SortType.recent;
-  List<History> historyList = [];
+  List<QueueEntry> historyList = [];
 
   @override
   void initState() {
     super.initState();
     Customer? user = context.read<UserProvider>().asCustomer;
     if (user != null) {
-      List<History> sortedList = [...user.histories];
-      sortedList.sort((a, b) => b.queue.joinTime.compareTo(a.queue.joinTime));
+      List<QueueEntry> sortedList = [...user.histories];
+      sortedList.sort((a, b) => b.joinTime.compareTo(a.joinTime));
       historyList = sortedList;
     }
   }
@@ -50,13 +50,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
       content: Column(
         spacing: 20,
         children: [
-          SearchWidget<History>(
+          SearchWidget<QueueEntry>(
             filterLogic: (String search) {
-              Set<History> filteredList = (user?.histories ?? [])
+              // TODO: Use Repos in VM to fetch and create Rest obj
+              Set<QueueEntry> filteredList = (user?.histories ?? [])
                   .where(
-                    (e) => e.rest.name.toLowerCase().startsWith(
-                      search.toLowerCase(),
-                    ),
+                    (e) =>
+                        e.restId.toLowerCase().startsWith(search.toLowerCase()),
                   )
                   .toSet();
               return filteredList

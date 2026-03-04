@@ -21,6 +21,7 @@ class QueueService {
     required String customerName,
     required String customerPhone,
     required int partySize,
+    required String restId,
   }) async {
     final entry = QueueEntry(
       queueNumber: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -30,6 +31,7 @@ class QueueService {
       status: QueueStatus.waiting, // This is correct - using enum
       customerId: '',
       joinedMethod: JoinedMethod.remote,
+      restId: restId,
     );
 
     await _repository.addQueueEntry(entry);

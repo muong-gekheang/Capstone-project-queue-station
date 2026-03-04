@@ -1,19 +1,21 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
-import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history_detail.dart';
 
 class StoreQueueHistoryCard extends StatelessWidget {
-  final History history;
-  const StoreQueueHistoryCard({super.key, required this.history});
+  final QueueEntry queueEntry;
+  const StoreQueueHistoryCard({super.key, required this.queueEntry});
 
   String formattedtime(DateTime date) {
     return DateFormat('hh:mm a').format(date);
   }
 
   String getUserName() {
-    return mockUsers.firstWhere((user) => user.id == history.userId).name;
+    return mockUsers
+        .firstWhere((user) => user.id == queueEntry.customerId)
+        .name;
   }
 
   @override
@@ -24,7 +26,8 @@ class StoreQueueHistoryCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => StoreQueueHistoryDetail(history: history),
+              builder: (context) =>
+                  StoreQueueHistoryDetail(queueEntry: queueEntry),
             ),
           );
         },
@@ -43,9 +46,9 @@ class StoreQueueHistoryCard extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Joined: ${formattedtime(history.queue.joinTime)} | Seated: ${history.queue.servedTime != null ? formattedtime(history.queue.servedTime!) : '-'}',
+                      'Joined: ${formattedtime(queueEntry.joinTime)} | Seated: ${queueEntry.servedTime != null ? formattedtime(queueEntry.servedTime!) : '-'}',
                     ),
-                    Text(history.queue.status.name),
+                    Text(queueEntry.status.name),
                   ],
                 ),
 

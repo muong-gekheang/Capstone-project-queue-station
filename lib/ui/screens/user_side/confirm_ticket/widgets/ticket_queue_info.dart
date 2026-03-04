@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class TicketQueueInfo extends StatelessWidget {
-  const TicketQueueInfo({super.key, required this.history});
+  const TicketQueueInfo({super.key, required this.queueEntry});
 
-  final History history;
+  final QueueEntry queueEntry;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,8 @@ class TicketQueueInfo extends StatelessWidget {
                   spacing: 10,
                   children: [
                     Text(
-                      history.rest.name,
+                      queueEntry
+                          .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -42,7 +44,8 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            history.rest.address,
+                            queueEntry
+                                .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
                             softWrap: true,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -73,7 +76,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        history.queue.id.substring(0, 4),
+                        queueEntry.id.substring(0, 4),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,
@@ -100,7 +103,9 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        history.queue.currentSpot(history.rest).toString(),
+                        queueEntry
+                            .currentSpot(restaurant1)
+                            .toString(), // TODO: Use Repos in ViewModel to fetch the Restaurant Object
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,
@@ -125,7 +130,7 @@ class TicketQueueInfo extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onPrimary,
               ),
               Text(
-                DateFormat("dd / MMM/ yyyy").format(history.queue.joinTime),
+                DateFormat("dd / MMM/ yyyy").format(queueEntry.joinTime),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
@@ -143,7 +148,7 @@ class TicketQueueInfo extends StatelessWidget {
                 ),
               ),
               Text(
-                DateFormat("h:mm:ss a").format(history.queue.joinTime),
+                DateFormat("h:mm:ss a").format(queueEntry.joinTime),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
@@ -161,7 +166,7 @@ class TicketQueueInfo extends StatelessWidget {
                 ),
               ),
               Text(
-                history.queue.partySize.toString(),
+                queueEntry.partySize.toString(),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
