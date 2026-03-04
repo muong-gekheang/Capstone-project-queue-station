@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/mock_restaurant.dart';
+import 'package:queue_station_app/services/restaurant_service.dart';
+import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 
-import '../ui/widgets/store_side_bottom_nav.dart';
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
-import '../ui/screens/store_side/store_management/manage_store_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
+import '../ui/screens/store_side/store_management/manage_store_screen.dart';
+import '../ui/widgets/store_side_bottom_nav.dart';
 
 enum NavTab { dashboard, analytics, queue, settings }
 
@@ -47,11 +49,17 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _getTabIndex(_selectedTab), children: _screens),
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: _selectedTab,
-        onTabSelected: _onTabSelected,
+    return Provider<RestaurantService>(
+      create: (_) => RestaurantService(restaurant: mockRestaurants[0]),
+      child: Scaffold(
+        body: IndexedStack(
+          index: _getTabIndex(_selectedTab),
+          children: _screens,
+        ),
+        bottomNavigationBar: BottomNavBar(
+          selectedTab: _selectedTab,
+          onTabSelected: _onTabSelected,
+        ),
       ),
     );
   }
