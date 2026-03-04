@@ -65,7 +65,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
           status: QueueStatus.waiting,
           customerId: user.id,
           joinedMethod: JoinedMethod.walkIn,
-          restId: user.rest.id,
+          restId: user.rest!.id,
           customerName: nameController.text,
           phoneNumber: phoneController.text,
         ),
