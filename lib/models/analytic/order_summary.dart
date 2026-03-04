@@ -1,11 +1,21 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'order_summary.g.dart';
+
+@JsonSerializable()
 class OrderSummary {
   final String time;
   final String tableNumber;
   final double amount;
 
-  OrderSummary(String s, int i, {
+  OrderSummary({
     required this.time,
     required this.tableNumber,
-    required this.amount, required String id,
+    required this.amount,
   });
+
+  factory OrderSummary.fromJson(Map<String, dynamic> json) =>
+      _$OrderSummaryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrderSummaryToJson(this);
 }
