@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/models/user/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/history/history_view_screen.dart';
 
@@ -11,7 +11,7 @@ class HistoryListView extends StatelessWidget {
     required this.currentSortType,
   });
 
-  final List<History> historyList;
+  final List<QueueEntry> historyList;
   final SortType currentSortType;
 
   List<Widget> get uiItems {
@@ -25,7 +25,7 @@ class HistoryListView extends StatelessWidget {
 
     for (var h in historyList) {
       if (currentSortType != SortType.recent) {
-        currentGroup = DateFormat(dateDisplayFormat).format(h.queue.joinTime);
+        currentGroup = DateFormat(dateDisplayFormat).format(h.joinTime);
         if (currentGroup != lastGroup) {
           widgetList.add(HistoryTitle(currentGroup: currentGroup));
           lastGroup = currentGroup;
@@ -70,14 +70,14 @@ class HistoryTitle extends StatelessWidget {
 
 class HistoryCard extends StatefulWidget {
   const HistoryCard({super.key, required this.history});
-  final History history;
+  final QueueEntry history;
 
   @override
   State<HistoryCard> createState() => _HistoryCardState();
 }
 
 class _HistoryCardState extends State<HistoryCard> {
-  Future<void> onHistoryTab(History history) async {
+  Future<void> onHistoryTab(QueueEntry history) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -90,9 +90,7 @@ class _HistoryCardState extends State<HistoryCard> {
 
   @override
   Widget build(BuildContext context) {
-    String guestSuffix = widget.history.queue.partySize > 1
-        ? "People"
-        : "Person";
+    String guestSuffix = widget.history.partySize > 1 ? "People" : "Person";
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () => onHistoryTab(widget.history),
@@ -118,7 +116,9 @@ class _HistoryCardState extends State<HistoryCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.history.rest.name,
+                    widget
+                        .history
+                        .restId, // TODO: Use Repos in VM to fetch and create Rest obj
                     softWrap: true,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
@@ -128,7 +128,9 @@ class _HistoryCardState extends State<HistoryCard> {
                       Icon(Icons.location_pin),
                       Expanded(
                         child: Text(
-                          widget.history.rest.address,
+                          widget
+                              .history
+                              .restId, // TODO: Use Repos in VM to fetch and create Rest obj
                           softWrap: true,
                         ),
                       ),
@@ -143,14 +145,14 @@ class _HistoryCardState extends State<HistoryCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    "Date: ${DateFormat("dd/MM/yyyy").format(widget.history.queue.joinTime)}",
+                    "Date: ${DateFormat("dd/MM/yyyy").format(widget.history.joinTime)}",
                     softWrap: true,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                   Text(
-                    widget.history.queue.id.substring(0, 4),
+                    widget.history.id.substring(0, 4),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                       fontWeight: FontWeight.bold,
@@ -158,7 +160,7 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                   ),
                   Text(
-                    "${widget.history.queue.partySize} $guestSuffix",
+                    "${widget.history.partySize} $guestSuffix",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                     ),

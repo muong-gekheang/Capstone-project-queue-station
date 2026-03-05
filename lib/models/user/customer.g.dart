@@ -12,11 +12,11 @@ Customer _$CustomerFromJson(Map<String, dynamic> json) => Customer(
   phone: json['phone'] as String,
   id: json['id'] as String,
   histories: (json['histories'] as List<dynamic>)
-      .map((e) => History.fromJson(e as Map<String, dynamic>))
+      .map((e) => QueueEntry.fromJson(e as Map<String, dynamic>))
       .toList(),
   currentHistory: json['currentHistory'] == null
       ? null
-      : History.fromJson(json['currentHistory'] as Map<String, dynamic>),
+      : QueueEntry.fromJson(json['currentHistory'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{

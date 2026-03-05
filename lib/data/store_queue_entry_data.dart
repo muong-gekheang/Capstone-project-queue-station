@@ -1,4 +1,5 @@
 import 'package:queue_station_app/data/menu_mock_data.dart';
+import 'package:queue_station_app/data/mock_restaurant.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
@@ -8,6 +9,7 @@ import 'package:uuid/uuid.dart';
 List<QueueEntry> mockQueueEntries() {
   return [
     QueueEntry(
+      restId: mockRestaurants[0].id,
       id: Uuid().v4(),
       queueNumber: 'A001',
       customerId: 'c001',
@@ -68,6 +70,8 @@ List<QueueEntry> mockQueueEntries() {
       tableNumber: 'T1',
     ),
     QueueEntry(
+      restId: mockRestaurants[0].id,
+
       id: Uuid().v4(),
       queueNumber: 'A002',
       customerId: 'c002',
@@ -96,6 +100,8 @@ List<QueueEntry> mockQueueEntries() {
       tableNumber: 'T5',
     ),
     QueueEntry(
+      restId: mockRestaurants[0].id,
+
       id: Uuid().v4(),
       queueNumber: 'A003',
       customerId: 'c003',

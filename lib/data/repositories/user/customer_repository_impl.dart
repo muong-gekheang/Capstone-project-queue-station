@@ -3,7 +3,7 @@ import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 
-class UserRepositoryMock implements UserRepository {
+class CustomerRepositoryImpl implements UserRepository {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   Future<User?> _buildCustomerFromDoc(

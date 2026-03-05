@@ -1,3 +1,4 @@
+import 'package:queue_station_app/data/mock_restaurant.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
@@ -28,6 +29,7 @@ class QueueRepository {
         queueNumber: 'A-001',
         customerId: 'user_789',
         joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '102',
@@ -37,6 +39,7 @@ class QueueRepository {
         queueNumber: 'B-012',
         customerId: 'user_456',
         joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[1].id,
       ),
       QueueEntry(
         id: '103',
@@ -46,6 +49,7 @@ class QueueRepository {
         queueNumber: 'S-005',
         customerId: 'user_112',
         joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[3].id,
       ),
       QueueEntry(
         id: '104',
@@ -55,6 +59,7 @@ class QueueRepository {
         queueNumber: 'L-002',
         customerId: 'user_990',
         joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '105',
@@ -64,6 +69,7 @@ class QueueRepository {
         queueNumber: 'B-013',
         customerId: 'user_334',
         joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '106',
@@ -73,6 +79,7 @@ class QueueRepository {
         queueNumber: 'C-021',
         customerId: 'user_221',
         joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '107',
@@ -82,6 +89,7 @@ class QueueRepository {
         queueNumber: 'B-014',
         customerId: 'user_554',
         joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '108',
@@ -91,6 +99,7 @@ class QueueRepository {
         queueNumber: 'XL-001',
         customerId: 'user_667',
         joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '109',
@@ -100,6 +109,7 @@ class QueueRepository {
         queueNumber: 'B-015',
         customerId: 'user_882',
         joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
         id: '110',
@@ -109,6 +119,7 @@ class QueueRepository {
         queueNumber: 'A-002',
         customerId: 'user_003',
         joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[0].id,
       ),
     ];
 

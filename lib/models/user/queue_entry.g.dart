@@ -24,12 +24,14 @@ QueueEntry _$QueueEntryFromJson(Map<String, dynamic> json) => QueueEntry(
       : Order.fromJson(json['order'] as Map<String, dynamic>),
   joinedMethod: $enumDecode(_$JoinedMethodEnumMap, json['joinedMethod']),
   tableNumber: json['tableNumber'] as String?,
+  restId: json['restId'] as String,
 );
 
 Map<String, dynamic> _$QueueEntryToJson(QueueEntry instance) =>
     <String, dynamic>{
       'id': instance.id,
       'queueNumber': instance.queueNumber,
+      'restId': instance.restId,
       'customerId': instance.customerId,
       'partySize': instance.partySize,
       'joinTime': instance.joinTime.toIso8601String(),

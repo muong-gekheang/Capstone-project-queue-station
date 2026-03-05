@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/mock_restaurant.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
@@ -36,21 +36,18 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
     UserProvider userProvider = context.read<UserProvider>();
     Customer? user = userProvider.asCustomer;
     if (user != null) {
+      // TODO: Use Repos in VM to fetch and create Rest obj
       userProvider.updateUser(
         user.copyWith(
-          currentHistory: History(
-            rest: widget.rest,
-            queue: QueueEntry(
-              id: Uuid().v4(),
-              partySize: numPeople,
-              joinTime: DateTime.now(),
-              status: QueueStatus.waiting,
-              customerId: user.id,
-              queueNumber: '',
-              joinedMethod: JoinedMethod.remote,
-            ),
+          currentHistory: QueueEntry(
+            restId: mockRestaurants[0].id,
             id: Uuid().v4(),
-            userId: user.id,
+            partySize: numPeople,
+            joinTime: DateTime.now(),
+            status: QueueStatus.waiting,
+            customerId: user.id,
+            queueNumber: '',
+            joinedMethod: JoinedMethod.remote,
           ),
         ),
       );

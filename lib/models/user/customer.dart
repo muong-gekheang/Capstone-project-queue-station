@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 
 part 'customer.g.dart';
 
@@ -8,8 +8,8 @@ part 'customer.g.dart';
 class Customer extends User {
   @JsonKey(includeFromJson: false, includeToJson: true)
   final String userType = 'customer';
-  final List<History> histories;
-  final History? currentHistory;
+  final List<QueueEntry> histories;
+  final QueueEntry? currentHistory;
 
   Customer({
     required super.name,
@@ -17,7 +17,7 @@ class Customer extends User {
     required super.phone,
     required super.id,
     required this.histories,
-    this.currentHistory,
+    this.currentHistory, 
   });
 
   Customer copyWith({
@@ -25,8 +25,8 @@ class Customer extends User {
     String? email,
     String? phone,
     String? id,
-    List<History>? histories,
-    History? currentHistory,
+    List<QueueEntry>? histories,
+    QueueEntry? currentHistory,
     bool? noQueue,
   }) {
     return Customer(
