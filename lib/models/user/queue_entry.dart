@@ -135,7 +135,7 @@ class QueueEntry {
     DateTime? servedTime,
     DateTime? endedTime,
     QueueStatus? status,
-    Order? order,
+    String? orderId,
     String? tableNumber,
     String? customerName,
     String? phoneNumber,
@@ -153,7 +153,6 @@ class QueueEntry {
       endedTime: endedTime ?? this.endedTime,
       status: status ?? this.status,
       orderId: orderId ?? this.orderId,
-      joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,
       // Use ! because the .walkIn constructor requires these to be non-null
       customerName: customerName ?? this.customerName!,

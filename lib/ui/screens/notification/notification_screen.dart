@@ -19,7 +19,7 @@ class NotificationScreen extends StatelessWidget {
     for (var order in storeOrders) {
       debugPrint('Queue: ${order.queueNumber}');
       debugPrint('Table: ${order.tableNumber}');
-      debugPrint('Items: ${order.order?.inCart.length}');
+      // debugPrint('Items: ${order.order?.inCart.length}');
       debugPrint('-------------------');
     }
 

@@ -20,12 +20,14 @@ QueueEntry _$QueueEntryFromJson(Map<String, dynamic> json) => QueueEntry(
   status: $enumDecode(_$QueueStatusEnumMap, json['status']),
   customerId: json['customerId'] as String,
   orderId: json['orderId'] as String?,
-  joinedMethod: $enumDecode(_$JoinedMethodEnumMap, json['joinedMethod']),
+  joinedMethod:
+      $enumDecodeNullable(_$JoinedMethodEnumMap, json['joinedMethod']) ??
+      JoinedMethod.remote,
   tableNumber: json['tableNumber'] as String?,
-  expectedTableReadyAt: json['expectedTableReadyAt'] == null
-      ? null
-      : DateTime.parse(json['expectedTableReadyAt'] as String),
   restId: json['restId'] as String,
+  customerName: json['customerName'] as String?,
+  phoneNumber: json['phoneNumber'] as String?,
+  expectedTableReadyAt: DateTime.parse(json['expectedTableReadyAt'] as String),
 );
 
 Map<String, dynamic> _$QueueEntryToJson(QueueEntry instance) =>
@@ -36,13 +38,15 @@ Map<String, dynamic> _$QueueEntryToJson(QueueEntry instance) =>
       'customerId': instance.customerId,
       'partySize': instance.partySize,
       'joinTime': instance.joinTime.toIso8601String(),
+      'expectedTableReadyAt': instance.expectedTableReadyAt.toIso8601String(),
       'servedTime': instance.servedTime?.toIso8601String(),
       'endedTime': instance.endedTime?.toIso8601String(),
       'status': _$QueueStatusEnumMap[instance.status]!,
       'orderId': instance.orderId,
       'joinedMethod': _$JoinedMethodEnumMap[instance.joinedMethod]!,
       'tableNumber': instance.tableNumber,
-      'expectedTableReadyAt': instance.expectedTableReadyAt?.toIso8601String(),
+      'customerName': instance.customerName,
+      'phoneNumber': instance.phoneNumber,
     };
 
 const _$QueueStatusEnumMap = {
