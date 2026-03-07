@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/add_on_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 
 class AddOnRepositoryImpl implements AddOnRepository {
@@ -49,7 +49,10 @@ class AddOnRepositoryImpl implements AddOnRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   ) async {
-    final menuItemDoc = await fireStore.collection('menu_items').doc(menuItemId).get();
+    final menuItemDoc = await fireStore
+        .collection('menu_items')
+        .doc(menuItemId)
+        .get();
     if (!menuItemDoc.exists) return (<AddOn>[], null);
 
     final menuItemJson = Map<String, dynamic>.from(menuItemDoc.data()!);
@@ -134,7 +137,8 @@ class AddOnRepositoryImpl implements AddOnRepository {
   }
 
   @override
-  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)> getSearchAddOns(
+  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getSearchAddOns(
     String query,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
@@ -196,11 +200,13 @@ class AddOnRepositoryImpl implements AddOnRepository {
         .collection('add_ons')
         .orderBy('name')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-          final json = Map<String, dynamic>.from(doc.data());
-          json['id'] ??= doc.id;
-          return AddOn.fromJson(json);
-        }).toList());
+        .map(
+          (snap) => snap.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return AddOn.fromJson(json);
+          }).toList(),
+        );
   }
 
   @override

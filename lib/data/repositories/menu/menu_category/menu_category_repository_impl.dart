@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/menu_category_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 
 class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
@@ -72,7 +72,9 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
   }
 
   @override
-  Future<List<MenuItemCategory>> getManyMenuCategoriesById(List<String> ids) async {
+  Future<List<MenuItemCategory>> getManyMenuCategoriesById(
+    List<String> ids,
+  ) async {
     if (ids.isEmpty) return [];
 
     final categories = <MenuItemCategory>[];
@@ -82,11 +84,13 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
           .collection('menu_item_categories')
           .where(FieldPath.documentId, whereIn: chunk)
           .get();
-      categories.addAll(snap.docs.map((doc) {
-        final json = Map<String, dynamic>.from(doc.data());
-        json['id'] ??= doc.id;
-        return MenuItemCategory.fromJson(json);
-      }));
+      categories.addAll(
+        snap.docs.map((doc) {
+          final json = Map<String, dynamic>.from(doc.data());
+          json['id'] ??= doc.id;
+          return MenuItemCategory.fromJson(json);
+        }),
+      );
     }
 
     return categories;
@@ -122,10 +126,12 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
         .collection('menu_item_categories')
         .orderBy('name')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-          final json = Map<String, dynamic>.from(doc.data());
-          json['id'] ??= doc.id;
-          return MenuItemCategory.fromJson(json);
-        }).toList());
+        .map(
+          (snap) => snap.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return MenuItemCategory.fromJson(json);
+          }).toList(),
+        );
   }
 }

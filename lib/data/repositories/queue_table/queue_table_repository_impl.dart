@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/queue_table.dart';
+import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 
 class QueueTableRepositoryImpl implements QueueTableRepository {
@@ -25,7 +25,9 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
     final json = Map<String, dynamic>.from(doc.data()!);
     final status = (json['tableStatus'] as String? ?? '').toLowerCase();
     if (status != TableStatus.available.name) {
-      throw StateError('Cannot delete table "$tableId" because it is not available.');
+      throw StateError(
+        'Cannot delete table "$tableId" because it is not available.',
+      );
     }
 
     await docRef.delete();
@@ -125,10 +127,12 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
       for (final doc in snap.docs) {
         final json = Map<String, dynamic>.from(doc.data());
         final tableNum = (json['tableNum'] as String? ?? '').toLowerCase();
-        final tableStatus = (json['tableStatus'] as String? ?? '').toLowerCase();
+        final tableStatus = (json['tableStatus'] as String? ?? '')
+            .toLowerCase();
         final tableCategoryId = (json['tableCategoryId'] as String? ?? '')
             .toLowerCase();
-        final isMatch = tableNum.contains(searchQuery) ||
+        final isMatch =
+            tableNum.contains(searchQuery) ||
             tableStatus.contains(searchQuery) ||
             tableCategoryId.contains(searchQuery);
 
@@ -163,11 +167,13 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
         .collection('queue_tables')
         .orderBy('tableNum')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-          final json = Map<String, dynamic>.from(doc.data());
-          json['id'] ??= doc.id;
-          return QueueTable.fromJson(json);
-        }).toList());
+        .map(
+          (snap) => snap.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return QueueTable.fromJson(json);
+          }).toList(),
+        );
   }
 
   @override
@@ -176,7 +182,7 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
         .where((tables) => tables.isNotEmpty)
         .map((tables) => tables.first);
   }
-  
+
   @override
   Future<(List<QueueTable>, DocumentSnapshot<Map<String, dynamic>>?)>
   getAllByRestaurantId(

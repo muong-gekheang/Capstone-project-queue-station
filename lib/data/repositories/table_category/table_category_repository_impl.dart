@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/table_category_repository.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
 
 class TableCategoryRepositoryImpl implements TableCategoryRepository {
@@ -10,7 +10,9 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
 
   @override
   Future<void> create(TableCategory category) async {
-    final categoryRef = fireStore.collection('table_categories').doc(category.id);
+    final categoryRef = fireStore
+        .collection('table_categories')
+        .doc(category.id);
     final categoryJson = Map<String, dynamic>.from(category.toJson());
     await categoryRef.set(categoryJson);
   }
@@ -59,7 +61,9 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
   }
 
   @override
-  Future<List<TableCategory>> getManyTableCategoriesById(List<String> ids) async {
+  Future<List<TableCategory>> getManyTableCategoriesById(
+    List<String> ids,
+  ) async {
     if (ids.isEmpty) return [];
 
     final categories = <TableCategory>[];
@@ -69,11 +73,13 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
           .collection('table_categories')
           .where(FieldPath.documentId, whereIn: chunk)
           .get();
-      categories.addAll(snap.docs.map((doc) {
-        final json = Map<String, dynamic>.from(doc.data());
-        json['id'] ??= doc.id;
-        return TableCategory.fromJson(json);
-      }));
+      categories.addAll(
+        snap.docs.map((doc) {
+          final json = Map<String, dynamic>.from(doc.data());
+          json['id'] ??= doc.id;
+          return TableCategory.fromJson(json);
+        }),
+      );
     }
 
     return categories;
@@ -146,7 +152,9 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
 
   @override
   Future<TableCategory> update(TableCategory category) async {
-    final categoryRef = fireStore.collection('table_categories').doc(category.id);
+    final categoryRef = fireStore
+        .collection('table_categories')
+        .doc(category.id);
     final categoryJson = Map<String, dynamic>.from(category.toJson());
     await categoryRef.update(categoryJson);
     return category;
@@ -159,11 +167,13 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
         .where('restaurantId', isEqualTo: restaurantId)
         .orderBy('type')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-          final json = Map<String, dynamic>.from(doc.data());
-          json['id'] ??= doc.id;
-          return TableCategory.fromJson(json);
-        }).toList());
+        .map(
+          (snap) => snap.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return TableCategory.fromJson(json);
+          }).toList(),
+        );
   }
 
   @override

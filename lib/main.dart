@@ -8,7 +8,6 @@ import 'package:queue_station_app/services/store_order_notification_provider.dar
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
 import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
@@ -29,7 +28,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await seedDatabase(clearExisting: true); 
+  await seedDatabase(clearExisting: true);
   final GoRouter goRouter = GoRouter(
     routes: <RouteBase>[
       GoRoute(

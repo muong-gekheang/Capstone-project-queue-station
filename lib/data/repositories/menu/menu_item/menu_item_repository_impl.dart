@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/menu_item_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 
 class MenuItemRepositoryImpl implements MenuItemRepository {
@@ -95,7 +95,8 @@ class MenuItemRepositoryImpl implements MenuItemRepository {
         final description = (json['description'] as String? ?? '')
             .toLowerCase();
         final categoryId = (json['categoryId'] as String? ?? '').toLowerCase();
-        final isMatch = name.contains(searchQuery) ||
+        final isMatch =
+            name.contains(searchQuery) ||
             description.contains(searchQuery) ||
             categoryId.contains(searchQuery);
 
@@ -131,11 +132,13 @@ class MenuItemRepositoryImpl implements MenuItemRepository {
         .where('restaurantId', isEqualTo: restaurantId)
         .orderBy('name')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-          final json = Map<String, dynamic>.from(doc.data());
-          json['id'] ??= doc.id;
-          return MenuItem.fromJson(json);
-        }).toList());
+        .map(
+          (snap) => snap.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return MenuItem.fromJson(json);
+          }).toList(),
+        );
   }
 
   @override
@@ -151,7 +154,7 @@ class MenuItemRepositoryImpl implements MenuItemRepository {
           return MenuItem.fromJson(json);
         });
   }
-  
+
   @override
   Future<(List<MenuItem>, DocumentSnapshot<Map<String, dynamic>>?)>
   getMenuItemByCategoryId(

@@ -203,7 +203,7 @@ final MenuItem veggieWrap =
       ]);
 
 // List of all menu items
-final List<MenuItem> allMenuItems = [
+final List<MenuItem> mockMenuItems = [
   classicBurger,
   cheeseBurger,
   pepperoniPizza,

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/restaurant_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 
 class RestaurantRepositoryImpl implements RestaurantRepository {
@@ -96,7 +96,8 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
         final name = (json['name'] as String? ?? '').toLowerCase();
         final address = (json['address'] as String? ?? '').toLowerCase();
         final phone = (json['phone'] as String? ?? '').toLowerCase();
-        final isMatch = name.contains(searchQuery) ||
+        final isMatch =
+            name.contains(searchQuery) ||
             address.contains(searchQuery) ||
             phone.contains(searchQuery);
 
@@ -119,7 +120,9 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
 
   @override
   Future<Restaurant> update(Restaurant restaurant) async {
-    final restaurantRef = fireStore.collection('restaurants').doc(restaurant.id);
+    final restaurantRef = fireStore
+        .collection('restaurants')
+        .doc(restaurant.id);
     final restaurantJson = Map<String, dynamic>.from(restaurant.toJson());
 
     await restaurantRef.update(restaurantJson);
@@ -137,6 +140,4 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
     // TODO: implement watchCurrent
     throw UnimplementedError();
   }
-  
-
 }

@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 
-class StoreRepositoryImpl implements UserRepository<StoreUser> {
+class StoreUserRepositoryImpl implements UserRepository<StoreUser> {
   final FirebaseFirestore firestore;
 
-  StoreRepositoryImpl({FirebaseFirestore? firestore})
+  StoreUserRepositoryImpl({FirebaseFirestore? firestore})
     : firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<StoreUser?> _buildStoreFromDoc(
@@ -120,7 +120,7 @@ class StoreRepositoryImpl implements UserRepository<StoreUser> {
     if (type != null) {
       userJson['type'] = type;
     }
-    
+
     await userRef.update(userJson);
     return user;
   }

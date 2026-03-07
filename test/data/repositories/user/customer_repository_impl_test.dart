@@ -1,6 +1,6 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:queue_station_app/data/repositories/user/customer_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/user/production/customer_repository_impl.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:uuid/uuid.dart';
 
@@ -38,7 +38,6 @@ void main() {
       expect(data['currentHistoryId'], 'q1');
       expect(data.containsKey('histories'), isFalse);
       expect(data.containsKey('currentHistory'), isFalse);
-
     });
 
     test('getUserById maps missing historyIds to empty list', () async {
@@ -129,35 +128,38 @@ void main() {
       expect(data.containsKey('currentHistory'), isFalse);
     });
 
-    test('delete removes user document and keeps queue entries intact', () async {
-      final userId = uuid.v4();
-      final queueEntryId = uuid.v4();
-      await firestore.collection('users').doc(userId).set({
-        'id': userId,
-        'name': 'Del',
-        'email': 'del@example.com',
-        'phone': '077777777',
-        'userType': 'customer',
-        'historyIds': <String>[],
-      });
-      await firestore.collection('queue_entries').doc(queueEntryId).set({
-        'id': queueEntryId,
-        'customerId': userId,
-        'status': 'waiting',
-      });
+    test(
+      'delete removes user document and keeps queue entries intact',
+      () async {
+        final userId = uuid.v4();
+        final queueEntryId = uuid.v4();
+        await firestore.collection('users').doc(userId).set({
+          'id': userId,
+          'name': 'Del',
+          'email': 'del@example.com',
+          'phone': '077777777',
+          'userType': 'customer',
+          'historyIds': <String>[],
+        });
+        await firestore.collection('queue_entries').doc(queueEntryId).set({
+          'id': queueEntryId,
+          'customerId': userId,
+          'status': 'waiting',
+        });
 
-      await repository.delete(userId);
+        await repository.delete(userId);
 
-      final userSnap = await firestore.collection('users').doc(userId).get();
-      final queueSnap = await firestore
-          .collection('queue_entries')
-          .doc(queueEntryId)
-          .get();
-      final queueData = queueSnap.data();
+        final userSnap = await firestore.collection('users').doc(userId).get();
+        final queueSnap = await firestore
+            .collection('queue_entries')
+            .doc(queueEntryId)
+            .get();
+        final queueData = queueSnap.data();
 
-      expect(userSnap.exists, isFalse);
-      expect(queueSnap.exists, isTrue);
-      expect(queueData?['customerId'], userId);
-    });
+        expect(userSnap.exists, isFalse);
+        expect(queueSnap.exists, isTrue);
+        expect(queueData?['customerId'], userId);
+      },
+    );
   });
 }

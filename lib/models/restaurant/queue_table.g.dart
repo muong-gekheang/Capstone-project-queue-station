@@ -10,7 +10,7 @@ QueueTable _$QueueTableFromJson(Map<String, dynamic> json) => QueueTable(
   id: json['id'] as String?,
   tableNum: json['tableNum'] as String,
   tableStatus: $enumDecode(_$TableStatusEnumMap, json['tableStatus']),
-  tableCategoryId: json['tableCategoryId'] as String?,
+  tableCategoryId: json['tableCategoryId'] as String,
   queueEntryIds:
       (json['queueEntryIds'] as List<dynamic>?)
           ?.map((e) => e as String)
