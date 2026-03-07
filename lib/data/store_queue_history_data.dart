@@ -50,6 +50,8 @@ final restaurant3 = Restaurant(
 
 // Example QueueEntries
 final queue1 = QueueEntry(
+  expectedTableReadyAt: DateTime.now(),
+
   restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user1",
@@ -62,6 +64,8 @@ final queue1 = QueueEntry(
 );
 
 final queue2 = QueueEntry(
+  expectedTableReadyAt: DateTime.now(),
+
   restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user1",
@@ -74,6 +78,8 @@ final queue2 = QueueEntry(
 );
 
 final queue3 = QueueEntry(
+  expectedTableReadyAt: DateTime.now(),
+
   restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user2",
@@ -86,6 +92,8 @@ final queue3 = QueueEntry(
 );
 
 final queue4 = QueueEntry(
+  expectedTableReadyAt: DateTime.now(),
+
   restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user3",
@@ -98,6 +106,8 @@ final queue4 = QueueEntry(
 );
 
 final queue5 = QueueEntry(
+  expectedTableReadyAt: DateTime.now(),
+
   restId: mockRestaurants[0].id,
   id: uuid.v4(),
   customerId: "user3",

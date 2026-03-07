@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/models/restaurant/restaurant.dart';
-import 'package:queue_station_app/models/user/history.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/restaurant_service.dart';
 
 class QueueViewModel extends ChangeNotifier {
   final RestaurantService _restaurantService;
-  late Restaurant _restaurant;
+  String _searchKeyword = "";
 
   QueueViewModel({required RestaurantService restaurantService})
-    : _restaurantService = restaurantService {
-    init();
+    : _restaurantService = restaurantService;
+
+  List<QueueEntry> get currentQueue => _restaurantService.currentQueue;
+
+  Duration get avgWaitTime => _restaurantService.restaurant.averageWaitingTime;
+
+  int get biggestTableSize => _restaurantService.restaurant.biggestTableSize;
+
+  DateTime getQueueEstimatedTime(QueueEntry queue) {
+    return queue.joinTime.add(avgWaitTime);
   }
 
-  void init() {
-    _restaurant = _restaurantService.restaurant;
+  void onSearch(String keyword) {
+    _searchKeyword = keyword;
+    notifyListeners();
   }
 
-  // List<History> get currentQueue => _restaurant.currentInQueue;
+  List<QueueEntry> get filteredQueue {
+    return currentQueue
+        .where(
+          (q) => q.customerName!.toLowerCase().startsWith(
+            _searchKeyword.toLowerCase(),
+          ),
+        )
+        .toList();
+  }
 
-  List<History> filterQueue(String keyword) {
-    //  return currentQueue.where((q)=>q.)
+  void addQueue(QueueEntry newQueue) {
+    _restaurantService.addQueue(newQueue);
+    notifyListeners();
+  }
+
+  void removeQueue(QueueEntry queue) {
+    _restaurantService.removeQueue(queue);
+    notifyListeners();
   }
 }

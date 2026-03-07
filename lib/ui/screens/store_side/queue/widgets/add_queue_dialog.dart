@@ -1,11 +1,19 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
+import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
+import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
 
 class AddQueueDialog extends StatefulWidget {
-  final Function(String, String, int) onJoin;
+  final ValueChanged<QueueEntry> onJoin;
 
   const AddQueueDialog({super.key, required this.onJoin});
   @override
@@ -13,7 +21,6 @@ class AddQueueDialog extends StatefulWidget {
 }
 
 class _AddQueueDialogState extends State<AddQueueDialog> {
-  int _selectedTable = 1;
   int _guestCount = 1;
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
@@ -27,31 +34,49 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
   }
 
   void incrPeople() {
+    QueueViewModel queueViewModel = context.read<QueueViewModel>();
     setState(() {
-      _guestCount++;
-      if (_guestCount <= 4 && _selectedTable < _guestCount) {
-        _selectedTable = _guestCount;
-      } else {
-        _selectedTable = 0;
-      }
+      _guestCount = min(_guestCount + 1, queueViewModel.biggestTableSize);
     });
   }
 
   void decrPeople() {
-    if (_guestCount >= 0) {
-      setState(() {
-        _guestCount--;
-        if (_guestCount <= 4 && _selectedTable < _guestCount) {
-          _selectedTable = _guestCount;
-        } else {
-          _selectedTable = 0;
-        }
-      });
+    setState(() {
+      _guestCount = max(_guestCount - 1, 0);
+    });
+  }
+
+  void onTableTap(int value) {
+    setState(() {
+      _guestCount = value;
+    });
+  }
+
+  void onJoinTap() {
+    if (_formKey.currentState!.validate()) {
+      StoreUser user = context.read<UserProvider>().asStoreUser!;
+      widget.onJoin(
+        QueueEntry.walkIn(
+          expectedTableReadyAt: DateTime.now(),
+          id: uuid.v4(),
+          queueNumber: "ABCDE",
+          partySize: _guestCount,
+          joinTime: DateTime.now(),
+          status: QueueStatus.waiting,
+          customerId: user.id,
+          joinedMethod: JoinedMethod.walkIn,
+          restId: user.rest.id,
+          customerName: nameController.text,
+          phoneNumber: phoneController.text,
+        ),
+      );
+      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    QueueViewModel queueViewModel = context.watch<QueueViewModel>();
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: SingleChildScrollView(
@@ -91,33 +116,47 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 15),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [1, 2]
-                      .map(
-                        (i) => TableTypeWidget(
-                          value: i,
-                          selectedType: _selectedTable,
-                          onTap: (val) => setState(() => _selectedTable = val),
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 20,
+                alignment: WrapAlignment.center,
+                children: (queueViewModel.biggestTableSize >= 4)
+                    ? [
+                        TableTypeWidget(
+                          selectedType: _guestCount,
+                          value: 1,
+                          onTap: onTableTap,
                         ),
-                      )
-                      .toList(),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [3, 4]
-                      .map(
-                        (i) => TableTypeWidget(
-                          value: i,
-                          selectedType: _selectedTable,
-                          onTap: (val) => setState(() => _selectedTable = val),
+                        TableTypeWidget(
+                          selectedType: _guestCount,
+                          value: 2,
+                          onTap: onTableTap,
                         ),
-                      )
-                      .toList(),
-                ),
-              ],
+                        TableTypeWidget(
+                          selectedType: _guestCount,
+                          value: 3,
+                          onTap: onTableTap,
+                        ),
+                        TableTypeWidget(
+                          selectedType: _guestCount,
+                          value: 4,
+                          onTap: onTableTap,
+                        ),
+                      ]
+                    : [
+                        for (
+                          int i = 1;
+                          i < queueViewModel.biggestTableSize;
+                          i++
+                        )
+                          TableTypeWidget(
+                            value: i,
+                            selectedType: _guestCount,
+                            onTap: onTableTap,
+                          ),
+                      ],
+              ),
             ),
             const SizedBox(height: 30),
             Text(
@@ -126,6 +165,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
             ),
             const SizedBox(height: 15),
             GuestsCounterWidget(
+              maxPeople: queueViewModel.biggestTableSize,
               numPeople: _guestCount,
               incrPeople: incrPeople,
               decrPeople: decrPeople,
@@ -147,16 +187,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
                 Expanded(
                   child: ButtonWidget(
                     title: "Join Queue",
-                    onPressed: () {
-                      if(_formKey.currentState!.validate()){
-                        widget.onJoin(
-                          nameController.text,
-                          phoneController.text,
-                          _guestCount,
-                        );
-                        Navigator.pop(context);
-                      }
-                    },
+                    onPressed: _guestCount > 0 ? onJoinTap : null,
                     backgroundColor: AppTheme.primaryColor,
                     textColor: AppTheme.naturalWhite,
                     padding: const EdgeInsets.symmetric(vertical: 3),

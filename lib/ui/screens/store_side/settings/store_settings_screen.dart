@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import '../store_management/edit_store_screen.dart';
 import '../../user_side/setting/change_password_screen.dart';
 import 'store_subscription_screen.dart';
@@ -41,8 +44,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
+              UserProvider userProvider = context.read<UserProvider>();
+              userProvider.updateUser(null);
               Navigator.pop(context);
-              // Add logout logic here
+              context.go("/");
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF6835),

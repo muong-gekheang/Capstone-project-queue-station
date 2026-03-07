@@ -14,7 +14,7 @@ class UserProvider extends ChangeNotifier {
   StoreUser? get asStoreUser =>
       _currentUser is StoreUser ? _currentUser as StoreUser : null;
 
-  void updateUser(User newUser) {
+  void updateUser(User? newUser) {
     _currentUser = newUser;
     notifyListeners();
   }

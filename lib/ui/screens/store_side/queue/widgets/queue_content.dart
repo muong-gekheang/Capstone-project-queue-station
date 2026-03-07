@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/widgets/add_queue_dialog.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/widgets/edit_queue_dialog.dart';
@@ -66,14 +68,17 @@ class _QueueContentState extends State<QueueContent> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SearchBox(onSearch: _runFilter),
+            child: SearchBox(onSearch: queueViewModel.onSearch),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 10, bottom: 100),
-              itemCount: filteredList.length,
-              itemBuilder: (context, index) => _queueCard(filteredList[index]),
-            ),
+            child: queueViewModel.filteredQueue.isEmpty
+                ? Text("No Queue yet")
+                : ListView.builder(
+                    padding: const EdgeInsets.only(top: 10, bottom: 100),
+                    itemCount: queueViewModel.filteredQueue.length,
+                    itemBuilder: (context, index) =>
+                        _queueCard(queueViewModel.filteredQueue[index]),
+                  ),
           ),
         ],
       ),
@@ -91,7 +96,10 @@ class _QueueContentState extends State<QueueContent> {
           ),
           onPressed: () => showDialog(
             context: context,
-            builder: (ctx) => AddQueueDialog(onJoin: _addToQueue),
+            builder: (ctx) => ChangeNotifierProvider.value(
+              value: queueViewModel,
+              child: AddQueueDialog(onJoin: queueViewModel.addQueue),
+            ),
           ),
           child: const Text(
             "Add queue",
@@ -106,7 +114,8 @@ class _QueueContentState extends State<QueueContent> {
     );
   }
 
-  Widget _queueCard(Map<String, dynamic> item) {
+  Widget _queueCard(QueueEntry item) {
+    QueueViewModel queueViewModel = context.read<QueueViewModel>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -115,7 +124,9 @@ class _QueueContentState extends State<QueueContent> {
           SizedBox(
             width: 80,
             child: Text(
-              item['time'],
+              DateFormat(
+                "hh:mm",
+              ).format(queueViewModel.getQueueEstimatedTime(item)),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -127,9 +138,12 @@ class _QueueContentState extends State<QueueContent> {
             child: GestureDetector(
               onTap: () => showDialog(
                 context: context,
-                builder: (ctx) => EditQueueDialog(
-                  item: item,
-                  onUpdate: () => _handleQueueUpdate(item['qn']),
+                builder: (ctx) => ChangeNotifierProvider.value(
+                  value: queueViewModel,
+                  child: EditQueueDialog(
+                    item: item,
+                    onUpdate: () => queueViewModel.removeQueue(item),
+                  ),
                 ),
               ),
               child: Container(
@@ -149,7 +163,7 @@ class _QueueContentState extends State<QueueContent> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          item['name'],
+                          "${item.joinedMethod != JoinedMethod.remote ? item.customerName : item.customerId.substring(0, 4)}",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -159,13 +173,13 @@ class _QueueContentState extends State<QueueContent> {
                     ),
                     const SizedBox(height: 12),
                     _cardLine(
-                      "QN: ${item['qn']}",
-                      "In-queue since: ${item['since']}",
+                      "QN: ${item.queueNumber}",
+                      "In-queue since: ${DateFormat.Hm().format(item.joinTime)}",
                     ),
                     const SizedBox(height: 4),
                     _cardLine(
-                      "Guest(s): ${item['guests']}",
-                      "Time waited: ${item['waited']}",
+                      "Guest(s): ${item.partySize}",
+                      "Time waited: ${item.waitingTimeText}",
                     ),
                   ],
                 ),
