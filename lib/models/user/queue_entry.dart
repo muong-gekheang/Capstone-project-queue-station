@@ -50,25 +50,6 @@ class QueueEntry {
   });
 
   const QueueEntry.walkIn({
-  const QueueEntry({
-    required this.id,
-    required this.queueNumber,
-    required this.partySize,
-    required this.joinTime,
-    this.servedTime,
-    this.endedTime,
-    required this.status,
-    required this.customerId,
-    this.orderId,
-    this.joinedMethod = JoinedMethod.remote,
-    this.tableNumber,
-    required this.restId,
-    this.customerName,
-    this.phoneNumber,
-    required this.expectedTableReadyAt, // Added to constructor
-  });
-
-  const QueueEntry.walkIn({
     required this.id,
     required this.queueNumber,
     required this.partySize,
@@ -79,14 +60,8 @@ class QueueEntry {
     required this.customerId,
     this.orderId,
     this.joinedMethod = JoinedMethod.walkIn,
-    this.orderId,
-    this.joinedMethod = JoinedMethod.walkIn,
     this.tableNumber,
     required this.restId,
-    required this.customerName,
-    required this.phoneNumber,
-    required this.expectedTableReadyAt,
-  });
     required this.customerName,
     required this.phoneNumber,
     required this.expectedTableReadyAt,
@@ -127,7 +102,6 @@ class QueueEntry {
     DateTime? servedTime,
     DateTime? endedTime,
     QueueStatus? status,
-    QueueStatus? status,
     Order? order,
     String? orderId,
     JoinedMethod? joinedMethod,
@@ -161,7 +135,7 @@ class QueueEntry {
     DateTime? servedTime,
     DateTime? endedTime,
     QueueStatus? status,
-    String? orderId,
+    Order? order,
     String? tableNumber,
     String? customerName,
     String? phoneNumber,
@@ -179,6 +153,7 @@ class QueueEntry {
       endedTime: endedTime ?? this.endedTime,
       status: status ?? this.status,
       orderId: orderId ?? this.orderId,
+      joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,
       // Use ! because the .walkIn constructor requires these to be non-null
       customerName: customerName ?? this.customerName!,
