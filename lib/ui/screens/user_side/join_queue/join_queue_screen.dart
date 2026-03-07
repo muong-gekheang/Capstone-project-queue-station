@@ -13,6 +13,7 @@ import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
+import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class JoinQueueScreen extends StatefulWidget {
@@ -262,10 +263,46 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                         onTap: onTableTap,
                       ),
                   ],
+            children: (widget.rest.biggestTableSize >= 4)
+                ? [
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 1,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 2,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 3,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 4,
+                      onTap: onTableTap,
+                    ),
+                  ]
+                : [
+                    for (int i = 1; i < widget.rest.biggestTableSize; i++)
+                      TableTypeWidget(
+                        value: i,
+                        selectedType: numPeople,
+                        onTap: onTableTap,
+                      ),
+                  ],
           ),
           const SizedBox(height: 16),
           const Text("Number of Guest(s)", style: TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
+          GuestsCounterWidget(
+            maxPeople: widget.rest.biggestTableSize,
+            numPeople: numPeople,
+            incrPeople: incrPeople,
+            decrPeople: decrPeople,
           GuestsCounterWidget(
             maxPeople: widget.rest.biggestTableSize,
             numPeople: numPeople,

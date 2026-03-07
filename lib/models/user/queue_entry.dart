@@ -18,11 +18,15 @@ class QueueEntry {
   final int partySize;
   final DateTime joinTime;
   final DateTime expectedTableReadyAt;
+  final DateTime expectedTableReadyAt;
   final DateTime? servedTime;
   final DateTime? endedTime;
   final QueueStatus status;
   final String? orderId;
   final JoinedMethod joinedMethod;
+  final String? tableNumber;
+  final String? customerName; // Only store when the joinedMethod is walkIn
+  final String? phoneNumber; // Only store when the joinedMethod is walkIn
   final String? tableNumber;
   final String? customerName; // Only store when the joinedMethod is walkIn
   final String? phoneNumber; // Only store when the joinedMethod is walkIn
@@ -65,6 +69,10 @@ class QueueEntry {
     required this.customerName,
     required this.phoneNumber,
     required this.expectedTableReadyAt,
+    required this.restId,
+    required this.customerName,
+    required this.phoneNumber,
+    required this.expectedTableReadyAt,
   });
 
   Duration? get waitingTime {
@@ -97,15 +105,19 @@ class QueueEntry {
 
   /// Use for Remote Users (App Account)
   QueueEntry remoteCopyWith({
+  /// Use for Remote Users (App Account)
+  QueueEntry remoteCopyWith({
     String? queueNumber,
     int? partySize,
     DateTime? servedTime,
     DateTime? endedTime,
     QueueStatus? status,
+    QueueStatus? status,
     Order? order,
     String? orderId,
     JoinedMethod? joinedMethod,
     String? tableNumber,
+    DateTime? expectedTableReadyAt,
     DateTime? expectedTableReadyAt,
   }) {
     return QueueEntry(
@@ -155,6 +167,10 @@ class QueueEntry {
       orderId: orderId ?? this.orderId,
       joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,
+      // Use ! because the .walkIn constructor requires these to be non-null
+      customerName: customerName ?? this.customerName!,
+      phoneNumber: phoneNumber ?? this.phoneNumber!,
+      expectedTableReadyAt: expectedTableReadyAt ?? this.expectedTableReadyAt,
       // Use ! because the .walkIn constructor requires these to be non-null
       customerName: customerName ?? this.customerName!,
       phoneNumber: phoneNumber ?? this.phoneNumber!,
