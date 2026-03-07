@@ -19,35 +19,18 @@ class QueueTable {
   @JsonKey(defaultValue: <String>[])
   final List<String> queueEntryIds;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final TableCategory tableCategory;
-
   QueueTable({
     String? id,
     required this.tableNum,
     required this.tableStatus,
-    String? tableCategoryId,
-    TableCategory? tableCategory,
-    required List<String>? queueEntryIds,
-  }) : id = id ?? uuid.v4(),
-       tableCategoryId =
-           tableCategoryId ?? tableCategory?.id ?? 'unknown_table_category',
-       tableCategory =
-           tableCategory ??
-           TableCategory(
-             categoryId:
-                 tableCategoryId ?? tableCategory?.id ?? 'unknown_table_category',
-             type: 'Unknown',
-             minSeat: 1,
-             seatAmount: 1,
-           ),
-       queueEntryIds = queueEntryIds ?? [];
+    required this.tableCategoryId,
+    required this.queueEntryIds,
+  }) : id = id ?? uuid.v4();
 
   QueueTable copyWith({
     String? tableNum,
     TableStatus? tableStatus,
     String? tableCategoryId,
-    TableCategory? tableCategory,
     List<String>? queueEntryIds,
   }) {
     return QueueTable(
@@ -55,7 +38,6 @@ class QueueTable {
       tableNum: tableNum ?? this.tableNum,
       tableStatus: tableStatus ?? this.tableStatus,
       tableCategoryId: tableCategoryId ?? this.tableCategoryId,
-      tableCategory: tableCategory ?? this.tableCategory,
       queueEntryIds: queueEntryIds ?? this.queueEntryIds,
     );
   }
@@ -64,4 +46,6 @@ class QueueTable {
       _$QueueTableFromJson(json);
 
   Map<String, dynamic> toJson() => _$QueueTableToJson(this);
+
+  void operator []=(String other, QueueTable value) {}
 }

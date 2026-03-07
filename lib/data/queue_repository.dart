@@ -1,4 +1,6 @@
-import 'package:queue_station_app/data/mock_restaurant.dart';
+import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
@@ -133,68 +135,7 @@ class QueueRepository {
     );
 
     // Tables - Using QueueTable consistently
-    final tables = [
-      QueueTable(
-        tableNum: '1',
-        tableStatus: TableStatus.available,
-        tableCategory: standardCategory,
-        queueEntryIds: [],
-      ),
-      QueueTable(
-        tableNum: '2',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: ['102'],
-      ),
-      QueueTable(
-        tableNum: '3',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: ['103'],
-      ),
-      QueueTable(
-        tableNum: '4',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: ['104'],
-      ),
-      QueueTable(
-        tableNum: '5',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: ['105'],
-      ),
-      QueueTable(
-        tableNum: '6',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: ['106'],
-      ),
-      QueueTable(
-        tableNum: '7',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: ['107'],
-      ),
-      QueueTable(
-        tableNum: '8',
-        tableStatus: TableStatus.available,
-        tableCategory: standardCategory,
-        queueEntryIds: [],
-      ),
-      QueueTable(
-        tableNum: '9',
-        tableStatus: TableStatus.available,
-        tableCategory: standardCategory,
-        queueEntryIds: [],
-      ),
-      QueueTable(
-        tableNum: '10',
-        tableStatus: TableStatus.occupied,
-        tableCategory: standardCategory,
-        queueEntryIds: [],
-      ),
-    ];
+    final tables = mockTables;
 
     for (var table in tables) {
       _tablesByNumber[table.tableNum] = table;

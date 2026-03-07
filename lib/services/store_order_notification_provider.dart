@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/store_queue_entry_data.dart';
+import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_mock.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-
 
 enum NotificationStatus { read, unread }
 
@@ -12,9 +11,8 @@ class StoreOrderNotificationProvider with ChangeNotifier {
   List<QueueEntry> get queueEntries => List.unmodifiable(_queueEntries);
 
   StoreOrderNotificationProvider() {
-    _queueEntries.addAll(mockQueueEntries());
+    _queueEntries.addAll(mockQueueEntries);
     print('Initialized with ${_queueEntries.length} orders');
-
   }
 
   void addIncomingOrder(QueueEntry entry) {
@@ -29,7 +27,7 @@ class StoreOrderNotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-void acceptAllIncomingOrder(QueueEntry entry) {
+  void acceptAllIncomingOrder(QueueEntry entry) {
     final index = _queueEntries.indexWhere((e) => e.id == entry.id);
     if (index == -1) return;
 
@@ -41,7 +39,7 @@ void acceptAllIncomingOrder(QueueEntry entry) {
       return item.copyWith(orderItemStatus: OrderItemStatus.accepted);
     }).toList();
 
-     _queueEntries[index] = oldEntry.copyWith(
+    _queueEntries[index] = oldEntry.copyWith(
       order: order.copyWith(ordered: updatedItems),
     );
 

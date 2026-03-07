@@ -1,4 +1,4 @@
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/data/repositories/user/mock/mock_user_data.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 
