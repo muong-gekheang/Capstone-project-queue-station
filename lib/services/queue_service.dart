@@ -24,6 +24,8 @@ class QueueService {
     required String restId,
   }) async {
     final entry = QueueEntry(
+      expectedTableReadyAt: DateTime.now(),
+
       queueNumber: DateTime.now().millisecondsSinceEpoch.toString(),
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       partySize: partySize,
@@ -40,7 +42,7 @@ class QueueService {
   Future<void> serveCustomer(String queueEntryId, String tableNumber) async {
     final entry = await _repository.getQueueEntryById(queueEntryId);
     if (entry != null) {
-      final updatedEntry = entry.copyWith(
+      final updatedEntry = entry.remoteCopyWith(
         status: QueueStatus.serving,
         servedTime: DateTime.now(),
         tableNumber: tableNumber,
@@ -63,7 +65,7 @@ class QueueService {
   Future<void> cancelQueueEntry(String queueEntryId) async {
     final entry = await _repository.getQueueEntryById(queueEntryId);
     if (entry != null) {
-      final updatedEntry = entry.copyWith(
+      final updatedEntry = entry.remoteCopyWith(
         status: QueueStatus.cancelled, // FIXED: Using enum instead of string
         servedTime: DateTime.now(),
       );

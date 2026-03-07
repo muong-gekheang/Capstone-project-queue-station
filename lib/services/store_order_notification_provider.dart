@@ -3,7 +3,6 @@ import 'package:queue_station_app/data/store_queue_entry_data.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
-
 enum NotificationStatus { read, unread }
 
 class StoreOrderNotificationProvider with ChangeNotifier {
@@ -14,12 +13,11 @@ class StoreOrderNotificationProvider with ChangeNotifier {
   StoreOrderNotificationProvider() {
     _queueEntries.addAll(mockQueueEntries());
     print('Initialized with ${_queueEntries.length} orders');
-
   }
 
   void addIncomingOrder(QueueEntry entry) {
     _queueEntries.add(
-      entry.copyWith(
+      entry.remoteCopyWith(
         order: entry.order?.copyWith(
           ordered: entry.order!.ordered.map((item) => item.copyWith()).toList(),
           inCart: entry.order!.inCart.map((item) => item.copyWith()).toList(),
@@ -29,7 +27,7 @@ class StoreOrderNotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-void acceptAllIncomingOrder(QueueEntry entry) {
+  void acceptAllIncomingOrder(QueueEntry entry) {
     final index = _queueEntries.indexWhere((e) => e.id == entry.id);
     if (index == -1) return;
 
@@ -41,7 +39,7 @@ void acceptAllIncomingOrder(QueueEntry entry) {
       return item.copyWith(orderItemStatus: OrderItemStatus.accepted);
     }).toList();
 
-     _queueEntries[index] = oldEntry.copyWith(
+    _queueEntries[index] = oldEntry.remoteCopyWith(
       order: order.copyWith(ordered: updatedItems),
     );
 
@@ -60,7 +58,7 @@ void acceptAllIncomingOrder(QueueEntry entry) {
       inCart: order.inCart.where((i) => i != item).toList(),
     );
 
-    _queueEntries[index] = oldEntry.copyWith(order: updatedOrder);
+    _queueEntries[index] = oldEntry.remoteCopyWith(order: updatedOrder);
     notifyListeners();
   }
 }

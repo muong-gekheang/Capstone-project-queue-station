@@ -9,6 +9,8 @@ import 'package:uuid/uuid.dart';
 List<QueueEntry> mockQueueEntries() {
   return [
     QueueEntry(
+      expectedTableReadyAt: DateTime.now(),
+
       restId: mockRestaurants[0].id,
       id: Uuid().v4(),
       queueNumber: 'A001',
@@ -71,6 +73,7 @@ List<QueueEntry> mockQueueEntries() {
     ),
     QueueEntry(
       restId: mockRestaurants[0].id,
+      expectedTableReadyAt: DateTime.now(),
 
       id: Uuid().v4(),
       queueNumber: 'A002',
@@ -101,7 +104,7 @@ List<QueueEntry> mockQueueEntries() {
     ),
     QueueEntry(
       restId: mockRestaurants[0].id,
-
+      expectedTableReadyAt: DateTime.now(),
       id: Uuid().v4(),
       queueNumber: 'A003',
       customerId: 'c003',

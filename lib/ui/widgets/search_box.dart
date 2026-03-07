@@ -13,7 +13,7 @@ class SearchBox extends StatelessWidget {
         color: const Color(0xFFF1F1F1),
       ),
       child: TextField(
-        onChanged: onSearch,
+        onChanged: (value) => onSearch(value),
         style: const TextStyle(fontSize: 14),
         decoration: const InputDecoration(
           hintText: "Search customer name or queue ID",

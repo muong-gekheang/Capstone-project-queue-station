@@ -12,18 +12,21 @@ class QueueEntry {
   final String customerId;
   final int partySize;
   final DateTime joinTime;
+  final DateTime expectedTableReadyAt;
   final DateTime? servedTime;
   final DateTime? endedTime;
   final QueueStatus status;
   final Order? order;
   final JoinedMethod joinedMethod;
-  final String? tableNumber; // Added missing field
+  final String? tableNumber;
+  final String? customerName; // Only store when the joinedMethod is walkIn
+  final String? phoneNumber; // Only store when the joinedMethod is walkIn
 
   int currentSpot(Restaurant rest) {
     return rest.getQueueSpot(this);
   }
 
-  QueueEntry({
+  const QueueEntry({
     required this.id,
     required this.queueNumber,
     required this.partySize,
@@ -33,9 +36,30 @@ class QueueEntry {
     required this.status,
     required this.customerId,
     this.order,
-    required this.joinedMethod,
+    this.joinedMethod = JoinedMethod.remote,
     this.tableNumber,
-    required this.restId, // Added to constructor
+    required this.restId,
+    this.customerName,
+    this.phoneNumber,
+    required this.expectedTableReadyAt, // Added to constructor
+  });
+
+  const QueueEntry.walkIn({
+    required this.id,
+    required this.queueNumber,
+    required this.partySize,
+    required this.joinTime,
+    this.servedTime,
+    this.endedTime,
+    required this.status,
+    required this.customerId,
+    this.order,
+    this.joinedMethod = JoinedMethod.walkIn,
+    this.tableNumber,
+    required this.restId,
+    required this.customerName,
+    required this.phoneNumber,
+    required this.expectedTableReadyAt,
   });
 
   Duration? get waitingTime {
@@ -66,33 +90,67 @@ class QueueEntry {
   @override
   int get hashCode => Object.hash(id, customerId);
 
-  QueueEntry copyWith({
-    String? id,
+  /// Use for Remote Users (App Account)
+  QueueEntry remoteCopyWith({
     String? queueNumber,
-    String? customerId,
-    String? restId,
     int? partySize,
-    DateTime? joinTime,
     DateTime? servedTime,
     DateTime? endedTime,
-    QueueStatus? status, // Using enum, not String
+    QueueStatus? status,
     Order? order,
-    JoinedMethod? joinedMethod,
     String? tableNumber,
+    DateTime? expectedTableReadyAt,
   }) {
     return QueueEntry(
-      id: id ?? this.id,
+      id: id,
+      restId: restId,
+      customerId: customerId, // Original User ID
+      joinTime: joinTime,
+      joinedMethod: JoinedMethod.remote,
       queueNumber: queueNumber ?? this.queueNumber,
-      customerId: customerId ?? this.customerId,
       partySize: partySize ?? this.partySize,
-      joinTime: joinTime ?? this.joinTime,
       servedTime: servedTime ?? this.servedTime,
       endedTime: endedTime ?? this.endedTime,
-      status: status ?? this.status, // Using enum
+      status: status ?? this.status,
       order: order ?? this.order,
-      joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,
-      restId: restId ?? this.restId,
+      // Keep existing (likely null)
+      customerName: customerName,
+      phoneNumber: phoneNumber,
+      expectedTableReadyAt: expectedTableReadyAt ?? this.expectedTableReadyAt,
+    );
+  }
+
+  /// Use for Walk-In Users (Created by the Store)
+  QueueEntry walkInCopyWith({
+    String? queueNumber,
+    int? partySize,
+    DateTime? servedTime,
+    DateTime? endedTime,
+    QueueStatus? status,
+    Order? order,
+    String? tableNumber,
+    String? customerName,
+    String? phoneNumber,
+    DateTime? expectedTableReadyAt,
+  }) {
+    return QueueEntry.walkIn(
+      id: id,
+      restId: restId,
+      customerId: customerId, // This will be the storeId
+      joinTime: joinTime,
+      // joinedMethod is hardcoded to .walkIn in the constructor
+      queueNumber: queueNumber ?? this.queueNumber,
+      partySize: partySize ?? this.partySize,
+      servedTime: servedTime ?? this.servedTime,
+      endedTime: endedTime ?? this.endedTime,
+      status: status ?? this.status,
+      order: order ?? this.order,
+      tableNumber: tableNumber ?? this.tableNumber,
+      // Use ! because the .walkIn constructor requires these to be non-null
+      customerName: customerName ?? this.customerName!,
+      phoneNumber: phoneNumber ?? this.phoneNumber!,
+      expectedTableReadyAt: expectedTableReadyAt ?? this.expectedTableReadyAt,
     );
   }
 }
