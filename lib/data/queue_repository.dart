@@ -30,6 +30,7 @@ class QueueRepository {
         customerId: 'user_789',
         joinedMethod: JoinedMethod.remote,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '102',
@@ -40,6 +41,7 @@ class QueueRepository {
         customerId: 'user_456',
         joinedMethod: JoinedMethod.walkIn,
         restId: mockRestaurants[1].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '103',
@@ -50,6 +52,7 @@ class QueueRepository {
         customerId: 'user_112',
         joinedMethod: JoinedMethod.remote,
         restId: mockRestaurants[3].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '104',
@@ -60,6 +63,7 @@ class QueueRepository {
         customerId: 'user_990',
         joinedMethod: JoinedMethod.walkIn,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '105',
@@ -70,6 +74,7 @@ class QueueRepository {
         customerId: 'user_334',
         joinedMethod: JoinedMethod.remote,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '106',
@@ -80,6 +85,7 @@ class QueueRepository {
         customerId: 'user_221',
         joinedMethod: JoinedMethod.remote,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '107',
@@ -90,6 +96,7 @@ class QueueRepository {
         customerId: 'user_554',
         joinedMethod: JoinedMethod.walkIn,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '108',
@@ -100,6 +107,7 @@ class QueueRepository {
         customerId: 'user_667',
         joinedMethod: JoinedMethod.remote,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '109',
@@ -110,6 +118,7 @@ class QueueRepository {
         customerId: 'user_882',
         joinedMethod: JoinedMethod.remote,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
       QueueEntry(
         id: '110',
@@ -120,6 +129,7 @@ class QueueRepository {
         customerId: 'user_003',
         joinedMethod: JoinedMethod.walkIn,
         restId: mockRestaurants[0].id,
+        expectedTableReadyAt: DateTime.now(),
       ),
     ];
 

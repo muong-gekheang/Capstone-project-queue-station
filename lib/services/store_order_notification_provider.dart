@@ -17,7 +17,7 @@ class StoreOrderNotificationProvider with ChangeNotifier {
 
   void addIncomingOrder(QueueEntry entry) {
     _queueEntries.add(
-      entry.copyWith(
+      entry.remoteCopyWith(
         order: entry.order?.copyWith(
           ordered: entry.order!.ordered.map((item) => item.copyWith()).toList(),
           inCart: entry.order!.inCart.map((item) => item.copyWith()).toList(),
@@ -58,7 +58,7 @@ class StoreOrderNotificationProvider with ChangeNotifier {
       inCart: order.inCart.where((i) => i != item).toList(),
     );
 
-    _queueEntries[index] = oldEntry.copyWith(order: updatedOrder);
+    _queueEntries[index] = oldEntry.remoteCopyWith(order: updatedOrder);
     notifyListeners();
   }
 }

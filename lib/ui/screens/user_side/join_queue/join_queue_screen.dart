@@ -12,6 +12,7 @@ import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
+import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class JoinQueueScreen extends StatefulWidget {
@@ -36,24 +37,8 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
     UserProvider userProvider = context.read<UserProvider>();
     Customer? user = userProvider.asCustomer;
     if (user != null) {
-      final newHistory = QueueEntry(
-        restId: widget.rest.id,
-        id: Uuid().v4(),
-        partySize: numPeople,
-        joinTime: DateTime.now(),
-        status: QueueStatus.waiting,
-        customerId: user.id,
-        queueNumber: '',
-        joinedMethod: JoinedMethod.remote,
-      );
-      mockHistories.add(newHistory);
-      mockHistoriesById[newHistory.id] = newHistory;
-      userProvider.updateUser(
-        user.copyWith(
-          currentHistoryId: newHistory.id,
-          historyIds: [...user.historyIds, newHistory.id],
-        ),
-      );
+      // TODO: Use Repos in VM to fetch and create Rest obj
+      userProvider.updateUser(user.copyWith(currentHistoryId: ""));
       Navigator.pop(context);
       context.go("/ticket");
     } else {
@@ -246,80 +231,46 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TableTypeWidget(
-                selectedType: numPeople,
-                value: 1,
-                onTap: onTableTap,
-              ),
-              TableTypeWidget(
-                selectedType: numPeople,
-                value: 2,
-                onTap: onTableTap,
-              ),
-              TableTypeWidget(
-                selectedType: numPeople,
-                value: 3,
-                onTap: onTableTap,
-              ),
-              TableTypeWidget(
-                selectedType: numPeople,
-                value: 4,
-                onTap: onTableTap,
-              ),
-            ],
+            children: (widget.rest.biggestTableSize >= 4)
+                ? [
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 1,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 2,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 3,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 4,
+                      onTap: onTableTap,
+                    ),
+                  ]
+                : [
+                    for (int i = 1; i < widget.rest.biggestTableSize; i++)
+                      TableTypeWidget(
+                        value: i,
+                        selectedType: numPeople,
+                        onTap: onTableTap,
+                      ),
+                  ],
           ),
           const SizedBox(height: 16),
           const Text("Number of Guest(s)", style: TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 19,
-            children: [
-              IconButton(
-                onPressed: numPeople == 0 ? null : decrPeople,
-                color: Colors.white,
-                disabledColor: Colors.white,
-                style: IconButton.styleFrom(
-                  backgroundColor: Color(0xFFFF6835),
-                  disabledBackgroundColor: Color(0xFFD4D8D6),
-                ),
-                icon: const Icon(Icons.remove),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xFF73706E), width: 1),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Text(
-                      NumberFormat("00").format(numPeople),
-                      style: TextStyle(
-                        letterSpacing: 10,
-                        fontSize: 70,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D47A1),
-                        height: 1.0,
-                      ),
-                    ),
-                    const Positioned.fill(
-                      child: VerticalDivider(
-                        color: Color(0xFF73706E),
-                        thickness: 1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: incrPeople,
-                color: Colors.white,
-                style: IconButton.styleFrom(backgroundColor: Color(0xFFFF6835)),
-                icon: const Icon(Icons.add),
-              ),
-            ],
+          GuestsCounterWidget(
+            maxPeople: widget.rest.biggestTableSize,
+            numPeople: numPeople,
+            incrPeople: incrPeople,
+            decrPeople: decrPeople,
           ),
         ],
       ),
