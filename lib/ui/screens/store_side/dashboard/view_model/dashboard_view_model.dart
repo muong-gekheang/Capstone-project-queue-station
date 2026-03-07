@@ -1,33 +1,48 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/restaurant_service.dart';
-import 'package:queue_station_app/services/user_provider.dart';
 
 class DashboardViewModel extends ChangeNotifier {
-  final UserProvider _userProvider;
   final RestaurantService _restaurantService;
-  late Restaurant _restaurant;
+  StreamSubscription<Restaurant?>? _restaurantSubscription;
+  Restaurant? _currentRestaurant;
+  bool _isLoading = false;
 
-  DashboardViewModel({
-    required UserProvider userProvider,
-    required RestaurantService restaurantService,
-  }) : _userProvider = userProvider,
-       _restaurantService = restaurantService {
-    init();
+  DashboardViewModel({required RestaurantService restaurantService})
+    : _restaurantService = restaurantService {
+    _subscribeToRestaurant();
   }
 
-  void init() {
-    _restaurant = _restaurantService.restaurant;
+  void _subscribeToRestaurant() {
+    _restaurantSubscription = _restaurantService.streamRestaurant.listen(
+      (restaurant) {
+        _currentRestaurant = restaurant;
+        _isLoading = false;
+        notifyListeners(); // Updates the UI
+      },
+      onError: (error) {
+        // Handle potential stream errors here
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
   }
 
-  int get queueEntries => _restaurant.currentInQueue.length;
+  @override
+  void dispose() {
+    _restaurantSubscription?.cancel();
+    super.dispose();
+  }
+
+  int get queueEntries => _currentRestaurant?.currentInQueue.length ?? 0;
 
   int get peopleWaiting {
     int result = 0;
-    for (QueueEntry queueEntry in _restaurant.currentInQueue) {
+    for (QueueEntry queueEntry in _currentRestaurant?.currentInQueue ?? []) {
       result += queueEntry.partySize;
     }
     return result;
@@ -35,7 +50,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   int get activeTable {
     int result = 0;
-    for (QueueTable table in _restaurant.tables) {
+    for (String tableId in _currentRestaurant?.tableIds ?? []) {
       if (table.customers.isNotEmpty) {
         result++;
       }

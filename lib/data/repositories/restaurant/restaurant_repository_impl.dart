@@ -136,7 +136,7 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
   }
 
   @override
-  Stream<Restaurant> watchCurrent() {
+  Stream<Restaurant?> watchCurrent(String id) {
     // TODO: implement watchCurrent
     throw UnimplementedError();
   }

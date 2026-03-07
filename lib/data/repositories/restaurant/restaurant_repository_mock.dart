@@ -62,9 +62,8 @@ class RestaurantRepositoryMock implements RestaurantRepository {
   }
 
   @override
-  Stream<Restaurant> watchCurrent() {
-    // TODO: implement watchCurrent
-    throw UnimplementedError();
+  Stream<Restaurant?> watchCurrent(String restId) {
+    return Stream.value(restaurants[restId]!);
   }
 }
 

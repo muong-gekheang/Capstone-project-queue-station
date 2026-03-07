@@ -2,18 +2,25 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/user/mock/customer_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/user/mock/store_user_repository_mock.dart';
 import 'package:queue_station_app/firebase_options.dart';
-import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/services/store_order_notification_provider.dart';
-import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
-import 'package:queue_station_app/utils/seed.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
+import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
-import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/normal_user_app.dart';
 import 'package:queue_station_app/ui/screens/auth/login_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/register_screen.dart';
@@ -23,6 +30,23 @@ import 'package:queue_station_app/ui/screens/user_side/order/instruction_screen.
 import 'package:queue_station_app/ui/screens/user_side/order/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
+import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
+import 'package:queue_station_app/utils/seed.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+List<SingleChildWidget> dependencies = [
+  Provider(create: (_) => AddOnRepositoryMock()),
+  Provider(create: (_) => MenuCategoryRepositoryMock()),
+  Provider(create: (_) => MenuItemRepositoryMock()),
+  Provider(create: (_) => OrderRepositoryMock()),
+  Provider(create: (_) => QueueEntryRepositoryMock()),
+  Provider(create: (_) => QueueTableRepositoryMock()),
+  Provider(create: (_) => RestaurantRepositoryMock()),
+  Provider(create: (_) => TableCategoryRepositoryMock()),
+  Provider(create: (_) => CustomerRepositoryMock()),
+  Provider(create: (_) => StoreUserRepositoryMock()),
+];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,19 +103,19 @@ void main() async {
             redirect: (context, state) {
               Customer? user = context.read<UserProvider>().asCustomer;
               bool isLoggedIn = user != null;
-              final currentHistory = getHistoryById(user?.currentHistoryId);
 
               if (!isLoggedIn) return "/login";
-              if (currentHistory == null) return "/";
+              if (user.currentHistoryId == null) return "/";
               return null;
             },
             builder: (context, state) {
               UserProvider userProvider = context.read<UserProvider>();
               Customer? user = userProvider.asCustomer;
-              final currentHistory = getHistoryById(user?.currentHistoryId);
+
               return ConfirmTicketScreen(
                 user: user!,
-                queueEntry: currentHistory!,
+                queueEntry:
+                    mockQueueEntries[0], // TODO: USE MVVM TO handle this
               );
             },
           ),
@@ -119,7 +143,12 @@ void main() async {
           },
         ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => StoreOrderNotificationProvider()),
+        ChangeNotifierProvider(
+          create: (_) => StoreOrderNotificationProvider(
+            orderRepository: OrderRepositoryMock(),
+          ),
+        ),
+        ...dependencies,
       ],
       child: MaterialApp.router(
         scrollBehavior: GlobalScrollBehavior(),

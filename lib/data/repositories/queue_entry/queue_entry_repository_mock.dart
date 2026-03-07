@@ -102,6 +102,7 @@ List<QueueEntry> mockQueueEntries = [
     joinedMethod: JoinedMethod.walkIn,
     orderId: mockOrders[0].id,
     tableNumber: 'T1',
+    expectedTableReadyAt: DateTime.now(),
   ),
   QueueEntry(
     restId: mockRestaurants[0].id,
@@ -114,6 +115,7 @@ List<QueueEntry> mockQueueEntries = [
     joinedMethod: JoinedMethod.remote,
     orderId: mockOrders[1].id,
     tableNumber: 'T5',
+    expectedTableReadyAt: DateTime.now(),
   ),
   QueueEntry(
     restId: mockRestaurants[0].id,
@@ -126,5 +128,6 @@ List<QueueEntry> mockQueueEntries = [
     joinedMethod: JoinedMethod.walkIn,
     orderId: "",
     tableNumber: 'T3',
+    expectedTableReadyAt: DateTime.now(),
   ),
 ];

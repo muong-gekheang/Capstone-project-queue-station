@@ -1,22 +1,17 @@
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 
 class RestaurantService {
-  Restaurant _restaurant;
-  List<QueueEntry> currentQueue = [];
+  final RestaurantRepository _restaurantRepository;
+  final UserProvider _userProvider;
 
-  RestaurantService({required Restaurant restaurant})
-    : _restaurant = restaurant {
-    currentQueue = _restaurant.currentInQueue;
-  }
+  RestaurantService({
+    required UserProvider userProvider,
+    required RestaurantRepository restaurantRepository,
+  }) : _restaurantRepository = restaurantRepository,
+       _userProvider = userProvider;
 
-  Restaurant get restaurant => _restaurant;
-
-  void addQueue(QueueEntry newQueue) {
-    currentQueue.add(newQueue);
-  }
-
-  void removeQueue(QueueEntry queue) {
-    currentQueue.remove(queue);
-  }
+  Stream<Restaurant?> get streamRestaurant =>
+      _restaurantRepository.watchCurrent(_userProvider.currentUser?.id ?? "");
 }
