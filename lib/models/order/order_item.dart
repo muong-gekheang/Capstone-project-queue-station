@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import '../restaurant/menu_item.dart';
+import '../restaurant/menu_item_category.dart';
 import '../restaurant/size_option.dart';
 
 part 'order_item.g.dart';
@@ -8,56 +10,65 @@ enum OrderItemStatus { pending, accepted, rejected, cancelled }
 
 @JsonSerializable(explicitToJson: true)
 class OrderItem {
-  final String menuItemId; // For Storing in the DB
-  final MenuItem item; // For using direct in memory
+  final String menuItemId;
+
   @JsonKey(fromJson: _addOnsFromJson, toJson: _addOnsToJson)
-  final Map<String, double> addOns; // AddOn ID and current price snapshot
-  final double menuItemPrice; // Menu Item price current snapshot
-  final SizeOption size; // We will use only the name
+  final Map<String, double> addOns;
+
+  final double menuItemPrice;
+  final String sizeName;
   final int quantity;
   final String? note;
   final OrderItemStatus orderItemStatus;
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final MenuItem item;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final SizeOption size;
+
   OrderItem({
-    required this.quantity,
-    this.note,
-    required this.item,
-    required this.addOns,
     required this.menuItemId,
     required this.menuItemPrice,
-    required this.size,
+    required this.quantity,
+    this.note,
     required this.orderItemStatus,
-  });
+    Map<String, double>? addOns,
+    String? sizeName,
+    MenuItem? item,
+    SizeOption? size,
+  }) : addOns = addOns ?? {},
+       sizeName = sizeName ?? size?.name ?? 'Regular',
+       item = item ?? _placeholderMenuItem(menuItemId),
+       size = size ?? SizeOption(name: sizeName ?? 'Regular');
 
   OrderItem copyWith({
     String? menuItemId,
-    MenuItem? item,
     Map<String, double>? addOns,
     double? menuItemPrice,
+    String? sizeName,
     SizeOption? size,
+    MenuItem? item,
     int? quantity,
     String? note,
     OrderItemStatus? orderItemStatus,
   }) {
     return OrderItem(
-      quantity: quantity ?? this.quantity,
-      item: item ?? this.item,
-      addOns: addOns != null ? Map.from(addOns) : Map.from(this.addOns),
       menuItemId: menuItemId ?? this.menuItemId,
       menuItemPrice: menuItemPrice ?? this.menuItemPrice,
-      size: size ?? this.size,
+      quantity: quantity ?? this.quantity,
       note: note ?? this.note,
       orderItemStatus: orderItemStatus ?? this.orderItemStatus,
+      addOns: addOns != null ? Map.from(addOns) : Map.from(this.addOns),
+      sizeName: sizeName ?? this.sizeName,
+      size: size ?? this.size,
+      item: item ?? this.item,
     );
   }
 
   double calculateTotalPrice() {
-    double totalPrice = menuItemPrice; // base price
-    totalPrice += addOns.values.fold(
-      0.0,
-      (sum, price) => sum + price,
-    ); // add-ons
-    totalPrice *= quantity; // quantity
+    double totalPrice = menuItemPrice;
+    totalPrice += addOns.values.fold(0.0, (sum, price) => sum + price);
+    totalPrice *= quantity;
     return totalPrice;
   }
 
@@ -73,4 +84,13 @@ Map<String, double> _addOnsFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _addOnsToJson(Map<String, double> addOns) {
   return addOns;
+}
+
+MenuItem _placeholderMenuItem(String menuItemId) {
+  return MenuItem(
+    id: menuItemId,
+    name: 'Unknown item',
+    description: '',
+    category: MenuItemCategory(id: 'unknown_category', name: 'Unknown'),
+  );
 }

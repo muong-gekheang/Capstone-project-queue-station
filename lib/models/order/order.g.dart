@@ -9,17 +9,19 @@ part of 'order.dart';
 Order _$OrderFromJson(Map<String, dynamic> json) => Order(
   id: json['id'] as String,
   timestamp: DateTime.parse(json['timestamp'] as String),
-  ordered: (json['ordered'] as List<dynamic>?)
-      ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  inCart: (json['inCart'] as List<dynamic>?)
-      ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  orderedIds:
+      (json['orderedIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [],
+  inCartIds:
+      (json['inCartIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      [],
 );
 
 Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
   'id': instance.id,
-  'ordered': instance.ordered.map((e) => e.toJson()).toList(),
-  'inCart': instance.inCart.map((e) => e.toJson()).toList(),
+  'orderedIds': instance.orderedIds,
+  'inCartIds': instance.inCartIds,
   'timestamp': instance.timestamp.toIso8601String(),
 };

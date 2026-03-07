@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+
 import '../order/order.dart';
 
 part 'queue_entry.g.dart';
@@ -19,9 +20,13 @@ class QueueEntry {
   final DateTime? servedTime;
   final DateTime? endedTime;
   final QueueStatus status;
-  final Order? order;
+  final String? orderId;
   final JoinedMethod joinedMethod;
-  final String? tableNumber; // Added missing field
+  final String? tableNumber;
+  final DateTime? expectedTableReadyAt;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final Order? order;
 
   int currentSpot(Restaurant rest) {
     return rest.getQueueSpot(this);
@@ -37,10 +42,12 @@ class QueueEntry {
     required this.status,
     required this.customerId,
     this.order,
+    String? orderId,
     required this.joinedMethod,
     this.tableNumber,
-    required this.restId, // Added to constructor
-  });
+    this.expectedTableReadyAt,
+    required this.restId,
+  }) : orderId = orderId ?? order?.id;
 
   Duration? get waitingTime {
     if (servedTime == null) return null;
@@ -79,8 +86,9 @@ class QueueEntry {
     DateTime? joinTime,
     DateTime? servedTime,
     DateTime? endedTime,
-    QueueStatus? status, // Using enum, not String
+    QueueStatus? status,
     Order? order,
+    String? orderId,
     JoinedMethod? joinedMethod,
     String? tableNumber,
   }) {
@@ -92,8 +100,9 @@ class QueueEntry {
       joinTime: joinTime ?? this.joinTime,
       servedTime: servedTime ?? this.servedTime,
       endedTime: endedTime ?? this.endedTime,
-      status: status ?? this.status, // Using enum
+      status: status ?? this.status,
       order: order ?? this.order,
+      orderId: orderId ?? this.orderId,
       joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,
       restId: restId ?? this.restId,

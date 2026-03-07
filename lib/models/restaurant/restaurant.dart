@@ -3,8 +3,8 @@ import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
-import 'queue_table.dart';
 import 'menu_item.dart';
+import 'queue_table.dart';
 
 part 'restaurant.g.dart';
 
@@ -17,10 +17,27 @@ class Restaurant {
   final String policy;
   final int biggestTableSize;
   final String phone;
+
+  @JsonKey(defaultValue: <String>[])
+  final List<String> itemIds;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> tableIds;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> globalAddOnIds;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> globalSizeOptionIds;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> currentInQueueIds;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<MenuItem> items;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<QueueTable> tables;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<AddOn> globalAddOns;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<SizeOption> globalSizeOptions;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<QueueEntry> currentInQueue;
 
   Restaurant({
@@ -28,33 +45,58 @@ class Restaurant {
     required this.name,
     required this.address,
     required this.logoLink,
-    this.policy = "",
+    this.policy = '',
     required this.biggestTableSize,
     required this.phone,
-    required this.items,
-    required this.tables,
-    required this.globalAddOns,
-    required this.globalSizeOptions,
+    List<String>? itemIds,
+    List<String>? tableIds,
+    List<String>? globalAddOnIds,
+    List<String>? globalSizeOptionIds,
+    List<String>? currentInQueueIds,
+    List<MenuItem>? items,
+    List<QueueTable>? tables,
+    List<AddOn>? globalAddOns,
+    List<SizeOption>? globalSizeOptions,
     List<QueueEntry>? currentInQueue,
-  }) : currentInQueue = currentInQueue ?? [];
+  }) : items = items ?? [],
+       tables = tables ?? [],
+       globalAddOns = globalAddOns ?? [],
+       globalSizeOptions = globalSizeOptions ?? [],
+       currentInQueue = currentInQueue ?? [],
+       itemIds = itemIds ?? (items ?? []).map((e) => e.id).toList(),
+       tableIds = tableIds ?? (tables ?? []).map((e) => e.id).toList(),
+       globalAddOnIds =
+           globalAddOnIds ?? (globalAddOns ?? []).map((e) => e.id).toList(),
+       globalSizeOptionIds =
+           globalSizeOptionIds ??
+           (globalSizeOptions ?? []).map((e) => e.name).toList(),
+       currentInQueueIds =
+           currentInQueueIds ??
+           (currentInQueue ?? []).map((e) => e.id).toList();
 
   void enqueue(QueueEntry queue) {
+    if (!currentInQueueIds.contains(queue.id)) {
+      currentInQueueIds.add(queue.id);
+    }
     if (!currentInQueue.contains(queue)) {
       currentInQueue.add(queue);
     }
   }
 
   void dequeue(QueueEntry queue) {
+    currentInQueueIds.remove(queue.id);
     currentInQueue.remove(queue);
   }
 
   int getQueueSpot(QueueEntry queue) {
-    return currentInQueue.indexOf(queue) + 1; // BC it counts from 0
+    final idx = currentInQueueIds.indexOf(queue.id);
+    if (idx != -1) return idx + 1;
+    return currentInQueue.indexOf(queue) + 1; // fallback for in-memory only flow
   }
 
-  Duration get averageWaitingTime => Duration(hours: 1);
+  Duration get averageWaitingTime => const Duration(hours: 1);
 
-  int get curWait => currentInQueue.length;
+  int get curWait => currentInQueueIds.length;
 
   @override
   bool operator ==(Object other) {

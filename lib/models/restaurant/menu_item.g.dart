@@ -13,13 +13,15 @@ MenuItem _$MenuItemFromJson(Map<String, dynamic> json) => MenuItem(
   description: json['description'] as String,
   minPrepTimeMinutes: (json['minPrepTimeMinutes'] as num?)?.toInt(),
   maxPrepTimeMinutes: (json['maxPrepTimeMinutes'] as num?)?.toInt(),
-  category: MenuItemCategory.fromJson(json['category'] as Map<String, dynamic>),
-  sizes: (json['sizes'] as List<dynamic>?)
-      ?.map((e) => MenuSize.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  addOns: (json['addOns'] as List<dynamic>?)
-      ?.map((e) => AddOn.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  categoryId: json['categoryId'] as String?,
+  sizeOptionIds:
+      (json['sizeOptionIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [],
+  addOnIds:
+      (json['addOnIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      [],
   isAvailable: json['isAvailable'] as bool? ?? true,
 );
 
@@ -30,8 +32,8 @@ Map<String, dynamic> _$MenuItemToJson(MenuItem instance) => <String, dynamic>{
   'description': instance.description,
   'minPrepTimeMinutes': instance.minPrepTimeMinutes,
   'maxPrepTimeMinutes': instance.maxPrepTimeMinutes,
-  'category': instance.category.toJson(),
-  'sizes': instance.sizes.map((e) => e.toJson()).toList(),
-  'addOns': instance.addOns.map((e) => e.toJson()).toList(),
+  'categoryId': instance.categoryId,
+  'sizeOptionIds': instance.sizeOptionIds,
+  'addOnIds': instance.addOnIds,
   'isAvailable': instance.isAvailable,
 };

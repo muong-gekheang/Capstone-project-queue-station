@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import 'order_item.dart';
 
 part 'order.g.dart';
@@ -6,20 +7,35 @@ part 'order.g.dart';
 @JsonSerializable(explicitToJson: true)
 class Order {
   final String id;
-  final List<OrderItem> ordered;
-  final List<OrderItem> inCart;
+
+  @JsonKey(defaultValue: <String>[])
+  final List<String> orderedIds;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> inCartIds;
+
   final DateTime timestamp;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final List<OrderItem> ordered;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final List<OrderItem> inCart;
 
   Order({
     required this.id,
     required this.timestamp,
+    List<String>? orderedIds,
+    List<String>? inCartIds,
     List<OrderItem>? ordered,
     List<OrderItem>? inCart,
   }) : ordered = ordered ?? [],
-       inCart = inCart ?? [];
+       inCart = inCart ?? [],
+       orderedIds = orderedIds ?? (ordered ?? []).map(_orderItemRef).toList(),
+       inCartIds = inCartIds ?? (inCart ?? []).map(_orderItemRef).toList();
 
   Order copyWith({
     String? id,
+    List<String>? orderedIds,
+    List<String>? inCartIds,
     List<OrderItem>? ordered,
     List<OrderItem>? inCart,
     DateTime? timestamp,
@@ -27,14 +43,16 @@ class Order {
     return Order(
       id: id ?? this.id,
       timestamp: timestamp ?? this.timestamp,
-      ordered: ordered != null ? List.from(ordered) : List.from(this.ordered),
-      inCart: inCart != null ? List.from(inCart) : List.from(this.inCart),
+      orderedIds: orderedIds ?? List<String>.from(this.orderedIds),
+      inCartIds: inCartIds ?? List<String>.from(this.inCartIds),
+      ordered: ordered ?? List<OrderItem>.from(this.ordered),
+      inCart: inCart ?? List<OrderItem>.from(this.inCart),
     );
   }
 
   double calculateTotalPrice() {
     double totalPrice = 0;
-    for (OrderItem orderItem in ordered) {
+    for (final orderItem in ordered) {
       if (orderItem.orderItemStatus == OrderItemStatus.accepted) {
         totalPrice += orderItem.calculateTotalPrice();
       }
@@ -46,3 +64,6 @@ class Order {
 
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 }
+
+String _orderItemRef(OrderItem item) =>
+    '${item.menuItemId}_${item.sizeName}_${item.quantity}';

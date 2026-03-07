@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
+
 import 'add_on.dart';
 import 'menu_item_category.dart';
 
@@ -13,9 +14,20 @@ class MenuItem {
   final String description;
   final int? minPrepTimeMinutes;
   final int? maxPrepTimeMinutes;
+  final String categoryId;
+
+  @JsonKey(defaultValue: <String>[])
+  final List<String> sizeOptionIds;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> addOnIds;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final MenuItemCategory category;
-  final List<MenuSize> sizes; // Sizes handles the pricing
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final List<MenuSize> sizes;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<AddOn> addOns;
+
   bool isAvailable;
 
   MenuItem({
@@ -25,12 +37,26 @@ class MenuItem {
     required this.description,
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
-    required this.category,
+    String? categoryId,
+    MenuItemCategory? category,
+    List<String>? sizeOptionIds,
+    List<String>? addOnIds,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
     this.isAvailable = true,
-  }) : sizes = sizes ?? [],
-       addOns = addOns ?? [];
+  }) : categoryId = categoryId ?? category?.id ?? 'unknown_category',
+       category =
+           category ??
+           MenuItemCategory(
+             id: categoryId ?? 'unknown_category',
+             name: 'Unknown',
+           ),
+       sizes = sizes ?? [],
+       addOns = addOns ?? [],
+       sizeOptionIds =
+           sizeOptionIds ??
+           (sizes ?? []).map((s) => s.sizeOption.name).toList(),
+       addOnIds = addOnIds ?? (addOns ?? []).map((a) => a.id).toList();
 
   MenuItem copyWith({
     String? id,
@@ -39,7 +65,10 @@ class MenuItem {
     String? description,
     int? minPrepTimeMinutes,
     int? maxPrepTimeMinutes,
+    String? categoryId,
     MenuItemCategory? category,
+    List<String>? sizeOptionIds,
+    List<String>? addOnIds,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
     bool? isAvailable,
@@ -51,7 +80,10 @@ class MenuItem {
       description: description ?? this.description,
       minPrepTimeMinutes: minPrepTimeMinutes ?? this.minPrepTimeMinutes,
       maxPrepTimeMinutes: maxPrepTimeMinutes ?? this.maxPrepTimeMinutes,
+      categoryId: categoryId ?? this.categoryId,
       category: category ?? this.category,
+      sizeOptionIds: sizeOptionIds ?? List<String>.from(this.sizeOptionIds),
+      addOnIds: addOnIds ?? List<String>.from(this.addOnIds),
       sizes: sizes ?? List<MenuSize>.from(this.sizes),
       addOns: addOns ?? List<AddOn>.from(this.addOns),
       isAvailable: isAvailable ?? this.isAvailable,

@@ -9,11 +9,13 @@ var uuid = Uuid();
 class TableCategory {
   final String id;
   final String type;
+  final int minSeat;
   final int seatAmount;
 
   TableCategory({
     @JsonKey(name: 'id') String? categoryId,
     required this.type,
+    required this.minSeat,
     required this.seatAmount,
   }) : id = categoryId ?? uuid.v4();
 

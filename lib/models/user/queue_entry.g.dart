@@ -19,11 +19,12 @@ QueueEntry _$QueueEntryFromJson(Map<String, dynamic> json) => QueueEntry(
       : DateTime.parse(json['endedTime'] as String),
   status: $enumDecode(_$QueueStatusEnumMap, json['status']),
   customerId: json['customerId'] as String,
-  order: json['order'] == null
-      ? null
-      : Order.fromJson(json['order'] as Map<String, dynamic>),
+  orderId: json['orderId'] as String?,
   joinedMethod: $enumDecode(_$JoinedMethodEnumMap, json['joinedMethod']),
   tableNumber: json['tableNumber'] as String?,
+  expectedTableReadyAt: json['expectedTableReadyAt'] == null
+      ? null
+      : DateTime.parse(json['expectedTableReadyAt'] as String),
   restId: json['restId'] as String,
 );
 
@@ -38,9 +39,10 @@ Map<String, dynamic> _$QueueEntryToJson(QueueEntry instance) =>
       'servedTime': instance.servedTime?.toIso8601String(),
       'endedTime': instance.endedTime?.toIso8601String(),
       'status': _$QueueStatusEnumMap[instance.status]!,
-      'order': instance.order?.toJson(),
+      'orderId': instance.orderId,
       'joinedMethod': _$JoinedMethodEnumMap[instance.joinedMethod]!,
       'tableNumber': instance.tableNumber,
+      'expectedTableReadyAt': instance.expectedTableReadyAt?.toIso8601String(),
     };
 
 const _$QueueStatusEnumMap = {

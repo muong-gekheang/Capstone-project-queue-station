@@ -7,25 +7,23 @@ part of 'order_item.dart';
 // **************************************************************************
 
 OrderItem _$OrderItemFromJson(Map<String, dynamic> json) => OrderItem(
-  quantity: (json['quantity'] as num).toInt(),
-  note: json['note'] as String?,
-  item: MenuItem.fromJson(json['item'] as Map<String, dynamic>),
-  addOns: _addOnsFromJson(json['addOns'] as Map<String, dynamic>),
   menuItemId: json['menuItemId'] as String,
   menuItemPrice: (json['menuItemPrice'] as num).toDouble(),
-  size: SizeOption.fromJson(json['size'] as Map<String, dynamic>),
+  quantity: (json['quantity'] as num).toInt(),
+  note: json['note'] as String?,
   orderItemStatus: $enumDecode(
     _$OrderItemStatusEnumMap,
     json['orderItemStatus'],
   ),
+  addOns: _addOnsFromJson(json['addOns'] as Map<String, dynamic>),
+  sizeName: json['sizeName'] as String?,
 );
 
 Map<String, dynamic> _$OrderItemToJson(OrderItem instance) => <String, dynamic>{
   'menuItemId': instance.menuItemId,
-  'item': instance.item.toJson(),
   'addOns': _addOnsToJson(instance.addOns),
   'menuItemPrice': instance.menuItemPrice,
-  'size': instance.size.toJson(),
+  'sizeName': instance.sizeName,
   'quantity': instance.quantity,
   'note': instance.note,
   'orderItemStatus': _$OrderItemStatusEnumMap[instance.orderItemStatus]!,

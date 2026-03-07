@@ -8,14 +8,19 @@ part 'store_user.g.dart';
 class StoreUser extends User {
   @JsonKey(includeFromJson: false, includeToJson: true)
   final String userType = 'store';
-  final Restaurant rest;
+
+  final String restaurantId;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final Restaurant? rest;
+
   StoreUser({
     required super.name,
     required super.email,
     required super.phone,
     required super.id,
-    required this.rest,
-  });
+    String? restaurantId,
+    this.rest,
+  }) : restaurantId = restaurantId ?? rest?.id ?? '';
 
   factory StoreUser.fromJson(Map<String, dynamic> json) =>
       _$StoreUserFromJson(json);
