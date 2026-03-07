@@ -2,18 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
-import 'package:uuid/uuid.dart';
 
 class JoinQueueScreen extends StatefulWidget {
   const JoinQueueScreen({super.key, required this.rest});
