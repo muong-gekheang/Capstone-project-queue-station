@@ -50,10 +50,10 @@ class QueueService {
       // Update table status
       final table = await _repository.getTableByNumber(tableNumber);
       if (table != null) {
+        final updatedQueueIds = [...table.queueEntryIds, queueEntryId];
         final updatedTable = table.copyWith(
           tableStatus: TableStatus.occupied,
-          currentQueueEntryId: queueEntryId,
-          occupiedSince: DateTime.now(),
+          queueEntryIds: updatedQueueIds,
         );
         await _repository.updateTable(updatedTable);
       }
@@ -85,8 +85,7 @@ class QueueService {
     if (table != null) {
       final updatedTable = table.copyWith(
         tableStatus: TableStatus.available,
-        currentQueueEntryId: null,
-        occupiedSince: null,
+        queueEntryIds: [],
       );
       await _repository.updateTable(updatedTable);
     }

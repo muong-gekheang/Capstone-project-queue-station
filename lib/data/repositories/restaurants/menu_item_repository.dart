@@ -8,16 +8,22 @@ abstract class MenuItemRepository {
   Future<MenuItem?> getMenuItemById(String menuItemId);
   Future<(List<MenuItem>, DocumentSnapshot<Map<String, dynamic>>?)>
   getSearchMenuItems(
+    String restaurantId,
     String query,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
   Future<(List<MenuItem>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
+    String restaurantId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
-  Future<void> deleteMany(List<String> ids);
-  Future<List<MenuItem>> getManyMenuItemsById(List<String> ids);
-  Stream<MenuItem> watchCurrentMenuItem();
-  Stream<List<MenuItem>> watchAllMenuItem();
+  Future<(List<MenuItem>, DocumentSnapshot<Map<String, dynamic>>?)> getMenuItemByCategoryId(
+    String restaurantId,
+    String categoryId,
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  );
+  Stream<MenuItem> watchCurrentMenuItem(String menuItemId);
+  Stream<List<MenuItem>> watchAllMenuItem(String restaurantId);
 }

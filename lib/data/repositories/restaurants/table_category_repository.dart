@@ -8,16 +8,18 @@ abstract class TableCategoryRepository {
   Future<TableCategory?> getTableCategoryById(String categoryId);
   Future<(List<TableCategory>, DocumentSnapshot<Map<String, dynamic>>?)>
   getSearchCategories(
+    String restaurantId,
     String query,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
   Future<(List<TableCategory>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
+    String restaurantId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
   Future<void> deleteMany(List<String> ids);
   Future<List<TableCategory>> getManyTableCategoriesById(List<String> ids);
-  Stream<TableCategory> watchCurrentCategory();
-  Stream<List<TableCategory>> watchAllCategory();
+  Stream<TableCategory> watchCurrentCategory(String categoryId);
+  Stream<List<TableCategory>> watchAllCategory(String restaurantId);
 }

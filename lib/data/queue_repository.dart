@@ -17,8 +17,6 @@ class QueueRepository {
   }
 
   void _initializeSampleData() {
-    final now = DateTime.now();
-
     // Queue entries
     final queueEntries = [
       QueueEntry(
@@ -128,7 +126,11 @@ class QueueRepository {
     }
 
     // Create standard table category
-    final standardCategory = TableCategory(type: 'Standard', seatAmount: 4);
+    final standardCategory = TableCategory(
+      type: 'Standard',
+      minSeat: 1,
+      seatAmount: 4,
+    );
 
     // Tables - Using QueueTable consistently
     final tables = [
@@ -136,71 +138,61 @@ class QueueRepository {
         tableNum: '1',
         tableStatus: TableStatus.available,
         tableCategory: standardCategory,
-        currentQueueEntryId: null,
-        occupiedSince: null,
+        queueEntryIds: [],
       ),
       QueueTable(
         tableNum: '2',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: '102',
-        occupiedSince: now.subtract(const Duration(minutes: 15)),
+        queueEntryIds: ['102'],
       ),
       QueueTable(
         tableNum: '3',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: '103',
-        occupiedSince: now.subtract(const Duration(minutes: 12)),
+        queueEntryIds: ['103'],
       ),
       QueueTable(
         tableNum: '4',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: '104',
-        occupiedSince: now.subtract(const Duration(minutes: 10)),
+        queueEntryIds: ['104'],
       ),
       QueueTable(
         tableNum: '5',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: '105',
-        occupiedSince: now.subtract(const Duration(minutes: 8)),
+        queueEntryIds: ['105'],
       ),
       QueueTable(
         tableNum: '6',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: '106',
-        occupiedSince: now.subtract(const Duration(minutes: 5)),
+        queueEntryIds: ['106'],
       ),
       QueueTable(
         tableNum: '7',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: '107',
-        occupiedSince: now.subtract(const Duration(minutes: 3)),
+        queueEntryIds: ['107'],
       ),
       QueueTable(
         tableNum: '8',
         tableStatus: TableStatus.available,
         tableCategory: standardCategory,
-        currentQueueEntryId: null,
-        occupiedSince: null,
+        queueEntryIds: [],
       ),
       QueueTable(
         tableNum: '9',
         tableStatus: TableStatus.available,
         tableCategory: standardCategory,
-        currentQueueEntryId: null,
-        occupiedSince: null,
+        queueEntryIds: [],
       ),
       QueueTable(
         tableNum: '10',
         tableStatus: TableStatus.occupied,
         tableCategory: standardCategory,
-        currentQueueEntryId: null,
-        occupiedSince: now.subtract(const Duration(minutes: 25)),
+        queueEntryIds: [],
       ),
     ];
 
@@ -245,11 +237,13 @@ class QueueRepository {
     _queueEntriesById.remove(id);
     // Also remove references from tables
     for (var table in _tablesByNumber.values) {
-      if (table.currentQueueEntryId == id) {
+      if (table.queueEntryIds.contains(id)) {
+        final updatedQueueIds = [...table.queueEntryIds]..remove(id);
         final updatedTable = table.copyWith(
-          tableStatus: TableStatus.available,
-          currentQueueEntryId: null,
-          occupiedSince: null,
+          tableStatus: updatedQueueIds.isEmpty
+              ? TableStatus.available
+              : TableStatus.occupied,
+          queueEntryIds: updatedQueueIds,
         );
         _tablesByNumber[updatedTable.tableNum] = updatedTable;
       }

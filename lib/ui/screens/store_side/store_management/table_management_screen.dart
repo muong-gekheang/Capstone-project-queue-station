@@ -51,7 +51,11 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       categoryNames = tableCategories.map((c) => c.type).toList();
     } else {
       // Create default category if none exists
-      final defaultCategory = TableCategory(type: 'Standard', seatAmount: 4);
+      final defaultCategory = TableCategory(
+        type: 'Standard',
+        minSeat: 1,
+        seatAmount: 4,
+      );
       tableCategories = [defaultCategory];
       currentCategoryTable = defaultCategory;
       categoryNames = [defaultCategory.type];
@@ -205,8 +209,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         tableNum: tableNum,
         tableStatus: TableStatus.available,
         tableCategory: categoryObj,
-        currentQueueEntryId: null,
-        occupiedSince: null,
+        queueEntryIds: [],
       );
       allTables.add(newTable);
       _applyFilters();
@@ -253,12 +256,9 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       if (index != -1) {
         allTables[index] = allTables[index].copyWith(
           tableStatus: newStatus,
-          currentQueueEntryId: newStatus == TableStatus.occupied
-              ? allTables[index].currentQueueEntryId
-              : null,
-          occupiedSince: newStatus == TableStatus.occupied
-              ? DateTime.now()
-              : null,
+          queueEntryIds: newStatus == TableStatus.occupied
+              ? allTables[index].queueEntryIds
+              : [],
         );
         _applyFilters();
         _showSnackBar("Table $tableNum is ${newStatus.name}");
@@ -285,6 +285,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     setState(() {
       final newCategory = TableCategory(
         type: categoryName,
+        minSeat: 1,
         seatAmount: amountOfSeat,
       );
       tableCategories.add(newCategory);
@@ -307,6 +308,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         final updatedCategory = TableCategory(
           categoryId: tableCategories[index].id,
           type: newCategoryName,
+          minSeat: tableCategories[index].minSeat,
           seatAmount: amountOfSeat,
         );
 
@@ -345,7 +347,11 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         _applyFilters();
       } else {
         // Create default category if all are deleted
-        final defaultCategory = TableCategory(type: 'Standard', seatAmount: 4);
+        final defaultCategory = TableCategory(
+          type: 'Standard',
+          minSeat: 1,
+          seatAmount: 4,
+        );
         tableCategories = [defaultCategory];
         currentCategoryTable = defaultCategory;
         categoryNames = [defaultCategory.type];

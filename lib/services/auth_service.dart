@@ -23,7 +23,7 @@ class AuthService {
         email: email,
         phone: phoneNumber,
         id: uuid.v4(),
-        histories: [],
+        historyIds: [],
       ),
     );
     return true;

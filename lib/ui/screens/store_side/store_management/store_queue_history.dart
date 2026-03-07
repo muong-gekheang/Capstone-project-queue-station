@@ -38,7 +38,9 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
     List<QueueEntry> filteredHistories = [];
     for (var user in allUsers) {
       if (user is Customer) {
-        for (var history in user.histories) {
+        for (final historyId in user.historyIds) {
+          final history = getHistoryById(historyId);
+          if (history == null) continue;
           if (history.restId == restaurant.id) {
             filteredHistories.add(history);
           }

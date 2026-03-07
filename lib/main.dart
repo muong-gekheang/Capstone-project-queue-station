@@ -6,7 +6,9 @@ import 'package:queue_station_app/firebase_options.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
+import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
@@ -27,7 +29,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  await seedDatabase(clearExisting: true); 
   final GoRouter goRouter = GoRouter(
     routes: <RouteBase>[
       GoRoute(
@@ -78,17 +80,19 @@ void main() async {
             redirect: (context, state) {
               Customer? user = context.read<UserProvider>().asCustomer;
               bool isLoggedIn = user != null;
+              final currentHistory = getHistoryById(user?.currentHistoryId);
 
               if (!isLoggedIn) return "/login";
-              if (user.currentHistory == null) return "/";
+              if (currentHistory == null) return "/";
               return null;
             },
             builder: (context, state) {
               UserProvider userProvider = context.read<UserProvider>();
               Customer? user = userProvider.asCustomer;
+              final currentHistory = getHistoryById(user?.currentHistoryId);
               return ConfirmTicketScreen(
                 user: user!,
-                queueEntry: user.currentHistory!,
+                queueEntry: currentHistory!,
               );
             },
           ),

@@ -123,6 +123,12 @@ final List<QueueEntry> mockHistories = [
   history4,
   history5,
 ];
+final Map<String, QueueEntry> mockHistoriesById = {
+  for (final history in mockHistories) history.id: history,
+};
+
+QueueEntry? getHistoryById(String? id) =>
+    id == null ? null : mockHistoriesById[id];
 
 // Example Users
 final user1 = Customer(
@@ -130,15 +136,16 @@ final user1 = Customer(
   name: "Alice",
   email: "alice@example.com",
   phone: "1234567890",
-  histories: [
-    history1,
-    history2,
-    history3,
-    history3,
-    history3,
-    history3,
-    history3,
+  historyIds: [
+    history1.id,
+    history2.id,
+    history3.id,
+    history3.id,
+    history3.id,
+    history3.id,
+    history3.id,
   ],
+  currentHistoryId: history2.id,
 );
 
 final user2 = StoreUser(

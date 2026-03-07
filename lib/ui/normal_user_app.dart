@@ -39,7 +39,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
         selectedTab = tab;
       });
     } else if (tab == NormalUserNavTab.ticket) {
-      if (user != null && user.currentHistory != null) {
+      if (user != null && user.currentHistoryId != null) {
         context.go("/ticket");
       } else {
         await showDialog(
@@ -60,7 +60,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
         );
       }
     } else if (tab == NormalUserNavTab.foodOrdering) {
-      if (user != null && user.currentHistory != null) {
+      if (user != null && user.currentHistoryId != null) {
         if (!_hasSeenFoodInstruction) {
           setState(() {
             selectedTab = NormalUserNavTab.foodOrdering;

@@ -16,8 +16,13 @@ abstract class AddOnRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
+  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getAddOnsByMenuItemId(
+    String menuItemId,
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  );
   Future<void> deleteMany(List<String> ids);
-  Future<List<AddOn>> getManyAddOnsById(List<String> ids);
-  Stream<AddOn> watchCurrentAddOn();
+  Stream<AddOn> watchCurrentAddOn(String addOnId);
   Stream<List<AddOn>> watchAllAddOn();
 }

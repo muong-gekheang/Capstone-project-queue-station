@@ -1,18 +1,20 @@
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
-import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 
-class CustomerRepositoryImpl implements UserRepository {
-  final FirebaseFirestore fireStore = FirebaseFirestore.instance;
+class CustomerRepositoryImpl implements UserRepository<Customer> {
+  final FirebaseFirestore fireStore;
 
-  Future<User?> _buildCustomerFromDoc(
+  CustomerRepositoryImpl({FirebaseFirestore? fireStore})
+    : fireStore = fireStore ?? FirebaseFirestore.instance;
+
+  Future<Customer?> _buildCustomerFromDoc(
     DocumentSnapshot<Map<String, dynamic>> docSnap,
   ) async {
     if (!docSnap.exists) return null;
 
     final data = docSnap.data();
-    final type = data?['type'] ?? data?['userType'];
+    final type = data?['userType'];
     if (data == null || type != 'customer') return null;
 
     final customerJson = <String, dynamic>{
@@ -20,8 +22,7 @@ class CustomerRepositoryImpl implements UserRepository {
       'name': data['name'],
       'email': data['email'],
       'phone': data['phone'],
-      'histories': <Map<String, dynamic>>[],
-      'currentHistory': null,
+      'historyIds': List<String>.from(data['historyIds'] ?? <String>[]),
       'currentHistoryId': data['currentHistoryId'],
     };
 
@@ -29,7 +30,7 @@ class CustomerRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<User> create(User user) async {
+  Future<Customer> create(Customer user) async {
     final userRef = fireStore.collection('users').doc(user.id);
     final userJson = Map<String, dynamic>.from(user.toJson());
 
@@ -39,13 +40,11 @@ class CustomerRepositoryImpl implements UserRepository {
     }
 
     // Histories are handled by history repository.
-    if (user is Customer &&
-        userJson['currentHistoryId'] == null &&
-        user.currentHistory != null) {
-      userJson['currentHistoryId'] = user.currentHistory!.id;
+    if (userJson['currentHistoryId'] == null) {
+      userJson['currentHistoryId'] = user.currentHistoryId;
     }
-    userJson.remove('histories');
-    userJson.remove('currentHistory');
+    userJson.remove('histories'); // Legacy key cleanup.
+    userJson.remove('currentHistory'); // Legacy key cleanup.
 
     await userRef.set(userJson);
 
@@ -54,24 +53,11 @@ class CustomerRepositoryImpl implements UserRepository {
 
   @override
   Future<void> delete(String id) async {
-    final userRef = fireStore.collection('users').doc(id);
-
-    while (true) {
-      final historiesSnap = await userRef.collection('histories').limit(500).get();
-      if (historiesSnap.docs.isEmpty) break;
-
-      final batch = fireStore.batch();
-      for (final doc in historiesSnap.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-    }
-
-    await userRef.delete();
+    await fireStore.collection('users').doc(id).delete();
   }
 
   @override
-  Future<List<User>> getAll({int? limit, String? search}) async {
+  Future<List<Customer>> getAll({int? limit, String? search}) async {
     Query<Map<String, dynamic>> query = fireStore.collection('users');
     if (limit != null && limit > 0) {
       query = query.limit(limit);
@@ -80,7 +66,7 @@ class CustomerRepositoryImpl implements UserRepository {
     final snap = await query.get();
     final normalizedSearch = search?.trim().toLowerCase();
 
-    final users = <User>[];
+    final users = <Customer>[];
     for (final doc in snap.docs) {
       if (normalizedSearch != null && normalizedSearch.isNotEmpty) {
         final data = doc.data();
@@ -88,7 +74,8 @@ class CustomerRepositoryImpl implements UserRepository {
         final email = (data['email'] as String? ?? '').toLowerCase();
         final phone = (data['phone'] as String? ?? '').toLowerCase();
 
-        final matches = name.contains(normalizedSearch) ||
+        final matches =
+            name.contains(normalizedSearch) ||
             email.contains(normalizedSearch) ||
             phone.contains(normalizedSearch);
         if (!matches) continue;
@@ -104,7 +91,7 @@ class CustomerRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<User?> getByEmail(String email) async {
+  Future<Customer?> getByEmail(String email) async {
     final snap = await fireStore
         .collection('users')
         .where('email', isEqualTo: email)
@@ -116,19 +103,13 @@ class CustomerRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<User?> getCurrentUser() {
-    // TODO: implement getCurrentUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<User?> getUserById(String id) async {
+  Future<Customer?> getUserById(String id) async {
     final docSnap = await fireStore.collection('users').doc(id).get();
     return _buildCustomerFromDoc(docSnap);
   }
 
   @override
-  Future<User> update(User user) async {
+  Future<Customer> update(Customer user) async {
     final userRef = fireStore.collection('users').doc(user.id);
     final userJson = Map<String, dynamic>.from(user.toJson());
 
@@ -137,27 +118,18 @@ class CustomerRepositoryImpl implements UserRepository {
       userJson['type'] = type;
     }
 
-    if (user is Customer &&
-        userJson['currentHistoryId'] == null &&
-        user.currentHistory != null) {
-      userJson['currentHistoryId'] = user.currentHistory!.id;
+    if (userJson['currentHistoryId'] == null) {
+      userJson['currentHistoryId'] = user.currentHistoryId;
     }
-    userJson.remove('histories');
-    userJson.remove('currentHistory');
+    userJson.remove('histories'); // Legacy key cleanup.
+    userJson.remove('currentHistory'); // Legacy key cleanup.
 
-    await userRef.set(userJson, SetOptions(merge: true));
-
+    await userRef.update(userJson);
     return user;
   }
 
   @override
-  Stream<User?> watchCurrentUser() {
-    // TODO: implement watchCurrentUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<User?> getByPhoneNumber(String phoneNumber) async {
+  Future<Customer?> getByPhoneNumber(String phoneNumber) async {
     final snap = await fireStore
         .collection('users')
         .where('phone', isEqualTo: phoneNumber)
