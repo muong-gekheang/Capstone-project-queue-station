@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/services/store/analytics_service.dart';
 import 'dart:async'; // For Timer
-import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/analytic/order_summary.dart';
 
 class AnalyticsViewModel extends ChangeNotifier {
-  final QueueRepository _repository;
-  final QueueService _queueService;
+  final AnalyticsService _analyticsService;
   Timer? _refreshTimer;
 
-  AnalyticsViewModel({
-    required QueueRepository repository,
-    required QueueService queueService,
-  }) : _repository = repository,
-       _queueService = queueService {
+  AnalyticsViewModel({required AnalyticsService analyticsService})
+    : _analyticsService = analyticsService {
     loadAllData();
     _startPeriodicRefresh();
   }
@@ -57,7 +53,6 @@ class AnalyticsViewModel extends ChangeNotifier {
     }
 
     try {
-      // PRO TIP: Run all requests in parallel to save time
       final results = await Future.wait([
         _queueService.getDashboardStats(),
         _repository.getTotalOrdersCount(),

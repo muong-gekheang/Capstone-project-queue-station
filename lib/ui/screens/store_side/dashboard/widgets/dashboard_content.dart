@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/queue_repository.dart';
-import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/dashboard_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';

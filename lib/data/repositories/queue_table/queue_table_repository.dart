@@ -16,12 +16,13 @@ abstract class QueueTableRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
-  Future<(List<QueueTable>, DocumentSnapshot<Map<String, dynamic>>?)> getAllByRestaurantId(
+  Future<(List<QueueTable>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getAllByRestaurantId(
     String restaurantId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
   Future<void> deleteMany(List<String> ids);
   Stream<QueueTable> watchCurrentQueueTable();
-  Stream<List<QueueTable>> watchAllQueueTable();
+  Stream<List<QueueTable>> watchAllQueueTable(String restId);
 }

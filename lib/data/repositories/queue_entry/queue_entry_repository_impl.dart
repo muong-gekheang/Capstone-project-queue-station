@@ -4,6 +4,8 @@ import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueEntryRepositoryImpl implements QueueEntryRepository {
   final FirebaseFirestore fireStore;
+  List<QueueEntry> todayFinishedQueue = [];
+  DateTime? retrievedAt;
 
   QueueEntryRepositoryImpl({FirebaseFirestore? fireStore})
     : fireStore = fireStore ?? FirebaseFirestore.instance;
@@ -163,6 +165,15 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   ) async {
+    if (todayFinishedQueue.isNotEmpty) {
+      return (todayFinishedQueue, null);
+    }
+
+    if (retrievedAt != null &&
+        retrievedAt!.difference(DateTime.now()) > Duration(minutes: 60)) {
+      return (todayFinishedQueue, null);
+    }
+
     final now = DateTime.now();
     final startOfToday = DateTime(now.year, now.month, now.day);
 
@@ -192,6 +203,8 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     }).toList();
 
     final nextCursor = snap.docs.isEmpty ? null : snap.docs.last;
+    todayFinishedQueue = queueEntries;
+    retrievedAt = DateTime.now();
     return (queueEntries, nextCursor);
   }
 

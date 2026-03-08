@@ -3,16 +3,19 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
-import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/user/user_repository.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
+import 'package:queue_station_app/services/store/store_profile_service.dart';
+import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
-import 'screens/store_side/store_management/manage_store/manage_store_screen.dart';
 import '../ui/widgets/store_side_bottom_nav.dart';
+import 'screens/store_side/store_management/manage_store/manage_store_screen.dart';
 
 enum NavTab { dashboard, analytics, queue, settings }
 
@@ -28,7 +31,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
   List<Widget> get _screens => [
     DashboardScreen(),
-    ManageStorePage(),
+    ManageStoreScreen(),
     StoreQueueScreen(),
     StoreSettingsScreen(),
   ];
@@ -56,7 +59,10 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   Widget build(BuildContext context) {
     RestaurantRepository restaurantRepository = context
         .read<RestaurantRepository>();
-    UserProvider userProvider = context.read<UserProvider>();
+
+    UserRepository<StoreUser> userRepository = context
+        .read<UserRepository<StoreUser>>();
+
     QueueEntryRepository queueEntryRepository = context
         .read<QueueEntryRepository>();
 
@@ -64,19 +70,39 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         .read<QueueTableRepository>();
     return MultiProvider(
       providers: [
-        Provider<RestaurantService>(
-          create: (_) => RestaurantService(
+        ProxyProvider<UserProvider, RestaurantService>(
+          update: (context, userProvider, restaurantService) {
+            return RestaurantService(
+              userProvider: userProvider,
+              restaurantRepository: restaurantRepository,
+            );
+          },
+          dispose: (context, value) => value.dispose(),
+        ),
+
+        ProxyProvider<UserProvider, QueueService>(
+          update: (context, userProvider, queueService) => QueueService(
             userProvider: userProvider,
-            restaurantRepository: restaurantRepository,
             queueEntryRepository: queueEntryRepository,
+          ),
+          dispose: (context, value) => value.dispose(),
+        ),
+
+        ProxyProvider<UserProvider, StoreProfileService>(
+          update: (context, userProvider, restaurantService) {
+            return StoreProfileService(
+              userProvider: userProvider,
+              userRepository: userRepository,
+            );
+          },
+        ),
+
+        ProxyProvider<UserProvider, TableService>(
+          update: (context, userProvider, queueService) => TableService(
+            userProvider: userProvider,
             queueTableRepository: queueTableRepository,
           ),
-        ),
-        Provider<QueueService>(
-          create: (_) => QueueService(
-            userProvider: userProvider,
-            queueEntryRepository: queueEntryRepository,
-          ),
+          dispose: (context, value) => value.dispose(),
         ),
       ],
       child: Scaffold(

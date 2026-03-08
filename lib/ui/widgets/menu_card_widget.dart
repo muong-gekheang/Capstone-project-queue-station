@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
 import 'package:queue_station_app/ui/widgets/delete-menu-pop-up.dart';
 

@@ -10,6 +10,8 @@ class QueueViewModel extends ChangeNotifier {
   final RestaurantService _restaurantService;
   final QueueService _queueService;
 
+  bool _isDisposed = false;
+
   Restaurant? _currentRestaurant;
   List<QueueEntry> _currentQueue = [];
   bool _isLoading = true;
@@ -31,7 +33,8 @@ class QueueViewModel extends ChangeNotifier {
   }
 
   void init() async {
-    _avgWaitTime = await _restaurantService.avgWaitingTime;
+    _avgWaitTime = await _queueService.avgWaitingTime;
+    if (!_isDisposed) notifyListeners();
   }
 
   void _subscribeToRestaurant() {
@@ -52,11 +55,13 @@ class QueueViewModel extends ChangeNotifier {
   void _subscribeToQueueEntries() {
     _queueEntriesSubscription = _queueService.streamQueueEntries.listen(
       (queueEntries) {
+        if (_isDisposed) return;
         _currentQueue = queueEntries;
         _isLoading = false;
         notifyListeners(); // Updates the UI
       },
       onError: (error) {
+        if (_isDisposed) return;
         // Handle potential stream errors here
         _isLoading = false;
         notifyListeners();
@@ -68,6 +73,8 @@ class QueueViewModel extends ChangeNotifier {
   void dispose() {
     _restaurantSubscription?.cancel();
     _queueEntriesSubscription?.cancel();
+    _isDisposed = true;
+
     super.dispose();
   }
 

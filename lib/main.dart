@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/user/mock/customer_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/user/mock/store_user_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/user/production/customer_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/user/production/store_user_repository_impl.dart';
 import 'package:queue_station_app/firebase_options.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
@@ -36,16 +37,16 @@ import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<SingleChildWidget> dependencies = [
-  Provider(create: (_) => AddOnRepositoryMock()),
-  Provider(create: (_) => MenuCategoryRepositoryMock()),
-  Provider(create: (_) => MenuItemRepositoryMock()),
+  Provider(create: (_) => AddOnRepositoryImpl()),
+  Provider(create: (_) => MenuCategoryRepositoryImpl()),
+  Provider(create: (_) => MenuItemRepositoryImpl()),
   Provider(create: (_) => OrderRepositoryMock()),
-  Provider(create: (_) => QueueEntryRepositoryMock()),
-  Provider(create: (_) => QueueTableRepositoryMock()),
-  Provider(create: (_) => RestaurantRepositoryMock()),
-  Provider(create: (_) => TableCategoryRepositoryMock()),
-  Provider(create: (_) => CustomerRepositoryMock()),
-  Provider(create: (_) => StoreUserRepositoryMock()),
+  Provider(create: (_) => QueueEntryRepositoryImpl()),
+  Provider(create: (_) => QueueTableRepositoryImpl()),
+  Provider(create: (_) => RestaurantRepositoryImpl()),
+  Provider(create: (_) => TableCategoryRepositoryImpl()),
+  Provider(create: (_) => CustomerRepositoryImpl()),
+  Provider(create: (_) => StoreUserRepositoryImpl()),
 ];
 
 void main() async {

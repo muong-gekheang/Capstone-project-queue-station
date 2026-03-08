@@ -22,6 +22,26 @@ class StoreUser extends User {
     this.rest,
   }) : restaurantId = restaurantId ?? rest?.id ?? '';
 
+  StoreUser copyWith({
+    String? name,
+    String? email,
+    String? phone,
+    String? id,
+    String? restaurantId,
+    Restaurant? rest,
+  }) {
+    return StoreUser(
+      // Pass base class fields
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      id: id ?? this.id,
+      // Pass subclass fields
+      restaurantId: restaurantId ?? this.restaurantId,
+      rest: rest ?? this.rest,
+    );
+  }
+
   factory StoreUser.fromJson(Map<String, dynamic> json) =>
       _$StoreUserFromJson(json);
 

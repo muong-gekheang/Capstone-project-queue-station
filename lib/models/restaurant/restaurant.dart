@@ -12,6 +12,7 @@ part 'restaurant.g.dart';
 class Restaurant {
   final String id;
   final String name;
+  final String? description;
   final String address;
   final String logoLink;
   final String policy;
@@ -58,6 +59,7 @@ class Restaurant {
     List<AddOn>? globalAddOns,
     List<SizeOption>? globalSizeOptions,
     List<QueueEntry>? currentInQueue,
+    this.description,
   }) : items = items ?? [],
        tables = tables ?? [],
        globalAddOns = globalAddOns ?? [],
@@ -91,7 +93,8 @@ class Restaurant {
   int getQueueSpot(QueueEntry queue) {
     final idx = currentInQueueIds.indexOf(queue.id);
     if (idx != -1) return idx + 1;
-    return currentInQueue.indexOf(queue) + 1; // fallback for in-memory only flow
+    return currentInQueue.indexOf(queue) +
+        1; // fallback for in-memory only flow
   }
 
   Duration get averageWaitingTime => const Duration(hours: 1);

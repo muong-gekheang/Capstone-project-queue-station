@@ -162,9 +162,10 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
   }
 
   @override
-  Stream<List<QueueTable>> watchAllQueueTable() {
+  Stream<List<QueueTable>> watchAllQueueTable(String restId) {
     return fireStore
         .collection('queue_tables')
+        .where('restaurantId', whereIn: [restId])
         .orderBy('tableNum')
         .snapshots()
         .map(
@@ -178,9 +179,9 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
 
   @override
   Stream<QueueTable> watchCurrentQueueTable() {
-    return watchAllQueueTable()
-        .where((tables) => tables.isNotEmpty)
-        .map((tables) => tables.first);
+    return watchAllQueueTable(
+      "",
+    ).where((tables) => tables.isNotEmpty).map((tables) => tables.first);
   }
 
   @override

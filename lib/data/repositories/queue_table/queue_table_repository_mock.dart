@@ -73,7 +73,7 @@ class QueueTableRepositoryMock implements QueueTableRepository {
   }
 
   @override
-  Stream<List<QueueTable>> watchAllQueueTable() {
+  Stream<List<QueueTable>> watchAllQueueTable(String restId) {
     // TODO: implement watchAllQueueTable
     throw UnimplementedError();
   }
