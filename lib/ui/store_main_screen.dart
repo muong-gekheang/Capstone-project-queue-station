@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
+import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
-import 'package:queue_station_app/services/restaurant_service.dart';
+import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
-import '../ui/screens/store_side/store_management/manage_store_screen.dart';
+import 'screens/store_side/store_management/manage_store/manage_store_screen.dart';
 import '../ui/widgets/store_side_bottom_nav.dart';
 
 enum NavTab { dashboard, analytics, queue, settings }
@@ -49,8 +54,31 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<RestaurantService>(
-      create: (_) => RestaurantService(restaurant: mockRestaurants[0]),
+    RestaurantRepository restaurantRepository = context
+        .read<RestaurantRepository>();
+    UserProvider userProvider = context.read<UserProvider>();
+    QueueEntryRepository queueEntryRepository = context
+        .read<QueueEntryRepository>();
+
+    QueueTableRepository queueTableRepository = context
+        .read<QueueTableRepository>();
+    return MultiProvider(
+      providers: [
+        Provider<RestaurantService>(
+          create: (_) => RestaurantService(
+            userProvider: userProvider,
+            restaurantRepository: restaurantRepository,
+            queueEntryRepository: queueEntryRepository,
+            queueTableRepository: queueTableRepository,
+          ),
+        ),
+        Provider<QueueService>(
+          create: (_) => QueueService(
+            userProvider: userProvider,
+            queueEntryRepository: queueEntryRepository,
+          ),
+        ),
+      ],
       child: Scaffold(
         body: IndexedStack(
           index: _getTabIndex(_selectedTab),

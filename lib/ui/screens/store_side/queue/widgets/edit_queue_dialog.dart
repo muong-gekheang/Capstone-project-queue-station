@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/services/restaurant_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';

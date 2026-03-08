@@ -1,115 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
-import '../../../../models/analytic/analytics_data.dart';
-import '../../../../models/analytic/dashboard_stats.dart';
-import '../../../../models/analytic/order_summary.dart';
-import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/services/store_profile_service.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 
-class AnalyticsScreen extends StatefulWidget {
-  const AnalyticsScreen({super.key});
+class AnalyticsContent extends StatefulWidget {
+  const AnalyticsContent({super.key});
 
   @override
-  State<AnalyticsScreen> createState() => _AnalyticsScreenState();
+  State<AnalyticsContent> createState() => _AnalyticsContentState();
 }
 
-class _AnalyticsScreenState extends State<AnalyticsScreen> {
-  final QueueService _queueService = QueueService(QueueRepository());
-  final QueueRepository _repository = QueueRepository();
-
-  DashboardStats? _stats;
-  bool _isLoading = true;
-
-  String _queueLengthTimeframe = 'Today';
-  String _tableOccupancyTimeframe = 'This Week';
-  String _orderValueTimeframe = 'This Week';
-  String _ordersTimeframe = 'Today';
-  String _orderSummaryTimeframe = 'Today';
-
-  List<QueueLengthDataPoint> _queueLengthData = [];
-  List<TableOccupancyDataPoint> _tableOccupancyData = [];
-  List<OrderValueDataPoint> _orderValueData = [];
-  List<OrderSummary> _ordersLineData = [];
-  List<OrderSummary> _orderSummary = [];
-  int _totalOrders = 0;
-
-  final List<String> _timeframeOptions = [
-    'Today',
-    'This Week',
-    'This Month',
-    'This Year',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAnalyticsData();
-    _startPeriodicRefresh();
-  }
-
-  void _loadAnalyticsData() async {
-    try {
-      final stats = await _queueService.getDashboardStats();
-      final totalOrders = await _repository.getTotalOrdersCount();
-      final queueLengthData = await _repository.getQueueLengthData(
-        _queueLengthTimeframe,
-      );
-      final tableOccupancyData = await _repository.getTableOccupancyData(
-        _tableOccupancyTimeframe,
-      );
-      final orderValueData = await _repository.getAverageOrderValueData(
-        _orderValueTimeframe,
-      );
-      final ordersLineData = await _repository.getOrderSummary(
-        _ordersTimeframe,
-      );
-      final orderSummary = await _repository.getOrderSummary(
-        _orderSummaryTimeframe,
-      );
-
-      if (mounted) {
-        setState(() {
-          _stats = stats;
-          _totalOrders = totalOrders;
-          _queueLengthData = queueLengthData;
-          _tableOccupancyData = tableOccupancyData;
-          _orderValueData = orderValueData;
-          _ordersLineData = ordersLineData;
-          _orderSummary = orderSummary;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  void _startPeriodicRefresh() {
-    Future.delayed(const Duration(seconds: 30), () {
-      if (mounted) {
-        _loadAnalyticsData();
-        _startPeriodicRefresh();
-      }
-    });
-  }
-
+class _AnalyticsContentState extends State<AnalyticsContent> {
   void _showTimeframeSelector(
     String chartType,
     String currentTimeframe,
     Function(String) onSelected,
   ) {
+    AnalyticsViewModel analyticsViewModel = context.read<AnalyticsViewModel>();
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: _timeframeOptions.map((timeframe) {
+          children: analyticsViewModel.timeframeOptions.map((timeframe) {
             return ListTile(
               title: Text(timeframe),
               trailing: currentTimeframe == timeframe
@@ -118,7 +35,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               onTap: () {
                 onSelected(timeframe);
                 Navigator.pop(context);
-                _loadAnalyticsData();
+                analyticsViewModel.loadAllData();
               },
             );
           }).toList(),
@@ -167,6 +84,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsViewModel analyticsViewModel = context.watch<AnalyticsViewModel>();
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
@@ -194,7 +112,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
         ],
       ),
-      body: _isLoading
+      body: analyticsViewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),

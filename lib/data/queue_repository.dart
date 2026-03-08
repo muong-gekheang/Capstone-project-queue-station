@@ -1,6 +1,5 @@
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';

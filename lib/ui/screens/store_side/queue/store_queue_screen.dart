@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/services/restaurant_service.dart';
+import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/widgets/queue_content.dart';
 
@@ -10,8 +11,12 @@ class StoreQueueScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RestaurantService restaurantService = context.read<RestaurantService>();
+    QueueService queueService = context.read<QueueService>();
     return ChangeNotifierProvider(
-      create: (_) => QueueViewModel(restaurantService: restaurantService),
+      create: (_) => QueueViewModel(
+        restaurantService: restaurantService,
+        queueService: queueService,
+      ),
       child: QueueContent(),
     );
   }

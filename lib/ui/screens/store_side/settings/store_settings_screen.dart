@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
-import '../store_management/edit_store_screen.dart';
+import '../store_management/edit_store/edit_store_screen.dart';
 import '../../user_side/setting/change_password_screen.dart';
 import 'store_subscription_screen.dart';
 import '../../user_side/setting/contact_us_screen.dart';

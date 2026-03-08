@@ -88,6 +88,29 @@ class QueueEntryRepositoryMock implements QueueEntryRepository {
     // TODO: implement watchCurrentHistory
     throw UnimplementedError();
   }
+
+  @override
+  Future<(List<QueueEntry>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getTodayHistory(
+    String restaurantId,
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  ) {
+    // TODO: implement getTodayHistory
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<QueueEntry>> watchCurrentActiveQueue(String restId) {
+    // TODO: implement watchCurrentActiveQueue
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateStatus(String queueId, QueueStatus newStatus) {
+    // TODO: implement updateStatus
+    throw UnimplementedError();
+  }
 }
 
 List<QueueEntry> mockQueueEntries = [

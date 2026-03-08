@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../services/store_profile_service.dart';
-import '../../../widgets/custom_success_snackbar.dart';
+import '../../../../../services/store_profile_service.dart';
+import '../../../../widgets/custom_success_snackbar.dart';
 
 class EditStoreScreen extends StatefulWidget {
   const EditStoreScreen({super.key});

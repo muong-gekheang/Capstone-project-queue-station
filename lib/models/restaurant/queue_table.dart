@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import 'table_category.dart';
-
 part 'queue_table.g.dart';
 
 final uuid = Uuid();

@@ -155,4 +155,86 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     // TODO: implement watchCurrentHistory
     throw UnimplementedError();
   }
+
+  @override
+  Future<(List<QueueEntry>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getTodayHistory(
+    String restaurantId,
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  ) async {
+    final now = DateTime.now();
+    final startOfToday = DateTime(now.year, now.month, now.day);
+
+    var query = fireStore
+        .collection('queueEntries')
+        .where('restaurantId', isEqualTo: restaurantId)
+        .where(
+          'status',
+          whereIn: [QueueStatus.completed.name, QueueStatus.serving.name],
+        ) // Filter for both statuses
+        .where(
+          'createdAt',
+          isGreaterThanOrEqualTo: startOfToday,
+        ) // Filter for today
+        .orderBy('createdAt', descending: true)
+        .limit(limit);
+
+    if (lastDoc != null) {
+      query = query.startAfterDocument(lastDoc);
+    }
+
+    final snap = await query.get();
+    final queueEntries = snap.docs.map((doc) {
+      final json = Map<String, dynamic>.from(doc.data());
+      json['id'] ??= doc.id;
+      return QueueEntry.fromJson(json);
+    }).toList();
+
+    final nextCursor = snap.docs.isEmpty ? null : snap.docs.last;
+    return (queueEntries, nextCursor);
+  }
+
+  @override
+  Stream<List<QueueEntry>> watchCurrentActiveQueue(String restId) {
+    return fireStore
+        .collection('queueEntries')
+        .where('restaurantId', isEqualTo: restId)
+        .where('status', isEqualTo: 'waiting')
+        .orderBy('expectedTableReadyAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return QueueEntry.fromJson(json);
+          }).toList();
+        });
+  }
+
+  @override
+  Future<void> updateStatus(String id, QueueStatus newStatus) async {
+    String? fieldToUpdate;
+    switch (newStatus) {
+      case QueueStatus.waiting:
+        fieldToUpdate = null;
+        break;
+      case QueueStatus.serving:
+        fieldToUpdate = "servedTime";
+        break;
+      case QueueStatus.completed:
+        fieldToUpdate = "endedTime";
+        break;
+      case QueueStatus.cancelled:
+        fieldToUpdate = "endedTime";
+        break;
+      case QueueStatus.noShow:
+        fieldToUpdate = "endedTime";
+        break;
+    }
+    await fireStore.collection('queue_entries').doc(id).update({
+      'status': newStatus.name,
+      if (fieldToUpdate != null) fieldToUpdate: DateTime.now(),
+    });
+  }
 }

@@ -1,19 +1,83 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/services/restaurant_service.dart';
+import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
 
 class QueueViewModel extends ChangeNotifier {
   final RestaurantService _restaurantService;
+  final QueueService _queueService;
+
+  Restaurant? _currentRestaurant;
+  List<QueueEntry> _currentQueue = [];
+  bool _isLoading = true;
+  Duration _avgWaitTime = Duration.zero;
+
+  StreamSubscription<Restaurant?>? _restaurantSubscription;
+  StreamSubscription<List<QueueEntry>>? _queueEntriesSubscription;
+
   String _searchKeyword = "";
 
-  QueueViewModel({required RestaurantService restaurantService})
-    : _restaurantService = restaurantService;
+  QueueViewModel({
+    required RestaurantService restaurantService,
+    required QueueService queueService,
+  }) : _restaurantService = restaurantService,
+       _queueService = queueService {
+    _subscribeToRestaurant();
+    _subscribeToQueueEntries();
+    init();
+  }
 
-  List<QueueEntry> get currentQueue => _restaurantService.currentQueue;
+  void init() async {
+    _avgWaitTime = await _restaurantService.avgWaitingTime;
+  }
 
-  Duration get avgWaitTime => _restaurantService.restaurant.averageWaitingTime;
+  void _subscribeToRestaurant() {
+    _restaurantSubscription = _restaurantService.streamRestaurant.listen(
+      (restaurant) {
+        _currentRestaurant = restaurant;
+        _isLoading = false;
+        notifyListeners(); // Updates the UI
+      },
+      onError: (error) {
+        // Handle potential stream errors here
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
 
-  int get biggestTableSize => _restaurantService.restaurant.biggestTableSize;
+  void _subscribeToQueueEntries() {
+    _queueEntriesSubscription = _queueService.streamQueueEntries.listen(
+      (queueEntries) {
+        _currentQueue = queueEntries;
+        _isLoading = false;
+        notifyListeners(); // Updates the UI
+      },
+      onError: (error) {
+        // Handle potential stream errors here
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _restaurantSubscription?.cancel();
+    _queueEntriesSubscription?.cancel();
+    super.dispose();
+  }
+
+  bool get isLoading => _isLoading;
+
+  List<QueueEntry> get currentQueue => _currentQueue;
+
+  Duration get avgWaitTime => _avgWaitTime;
+
+  int get biggestTableSize => _currentRestaurant?.biggestTableSize ?? 0;
 
   DateTime getQueueEstimatedTime(QueueEntry queue) {
     return queue.joinTime.add(avgWaitTime);
@@ -35,12 +99,12 @@ class QueueViewModel extends ChangeNotifier {
   }
 
   void addQueue(QueueEntry newQueue) {
-    _restaurantService.addQueue(newQueue);
+    _queueService.addCustomerToQueue(newQueue: newQueue);
     notifyListeners();
   }
 
   void removeQueue(QueueEntry queue) {
-    _restaurantService.removeQueue(queue);
+    _queueService.removeUserFromQueue(queue.id);
     notifyListeners();
   }
 }

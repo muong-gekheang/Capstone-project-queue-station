@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
-import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/dashboard_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
@@ -16,11 +16,10 @@ class DashboardContent extends StatefulWidget {
 }
 
 class _DashboardContentState extends State<DashboardContent> {
-  bool isLoading = false;
-
   @override
   Widget build(BuildContext context) {
     DashboardViewModel dashboardViewModel = context.watch<DashboardViewModel>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
@@ -60,7 +59,7 @@ class _DashboardContentState extends State<DashboardContent> {
           ),
         ],
       ),
-      body: isLoading
+      body: dashboardViewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
