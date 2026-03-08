@@ -30,11 +30,6 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
           ?.map((e) => e as String)
           .toList() ??
       [],
-  currentInQueueIds:
-      (json['currentInQueueIds'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      [],
 );
 
 Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
@@ -50,5 +45,4 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
       'tableIds': instance.tableIds,
       'globalAddOnIds': instance.globalAddOnIds,
       'globalSizeOptionIds': instance.globalSizeOptionIds,
-      'currentInQueueIds': instance.currentInQueueIds,
     };

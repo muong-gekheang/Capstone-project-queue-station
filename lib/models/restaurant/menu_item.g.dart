@@ -13,7 +13,7 @@ MenuItem _$MenuItemFromJson(Map<String, dynamic> json) => MenuItem(
   description: json['description'] as String,
   minPrepTimeMinutes: (json['minPrepTimeMinutes'] as num?)?.toInt(),
   maxPrepTimeMinutes: (json['maxPrepTimeMinutes'] as num?)?.toInt(),
-  categoryId: json['categoryId'] as String?,
+  categoryId: json['categoryId'] as String,
   sizeOptionIds:
       (json['sizeOptionIds'] as List<dynamic>?)
           ?.map((e) => e as String)

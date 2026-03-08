@@ -26,19 +26,6 @@ class Restaurant {
   final List<String> globalAddOnIds;
   @JsonKey(defaultValue: <String>[])
   final List<String> globalSizeOptionIds;
-  @JsonKey(defaultValue: <String>[])
-  final List<String> currentInQueueIds;
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<MenuItem> items;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<QueueTable> tables;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<AddOn> globalAddOns;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<SizeOption> globalSizeOptions;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<QueueEntry> currentInQueue;
 
   Restaurant({
     required this.id,
@@ -53,50 +40,12 @@ class Restaurant {
     List<String>? globalAddOnIds,
     List<String>? globalSizeOptionIds,
     List<String>? currentInQueueIds,
-    List<MenuItem>? items,
-    List<QueueTable>? tables,
-    List<AddOn>? globalAddOns,
-    List<SizeOption>? globalSizeOptions,
-    List<QueueEntry>? currentInQueue,
-  }) : items = items ?? [],
-       tables = tables ?? [],
-       globalAddOns = globalAddOns ?? [],
-       globalSizeOptions = globalSizeOptions ?? [],
-       currentInQueue = currentInQueue ?? [],
-       itemIds = itemIds ?? (items ?? []).map((e) => e.id).toList(),
-       tableIds = tableIds ?? (tables ?? []).map((e) => e.id).toList(),
-       globalAddOnIds =
-           globalAddOnIds ?? (globalAddOns ?? []).map((e) => e.id).toList(),
-       globalSizeOptionIds =
-           globalSizeOptionIds ??
-           (globalSizeOptions ?? []).map((e) => e.name).toList(),
-       currentInQueueIds =
-           currentInQueueIds ??
-           (currentInQueue ?? []).map((e) => e.id).toList();
-
-  void enqueue(QueueEntry queue) {
-    if (!currentInQueueIds.contains(queue.id)) {
-      currentInQueueIds.add(queue.id);
-    }
-    if (!currentInQueue.contains(queue)) {
-      currentInQueue.add(queue);
-    }
-  }
-
-  void dequeue(QueueEntry queue) {
-    currentInQueueIds.remove(queue.id);
-    currentInQueue.remove(queue);
-  }
-
-  int getQueueSpot(QueueEntry queue) {
-    final idx = currentInQueueIds.indexOf(queue.id);
-    if (idx != -1) return idx + 1;
-    return currentInQueue.indexOf(queue) + 1; // fallback for in-memory only flow
-  }
+  }) : itemIds = itemIds ?? [],
+       tableIds = tableIds ?? [],
+       globalAddOnIds = globalAddOnIds ?? [],
+       globalSizeOptionIds = globalSizeOptionIds ?? [];
 
   Duration get averageWaitingTime => const Duration(hours: 1);
-
-  int get curWait => currentInQueueIds.length;
 
   @override
   bool operator ==(Object other) {

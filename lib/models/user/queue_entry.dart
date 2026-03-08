@@ -25,13 +25,6 @@ class QueueEntry {
   final String? tableNumber;
   final DateTime? expectedTableReadyAt;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final Order? order;
-
-  int currentSpot(Restaurant rest) {
-    return rest.getQueueSpot(this);
-  }
-
   QueueEntry({
     required this.id,
     required this.queueNumber,
@@ -41,13 +34,12 @@ class QueueEntry {
     this.endedTime,
     required this.status,
     required this.customerId,
-    this.order,
-    String? orderId,
+    this.orderId,
     required this.joinedMethod,
     this.tableNumber,
     this.expectedTableReadyAt,
     required this.restId,
-  }) : orderId = orderId ?? order?.id;
+  });
 
   Duration? get waitingTime {
     if (servedTime == null) return null;
@@ -101,7 +93,6 @@ class QueueEntry {
       servedTime: servedTime ?? this.servedTime,
       endedTime: endedTime ?? this.endedTime,
       status: status ?? this.status,
-      order: order ?? this.order,
       orderId: orderId ?? this.orderId,
       joinedMethod: joinedMethod ?? this.joinedMethod,
       tableNumber: tableNumber ?? this.tableNumber,

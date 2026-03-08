@@ -21,13 +21,6 @@ class MenuItem {
   @JsonKey(defaultValue: <String>[])
   final List<String> addOnIds;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final MenuItemCategory category;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<MenuSize> sizes;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<AddOn> addOns;
-
   bool isAvailable;
 
   MenuItem({
@@ -37,23 +30,14 @@ class MenuItem {
     required this.description,
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
-    String? categoryId,
+    required this.categoryId,
     MenuItemCategory? category,
     List<String>? sizeOptionIds,
     List<String>? addOnIds,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
     this.isAvailable = true,
-  }) : categoryId = categoryId ?? category?.id ?? 'unknown_category',
-       category =
-           category ??
-           MenuItemCategory(
-             id: categoryId ?? 'unknown_category',
-             name: 'Unknown',
-           ),
-       sizes = sizes ?? [],
-       addOns = addOns ?? [],
-       sizeOptionIds =
+  }) : sizeOptionIds =
            sizeOptionIds ??
            (sizes ?? []).map((s) => s.sizeOption.name).toList(),
        addOnIds = addOnIds ?? (addOns ?? []).map((a) => a.id).toList();
@@ -81,16 +65,13 @@ class MenuItem {
       minPrepTimeMinutes: minPrepTimeMinutes ?? this.minPrepTimeMinutes,
       maxPrepTimeMinutes: maxPrepTimeMinutes ?? this.maxPrepTimeMinutes,
       categoryId: categoryId ?? this.categoryId,
-      category: category ?? this.category,
       sizeOptionIds: sizeOptionIds ?? List<String>.from(this.sizeOptionIds),
       addOnIds: addOnIds ?? List<String>.from(this.addOnIds),
-      sizes: sizes ?? List<MenuSize>.from(this.sizes),
-      addOns: addOns ?? List<AddOn>.from(this.addOns),
       isAvailable: isAvailable ?? this.isAvailable,
     );
   }
 
-  double cheapestPrice() {
+  double cheapestPrice(List<MenuSize> sizes) {
     if (sizes.isEmpty) return 0.0;
     return sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);
   }
