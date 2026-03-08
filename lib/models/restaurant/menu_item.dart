@@ -17,7 +17,7 @@ class MenuItem {
   final String categoryId;
 
   @JsonKey(defaultValue: <String>[])
-  final List<String> sizeOptionIds;
+  final List<String> menuSizeIds;
   @JsonKey(defaultValue: <String>[])
   final List<String> addOnIds;
 
@@ -31,16 +31,10 @@ class MenuItem {
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
     required this.categoryId,
-    MenuItemCategory? category,
-    List<String>? sizeOptionIds,
+    required this.menuSizeIds,
     List<String>? addOnIds,
-    List<MenuSize>? sizes,
-    List<AddOn>? addOns,
     this.isAvailable = true,
-  }) : sizeOptionIds =
-           sizeOptionIds ??
-           (sizes ?? []).map((s) => s.sizeOption.name).toList(),
-       addOnIds = addOnIds ?? (addOns ?? []).map((a) => a.id).toList();
+  }) : addOnIds = addOnIds ?? [];
 
   MenuItem copyWith({
     String? id,
@@ -53,8 +47,7 @@ class MenuItem {
     MenuItemCategory? category,
     List<String>? sizeOptionIds,
     List<String>? addOnIds,
-    List<MenuSize>? sizes,
-    List<AddOn>? addOns,
+    List<String>? menuSizeIds,
     bool? isAvailable,
   }) {
     return MenuItem(
@@ -65,9 +58,9 @@ class MenuItem {
       minPrepTimeMinutes: minPrepTimeMinutes ?? this.minPrepTimeMinutes,
       maxPrepTimeMinutes: maxPrepTimeMinutes ?? this.maxPrepTimeMinutes,
       categoryId: categoryId ?? this.categoryId,
-      sizeOptionIds: sizeOptionIds ?? List<String>.from(this.sizeOptionIds),
       addOnIds: addOnIds ?? List<String>.from(this.addOnIds),
       isAvailable: isAvailable ?? this.isAvailable,
+      menuSizeIds: menuSizeIds ?? this.menuSizeIds,
     );
   }
 

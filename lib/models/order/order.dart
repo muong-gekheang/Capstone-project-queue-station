@@ -15,29 +15,18 @@ class Order {
 
   final DateTime timestamp;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<OrderItem> ordered;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<OrderItem> inCart;
-
   Order({
     required this.id,
     required this.timestamp,
     List<String>? orderedIds,
     List<String>? inCartIds,
-    List<OrderItem>? ordered,
-    List<OrderItem>? inCart,
-  }) : ordered = ordered ?? [],
-       inCart = inCart ?? [],
-       orderedIds = orderedIds ?? (ordered ?? []).map(_orderItemRef).toList(),
-       inCartIds = inCartIds ?? (inCart ?? []).map(_orderItemRef).toList();
+  }) : orderedIds = orderedIds ?? [],
+       inCartIds = inCartIds ?? [];
 
   Order copyWith({
     String? id,
     List<String>? orderedIds,
     List<String>? inCartIds,
-    List<OrderItem>? ordered,
-    List<OrderItem>? inCart,
     DateTime? timestamp,
   }) {
     return Order(
@@ -45,25 +34,21 @@ class Order {
       timestamp: timestamp ?? this.timestamp,
       orderedIds: orderedIds ?? List<String>.from(this.orderedIds),
       inCartIds: inCartIds ?? List<String>.from(this.inCartIds),
-      ordered: ordered ?? List<OrderItem>.from(this.ordered),
-      inCart: inCart ?? List<OrderItem>.from(this.inCart),
     );
   }
 
-  double calculateTotalPrice() {
-    double totalPrice = 0;
-    for (final orderItem in ordered) {
-      if (orderItem.orderItemStatus == OrderItemStatus.accepted) {
-        totalPrice += orderItem.calculateTotalPrice();
-      }
-    }
-    return totalPrice;
-  }
+  // This should be handle in the ui because right now the attributes represent id not actual objects
+  // double calculateTotalPrice() {
+  //   double totalPrice = 0;
+  //   for (final orderItem in ordered) {
+  //     if (orderItem.orderItemStatus == OrderItemStatus.accepted) {
+  //       totalPrice += orderItem.calculateTotalPrice();
+  //     }
+  //   }
+  //   return totalPrice;
+  // }
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
 
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 }
-
-String _orderItemRef(OrderItem item) =>
-    '${item.menuItemId}_${item.sizeName}_${item.quantity}';
