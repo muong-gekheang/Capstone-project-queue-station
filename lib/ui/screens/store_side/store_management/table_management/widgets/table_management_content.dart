@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/view_model/table_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/search_bar.dart';
@@ -20,7 +22,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
   // Controllers
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _seatController = TextEditingController();
-  String? selectedCategory;
+  final TextEditingController _minSeatController = TextEditingController();
 
   @override
   void initState() {
@@ -30,92 +32,39 @@ class _TableManagementContentState extends State<TableManagementContent> {
   @override
   void dispose() {
     _textController.dispose();
+    _minSeatController.dispose();
     _seatController.dispose();
     super.dispose();
   }
 
-  void _applyFilters() {
-    setState(() {
-      // 1. Filter by the selected Category
-      var result = allTables
-          .where((t) => t.tableCategory.id == currentCategoryTable.id)
-          .toList();
-
-      // 2. Filter by Search Query
-      if (searchQuery.isNotEmpty) {
-        result = result
-            .where(
-              (t) =>
-                  t.tableNum.toLowerCase().contains(searchQuery.toLowerCase()),
-            )
-            .toList();
-      }
-
-      // 3. Filter by Status
-      if (isFiltered && currentFilter != FilterOption.clear) {
-        result = result.where((t) {
-          if (currentFilter == FilterOption.available) {
-            return t.tableStatus == TableStatus.available;
-          } else if (currentFilter == FilterOption.occupied) {
-            return t.tableStatus == TableStatus.occupied;
-          }
-          return true;
-        }).toList();
-      }
-
-      filteredTables = result;
-    });
-  }
-
   // Chip Category
-  void onSelectedChip(int chipIndex) {
-    if (isEditMode && chipIndex == selectedChipIndex) {
-      setState(() {
-        selectedChipIndex = chipIndex;
-        currentCategoryTable = tableCategories[chipIndex];
-        _applyFilters();
-      });
-
-      showEditCategoryDialog(category: tableCategories[chipIndex]);
-      return;
+  void onSelectedChip(TableCategory category) {
+    TableManagementViewModel vm = context.read<TableManagementViewModel>();
+    vm.updateCurrentSelectedCategory(category);
+    if (vm.isEditMode) {
+      showEditCategoryDialog(category: category);
     }
-
-    setState(() {
-      selectedChipIndex = chipIndex;
-      currentCategoryTable = tableCategories[chipIndex];
-      _applyFilters();
-    });
-  }
-
-  // Search
-  void onSearch(String query) {
-    searchQuery = query;
-    _applyFilters();
   }
 
   // Edit Mode
   void onEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-    });
-    _showSnackBar(isEditMode ? "Editing Mode" : "Normal Mode");
+    TableManagementViewModel vm = context.read<TableManagementViewModel>();
+    vm.updateIsEditMode(!vm.isEditMode);
+    _showSnackBar(vm.isEditMode ? "Editing Mode" : "Normal Mode");
   }
 
   // Filter Popup
   Widget onFilterBy() {
+    TableManagementViewModel vm = context.read<TableManagementViewModel>();
     return PopupMenuButton<FilterOption>(
       tooltip: "Filter by status",
       borderRadius: BorderRadius.circular(AppTheme.borderRadiusL),
       icon: Icon(
         Icons.filter_list,
-        color: isFiltered ? AppTheme.primaryColor : AppTheme.secondaryColor,
+        color: vm.isFiltered ? AppTheme.primaryColor : AppTheme.secondaryColor,
       ),
       onSelected: (status) {
-        setState(() {
-          currentFilter = status;
-          isFiltered = status != FilterOption.clear;
-          _applyFilters();
-        });
+        vm.setFilter(status);
       },
       itemBuilder: (context) => const [
         PopupMenuItem<FilterOption>(
@@ -152,179 +101,70 @@ class _TableManagementContentState extends State<TableManagementContent> {
     );
   }
 
-  void onTable({required String tableNum, required TableStatus status}) {
-    if (isEditMode) {
-      showEditTableDialog(tableNum: tableNum);
+  void onTable({required QueueTable table, required TableStatus status}) {
+    var vm = context.read<TableManagementViewModel>();
+    if (vm.isEditMode) {
+      showEditTableDialog(table: table);
     } else {
-      showTableStatusDialog(tableNum: tableNum, status: status);
+      showTableStatusDialog(table: table, status: status);
     }
   }
 
   // --- CRUD Operations ---
 
-  void _addNewTable(String tableNum, String categoryName) {
-    setState(() {
-      final categoryObj = tableCategories.firstWhere(
-        (c) => c.type == categoryName,
-      );
-      final newTable = QueueTable(
-        tableNum: tableNum,
-        tableStatus: TableStatus.available,
-        tableCategory: categoryObj,
-        queueEntryIds: [],
-      );
-      allTables.add(newTable);
-      _applyFilters();
-      _showSnackBar("Table $tableNum added to $categoryName");
-    });
+  void _addNewTable(String tableNum, TableCategory tableCategory) {
+    var vm = context.read<TableManagementViewModel>();
+    final newTable = QueueTable(
+      tableNum: tableNum,
+      tableStatus: TableStatus.available,
+      tableCategoryId: tableCategory.id,
+      queueEntryIds: [],
+    );
+    vm.addNewTable(newTable);
+
+    _showSnackBar("Table $tableNum added to ${tableCategory.type}");
   }
 
-  void _updateTable(
-    String oldTableNum,
-    String newTableNum,
-    String newCategoryName,
-  ) {
-    setState(() {
-      final index = allTables.indexWhere(
-        (t) =>
-            t.tableNum == oldTableNum &&
-            t.tableCategory.id == currentCategoryTable.id,
-      );
-
-      if (index != -1) {
-        final newCategoryObj = tableCategories.firstWhere(
-          (c) => c.type == newCategoryName,
-        );
-
-        allTables[index] = allTables[index].copyWith(
-          tableNum: newTableNum,
-          tableCategory: newCategoryObj,
-        );
-
-        _applyFilters();
-        _showSnackBar("Table updated and moved to $newCategoryName");
-      }
-    });
+  void _updateTable(QueueTable newTable) {
+    var vm = context.read<TableManagementViewModel>();
+    vm.updateTable(newTable);
   }
 
-  void _updateTableStatus(String tableNum, TableStatus newStatus) {
-    setState(() {
-      final index = allTables.indexWhere(
-        (t) =>
-            t.tableNum == tableNum &&
-            t.tableCategory.id == currentCategoryTable.id,
-      );
-
-      if (index != -1) {
-        allTables[index] = allTables[index].copyWith(
-          tableStatus: newStatus,
-          queueEntryIds: newStatus == TableStatus.occupied
-              ? allTables[index].queueEntryIds
-              : [],
-        );
-        _applyFilters();
-        _showSnackBar("Table $tableNum is ${newStatus.name}");
-      }
-    });
+  void _updateTableStatus(QueueTable table, TableStatus newStatus) {
+    var vm = context.read<TableManagementViewModel>();
+    QueueTable newTable = table.copyWith(tableStatus: newStatus);
+    vm.updateTable(newTable);
+    _showSnackBar("Table ${newTable.tableNum} is ${newStatus.name}");
   }
 
-  void _deleteTable(String tableNum) {
-    setState(() {
-      allTables.removeWhere(
-        (t) =>
-            t.tableNum == tableNum &&
-            t.tableCategory.id == currentCategoryTable.id,
-      );
-      _applyFilters();
-      _showSnackBar(
-        "Table $tableNum deleted",
-        backgroundColor: AppTheme.accentRed,
-      );
-    });
+  void _deleteTable(QueueTable table) {
+    var vm = context.read<TableManagementViewModel>();
+    vm.deleteTable(table);
+    _showSnackBar(
+      "Table ${table.tableNum} deleted",
+      backgroundColor: AppTheme.accentRed,
+    );
   }
 
-  void _addNewCategory(String categoryName, int amountOfSeat) {
-    setState(() {
-      final newCategory = TableCategory(
-        type: categoryName,
-        minSeat: 1,
-        seatAmount: amountOfSeat,
-      );
-      tableCategories.add(newCategory);
-      categoryNames = tableCategories.map((c) => c.type).toList();
-      _showSnackBar("Category $categoryName added");
-    });
+  void _addNewCategory(TableCategory newCategory) {
+    var vm = context.read<TableManagementViewModel>();
+    vm.addNewCategory(newCategory);
+    _showSnackBar("Category ${newCategory.type} added");
   }
 
-  void _updateCategory(
-    String oldCategoryName,
-    String newCategoryName,
-    int amountOfSeat,
-  ) {
-    setState(() {
-      final index = tableCategories.indexWhere(
-        (c) => c.type == oldCategoryName,
-      );
-
-      if (index != -1) {
-        final updatedCategory = TableCategory(
-          categoryId: tableCategories[index].id,
-          type: newCategoryName,
-          minSeat: tableCategories[index].minSeat,
-          seatAmount: amountOfSeat,
-        );
-
-        tableCategories[index] = updatedCategory;
-
-        // Update all tables with this category
-        for (int i = 0; i < allTables.length; i++) {
-          if (allTables[i].tableCategory.id == tableCategories[index].id) {
-            allTables[i] = allTables[i].copyWith(
-              tableCategory: updatedCategory,
-            );
-          }
-        }
-
-        categoryNames = tableCategories.map((c) => c.type).toList();
-
-        if (selectedChipIndex == index) {
-          currentCategoryTable = updatedCategory;
-        }
-
-        _applyFilters();
-        _showSnackBar("Category updated: $newCategoryName");
-      }
-    });
+  void _updateCategory(TableCategory newCategory) {
+    var vm = context.read<TableManagementViewModel>();
+    vm.updateTableCategory(newCategory);
+    _showSnackBar("Category updated: ${newCategory.type}");
   }
 
-  void _deleteCategory(String categoryId) {
-    setState(() {
-      tableCategories.removeWhere((c) => c.id == categoryId);
-      allTables.removeWhere((t) => t.tableCategory.id == categoryId);
-      categoryNames = tableCategories.map((c) => c.type).toList();
-
-      if (tableCategories.isNotEmpty) {
-        selectedChipIndex = 0;
-        currentCategoryTable = tableCategories[0];
-        _applyFilters();
-      } else {
-        // Create default category if all are deleted
-        final defaultCategory = TableCategory(
-          type: 'Standard',
-          minSeat: 1,
-          seatAmount: 4,
-        );
-        tableCategories = [defaultCategory];
-        currentCategoryTable = defaultCategory;
-        categoryNames = [defaultCategory.type];
-        filteredTables = [];
-      }
-
-      _showSnackBar(
-        "Category and its tables deleted",
-        backgroundColor: AppTheme.accentRed,
-      );
-    });
+  void _deleteCategory(TableCategory tableCategory) {
+    var vm = context.read<TableManagementViewModel>();
+    vm.deleteTableCategory(tableCategory);
+    _showSnackBar(
+      "Category ${tableCategory.type} and its tables deleted",
+      backgroundColor: AppTheme.accentRed,
+    );
   }
 
   // --- Dialogs & UI Helpers ---
@@ -360,6 +200,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
 
   @override
   Widget build(BuildContext context) {
+    var vm = context.read<TableManagementViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Table List"),
@@ -368,7 +209,9 @@ class _TableManagementContentState extends State<TableManagementContent> {
           IconButton(
             onPressed: onEditMode,
             icon: Icon(
-              isEditMode ? Icons.cancel_presentation : Icons.edit_note_rounded,
+              vm.isEditMode
+                  ? Icons.cancel_presentation
+                  : Icons.edit_note_rounded,
             ),
             iconSize: AppTheme.iconSizeXl,
             color: AppTheme.secondaryColor,
@@ -383,7 +226,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
           children: [
             Row(
               children: [
-                Expanded(child: SearchBox(onSearch: onSearch)),
+                Expanded(child: SearchBox(onSearch: vm.onSearch)),
                 const SizedBox(width: AppTheme.spacingS),
                 SizedBox(
                   width: 110,
@@ -405,14 +248,15 @@ class _TableManagementContentState extends State<TableManagementContent> {
                 ),
               ],
             ),
-            CategoryChips(
-              tableData: tableCategories,
-              selectedChipIndex: selectedChipIndex,
-              onSelectedChip: onSelectedChip,
-              isEditMode: isEditMode,
-              onAddChip: (name) =>
-                  showAddNewUpdateCategoryDialog(tableCategory: name),
-            ),
+            if (vm.tableCategories.isNotEmpty)
+              CategoryChips(
+                tableData: vm.tableCategories,
+                selectedCat: vm.currentSelectedCategory!,
+                onSelectedChip: onSelectedChip,
+                isEditMode: vm.isEditMode,
+                onAddChip: (name) =>
+                    showAddNewUpdateCategoryDialog(tableCategory: name),
+              ),
             SizedBox(
               width: double.infinity,
               child: Wrap(
@@ -421,7 +265,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
                 runSpacing: 10,
                 children: [
                   Text(
-                    "Category: ${currentCategoryTable.type}",
+                    "Category: ${vm.currentSelectedCategory?.type ?? ""}",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: AppTheme.heading2,
@@ -438,7 +282,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
                       ),
                       const SizedBox(width: AppTheme.spacingXS),
                       Text(
-                        ": ${filteredTables.length} table(s)  |",
+                        ": ${vm.filteredTable.length} table(s)  |",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: AppTheme.heading2,
@@ -452,7 +296,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
                       ),
                       const SizedBox(width: AppTheme.spacingXS),
                       Text(
-                        ": ${currentCategoryTable.seatAmount} seat(s)",
+                        ": ${vm.currentSelectedCategory?.seatAmount ?? ""} seat(s)",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: AppTheme.heading2,
@@ -464,13 +308,19 @@ class _TableManagementContentState extends State<TableManagementContent> {
               ),
             ),
             Expanded(
-              child: TableSearchResult(
-                allTables: filteredTables,
-                isEditMode: isEditMode,
-                onTable: (tableNum, status) =>
-                    onTable(tableNum: tableNum, status: status),
-                onAddTable: () =>
-                    showAddNewUpdateTableDialog(categoryTable: categoryNames),
+              child: Selector<TableManagementViewModel, List<QueueTable>>(
+                selector: (_, vm) => vm.filteredTable,
+                builder: (context, filteredTables, child) {
+                  return TableSearchResult(
+                    allTables: filteredTables,
+                    isEditMode: context
+                        .read<TableManagementViewModel>()
+                        .isEditMode,
+                    onTable: (table, status) =>
+                        onTable(table: table, status: status),
+                    onAddTable: () => showAddNewUpdateTableDialog(),
+                  );
+                },
               ),
             ),
           ],
@@ -480,6 +330,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
   }
 
   void showAddNewDialog() {
+    _clearControllers();
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
@@ -503,7 +354,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
               title: "Table",
               onPressed: () {
                 Navigator.pop(context);
-                showAddNewUpdateTableDialog(categoryTable: categoryNames);
+                showAddNewUpdateTableDialog();
               },
               color: AppTheme.secondaryColor,
             ),
@@ -514,9 +365,10 @@ class _TableManagementContentState extends State<TableManagementContent> {
   }
 
   void showTableStatusDialog({
-    required String tableNum,
+    required QueueTable table,
     required TableStatus status,
   }) {
+    _clearControllers();
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
@@ -525,7 +377,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              tableNum,
+              table.tableNum,
               style: const TextStyle(
                 fontSize: AppTheme.displayText2,
                 fontWeight: FontWeight.bold,
@@ -562,7 +414,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
                           color: AppTheme.secondaryColor,
                           onPressed: () {
                             Navigator.pop(context);
-                            _updateTableStatus(tableNum, TableStatus.available);
+                            _updateTableStatus(table, TableStatus.available);
                           },
                         ),
                       ),
@@ -575,7 +427,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
                           color: AppTheme.primaryColor,
                           onPressed: () {
                             Navigator.pop(context);
-                            _updateTableStatus(tableNum, TableStatus.occupied);
+                            _updateTableStatus(table, TableStatus.occupied);
                           },
                         ),
                       ),
@@ -612,13 +464,15 @@ class _TableManagementContentState extends State<TableManagementContent> {
     );
   }
 
-  void showEditTableDialog({required String tableNum}) {
+  void showEditTableDialog({required QueueTable table}) {
+    _clearControllers();
+    var vm = context.read<TableManagementViewModel>();
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
         title: "Table Options",
         content: Text(
-          "Table: $tableNum",
+          "Table: ${table.tableNum}",
           style: const TextStyle(
             fontSize: AppTheme.heading3,
             fontWeight: FontWeight.bold,
@@ -634,9 +488,8 @@ class _TableManagementContentState extends State<TableManagementContent> {
               onPressed: () {
                 Navigator.pop(context);
                 showAddNewUpdateTableDialog(
-                  categoryTable: categoryNames,
-                  tableNum: tableNum,
-                  tableCategory: currentCategoryTable.type,
+                  table: table,
+                  tableCategory: vm.currentSelectedCategory,
                 );
               },
             ),
@@ -648,7 +501,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
               color: AppTheme.accentRed,
               onPressed: () {
                 Navigator.pop(context);
-                showDeleteCategoryTableDialog(true, tableNum, null);
+                showDeleteCategoryTableDialog(true, table);
               },
             ),
           ),
@@ -658,6 +511,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
   }
 
   void showEditCategoryDialog({required TableCategory category}) {
+    _clearControllers();
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
@@ -678,7 +532,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
               color: AppTheme.secondaryColor,
               onPressed: () {
                 Navigator.pop(context);
-                showAddNewUpdateCategoryDialog(tableCategory: category.type);
+                showAddNewUpdateCategoryDialog(tableCategory: category);
               },
             ),
           ),
@@ -689,7 +543,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
               color: AppTheme.accentRed,
               onPressed: () {
                 Navigator.pop(context);
-                showDeleteCategoryTableDialog(false, null, category.type);
+                showDeleteCategoryTableDialog(false, null);
               },
             ),
           ),
@@ -698,19 +552,17 @@ class _TableManagementContentState extends State<TableManagementContent> {
     );
   }
 
-  void showDeleteCategoryTableDialog(
-    bool isTable,
-    String? tableNum,
-    String? categoryName,
-  ) {
+  void showDeleteCategoryTableDialog(bool isTable, QueueTable? table) {
+    _clearControllers();
+    var vm = context.read<TableManagementViewModel>();
     showDialog(
       context: context,
       builder: (_) => CustomDialog(
         title: "Are you sure?",
         content: Text(
-          isTable
-              ? "Delete Table ($tableNum)"
-              : "This action will delete every table in the ($categoryName) category",
+          isTable && table != null
+              ? "Delete Table (${table.tableNum})"
+              : "This action will delete every table in the (${vm.currentSelectedCategory?.type ?? ""}) category",
           style: const TextStyle(
             color: AppTheme.primaryColor,
             fontSize: AppTheme.heading3,
@@ -731,10 +583,10 @@ class _TableManagementContentState extends State<TableManagementContent> {
               title: "Delete",
               color: AppTheme.accentRed,
               onPressed: () {
-                if (isTable) {
-                  _deleteTable(tableNum!);
-                } else {
-                  _deleteCategory(currentCategoryTable.id);
+                if (isTable && table != null) {
+                  _deleteTable(table);
+                } else if (vm.currentSelectedCategory != null) {
+                  _deleteCategory(vm.currentSelectedCategory!);
                 }
                 Navigator.pop(context);
               },
@@ -746,15 +598,19 @@ class _TableManagementContentState extends State<TableManagementContent> {
   }
 
   void showAddNewUpdateTableDialog({
-    required List<String> categoryTable,
-    String? tableNum,
-    String? tableCategory,
+    QueueTable? table,
+    TableCategory? tableCategory,
   }) {
-    final bool isUpdate = tableNum != null && tableCategory != null;
-    selectedCategory = isUpdate
-        ? tableCategory
-        : (categoryTable.isNotEmpty ? categoryTable.first : null);
-    _textController.text = isUpdate ? tableNum : "";
+    _clearControllers();
+    var vm = context.read<TableManagementViewModel>();
+    final bool isUpdate = table != null && tableCategory != null;
+    if (isUpdate) {
+      vm.updateCurrentSelectedCategory(tableCategory);
+    } else if (vm.tableCategories.isNotEmpty) {
+      vm.updateCurrentSelectedCategory(vm.tableCategories.first);
+    }
+
+    _textController.text = isUpdate ? table.tableNum : "";
 
     showDialog(
       context: context,
@@ -764,12 +620,16 @@ class _TableManagementContentState extends State<TableManagementContent> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              DropdownButtonFormField<String>(
-                initialValue: selectedCategory,
-                items: categoryTable
-                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+              DropdownButtonFormField<TableCategory>(
+                initialValue: vm.currentSelectedCategory,
+                items: vm.tableCategories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c.type)))
                     .toList(),
-                onChanged: (v) => setDialogState(() => selectedCategory = v),
+                onChanged: (v) => setDialogState(() {
+                  if (v != null) {
+                    vm.updateCurrentSelectedCategory(v);
+                  }
+                }),
                 decoration: const InputDecoration(
                   labelText: "Category",
                   border: OutlineInputBorder(),
@@ -791,19 +651,15 @@ class _TableManagementContentState extends State<TableManagementContent> {
               title: isUpdate ? "Update" : "Add new",
               color: AppTheme.secondaryColor,
               onPressed: () {
-                if (selectedCategory != null &&
-                    _textController.text.isNotEmpty) {
-                  if (isUpdate) {
-                    _updateTable(
-                      tableNum,
-                      _textController.text,
-                      selectedCategory!,
-                    );
-                  } else {
-                    _addNewTable(_textController.text, selectedCategory!);
-                  }
-                  Navigator.pop(context);
+                if (isUpdate) {
+                  _updateTable(table.copyWith(tableNum: _textController.text));
+                } else if (vm.currentSelectedCategory != null) {
+                  _addNewTable(
+                    _textController.text,
+                    vm.currentSelectedCategory!,
+                  );
                 }
+                Navigator.pop(context);
               },
             ),
           ],
@@ -812,12 +668,11 @@ class _TableManagementContentState extends State<TableManagementContent> {
     );
   }
 
-  void showAddNewUpdateCategoryDialog({String? tableCategory}) {
+  void showAddNewUpdateCategoryDialog({TableCategory? tableCategory}) {
+    _clearControllers();
     final bool isUpdate = tableCategory != null;
-    _textController.text = isUpdate ? tableCategory : "";
-    _seatController.text = isUpdate
-        ? currentCategoryTable.seatAmount.toString()
-        : "2";
+    _textController.text = isUpdate ? tableCategory.type : "";
+    _seatController.text = isUpdate ? tableCategory.seatAmount.toString() : "2";
 
     showDialog(
       context: context,
@@ -842,6 +697,15 @@ class _TableManagementContentState extends State<TableManagementContent> {
                 border: OutlineInputBorder(),
               ),
             ),
+            const SizedBox(height: AppTheme.spacingS),
+            TextFormField(
+              controller: _minSeatController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Min Seats",
+                border: OutlineInputBorder(),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -851,16 +715,21 @@ class _TableManagementContentState extends State<TableManagementContent> {
             onPressed: () {
               if (_textController.text.isNotEmpty) {
                 if (isUpdate) {
-                  _updateCategory(
-                    tableCategory,
-                    _textController.text,
-                    int.tryParse(_seatController.text) ?? 2,
+                  TableCategory newCategory = tableCategory.copyWith(
+                    type: _textController.text.isNotEmpty
+                        ? _textController.text
+                        : null,
+                    minSeat: int.tryParse(_minSeatController.text) ?? 1,
+                    seatAmount: int.tryParse(_seatController.text) ?? 2,
                   );
+                  _updateCategory(newCategory);
                 } else {
-                  _addNewCategory(
-                    _textController.text,
-                    int.tryParse(_seatController.text) ?? 2,
+                  TableCategory newCategory = TableCategory(
+                    type: _textController.text,
+                    minSeat: int.tryParse(_minSeatController.text) ?? 1,
+                    seatAmount: int.tryParse(_seatController.text) ?? 2,
                   );
+                  _addNewCategory(newCategory);
                 }
                 Navigator.pop(context);
               }
@@ -869,6 +738,12 @@ class _TableManagementContentState extends State<TableManagementContent> {
         ],
       ),
     );
+  }
+
+  void _clearControllers() {
+    _minSeatController.clear();
+    _textController.clear();
+    _seatController.clear();
   }
 }
 

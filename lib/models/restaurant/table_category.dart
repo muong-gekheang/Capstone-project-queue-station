@@ -19,6 +19,15 @@ class TableCategory {
     required this.seatAmount,
   }) : id = categoryId ?? uuid.v4();
 
+  TableCategory copyWith({String? type, int? minSeat, int? seatAmount}) {
+    return TableCategory(
+      categoryId: id, // Keep the same ID
+      type: type ?? this.type,
+      minSeat: minSeat ?? this.minSeat,
+      seatAmount: seatAmount ?? this.seatAmount,
+    );
+  }
+
   factory TableCategory.fromJson(Map<String, dynamic> json) =>
       _$TableCategoryFromJson(json);
 

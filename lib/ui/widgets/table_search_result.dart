@@ -13,7 +13,7 @@ class TableSearchResult extends StatelessWidget {
 
   final List<QueueTable> allTables;
   final bool isEditMode;
-  final void Function(String tableNum, TableStatus status) onTable;
+  final void Function(QueueTable table, TableStatus status) onTable;
   final VoidCallback onAddTable;
 
   @override
@@ -95,12 +95,11 @@ class TableBox extends StatelessWidget {
   });
 
   final QueueTable table;
-  final void Function(String tableNum, TableStatus status) onTable;
+  final void Function(QueueTable table, TableStatus status) onTable;
   final bool isEditMode;
 
   @override
   Widget build(BuildContext context) {
-    String tableNum = table.tableNum;
     TableStatus status = table.tableStatus;
 
     Widget showEditIcon = isEditMode
@@ -114,7 +113,7 @@ class TableBox extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () => onTable(tableNum, status),
+      onTap: () => onTable(table, status),
       child: Container(
         decoration: BoxDecoration(
           color: AppTheme.naturalWhite,
