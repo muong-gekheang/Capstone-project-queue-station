@@ -8,7 +8,7 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/analyti
 import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/view_model/manage_store_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/table_management_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_queue_history/store_queue_history_screen.dart';
 
 class ManageStoreContent extends StatefulWidget {
   const ManageStoreContent({super.key});

@@ -16,7 +16,6 @@ class AddSizeScreen extends StatefulWidget {
 class _AddSizeScreenState extends State<AddSizeScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _sizeController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
   List<SizeOption> selectedSizes = [];
   @override
   void initState() {

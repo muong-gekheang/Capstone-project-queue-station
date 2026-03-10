@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
+import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
@@ -57,24 +60,13 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    RestaurantRepository restaurantRepository = context
-        .read<RestaurantRepository>();
-
-    UserRepository<StoreUser> userRepository = context
-        .read<UserRepository<StoreUser>>();
-
-    QueueEntryRepository queueEntryRepository = context
-        .read<QueueEntryRepository>();
-
-    QueueTableRepository queueTableRepository = context
-        .read<QueueTableRepository>();
     return MultiProvider(
       providers: [
         ProxyProvider<UserProvider, RestaurantService>(
           update: (context, userProvider, restaurantService) {
             return RestaurantService(
               userProvider: userProvider,
-              restaurantRepository: restaurantRepository,
+              restaurantRepository: context.read<RestaurantRepository>(),
             );
           },
           dispose: (context, value) => value.dispose(),
@@ -83,7 +75,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         ProxyProvider<UserProvider, QueueService>(
           update: (context, userProvider, queueService) => QueueService(
             userProvider: userProvider,
-            queueEntryRepository: queueEntryRepository,
+            queueEntryRepository: context.read<QueueEntryRepository>(),
           ),
           dispose: (context, value) => value.dispose(),
         ),
@@ -92,7 +84,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
           update: (context, userProvider, restaurantService) {
             return StoreProfileService(
               userProvider: userProvider,
-              userRepository: userRepository,
+              userRepository: context.read<UserRepository<StoreUser>>(),
             );
           },
         ),
@@ -100,7 +92,16 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         ProxyProvider<UserProvider, TableService>(
           update: (context, userProvider, queueService) => TableService(
             userProvider: userProvider,
-            queueTableRepository: queueTableRepository,
+            queueTableRepository: context.read<QueueTableRepository>(),
+            tableCategoryRepository: context.read<TableCategoryRepository>(),
+          ),
+          dispose: (context, value) => value.dispose(),
+        ),
+
+        ProxyProvider<UserProvider, MenuService>(
+          update: (context, userProvider, menuService) => MenuService(
+            userProvider: userProvider,
+            menuItemRepository: context.read<MenuItemRepository>(),
           ),
           dispose: (context, value) => value.dispose(),
         ),
