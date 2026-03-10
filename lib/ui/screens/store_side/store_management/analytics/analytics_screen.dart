@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/store/analytics_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/widgets/analytics_content.dart';
 
@@ -9,8 +10,11 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AnalyticsViewModel(),
-      child: AnalyticsContent(),
+      create: (_) => AnalyticsViewModel(
+        analyticsService: context
+            .read<AnalyticsService>(), // Inject the service here
+      ),
+      child: const AnalyticsContent(),
     );
   }
 }

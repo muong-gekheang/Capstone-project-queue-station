@@ -44,46 +44,48 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
   }
 
   Widget _buildStoreProfileImage() {
-    final storeService = StoreProfileService();
-    final profileImage = storeService.storeProfileImage;
-    final storeName = storeService.storeName;
+    var storeService = context.read<StoreProfileService>();
+    final profileImage = "assets/home_screen";
+    final storeName = storeService.storeUser?.name;
     return Container(
       margin: const EdgeInsets.only(right: 8),
-      child: profileImage != null
-          ? ClipRRect(
+      child: //!= null
+          // ? ClipRRect(
+          //     borderRadius: BorderRadius.circular(20),
+          //     child: Image.file(
+          //       profileImage,
+          //       width: 40,
+          //       height: 40,
+          //       fit: BoxFit.cover,
+          //     ),
+          //   )
+          Container(
+            width: 40,
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
               borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                profileImage,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Container(
-              width: 40,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
-                  style: const TextStyle(
-                    color: Color(0xFFFF6835),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
+            ),
+            child: Center(
+              child: Text(
+                storeName != null && storeName.isNotEmpty
+                    ? storeName[0].toUpperCase()
+                    : 'S',
+                style: const TextStyle(
+                  color: Color(0xFFFF6835),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
               ),
             ),
+          ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    AnalyticsViewModel analyticsViewModel = context.watch<AnalyticsViewModel>();
+    AnalyticsViewModel vm = context.watch<AnalyticsViewModel>();
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
@@ -111,7 +113,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
           ),
         ],
       ),
-      body: analyticsViewModel.isLoading
+      body: vm.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -121,43 +123,43 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                   // Stat Cards
                   _buildStatCard(
                     'People Waiting',
-                    '${_stats?.peopleWaiting ?? 0}',
+                    '${vm.stats?.peopleWaiting ?? 0}',
                     '',
                   ),
                   const SizedBox(height: 12),
                   _buildStatCard(
                     'Average Wait Time',
-                    '${_stats?.averageWaitTimeMinutes ?? 0}',
+                    '${vm.stats?.averageWaitTimeMinutes ?? 0}',
                     'min',
                   ),
                   const SizedBox(height: 12),
                   _buildStatCard(
                     'Active Tables',
-                    '${_stats?.activeTables ?? 0}',
+                    '${vm.stats?.activeTables ?? 0}',
                     '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard('Orders', '$_totalOrders', 'orders'),
+                  _buildStatCard('Orders', '${vm.totalOrders}', 'orders'),
                   const SizedBox(height: 24),
 
                   // Queue Length Chart
-                  _buildQueueLengthChart(),
+                  _buildQueueLengthChart(vm),
                   const SizedBox(height: 24),
 
                   // Table Occupancy Chart
-                  _buildTableOccupancyChart(),
+                  _buildTableOccupancyChart(vm),
                   const SizedBox(height: 24),
 
                   // Average Order Value Chart
-                  _buildAverageOrderValueChart(),
+                  _buildAverageOrderValueChart(vm),
                   const SizedBox(height: 24),
 
                   // Orders Line Chart
-                  _buildOrdersLineChart(),
+                  _buildOrdersLineChart(vm),
                   const SizedBox(height: 24),
 
                   // Order Summary Table
-                  _buildOrderSummaryTable(),
+                  _buildOrderSummaryTable(vm),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -223,7 +225,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildQueueLengthChart() {
+  Widget _buildQueueLengthChart(AnalyticsViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -254,13 +256,13 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
               GestureDetector(
                 onTap: () => _showTimeframeSelector(
                   'queueLength',
-                  _queueLengthTimeframe,
-                  (value) => setState(() => _queueLengthTimeframe = value),
+                  vm.queueLengthTimeframe,
+                  (value) => setState(() => vm.queueLengthTimeframe = value),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      _queueLengthTimeframe,
+                      vm.queueLengthTimeframe,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -306,11 +308,11 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
-                        if (_queueLengthData.isEmpty) return const Text('');
+                        if (vm.queueLengthData.isEmpty) return const Text('');
                         final index = value.toInt();
-                        if (index >= 0 && index < _queueLengthData.length) {
-                          final time = _queueLengthData[index].time;
-                          if (_queueLengthTimeframe == 'Today') {
+                        if (index >= 0 && index < vm.queueLengthData.length) {
+                          final time = vm.queueLengthData[index].time;
+                          if (vm.queueLengthTimeframe == 'Today') {
                             final hour = time.hour;
                             if (hour == 8 ||
                                 hour == 10 ||
@@ -350,7 +352,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: _queueLengthData.asMap().entries.map((entry) {
+                    spots: vm.queueLengthData.asMap().entries.map((entry) {
                       return FlSpot(
                         entry.key.toDouble(),
                         entry.value.queueLength.toDouble(),
@@ -379,7 +381,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildTableOccupancyChart() {
+  Widget _buildTableOccupancyChart(AnalyticsViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -410,13 +412,13 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
               GestureDetector(
                 onTap: () => _showTimeframeSelector(
                   'tableOccupancy',
-                  _tableOccupancyTimeframe,
-                  (value) => setState(() => _tableOccupancyTimeframe = value),
+                  vm.tableOccupancyTimeframe,
+                  (value) => setState(() => vm.tableOccupancyTimeframe = value),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      _tableOccupancyTimeframe,
+                      vm.tableOccupancyTimeframe,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -458,11 +460,15 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
-                        if (_tableOccupancyData.isEmpty) return const Text('');
+                        if (vm.tableOccupancyData.isEmpty) {
+                          return const Text('');
+                        }
+
                         final index = value.toInt();
-                        if (index >= 0 && index < _tableOccupancyData.length) {
+                        if (index >= 0 &&
+                            index < vm.tableOccupancyData.length) {
                           return Text(
-                            _tableOccupancyData[index].day,
+                            vm.tableOccupancyData[index].day,
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.grey,
@@ -481,7 +487,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                   ),
                 ),
                 borderData: FlBorderData(show: false),
-                barGroups: _tableOccupancyData.asMap().entries.map((entry) {
+                barGroups: vm.tableOccupancyData.asMap().entries.map((entry) {
                   return BarChartGroupData(
                     x: entry.key,
                     barRods: [
@@ -505,7 +511,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildAverageOrderValueChart() {
+  Widget _buildAverageOrderValueChart(AnalyticsViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -536,13 +542,13 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
               GestureDetector(
                 onTap: () => _showTimeframeSelector(
                   'orderValue',
-                  _orderValueTimeframe,
-                  (value) => setState(() => _orderValueTimeframe = value),
+                  vm.orderValueTimeframe,
+                  (value) => setState(() => vm.orderValueTimeframe = value),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      _orderValueTimeframe,
+                      vm.orderValueTimeframe,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -584,11 +590,11 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
-                        if (_orderValueData.isEmpty) return const Text('');
+                        if (vm.orderValueData.isEmpty) return const Text('');
                         final index = value.toInt();
-                        if (index >= 0 && index < _orderValueData.length) {
+                        if (index >= 0 && index < vm.orderValueData.length) {
                           return Text(
-                            _orderValueData[index].day,
+                            vm.orderValueData[index].day,
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.grey,
@@ -607,7 +613,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                   ),
                 ),
                 borderData: FlBorderData(show: false),
-                barGroups: _orderValueData.asMap().entries.map((entry) {
+                barGroups: vm.orderValueData.asMap().entries.map((entry) {
                   return BarChartGroupData(
                     x: entry.key,
                     barRods: [
@@ -631,8 +637,8 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildOrdersLineChart() {
-    if (_ordersLineData.isEmpty) return const SizedBox();
+  Widget _buildOrdersLineChart(AnalyticsViewModel vm) {
+    if (vm.ordersLineData.isEmpty) return const SizedBox();
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -660,13 +666,13 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
               GestureDetector(
                 onTap: () => _showTimeframeSelector(
                   'orders',
-                  _ordersTimeframe,
-                  (v) => setState(() => _ordersTimeframe = v),
+                  vm.ordersTimeframe,
+                  (v) => setState(() => vm.ordersTimeframe = v),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      _ordersTimeframe,
+                      vm.ordersTimeframe,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -688,7 +694,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                     isCurved: true,
                     barWidth: 3,
                     color: const Color(0xFF7987FF),
-                    spots: _ordersLineData
+                    spots: vm.ordersLineData
                         .asMap()
                         .entries
                         .map((e) => FlSpot(e.key.toDouble(), e.value.amount))
@@ -703,7 +709,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildOrderSummaryTable() {
+  Widget _buildOrderSummaryTable(AnalyticsViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -734,19 +740,16 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
               GestureDetector(
                 onTap: () => _showTimeframeSelector(
                   'orderSummary',
-                  _orderSummaryTimeframe,
+                  vm.orderSummaryTimeframe,
                   (value) {
-                    setState(() {
-                      _orderSummaryTimeframe = value;
-                      _isLoading = true;
-                    });
-                    _loadAnalyticsData();
+                    vm.orderSummaryTimeframe = value;
+                    vm.loadAllData();
                   },
                 ),
                 child: Row(
                   children: [
                     Text(
-                      _orderSummaryTimeframe,
+                      vm.orderSummaryTimeframe,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -756,7 +759,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
             ],
           ),
           const SizedBox(height: 20),
-          _orderSummary.isEmpty
+          vm.orderSummary.isEmpty
               ? const Center(
                   child: Padding(
                     padding: EdgeInsets.all(16),
@@ -772,7 +775,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                     DataColumn(label: Text('Table')),
                     DataColumn(label: Text('Amount')),
                   ],
-                  rows: _orderSummary.map((order) {
+                  rows: vm.orderSummary.map((order) {
                     return DataRow(
                       cells: [
                         DataCell(Text(order.time)),

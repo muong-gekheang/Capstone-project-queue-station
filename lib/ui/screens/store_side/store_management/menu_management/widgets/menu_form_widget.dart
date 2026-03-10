@@ -7,9 +7,9 @@ import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_category.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/add_size_management.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_category.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_ons_management.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_size_management.dart';
 import 'package:queue_station_app/ui/widgets/add_on_tile_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_size_tile_widget.dart';
@@ -32,7 +32,6 @@ class _MenuFormState extends State<MenuForm> {
   late final TextEditingController _nameController = TextEditingController();
   late final TextEditingController _descriptionController =
       TextEditingController();
-  late final TextEditingController _priceController = TextEditingController();
   late TextEditingController _minTimeController = TextEditingController();
   late TextEditingController _maxTimeController = TextEditingController();
 
@@ -220,18 +219,6 @@ class _MenuFormState extends State<MenuForm> {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    // Expanded(
-                    //   child: TextFieldWidget(
-                    //     title: 'Price',
-                    //     hintText: '9.9',
-                    //     prefixText: '\$',
-                    //     color: Theme.of(
-                    //       context,
-                    //     ).colorScheme.secondary.withAlpha(127),
-                    //     validator: _nullValidator,
-                    //     textController: _priceController,
-                    //   ),
-                    // ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(

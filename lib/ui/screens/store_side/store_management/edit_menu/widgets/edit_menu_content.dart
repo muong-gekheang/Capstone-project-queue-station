@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/view_model/edit_menu_view_model.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
-import 'package:queue_station_app/ui/widgets/menu_form_widget.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/menu_form_widget.dart';
 
 class EditMenuContent extends StatelessWidget {
   final MenuItem existingMenu;

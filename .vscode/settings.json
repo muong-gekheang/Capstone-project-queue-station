@@ -1,5 +1,6 @@
 {
   "cmake.sourceDirectory": "D:/term2-year3/capstone 2/Capstone-project-queue-station/linux",
   "java.configuration.updateBuildConfiguration": "interactive",
-  "cmake.ignoreCMakeListsMissing": true
+  "cmake.ignoreCMakeListsMissing": true,
+  "cSpell.words": ["formattedtime"]
 }

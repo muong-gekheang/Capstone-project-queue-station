@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
@@ -7,16 +8,10 @@ class StoreQueueHistoryDetail extends StatelessWidget {
   final QueueEntry queueEntry;
   const StoreQueueHistoryDetail({super.key, required this.queueEntry});
 
-  String getUserName() {
-    return mockUsers
-        .firstWhere((user) => user.id == queueEntry.customerId)
-        .name;
-  }
-
-  Widget orderDetail() {
-    if (queueEntry.order != null && queueEntry.order!.ordered.isNotEmpty) {
+  Widget orderDetail(BuildContext context) {
+    if (queueEntry.orderId != null) {
       return Column(
-        children: queueEntry.order!.ordered.map((orderItem) {
+        children: mockOrders[0].ordered.map((orderItem) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -50,7 +45,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    getUserName(),
+                    queueEntry.customerName ?? "",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   SizedBox(height: 10),
@@ -228,7 +223,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                   SizedBox(height: 5),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: orderDetail(),
+                    child: orderDetail(context),
                   ),
                 ],
               ),

@@ -3,7 +3,7 @@ import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/add_new_add_on_menu.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_add_on_menu.dart';
 
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';

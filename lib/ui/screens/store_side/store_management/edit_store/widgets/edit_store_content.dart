@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/view_model/edit_store_view_model.dart';
 import 'package:queue_station_app/ui/widgets/custom_success_snackbar.dart';
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 import 'package:uuid/uuid.dart';
@@ -24,13 +26,14 @@ class _AddNewCategoryState extends State<AddNewCategory> {
   }
 
   void onSave() {
+    var vm = context.read<MenuManagementViewModel>();
     if (!_formKey.currentState!.validate()) {
       return;
     }
     final categoryName = _categoryNameController.text;
-    final newCategory = MenuItemCategory(id: Uuid().v4(), name: categoryName, ); // how about id?
- 
-    Navigator.pop(context, newCategory);
+    final newCategory = MenuItemCategory(id: Uuid().v4(), name: categoryName);
+    vm.AddNewCategory(newCategory);
+    Navigator.pop(context);
   }
 
   @override

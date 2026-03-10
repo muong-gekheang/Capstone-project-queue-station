@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
@@ -102,6 +103,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
           update: (context, userProvider, menuService) => MenuService(
             userProvider: userProvider,
             menuItemRepository: context.read<MenuItemRepository>(),
+            menuCategoryRepository: context.read<MenuCategoryRepository>(),
           ),
           dispose: (context, value) => value.dispose(),
         ),

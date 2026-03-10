@@ -1,10 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:queue_station_app/services/store/analytics_service.dart';
 import 'dart:async'; // For Timer
-import 'package:queue_station_app/services/store/queue_service.dart';
+
+import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/analytic/order_summary.dart';
+import 'package:queue_station_app/services/store/analytics_service.dart';
+
+enum TimeFrameOption {
+  today("Today", Duration(minutes: 15)),
+  thisWeek("This Week", Duration(hours: 6)),
+  thisMonth("This Month", Duration(days: 1)),
+  thisYear("This Year", Duration(days: 31));
+
+  final String label;
+  final Duration bucketSize;
+
+  const TimeFrameOption(this.label, this.bucketSize);
+}
 
 class AnalyticsViewModel extends ChangeNotifier {
   final AnalyticsService _analyticsService;
@@ -54,13 +66,13 @@ class AnalyticsViewModel extends ChangeNotifier {
 
     try {
       final results = await Future.wait([
-        _queueService.getDashboardStats(),
-        _repository.getTotalOrdersCount(),
-        _repository.getQueueLengthData(queueLengthTimeframe),
-        _repository.getTableOccupancyData(tableOccupancyTimeframe),
-        _repository.getAverageOrderValueData(orderValueTimeframe),
-        _repository.getOrderSummary(ordersTimeframe),
-        _repository.getOrderSummary(orderSummaryTimeframe),
+        _analyticsService.dashboardStats,
+        _analyticsService.totalOrders,
+        _analyticsService.getQueueLengthData(queueLengthTimeframe),
+        _analyticsService.getTableOccupancyData(tableOccupancyTimeframe),
+        _analyticsService.getAverageOrderValueData(orderValueTimeframe),
+        _analyticsService.getOrderSummary(ordersTimeframe),
+        _analyticsService.getOrderSummary(orderSummaryTimeframe),
       ]);
 
       _stats = results[0] as DashboardStats;
@@ -116,7 +128,7 @@ class AnalyticsViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    _refreshTimer?.cancel(); // CRITICAL: Stop the timer when leaving the screen
+    _refreshTimer?.cancel();
     super.dispose();
   }
 }

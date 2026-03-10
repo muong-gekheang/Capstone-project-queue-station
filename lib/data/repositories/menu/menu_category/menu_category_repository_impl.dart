@@ -121,9 +121,10 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
   }
 
   @override
-  Stream<List<MenuItemCategory>> watchAllMenuCategory() {
+  Stream<List<MenuItemCategory>> watchAllMenuCategory(String restId) {
     return fireStore
         .collection('menu_item_categories')
+        .where("restaurantId", isEqualTo: restId)
         .orderBy('name')
         .snapshots()
         .map(

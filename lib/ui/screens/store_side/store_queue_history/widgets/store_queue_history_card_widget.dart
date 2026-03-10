@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/user/mock/mock_user_data.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history_detail.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_queue_history/widgets/store_queue_history_detail.dart';
 
 class StoreQueueHistoryCard extends StatelessWidget {
   final QueueEntry queueEntry;

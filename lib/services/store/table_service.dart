@@ -90,6 +90,8 @@ class TableService {
 
   // For Service-to-Service operation
   List<QueueTable> _tables = [];
+  List<QueueTable> get tables => _tables;
 
   List<TableCategory> _tableCategories = [];
+  List<TableCategory> get tableCategories => _tableCategories;
 }

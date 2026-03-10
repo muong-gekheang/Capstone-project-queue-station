@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';

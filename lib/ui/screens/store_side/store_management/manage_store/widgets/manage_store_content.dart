@@ -7,7 +7,7 @@ import 'package:queue_station_app/ui/screens/notification/notification_screen.da
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/analytics_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/view_model/manage_store_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/table_management_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/menu_management.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/menu_management_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_queue_history/store_queue_history_screen.dart';
 
 class ManageStoreContent extends StatefulWidget {
@@ -247,7 +247,7 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MenuManagement()),
+              MaterialPageRoute(builder: (context) => MenuManagementScreen()),
             );
           },
         ),
@@ -377,7 +377,7 @@ class _ActionCard extends StatelessWidget {
   final Color iconColor;
   final VoidCallback? onTap;
 
-  const _ActionCard(this.icon, this.label, this.iconColor, {this.onTap});
+  const _ActionCard(this.icon, this.label, this.iconColor, this.onTap);
 
   @override
   Widget build(BuildContext context) {
