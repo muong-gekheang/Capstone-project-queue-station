@@ -100,14 +100,32 @@ class StoreQueueHistoryContent extends StatelessWidget {
   }
 
   Widget _buildHistoryList(StoreQueueHistoryViewModel vm) {
-    // Note: Here you'd likely be using a StreamBuilder or similar
-    // to get data from your Service, then passing it to vm.getFilteredHistory()
-    final filteredResults = vm.getFilteredHistory([]); // Pass actual data here
+    final filteredResults = vm.getFilteredHistory();
 
-    return ListView.builder(
-      itemCount: filteredResults.length,
-      itemBuilder: (context, index) =>
-          StoreQueueHistoryCard(queueEntry: filteredResults[index]),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        if (scrollInfo.metrics.pixels >=
+            scrollInfo.metrics.maxScrollExtent - 200) {
+          vm.loadMore();
+        }
+        return true;
+      },
+      child: ListView.builder(
+        // Add one extra item for the loading indicator if we are fetching
+        itemCount: filteredResults.length + (vm.isFetching ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index < filteredResults.length) {
+            return StoreQueueHistoryCard(queueEntry: filteredResults[index]);
+          } else {
+            return Padding(
+              padding: EdgeInsets.all(8.0),
+              child: vm.hasMoreData
+                  ? Center(child: CircularProgressIndicator())
+                  : Text("There is no more history."),
+            );
+          }
+        },
+      ),
     );
   }
 }

@@ -91,7 +91,7 @@ class QueueEntryRepositoryMock implements QueueEntryRepository {
 
   @override
   Future<(List<QueueEntry>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getTodayHistory(
+  getQueueHistory(
     String restaurantId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,

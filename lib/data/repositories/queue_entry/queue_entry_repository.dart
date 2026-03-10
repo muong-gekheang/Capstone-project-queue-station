@@ -28,7 +28,7 @@ abstract class QueueEntryRepository {
   );
 
   Future<(List<QueueEntry>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getTodayHistory(
+  getQueueHistory(
     String restaurantId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,

@@ -4,16 +4,12 @@ import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueEntryRepositoryImpl implements QueueEntryRepository {
   final FirebaseFirestore fireStore;
-  List<QueueEntry> todayFinishedQueue = [];
-  DateTime? retrievedAt;
 
   QueueEntryRepositoryImpl({FirebaseFirestore? fireStore})
     : fireStore = fireStore ?? FirebaseFirestore.instance;
   @override
   Future<void> create(QueueEntry queueEntry) async {
-    final queueEntryRef = fireStore
-        .collection('queue_entries')
-        .doc(queueEntry.id);
+    final queueEntryRef = fireStore.doc(queueEntry.id);
 
     final queueEntryJson = queueEntry.toJson();
 
@@ -160,23 +156,11 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
 
   @override
   Future<(List<QueueEntry>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getTodayHistory(
+  getQueueHistory(
     String restaurantId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   ) async {
-    if (todayFinishedQueue.isNotEmpty) {
-      return (todayFinishedQueue, null);
-    }
-
-    if (retrievedAt != null &&
-        retrievedAt!.difference(DateTime.now()) > Duration(minutes: 60)) {
-      return (todayFinishedQueue, null);
-    }
-
-    final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day);
-
     var query = fireStore
         .collection('queueEntries')
         .where('restaurantId', isEqualTo: restaurantId)
@@ -184,11 +168,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
           'status',
           whereIn: [QueueStatus.completed.name, QueueStatus.serving.name],
         ) // Filter for both statuses
-        .where(
-          'createdAt',
-          isGreaterThanOrEqualTo: startOfToday,
-        ) // Filter for today
-        .orderBy('createdAt', descending: true)
+        .orderBy('joinTime', descending: true)
         .limit(limit);
 
     if (lastDoc != null) {
@@ -203,8 +183,6 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     }).toList();
 
     final nextCursor = snap.docs.isEmpty ? null : snap.docs.last;
-    todayFinishedQueue = queueEntries;
-    retrievedAt = DateTime.now();
     return (queueEntries, nextCursor);
   }
 
