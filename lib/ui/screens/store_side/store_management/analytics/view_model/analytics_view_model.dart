@@ -40,11 +40,46 @@ class AnalyticsViewModel extends ChangeNotifier {
   List<OrderSummary> _orderSummary = [];
 
   // --- Timeframes (Moved from View to VM) ---
-  String queueLengthTimeframe = 'Today';
-  String tableOccupancyTimeframe = 'This Week';
-  String orderValueTimeframe = 'This Week';
-  String ordersTimeframe = 'Today';
-  String orderSummaryTimeframe = 'Today';
+  TimeFrameOption _queueLengthTimeframe = TimeFrameOption.today;
+
+  TimeFrameOption get queueLengthTimeframe => _queueLengthTimeframe;
+
+  set queueLengthTimeframe(TimeFrameOption newTimeFrame) {
+    _queueLengthTimeframe = newTimeFrame;
+    notifyListeners();
+  }
+
+  TimeFrameOption _tableOccupancyTimeframe = TimeFrameOption.thisWeek;
+  TimeFrameOption get tableOccupancyTimeframe => _tableOccupancyTimeframe;
+
+  set tableOccupancyTimeframe(TimeFrameOption newTimeFrame) {
+    _tableOccupancyTimeframe = newTimeFrame;
+    notifyListeners();
+  }
+
+  TimeFrameOption _orderValueTimeframe = TimeFrameOption.thisWeek;
+  TimeFrameOption get orderValueTimeframe => _orderValueTimeframe;
+
+  set orderValueTimeframe(TimeFrameOption newTimeFrame) {
+    _orderValueTimeframe = newTimeFrame;
+    notifyListeners();
+  }
+
+  TimeFrameOption _ordersTimeframe = TimeFrameOption.today;
+  TimeFrameOption get ordersTimeframe => _ordersTimeframe;
+
+  set ordersTimeframe(TimeFrameOption newTimeFrame) {
+    _ordersTimeframe = newTimeFrame;
+    notifyListeners();
+  }
+
+  TimeFrameOption _orderSummaryTimeframe = TimeFrameOption.today;
+  TimeFrameOption get orderSummaryTimeframe => _orderSummaryTimeframe;
+
+  set orderSummaryTimeframe(TimeFrameOption newTimeFrame) {
+    _orderSummaryTimeframe = newTimeFrame;
+    notifyListeners();
+  }
 
   // --- Getters ---
   DashboardStats? get stats => _stats;
@@ -58,6 +93,46 @@ class AnalyticsViewModel extends ChangeNotifier {
 
   // --- Logic ---
 
+  Future<List<QueueLengthDataPoint>> loadQueueLength({
+    bool notifyListener = true,
+    required TimeFrameOption timeFrame,
+  }) async {
+    if (notifyListener) {
+      notifyListeners();
+    }
+    return [];
+  }
+
+  Future<List<TableOccupancyDataPoint>> loadTableOccupancy({
+    bool notifyListener = true,
+    required TimeFrameOption timeFrame,
+  }) async {
+    if (notifyListener) {
+      notifyListeners();
+    }
+    return [];
+  }
+
+  Future<List<OrderValueDataPoint>> loadAverageOrderValue({
+    bool notifyListener = true,
+    required TimeFrameOption timeFrame,
+  }) async {
+    if (notifyListener) {
+      notifyListeners();
+    }
+    return [];
+  }
+
+  Future<List<OrderSummary>> loadOrderSummary({
+    bool notifyListener = true,
+    required TimeFrameOption timeFrame,
+  }) async {
+    if (notifyListener) {
+      notifyListeners();
+    }
+    return [];
+  }
+
   Future<void> loadAllData({bool showLoading = true}) async {
     if (showLoading) {
       _isLoading = true;
@@ -65,15 +140,15 @@ class AnalyticsViewModel extends ChangeNotifier {
     }
 
     try {
-      final results = await Future.wait([
-        _analyticsService.dashboardStats,
+      final results = [
+        await _analyticsService.dashboardStats,
         _analyticsService.totalOrders,
-        _analyticsService.getQueueLengthData(queueLengthTimeframe),
-        _analyticsService.getTableOccupancyData(tableOccupancyTimeframe),
-        _analyticsService.getAverageOrderValueData(orderValueTimeframe),
-        _analyticsService.getOrderSummary(ordersTimeframe),
-        _analyticsService.getOrderSummary(orderSummaryTimeframe),
-      ]);
+        await loadQueueLength(timeFrame: queueLengthTimeframe),
+        await loadTableOccupancy(timeFrame: tableOccupancyTimeframe),
+        await loadAverageOrderValue(timeFrame: orderValueTimeframe),
+        await loadOrderSummary(timeFrame: ordersTimeframe),
+        await loadOrderSummary(timeFrame: orderSummaryTimeframe),
+      ];
 
       _stats = results[0] as DashboardStats;
       _totalOrders = results[1] as int;
@@ -90,28 +165,6 @@ class AnalyticsViewModel extends ChangeNotifier {
     }
   }
 
-  // Handle timeframe changes
-  void updateTimeframe(String type, String value) {
-    switch (type) {
-      case 'queueLength':
-        queueLengthTimeframe = value;
-        break;
-      case 'tableOccupancy':
-        tableOccupancyTimeframe = value;
-        break;
-      case 'orderValue':
-        orderValueTimeframe = value;
-        break;
-      case 'orders':
-        ordersTimeframe = value;
-        break;
-      case 'orderSummary':
-        orderSummaryTimeframe = value;
-        break;
-    }
-    loadAllData(); // Refresh specific data
-  }
-
   void _startPeriodicRefresh() {
     _refreshTimer?.cancel();
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
@@ -119,11 +172,11 @@ class AnalyticsViewModel extends ChangeNotifier {
     });
   }
 
-  List<String> get timeframeOptions => [
-    'Today',
-    'This Week',
-    'This Month',
-    'This Year',
+  List<TimeFrameOption> get timeframeOptions => [
+    TimeFrameOption.today,
+    TimeFrameOption.thisWeek,
+    TimeFrameOption.thisMonth,
+    TimeFrameOption.thisYear,
   ];
 
   @override

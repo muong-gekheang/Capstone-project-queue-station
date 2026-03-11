@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/mock_restaurant.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/user_provider.dart';
@@ -32,10 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
     Customer user = userProvider.asCustomer!;
-    final currentHistory = getHistoryById(user.currentHistoryId);
-    if (currentHistory != null) {
-      restaurants.removeWhere((rest) => rest.id == currentHistory.restId);
-    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(

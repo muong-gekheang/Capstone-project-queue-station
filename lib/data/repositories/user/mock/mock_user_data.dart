@@ -14,15 +14,7 @@ List<Customer> mockCustomers = [
     name: "Sok Dara",
     email: "dara.sok@gmail.com",
     phone: "012888777",
-    historyIds: mockQueueEntries
-        .where(
-          (q) =>
-              q.status == QueueStatus.completed ||
-              q.status == QueueStatus.cancelled,
-        )
-        .map((q) => q.id)
-        .take(3)
-        .toList(),
+    historyIds: [],
   ),
   Customer(
     id: uuid.v4(),
@@ -36,14 +28,14 @@ List<Customer> mockCustomers = [
     name: "Keo Pich",
     email: "pich.keo@yahoo.com",
     phone: "099444555",
-    historyIds: [mockQueueEntries.first.id],
+    historyIds: [],
   ),
   Customer(
     id: uuid.v4(),
     name: "Vannak Nimol",
     email: "nimol.v@gmail.com",
     phone: "088777666",
-    historyIds: mockQueueEntries.map((q) => q.id).toList(),
+    historyIds: [],
   ),
   Customer(
     id: uuid.v4(),
@@ -57,10 +49,11 @@ List<Customer> mockCustomers = [
 // --- 5 STORE USERS ---
 List<StoreUser> mockStoreUsers = [
   StoreUser(
-    id: uuid.v4(),
-    name: "Manager Rath",
-    email: "rath.manager@queuestation.com",
-    phone: "012333444",
+    id: "2fc46d2f-e126-4d20-ab07-eac1696fb295",
+    name: "Jackie",
+    email: "JackieStore@queuestation.com",
+    phone: "012589745",
+    restaurantId: "2fc46d2f-e126-4d20-ab07-eac1696fb295",
   ),
   StoreUser(
     id: uuid.v4(),

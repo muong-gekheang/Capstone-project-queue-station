@@ -3,10 +3,9 @@ import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 
 class AuthService {
-  // TODO: Implement the login (rn just this for easier development)
   Future<User?> login(String email, String password) async {
     await Future.delayed(const Duration(seconds: 1));
-    User newUser = email.isEmpty ? mockUsers[0] : mockUsers[1];
+    User newUser = email.isEmpty ? mockUsers[0] : mockUsers[5];
     return newUser;
   }
 

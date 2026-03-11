@@ -1,7 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
@@ -23,7 +22,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
 
   @override
   Widget build(BuildContext context) {
-    final currentHistory = getHistoryById(widget.user.currentHistoryId);
+    // final currentHistory = getHistoryById(widget.user.currentHistoryId);
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -134,8 +133,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                       ),
                     ),
                     Text(
-                      currentHistory?.restId ??
-                          "-", // TODO: Use Repos in VM to fetch and create Rest obj (Current Wait)
+                      "-", // TODO: Use Repos in VM to fetch and create Rest obj (Current Wait)
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,

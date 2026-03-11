@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 
@@ -15,8 +15,8 @@ class AnalyticsContent extends StatefulWidget {
 class _AnalyticsContentState extends State<AnalyticsContent> {
   void _showTimeframeSelector(
     String chartType,
-    String currentTimeframe,
-    Function(String) onSelected,
+    TimeFrameOption currentTimeframe,
+    Function(TimeFrameOption) onSelected,
   ) {
     AnalyticsViewModel analyticsViewModel = context.read<AnalyticsViewModel>();
     showModalBottomSheet(
@@ -27,7 +27,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
           mainAxisSize: MainAxisSize.min,
           children: analyticsViewModel.timeframeOptions.map((timeframe) {
             return ListTile(
-              title: Text(timeframe),
+              title: Text(timeframe.label),
               trailing: currentTimeframe == timeframe
                   ? const Icon(Icons.check, color: Color(0xFFFF6835))
                   : null,
@@ -257,12 +257,12 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 onTap: () => _showTimeframeSelector(
                   'queueLength',
                   vm.queueLengthTimeframe,
-                  (value) => setState(() => vm.queueLengthTimeframe = value),
+                  (value) => vm.queueLengthTimeframe = value,
                 ),
                 child: Row(
                   children: [
                     Text(
-                      vm.queueLengthTimeframe,
+                      vm.queueLengthTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -418,7 +418,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 child: Row(
                   children: [
                     Text(
-                      vm.tableOccupancyTimeframe,
+                      vm.tableOccupancyTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -468,7 +468,9 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                         if (index >= 0 &&
                             index < vm.tableOccupancyData.length) {
                           return Text(
-                            vm.tableOccupancyData[index].day,
+                            DateFormat(
+                              "d",
+                            ).format(vm.tableOccupancyData[index].day),
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.grey,
@@ -548,7 +550,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 child: Row(
                   children: [
                     Text(
-                      vm.orderValueTimeframe,
+                      vm.orderValueTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -672,7 +674,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 child: Row(
                   children: [
                     Text(
-                      vm.ordersTimeframe,
+                      vm.ordersTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -749,7 +751,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 child: Row(
                   children: [
                     Text(
-                      vm.orderSummaryTimeframe,
+                      vm.orderSummaryTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey),
@@ -778,7 +780,13 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                   rows: vm.orderSummary.map((order) {
                     return DataRow(
                       cells: [
-                        DataCell(Text(order.time)),
+                        DataCell(
+                          Text(
+                            DateFormat(
+                              DateFormat.HOUR24_MINUTE,
+                            ).format(order.time),
+                          ),
+                        ),
                         DataCell(Text(order.tableNumber)),
                         DataCell(Text('\$${order.amount.toStringAsFixed(2)}')),
                       ],

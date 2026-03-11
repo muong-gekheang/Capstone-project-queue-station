@@ -1,6 +1,5 @@
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/store/queue_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
@@ -35,13 +34,10 @@ class AnalyticsService {
     return 100; // TODO: Implement Order Service
   }
 
-  List<QueueLengthDataPoint> getGraphData(
-    List<QueueEntry> rawHistory,
-    TimeFrameOption option,
-  ) {
+  List<QueueLengthDataPoint> getQueueLengthData(TimeFrameOption option) {
     final Map<DateTime, int> buckets = {};
 
-    for (var entry in rawHistory) {
+    for (var entry in _queueService.queueHistory) {
       // This is the magic line: it rounds the time down to your bucket size
       final bucketTime = _roundToBucket(entry.joinTime, option.bucketSize);
 
@@ -50,6 +46,21 @@ class AnalyticsService {
 
     return buckets.entries
         .map((e) => QueueLengthDataPoint(time: e.key, queueLength: e.value))
+        .toList();
+  }
+
+  List<TableOccupancyDataPoint> getTableOccupancyData(TimeFrameOption option) {
+    final Map<DateTime, int> buckets = {};
+
+    for (var entry in _queueService.queueHistory) {
+      // This is the magic line: it rounds the time down to your bucket size
+      final bucketTime = _roundToBucket(entry.joinTime, option.bucketSize);
+
+      buckets[bucketTime] = (buckets[bucketTime] ?? 0) + 1;
+    }
+
+    return buckets.entries
+        .map((e) => TableOccupancyDataPoint(day: e.key, occupancyPercentage: 1))
         .toList();
   }
 

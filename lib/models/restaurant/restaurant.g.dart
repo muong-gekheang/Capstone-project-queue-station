@@ -35,12 +35,14 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
           ?.map((e) => e as String)
           .toList() ??
       [],
+  description: json['description'] as String?,
 );
 
 Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'description': instance.description,
       'address': instance.address,
       'logoLink': instance.logoLink,
       'policy': instance.policy,

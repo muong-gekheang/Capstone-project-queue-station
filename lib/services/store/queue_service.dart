@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 
 class QueueService {
+  final FirebaseFunctions functions = FirebaseFunctions.instance;
   final UserProvider _userProvider;
   final QueueEntryRepository _queueEntryRepository;
 
@@ -50,7 +53,35 @@ class QueueService {
       _queueEntryStreamController.stream;
 
   void addCustomerToQueue({required QueueEntry newQueue}) async {
-    _queueEntryRepository.create(newQueue);
+    try {
+      // 1. Point to your specific function name
+      HttpsCallable callable = functions.httpsCallable('createQueue');
+
+      // 2. Call the function with your data Map
+      final results = await callable.call({
+        "customerId": newQueue.restId,
+        "id": newQueue.id,
+        "joinedMethod": newQueue.joinedMethod.name,
+        "orderId": newQueue.orderId,
+        "restId": newQueue.restId,
+        "partySize": newQueue.partySize,
+        "customerName": newQueue.customerName,
+        "phoneNumber": newQueue.phoneNumber,
+        "joinTime": newQueue.joinTime,
+        "queueNumber": newQueue.id.substring(0, 4),
+      });
+
+      // 3. Handle the response (The data returned from your exports.createQueue)
+      print("Success! Assigned Queue Number: ${results.data['queueNumber']}");
+      print("Estimated Wait: ${results.data['expectedReadyAt']}");
+    } on FirebaseFunctionsException catch (e) {
+      // This catches the "HttpsError" you threw in Node.js
+      print("Code: ${e.code}");
+      print("Message: ${e.message}");
+      print("Details: ${e.details}");
+    } catch (e) {
+      print("General Error: $e");
+    }
   }
 
   void serveCustomer(String queueEntryId) {
@@ -109,6 +140,29 @@ class QueueService {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  Future<void> retrieveQueueHistory(TimeFrameOption timeFrame) async {
+    int limit = (timeFrame == TimeFrameOption.today) ? 100 : 500;
+
+    try {
+      final result = await _queueEntryRepository.getQueueHistory(
+        _restId,
+        limit,
+        null,
+      );
+
+      final newEntries = result.$1;
+      final existingIds = queueHistory.map((e) => e.id).toSet();
+
+      for (var entry in newEntries) {
+        if (!existingIds.contains(entry.id)) {
+          queueHistory.add(entry);
+        }
+      }
+    } catch (e) {
+      print("History Fetch Error: $e");
     }
   }
 

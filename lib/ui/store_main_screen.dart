@@ -33,12 +33,18 @@ class StoreMainScreen extends StatefulWidget {
 class _StoreMainScreenState extends State<StoreMainScreen> {
   NavTab _selectedTab = NavTab.dashboard;
 
-  List<Widget> get _screens => [
-    DashboardScreen(),
-    ManageStoreScreen(),
-    StoreQueueScreen(),
-    StoreSettingsScreen(),
-  ];
+  List<Widget> _screens = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      DashboardScreen(),
+      ManageStoreScreen(),
+      StoreQueueScreen(),
+      StoreSettingsScreen(),
+    ];
+  }
 
   void _onTabSelected(NavTab tab) {
     setState(() {

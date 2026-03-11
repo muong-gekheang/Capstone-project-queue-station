@@ -17,7 +17,7 @@ class QueueLengthDataPoint {
 
 @JsonSerializable()
 class TableOccupancyDataPoint {
-  final String day;
+  final DateTime day;
   final double occupancyPercentage;
 
   TableOccupancyDataPoint({

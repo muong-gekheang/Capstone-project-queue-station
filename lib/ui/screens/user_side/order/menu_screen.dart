@@ -23,7 +23,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   //must match both search and category
   List<MenuItem> get filteredMenuItems {
-    return allMenuItems.where((item) {
+    return mockMenuItems.where((item) {
       final matchesCategory = item.category.id == selectedCategoryId;
       final matchesSearch =
           searchQuery.isEmpty ||
