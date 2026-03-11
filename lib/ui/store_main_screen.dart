@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 
 import '../ui/widgets/store_side_bottom_nav.dart';
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/store_management/manage_store_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
 
-enum NavTab { dashboard, analytics, queue, settings }
+enum NavTab { dashboard, analytics, settings }
 
 class StoreMainScreen extends StatefulWidget {
-  const StoreMainScreen({super.key});
+  const StoreMainScreen({super.key, required user});
 
   @override
   State<StoreMainScreen> createState() => _StoreMainScreenState();
@@ -19,10 +17,9 @@ class StoreMainScreen extends StatefulWidget {
 class _StoreMainScreenState extends State<StoreMainScreen> {
   NavTab _selectedTab = NavTab.dashboard;
 
-  List<Widget> get _screens => [
+  final List<Widget> _screens = const [
     DashboardScreen(),
     ManageStorePage(),
-    StoreQueueScreen(),
     StoreSettingsScreen(),
   ];
 
@@ -38,10 +35,8 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         return 0;
       case NavTab.analytics:
         return 1;
-      case NavTab.queue:
-        return 2;
       case NavTab.settings:
-        return 3;
+        return 2;
     }
   }
 
