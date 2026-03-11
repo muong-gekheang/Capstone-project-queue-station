@@ -3,12 +3,25 @@ import 'package:flutter/material.dart';
 class ButtonWidget extends StatelessWidget {
   final IconData? leadingIcon;
   final String title;
-  final VoidCallback onPressed;
+  final String? trailingText;
+  final VoidCallback? onPressed;
   final Color backgroundColor;
+  final Color? borderColor; 
   final Color textColor;
-  final double borderRadius; 
+  final double borderRadius;
   final EdgeInsets? padding;
-  const ButtonWidget({super.key, this.leadingIcon, required this.title, required this.onPressed, required this.backgroundColor, required this.textColor, this.borderRadius = 50, required this.padding});
+  const ButtonWidget({
+    super.key,
+    this.leadingIcon,
+    required this.title,
+    this.trailingText,
+    required this.onPressed,
+    required this.backgroundColor,
+    required this.textColor,
+    this.borderRadius = 50,
+    this.borderColor,
+    required this.padding,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,21 +31,32 @@ class ButtonWidget extends StatelessWidget {
         elevation: 0,
         backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(borderRadius)
-        )
-      ),
-      onPressed: onPressed, 
-      child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if(leadingIcon != null)
-              Icon(leadingIcon, color: textColor,),
-            SizedBox(width: 3),
-            Text(title, style: TextStyle(color: textColor),),
-          ],
+          borderRadius: BorderRadiusGeometry.circular(borderRadius),
+          side: borderColor != null
+              ? BorderSide(color: borderColor!, width: 1)
+              : BorderSide.none,
         ),
-      )
-    );
+      ),
+      onPressed: onPressed,
+      child: trailingText == null
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (leadingIcon != null) ...[
+                Icon(leadingIcon, color: textColor),
+                const SizedBox(width: 5),
+              ],
+              Text(title, style: TextStyle(color: textColor)),
+            ],
+          )
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+              Text(trailingText!, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        );
   }
 }

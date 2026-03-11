@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/model/entities/history.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/order_card.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class HistoryViewScreen extends StatelessWidget {
   const HistoryViewScreen({super.key, required this.history});
-  final History history;
+  final QueueEntry history;
 
   @override
   Widget build(BuildContext context) {
     double screenSize = MediaQuery.sizeOf(context).width;
-    String guestSuffix = history.guests > 1 ? "People" : "Person";
+    String guestSuffix = history.partySize > 1 ? "People" : "Person";
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +42,8 @@ class HistoryViewScreen extends StatelessWidget {
                           spacing: 10,
                           children: [
                             Text(
-                              history.rest.name,
+                              history
+                                  .restId, // TODO: Use Repos in VM to fetch and create Rest obj
                               softWrap: true,
                               style: TextStyle(
                                 fontSize: 18,
@@ -60,7 +61,8 @@ class HistoryViewScreen extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    history.rest.address,
+                                    history
+                                        .restId, // TODO: Use Repos in VM to fetch and create Rest obj
                                     softWrap: true,
                                     style: TextStyle(
                                       color: Theme.of(
@@ -85,7 +87,7 @@ class HistoryViewScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    history.queueId,
+                    history.id.substring(0, 4),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 40,
@@ -120,7 +122,7 @@ class HistoryViewScreen extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       Text(
-                        DateFormat("dd / MMM/ yyyy").format(history.queueDate),
+                        DateFormat("dd / MMM/ yyyy").format(history.joinTime),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
@@ -138,7 +140,7 @@ class HistoryViewScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        DateFormat("h:mm:ss a").format(history.queueDate),
+                        DateFormat("h:mm:ss a").format(history.joinTime),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
@@ -156,7 +158,7 @@ class HistoryViewScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "${history.guests.toString()} $guestSuffix",
+                        "${history.partySize.toString()} $guestSuffix",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),

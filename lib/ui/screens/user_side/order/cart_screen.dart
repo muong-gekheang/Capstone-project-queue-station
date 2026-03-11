@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/entities/cart_item.dart';
-import 'package:queue_station_app/model/services/cart_provider.dart';
-import 'package:queue_station_app/model/services/order_provider.dart';
+import 'package:queue_station_app/models/order/order_item.dart';
+import 'package:queue_station_app/services/cart_provider.dart';
+import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
-  Future<void> _confirmDelete(BuildContext context, CartItem item) async {
+  void _handleConfirmOrder(BuildContext context, CartProvider cart) {
+    final orderProvider = context.read<OrderProvider>();
+    orderProvider.confirmCurrentOrder();
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pop(context);
+    });
+  }
+
+  Future<void> _confirmDelete(BuildContext context, OrderItem item) async {
     final shouldDelete = await showDialog(
       context: context,
       builder: (context) {
@@ -30,18 +38,15 @@ class CartScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "Are you sure you want to Remove ${item.menuItem.name} from the cart?",
+                "Are you sure you want to Remove ${item.item.name} from the cart?",
               ),
               SizedBox(
                 width: 100,
                 height: 100,
-                child: item.menuItem.image != null
+                child: item.item.image != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          item.menuItem.image!,
-                          fit: BoxFit.cover,
-                        ),
+                        child: Image.asset(item.item.image!, fit: BoxFit.cover),
                       )
                     : Icon(Icons.restaurant, color: Colors.grey[400]),
               ),
@@ -77,7 +82,7 @@ class CartScreen extends StatelessWidget {
     );
 
     if (shouldDelete == true) {
-      context.read<CartProvider>().removeItem(item.id);
+      context.read<CartProvider>().removeItem(item);
     }
   }
 
@@ -169,13 +174,13 @@ class CartScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final cartItem = cartItems[index];
                         return Slidable(
-                          key: ValueKey(cartItem.id),
+                          key: ValueKey(cartItem.menuItemId),
                           endActionPane: ActionPane(
                             motion: const ScrollMotion(),
                             children: [
                               SlidableAction(
                                 onPressed: (context) {
-                                  Navigator.push<CartItem>(
+                                  Navigator.push<OrderItem>(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
@@ -198,33 +203,47 @@ class CartScreen extends StatelessWidget {
                             ],
                           ),
                           child: FoodItemCard(
-                            name: cartItem.menuItem.name,
-                            image: cartItem.menuItem.image,
-                            size: cartItem.selectedSize?.name,
-                            addons: {
-                              for (final addon in cartItem.selectedAddOns)
-                                addon.name: addon.price,
-                            },
+                            name: cartItem.item.name,
+                            item: cartItem.item,
+                            image: cartItem.item.image,
+                            size: cartItem.size,
+                            addons: cartItem.addOns,
+                            price:
+                                (cartItem.menuItemPrice +
+                                    cartItem.addOns.values.fold(
+                                      0.0,
+                                      (a, b) => a + b,
+                                    )) *
+                                cartItem.quantity,
 
-                            price: cartItem.totalItemPrice,
                             quantity: cartItem.quantity,
-                            note: cartItem.note.isNotEmpty
-                                ? cartItem.note
-                                : null,
+                            note: cartItem.note,
                             isEditable: true,
                             onEdit: () {},
                             onIncrease: () {
-                              cartProvider.updateQuantity(
-                                cartItem.id,
-                                cartItem.quantity + 1,
+                              final updatedItem = OrderItem(
+                                menuItemId: cartItem.menuItemId,
+                                menuItemPrice: cartItem.menuItemPrice,
+                                quantity: cartItem.quantity + 1,
+                                item: cartItem.item,
+                                addOns: cartItem.addOns,
+                                size: cartItem.size,
+                                orderItemStatus: OrderItemStatus.pending,
                               );
+                              cartProvider.updateCartItem(cartItem, updatedItem);
                             },
                             onDecrease: () {
                               if (cartItem.quantity > 1) {
-                                cartProvider.updateQuantity(
-                                  cartItem.id,
-                                  cartItem.quantity - 1,
+                                final updatedItem = OrderItem(
+                                  menuItemId: cartItem.menuItemId,
+                                  menuItemPrice: cartItem.menuItemPrice,
+                                  quantity: cartItem.quantity - 1,
+                                  item: cartItem.item,
+                                  addOns: cartItem.addOns,
+                                  size: cartItem.size,
+                                  orderItemStatus: OrderItemStatus.pending,
                                 );
+                                cartProvider.updateCartItem(cartItem, updatedItem);
                               }
                             },
                           ),
@@ -318,33 +337,6 @@ class CartScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _handleConfirmOrder(BuildContext context, CartProvider cart) {
-    final orderProvider = context.read<OrderProvider>();
-    if (cart.items.isNotEmpty) {
-      orderProvider.addOrder(cart.items, cart.totalAmount);
-    }
-    cart.clear();
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
-            const Text(
-              "Order placed successfully",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF10B981),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
       ),
     );
   }

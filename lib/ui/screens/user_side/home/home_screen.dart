@@ -1,45 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/restaurant.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/join_queue_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/mock_restaurant.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/customer.dart';
+import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
+import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
+import 'package:uuid/uuid.dart';
 
-List<Restaurant> mockData = [
-  Restaurant(
-    name: 'Kungfu Kitchen',
-    address: "BKK St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-  ),
-  Restaurant(
-    name: 'Angle Hai',
-    address: "STM St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-  ),
-  Restaurant(
-    name: 'DoriDori Korean Chicken',
-    address: 'AEON MALL SEN SOK',
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-  ),
-  Restaurant(
-    name: 'Kungfu Kitchen',
-    address: "BKK St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-  ),
-  Restaurant(
-    name: 'Kungfu Kitchen',
-    address: "BKK St.57",
-    logoLink: '',
-    biggestTableSize: 10,
-    phone: "012255007",
-  ),
-];
+var uuid = Uuid();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,26 +20,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int selectedIndex = 0;
+  List<Restaurant> restaurants = [];
 
-  final List<String> iconPaths = [
-    'assets/images/home_icon.svg',
-    'assets/images/map_icon.svg',
-    'assets/images/food_ordering_icon.svg',
-    'assets/images/ticket_confirmation.svg',
-    'assets/images/profile_icon.svg',
-  ];
-
-  final List<String> labels = [
-    'Home',
-    'Map',
-    'Ticket Confirmation',
-    'Orders',
-    'Profile',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    restaurants = [...mockRestaurants];
+  }
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
+    Customer user = userProvider.asCustomer!;
+    final currentHistory = getHistoryById(user.currentHistoryId);
+    if (currentHistory != null) {
+      restaurants.removeWhere((rest) => rest.id == currentHistory.restId);
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -81,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: SearchWidget<Restaurant>(
                   filterLogic: (String search) {
-                    Set<Restaurant> filteredList = mockData
+                    Set<Restaurant> filteredList = mockRestaurants
                         .where(
                           (e) => e.name.toLowerCase().startsWith(
                             search.toLowerCase(),
@@ -92,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         .map(
                           (e) => Padding(
                             padding: const EdgeInsets.all(12.0),
-                            child: RestaurantCard(rest: e),
+                            child: RestaurantTile(rest: e),
                           ),
                         )
                         .toList();
@@ -123,95 +90,37 @@ class _HomeScreenState extends State<HomeScreen> {
             "Restaurants",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
+
           Expanded(
-            child: ListView.separated(
-              itemCount: mockData.length,
-              itemBuilder: (context, index) {
-                return Padding(
+            child: CustomScrollView(
+              clipBehavior: Clip.antiAlias,
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                if (user.currentHistoryId != null)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(8, 2, 8, 10),
+                    sliver: SliverToBoxAdapter(
+                      child: RestaurantJoinedTile(user: user),
+                    ),
+                  ),
+
+                SliverPadding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8.0,
                     vertical: 2,
                   ),
-                  child: RestaurantCard(rest: mockData[index]),
-                );
-              },
-              separatorBuilder: (context, index) => SizedBox(height: 10),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class RestaurantCard extends StatefulWidget {
-  const RestaurantCard({super.key, required this.rest});
-
-  final Restaurant rest;
-
-  @override
-  State<RestaurantCard> createState() => _RestaurantCardState();
-}
-
-class _RestaurantCardState extends State<RestaurantCard> {
-  Future<void> onRestTap(Restaurant rest) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return JoinQueueScreen(rest: widget.rest);
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: () => onRestTap(widget.rest),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.black),
-        ),
-        child: Row(
-          spacing: 10,
-          children: [
-            SizedBox.square(
-              dimension: 75,
-              child: Image.asset(
-                "assets/home_screen/kungfu.png",
-                fit: BoxFit.fitHeight,
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.rest.name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.location_pin),
-                    Text(widget.rest.address),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.hourglass_empty, color: Color(0xFFFF6835)),
-                    Text(
-                      "${widget.rest.curWait} people waiting",
-                      style: TextStyle(color: Color(0xFFFF6835)),
-                    ),
-                  ],
+                  sliver: SliverList.separated(
+                    itemCount: mockRestaurants.length,
+                    itemBuilder: (context, index) {
+                      return RestaurantTile(rest: mockRestaurants[index]);
+                    },
+                    separatorBuilder: (context, index) => SizedBox(height: 10),
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

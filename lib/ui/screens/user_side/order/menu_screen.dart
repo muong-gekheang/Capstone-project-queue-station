@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/model/entities/cart_item.dart';
-import 'package:queue_station_app/model/services/cart_provider.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
+import 'package:queue_station_app/models/order/order_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/cart_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
-import '../../../../model/entities/menu_item.dart';
-import '../../../../model/entities/category.dart';
 import '../../../widgets/menu_item_card.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -17,14 +17,14 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  String selectedCategoryId = categories[0].id;
+  String selectedCategoryId = mockMenuCategories[0].id;
   String searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
   //must match both search and category
   List<MenuItem> get filteredMenuItems {
-    return menuItems.where((item) {
-      final matchesCategory = item.categoryId == selectedCategoryId;
+    return allMenuItems.where((item) {
+      final matchesCategory = item.category.id == selectedCategoryId;
       final matchesSearch =
           searchQuery.isEmpty ||
           item.name.toLowerCase().contains(searchQuery.toLowerCase());
@@ -170,9 +170,9 @@ class _MenuScreenState extends State<MenuScreen> {
               color: Colors.white,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
+                itemCount: mockMenuCategories.length,
                 itemBuilder: (context, index) {
-                  final category = categories[index];
+                  final category = mockMenuCategories[index];
                   final isSelected = category.id == selectedCategoryId;
 
                   return Padding(
@@ -246,14 +246,14 @@ class _MenuScreenState extends State<MenuScreen> {
                         maxCrossAxisExtent: 200, // max width of each card
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
-                        childAspectRatio: 0.7,
+                        childAspectRatio: 0.75,
                       ),
                       itemCount: filteredMenuItems.length,
                       itemBuilder: (context, index) {
                         final item = filteredMenuItems[index];
                         return GestureDetector(
                           onTap: () {
-                            Navigator.push<CartItem>(
+                            Navigator.push<OrderItem>(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => MenuItemScreen(item: item),
@@ -274,8 +274,8 @@ class _MenuScreenState extends State<MenuScreen> {
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               color: const Color(0xFFFF6835),
               shape: BoxShape.circle,
@@ -292,7 +292,7 @@ class _MenuScreenState extends State<MenuScreen> {
               shape: const CircleBorder(),
               child: InkWell(
                 onTap: () {
-                  Navigator.push<CartItem>(
+                  Navigator.push<OrderItem>(
                     context,
                     MaterialPageRoute(builder: (_) => CartScreen()),
                   );
@@ -300,9 +300,9 @@ class _MenuScreenState extends State<MenuScreen> {
                 borderRadius: BorderRadius.circular(28),
                 child: const Center(
                   child: Icon(
-                    Icons.shopping_cart,
+                    Icons.shopping_cart_outlined,
                     color: Colors.white,
-                    size: 24,
+                    size: 28,
                   ),
                 ),
               ),

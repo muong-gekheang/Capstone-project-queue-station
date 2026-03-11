@@ -16,15 +16,16 @@ class SettingCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 14,),
           child: Text(
             title,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         Container(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 18),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: Colors.grey.shade300,

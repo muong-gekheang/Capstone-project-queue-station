@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 
 class SearchBox extends StatelessWidget {
   const SearchBox({super.key, required this.onSearch});
@@ -8,14 +9,15 @@ class SearchBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: AppTheme.spacingXL,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Color(0xFFF1F1F1),
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusL),
+        color: AppTheme.naturalGrey,
+        border: Border.all(color: AppTheme.naturalGrey),
       ),
       child: SearchBar(
         onChanged: onSearch,
-        leading: Icon(Icons.search),
+        leading: const Icon(Icons.search),
         hintText: "Search",
         elevation: WidgetStatePropertyAll(0),
         backgroundColor: WidgetStatePropertyAll(Colors.transparent),

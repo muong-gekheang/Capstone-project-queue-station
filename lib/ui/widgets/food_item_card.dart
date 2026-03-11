@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/size_option.dart';
 
 class FoodItemCard extends StatelessWidget {
   final String name;
+  final MenuItem item;
   final String? image;
-  final String? size;
+  final SizeOption? size;
   final Map<String, double> addons;
   final double price;
   final int quantity;
@@ -16,6 +19,7 @@ class FoodItemCard extends StatelessWidget {
   const FoodItemCard({
     super.key,
     required this.name,
+    required this.item, 
     required this.addons,
     required this.price,
     required this.quantity,
@@ -30,6 +34,12 @@ class FoodItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final addOnLookup = {
+      for (var addOn in item.addOns) addOn.id: addOn
+    };
+
+    final addOnEntries = addons.entries.toList();
+
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -94,7 +104,7 @@ class FoodItemCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${size!} ',
+                              '${size!.name} ',
                               style: TextStyle(
                                 fontSize: 16,
                               ),
@@ -219,43 +229,33 @@ class FoodItemCard extends StatelessWidget {
                         color: Color(0xFF0D47A1),
                       ),
                     ),
-
+                    
                     Column(
+
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: addons.entries
-                          .toList()
-                          .asMap()
-                          .entries
-                          .map((entry) {
-                        final index = entry.key;
-                        final addon = entry.value;
+                      children: List.generate(addOnEntries.length, (index) {
+                        final addOnId = addOnEntries[index].key;
+                        final addOnPrice = addOnEntries[index].value;
+
+                        final addOnModel = addOnLookup[addOnId];
 
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Text("${index + 1}. ${addOnModel?.name ?? 'Unknown'}"),
                               Text(
-                                "${index + 1}. ${addon.key}",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '+\$${addon.value.toStringAsFixed(2)}',
-                                style: TextStyle(
+                                '+\$${addOnPrice.toStringAsFixed(2)}',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFFFF6835),
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                     ),
                   ],
 

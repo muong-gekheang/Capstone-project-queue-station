@@ -1,81 +1,125 @@
-import 'package:queue_station_app/model/entities/analytics_data.dart';
-import 'package:queue_station_app/model/entities/dashboard_stats.dart';
-import 'package:queue_station_app/model/entities/order.dart';
-import 'package:queue_station_app/model/entities/order_summary.dart';
-import 'package:queue_station_app/model/entities/queue_entry.dart';
-import 'package:queue_station_app/model/entities/store_order.dart';
-import 'package:queue_station_app/model/entities/table.dart';
+import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
+import 'package:queue_station_app/models/analytic/analytics_data.dart';
+import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
+import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/restaurant/table_category.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueRepository {
   // In-memory storage using Maps for fast lookup
   final Map<String, QueueEntry> _queueEntriesById = {};
-  final Map<String, Table> _tablesById = {};
-  final Map<String, StoreOrder> _ordersById = {};
+  final Map<String, QueueTable> _tablesByNumber = {};
+  final Map<String, dynamic> _ordersById =
+      {}; // Using dynamic until StoreOrder is defined
 
   QueueRepository() {
     _initializeSampleData();
   }
 
   void _initializeSampleData() {
-    final now = DateTime.now();
-
     // Queue entries
     final queueEntries = [
       QueueEntry(
-        id: '1',
-        customerName: 'John Doe',
-        customerPhone: '012345678',
-        partySize: 2,
-        joinTime: now.subtract(const Duration(minutes: 20)),
-        status: 'waiting',
-      ),
-      QueueEntry(
-        id: '2',
-        customerName: 'Jane Smith',
-        customerPhone: '012345679',
+        id: '101',
         partySize: 4,
-        joinTime: now.subtract(const Duration(minutes: 15)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 45)),
+        status: QueueStatus.waiting,
+        queueNumber: 'A-001',
+        customerId: 'user_789',
+        joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
-        id: '3',
-        customerName: 'Bob Johnson',
-        customerPhone: '012345680',
+        id: '102',
+        partySize: 2,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 32)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-012',
+        customerId: 'user_456',
+        joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[1].id,
+      ),
+      QueueEntry(
+        id: '103',
+        partySize: 1,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 28)),
+        status: QueueStatus.noShow,
+        queueNumber: 'S-005',
+        customerId: 'user_112',
+        joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[3].id,
+      ),
+      QueueEntry(
+        id: '104',
+        partySize: 6,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 25)),
+        status: QueueStatus.waiting,
+        queueNumber: 'L-002',
+        customerId: 'user_990',
+        joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[0].id,
+      ),
+      QueueEntry(
+        id: '105',
+        partySize: 2,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 18)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-013',
+        customerId: 'user_334',
+        joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
+      ),
+      QueueEntry(
+        id: '106',
         partySize: 3,
-        joinTime: now.subtract(const Duration(minutes: 12)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 15)),
+        status: QueueStatus.waiting,
+        queueNumber: 'C-021',
+        customerId: 'user_221',
+        joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
-        id: '4',
-        customerName: 'Alice Brown',
-        customerPhone: '012345681',
+        id: '107',
         partySize: 2,
-        joinTime: now.subtract(const Duration(minutes: 10)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 10)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-014',
+        customerId: 'user_554',
+        joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
-        id: '5',
-        customerName: 'Charlie Wilson',
-        customerPhone: '012345682',
-        partySize: 5,
-        joinTime: now.subtract(const Duration(minutes: 8)),
-        status: 'waiting',
+        id: '108',
+        partySize: 8,
+        joinTime: DateTime.now().subtract(const Duration(minutes: 8)),
+        status: QueueStatus.waiting,
+        queueNumber: 'XL-001',
+        customerId: 'user_667',
+        joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
-        id: '6',
-        customerName: 'Diana Lee',
-        customerPhone: '012345683',
+        id: '109',
         partySize: 2,
-        joinTime: now.subtract(const Duration(minutes: 5)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 5)),
+        status: QueueStatus.waiting,
+        queueNumber: 'B-015',
+        customerId: 'user_882',
+        joinedMethod: JoinedMethod.remote,
+        restId: mockRestaurants[0].id,
       ),
       QueueEntry(
-        id: '7',
-        customerName: 'Frank Miller',
-        customerPhone: '012345684',
+        id: '110',
         partySize: 4,
-        joinTime: now.subtract(const Duration(minutes: 3)),
-        status: 'waiting',
+        joinTime: DateTime.now().subtract(const Duration(minutes: 2)),
+        status: QueueStatus.waiting,
+        queueNumber: 'A-002',
+        customerId: 'user_003',
+        joinedMethod: JoinedMethod.walkIn,
+        restId: mockRestaurants[0].id,
       ),
     ];
 
@@ -83,107 +127,18 @@ class QueueRepository {
       _queueEntriesById[entry.id] = entry;
     }
 
-    // Tables
-    final tables = [
-      Table(
-        id: 't1',
-        tableNumber: '1',
-        capacity: 2,
-        status: 'occupied',
-        currentQueueEntryId: '1',
-        occupiedSince: now.subtract(const Duration(minutes: 20)),
-      ),
-      Table(
-        id: 't2',
-        tableNumber: '2',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: '2',
-        occupiedSince: now.subtract(const Duration(minutes: 15)),
-      ),
-      Table(
-        id: 't3',
-        tableNumber: '3',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: '3',
-        occupiedSince: now.subtract(const Duration(minutes: 12)),
-      ),
-      Table(
-        id: 't4',
-        tableNumber: '4',
-        capacity: 2,
-        status: 'occupied',
-        currentQueueEntryId: '4',
-        occupiedSince: now.subtract(const Duration(minutes: 10)),
-      ),
-      Table(
-        id: 't5',
-        tableNumber: '5',
-        capacity: 6,
-        status: 'occupied',
-        currentQueueEntryId: '5',
-        occupiedSince: now.subtract(const Duration(minutes: 8)),
-      ),
-      Table(
-        id: 't6',
-        tableNumber: '6',
-        capacity: 2,
-        status: 'occupied',
-        currentQueueEntryId: '6',
-        occupiedSince: now.subtract(const Duration(minutes: 5)),
-      ),
-      Table(
-        id: 't7',
-        tableNumber: '7',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: '7',
-        occupiedSince: now.subtract(const Duration(minutes: 3)),
-      ),
-      Table(id: 't8', tableNumber: '8', capacity: 4, status: 'available'),
-      Table(id: 't9', tableNumber: '9', capacity: 2, status: 'available'),
-      Table(
-        id: 't10',
-        tableNumber: '10',
-        capacity: 4,
-        status: 'occupied',
-        currentQueueEntryId: null,
-        occupiedSince: now.subtract(const Duration(minutes: 25)),
-      ),
-    ];
+    // Create standard table category
+    final standardCategory = TableCategory(
+      type: 'Standard',
+      minSeat: 1,
+      seatAmount: 4,
+    );
+
+    // Tables - Using QueueTable consistently
+    final tables = mockTables;
 
     for (var table in tables) {
-      _tablesById[table.id] = table;
-    }
-
-    // Orders
-    final orders = [
-      StoreOrder(
-        id: 'o1',
-        tableNumber: '1',
-        totalAmount: 45.50,
-        orderTime: now.subtract(const Duration(hours: 2)),
-        status: 'completed',
-      ),
-      StoreOrder(
-        id: 'o2',
-        tableNumber: '2',
-        totalAmount: 78.00,
-        orderTime: now.subtract(const Duration(hours: 1)),
-        status: 'completed',
-      ),
-      StoreOrder(
-        id: 'o3',
-        tableNumber: '3',
-        totalAmount: 32.25,
-        orderTime: now.subtract(const Duration(minutes: 30)),
-        status: 'completed',
-      ),
-    ];
-
-    for (var order in orders) {
-      _ordersById[order.id] = order;
+      _tablesByNumber[table.tableNum] = table;
     }
   }
 
@@ -196,7 +151,7 @@ class QueueRepository {
   Future<List<QueueEntry>> getWaitingQueueEntries() async {
     await Future.delayed(const Duration(milliseconds: 50));
     return _queueEntriesById.values
-        .where((e) => e.status == 'waiting')
+        .where((e) => e.status == QueueStatus.waiting)
         .toList();
   }
 
@@ -222,43 +177,43 @@ class QueueRepository {
   Future<void> removeQueueEntry(String id) async {
     _queueEntriesById.remove(id);
     // Also remove references from tables
-    for (var table in _tablesById.values) {
-      if (table.currentQueueEntryId == id) {
-        // Table.currentQueueEntryId must not be final for this assignment to work
-        table = Table(
-          id: table.id,
-          tableNumber: table.tableNumber,
-          capacity: table.capacity,
-          status: 'available',
-          currentQueueEntryId: null,
-          occupiedSince: table.occupiedSince,
+    for (var table in _tablesByNumber.values) {
+      if (table.queueEntryIds.contains(id)) {
+        final updatedQueueIds = [...table.queueEntryIds]..remove(id);
+        final updatedTable = table.copyWith(
+          tableStatus: updatedQueueIds.isEmpty
+              ? TableStatus.available
+              : TableStatus.occupied,
+          queueEntryIds: updatedQueueIds,
         );
-        _tablesById[table.id] = table;
+        _tablesByNumber[updatedTable.tableNum] = updatedTable;
       }
     }
   }
 
   // ================= Table Methods =================
-  Future<List<Table>> getAllTables() async {
+  Future<List<QueueTable>> getAllTables() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _tablesById.values.toList();
+    return _tablesByNumber.values.toList();
   }
 
-  Future<List<Table>> getActiveTables() async {
+  Future<List<QueueTable>> getActiveTables() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _tablesById.values.where((t) => t.status == 'occupied').toList();
+    return _tablesByNumber.values
+        .where((t) => t.tableStatus == TableStatus.occupied)
+        .toList();
   }
 
-  Future<Table?> getTableById(String id) async {
+  Future<QueueTable?> getTableByNumber(String tableNum) async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _tablesById[id];
+    return _tablesByNumber[tableNum];
   }
 
-  Future<void> updateTable(Table table) async {
-    if (!_tablesById.containsKey(table.id)) {
-      throw Exception('Table with id ${table.id} does not exist.');
+  Future<void> updateTable(QueueTable table) async {
+    if (!_tablesByNumber.containsKey(table.tableNum)) {
+      throw Exception('Table with number ${table.tableNum} does not exist.');
     }
-    _tablesById[table.id] = table;
+    _tablesByNumber[table.tableNum] = table;
   }
 
   // ================= Dashboard Stats =================
@@ -289,29 +244,14 @@ class QueueRepository {
   }
 
   // ================= Orders =================
-  Future<List<StoreOrder>> getAllOrders() async {
+  Future<List<dynamic>> getAllOrders() async {
     await Future.delayed(const Duration(milliseconds: 50));
     return _ordersById.values.toList();
   }
 
-  Future<List<StoreOrder>> getOrdersByDateRange(
-    DateTime start,
-    DateTime end,
-  ) async {
+  Future<int> getTotalOrdersCount() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return _ordersById.values
-        .where(
-          (order) =>
-              order.orderTime.isAfter(start) && order.orderTime.isBefore(end),
-        )
-        .toList();
-  }
-
-  Future<void> addOrder(StoreOrder order) async {
-    if (_ordersById.containsKey(order.id)) {
-      throw Exception('Order with id ${order.id} already exists.');
-    }
-    _ordersById[order.id] = order;
+    return _ordersById.length;
   }
 
   // ================= Analytics =================
@@ -322,12 +262,13 @@ class QueueRepository {
     final now = DateTime.now();
     final List<QueueLengthDataPoint> dataPoints = [];
 
-    // Example: queue length based on current waiting entries (simplified)
     if (timeframe == 'Today') {
       for (int hour = 8; hour <= 19; hour++) {
         final time = DateTime(now.year, now.month, now.day, hour);
         final count = _queueEntriesById.values
-            .where((e) => e.joinTime.hour <= hour && e.status == 'waiting')
+            .where(
+              (e) => e.joinTime.hour <= hour && e.status == QueueStatus.waiting,
+            )
             .length;
         dataPoints.add(QueueLengthDataPoint(time: time, queueLength: count));
       }
@@ -340,47 +281,21 @@ class QueueRepository {
     String timeframe,
   ) async {
     await Future.delayed(const Duration(milliseconds: 50));
-    final activeCount = _tablesById.values
-        .where((t) => t.status == 'occupied')
+    final activeCount = _tablesByNumber.values
+        .where((t) => t.tableStatus == TableStatus.occupied)
         .length;
-    final totalCount = _tablesById.length;
+    final totalCount = _tablesByNumber.length;
     return [
       TableOccupancyDataPoint(
         day: timeframe,
-        occupancyPercentage: ((activeCount / totalCount) * 100),
+        occupancyPercentage: totalCount > 0
+            ? ((activeCount / totalCount) * 100)
+            : 0,
       ),
     ];
   }
 
-  Future<List<OrderValueDataPoint>> getAverageOrderValueData(
-    String timeframe,
-  ) async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    if (_ordersById.isEmpty) return [];
-    final average =
-        _ordersById.values
-            .map((o) => o.totalAmount)
-            .fold(0.0, (a, b) => a + b) /
-        _ordersById.length;
-    return [OrderValueDataPoint(day: timeframe, averageOrderValue: average)];
-  }
+  Future<dynamic> getAverageOrderValueData(String orderValueTimeframe) async {}
 
-  Future<int> getTotalOrdersCount() async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    return _ordersById.length;
-  }
-
-  Future<List<OrderSummary>> getOrderSummary(String timeframe) async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    return _ordersById.values.map((order) {
-      return OrderSummary(
-        order.id,
-        int.parse(order.tableNumber),
-        time: order.orderTime.toIso8601String(),
-        tableNumber: order.tableNumber,
-        amount: order.totalAmount,
-        id: '',
-      );
-    }).toList();
-  }
+  Future<dynamic> getOrderSummary(String ordersTimeframe) async {}
 }

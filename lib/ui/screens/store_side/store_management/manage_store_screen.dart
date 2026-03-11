@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:queue_station_app/data/mock_table_data.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../model/services/store_profile_service.dart';
+import '../../../../services/store_profile_service.dart';
 import 'analytics_screen.dart';
 
 class ManageStorePage extends StatefulWidget {
@@ -162,7 +165,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
             ],
           ),
           onPressed: () {
-            // Toggle notifications or navigate to notifications page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NotificationScreen()),
+            );
           },
         ),
       ],
@@ -228,7 +234,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
           ),
           Switch(
             value: isStoreOpen,
-            activeColor: const Color(0xFF0D47A1),
+            activeThumbColor: const Color(0xFF0D47A1),
             onChanged: (value) {
               if (value == false) {
                 // Show warning dialog when trying to close store
@@ -261,7 +267,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    TableManagementScreen(tableCategory: tableData),
+                    TableManagementScreen(initialTables: tableData),
               ),
             );
           },
@@ -282,7 +288,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => StoreQueueHistory()),
+              MaterialPageRoute(
+                builder: (context) =>
+                    StoreQueueHistory(restaurant: restaurant1),
+              ),
             );
           },
         ),
@@ -315,6 +324,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
         ),
         onPressed: () {
           // Navigate to manage queue page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => StoreQueueScreen()),
+          );
         },
         child: const Text(
           'Manage Queue',

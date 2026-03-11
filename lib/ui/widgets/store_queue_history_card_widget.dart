@@ -1,14 +1,21 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/store_queue_history.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history_detail.dart';
 
 class StoreQueueHistoryCard extends StatelessWidget {
-  final StoreQueueHistory storeQueueHistory;
-  const StoreQueueHistoryCard({super.key, required this.storeQueueHistory});
+  final QueueEntry queueEntry;
+  const StoreQueueHistoryCard({super.key, required this.queueEntry});
 
   String formattedtime(DateTime date) {
     return DateFormat('hh:mm a').format(date);
+  }
+
+  String getUserName() {
+    return mockUsers
+        .firstWhere((user) => user.id == queueEntry.customerId)
+        .name;
   }
 
   @override
@@ -20,7 +27,7 @@ class StoreQueueHistoryCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  StoreQueueHistoryDetail(storeQueueHistory: storeQueueHistory),
+                  StoreQueueHistoryDetail(queueEntry: queueEntry),
             ),
           );
         },
@@ -35,13 +42,13 @@ class StoreQueueHistoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      storeQueueHistory.customerName,
+                      getUserName(),
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Joined: ${formattedtime(storeQueueHistory.joinedQueueTime)} | Seated: ${formattedtime(storeQueueHistory.seatedTime)}',
+                      'Joined: ${formattedtime(queueEntry.joinTime)} | Seated: ${queueEntry.servedTime != null ? formattedtime(queueEntry.servedTime!) : '-'}',
                     ),
-                    Text(storeQueueHistory.currentStatus.name),
+                    Text(queueEntry.status.name),
                   ],
                 ),
 

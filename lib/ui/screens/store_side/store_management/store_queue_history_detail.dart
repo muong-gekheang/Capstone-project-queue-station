@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/model/entities/store_queue_history.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
 class StoreQueueHistoryDetail extends StatelessWidget {
-  final StoreQueueHistory storeQueueHistory;
-  const StoreQueueHistoryDetail({super.key, required this.storeQueueHistory});
+  final QueueEntry queueEntry;
+  const StoreQueueHistoryDetail({super.key, required this.queueEntry});
+
+  String getUserName() {
+    return mockUsers
+        .firstWhere((user) => user.id == queueEntry.customerId)
+        .name;
+  }
 
   Widget orderDetail() {
-    if (storeQueueHistory.orderDetails.isEmpty) {
+    if (queueEntry.order != null && queueEntry.order!.ordered.isNotEmpty) {
+      return Column(
+        children: queueEntry.order!.ordered.map((orderItem) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(orderItem.item.name),
+              Text(orderItem.quantity.toString()),
+              Text('\$${orderItem.menuItemPrice.toStringAsFixed(2)}'),
+            ],
+          );
+        }).toList(),
+      );
+    } else {
       return const Text('No orders');
     }
-    return Column(
-      children: storeQueueHistory.orderDetails.map((order) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(order.menuName),
-            Text('${order.quantity}'),
-            Text('\$${order.unitPrice.toStringAsFixed(2)}'),
-          ],
-        );
-      }).toList(),
-    );
   }
 
   @override
@@ -43,7 +51,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    storeQueueHistory.customerName,
+                    getUserName(),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   SizedBox(height: 10),
@@ -55,7 +63,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        storeQueueHistory.queueNumber,
+                        queueEntry.queueNumber,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -69,7 +77,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        storeQueueHistory.currentStatus.name,
+                        queueEntry.status.name,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -83,7 +91,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        storeQueueHistory.numberOfGuests.toString(),
+                        queueEntry.partySize.toString(),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -96,7 +104,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                       Text(
                         DateFormat(
                           'dd/ MMM / yyyy, hh:mm a',
-                        ).format(storeQueueHistory.joinedQueueTime),
+                        ).format(queueEntry.joinTime),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -129,15 +137,69 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: [
-                        Row(children: [Text('Join Queue Method')]),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Join Queue Method'),
+                            Text(
+                              queueEntry.joinedMethod == JoinedMethod.remote
+                                  ? 'Remote'
+                                  : 'Walk-in',
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Joined Queue Time')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Joined Queue Time'),
+                            Text(
+                              DateFormat(
+                                'dd MMM yyyy, h:mm a',
+                              ).format(queueEntry.joinTime),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Serving Time')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Serving Time'),
+                            Text(
+                              queueEntry.servedTime != null
+                                  ? DateFormat(
+                                      'h:mm a',
+                                    ).format(queueEntry.servedTime!)
+                                  : '-',
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Serving End')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Serving End'),
+                            Text(
+                              queueEntry.servedTime != null
+                                  ? DateFormat(
+                                      'h:mm a',
+                                    ).format(queueEntry.endedTime!)
+                                  : '-',
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 5),
-                        Row(children: [Text('Waiting Duration')]),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Waiting Duration'),
+                            Text(queueEntry.waitingTimeText),
+                          ],
+                        ),
                       ],
                     ),
                   ),
