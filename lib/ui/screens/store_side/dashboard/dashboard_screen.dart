@@ -11,12 +11,12 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RestaurantService restaurantState = context.read<RestaurantService>();
+    RestaurantService restaurantService = context.read<RestaurantService>();
     QueueService queueService = context.read<QueueService>();
     TableService tableService = context.read<TableService>();
     return ChangeNotifierProvider(
       create: (_) => DashboardViewModel(
-        restaurantService: restaurantState,
+        restaurantService: restaurantService,
         queueService: queueService,
         tableService: tableService,
       ),

@@ -137,7 +137,18 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
 
   @override
   Stream<Restaurant?> watchCurrent(String id) {
-    // TODO: implement watchCurrent
-    throw UnimplementedError();
+    return fireStore
+        .collection('restaurants')
+        .where('id', isEqualTo: id)
+        .snapshots()
+        .map((snap) {
+          if (snap.docs.isEmpty) return null; // Handle not found
+
+          final doc = snap.docs.first; // Get the first match
+          final json = Map<String, dynamic>.from(doc.data());
+          json['id'] ??= doc.id;
+
+          return Restaurant.fromJson(json);
+        });
   }
 }

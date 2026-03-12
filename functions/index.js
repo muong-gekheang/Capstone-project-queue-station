@@ -133,10 +133,9 @@ exports.createQueue = onCall(async (request) => {
         status: "waiting",
         joinTime: joinTime || now.toISOString(),
         queueNumber,
-        tableNumber: tData.tableNumber || "", // Use actual table number from DB
+        tableNumber: tData.tableNumber || "",
         assignedTableId: bestTable.tableId,
         expectedTableReadyAt: readyAt.toISOString(),
-        createdAt: FieldValue.serverTimestamp(),
       });
     });
 

@@ -33,17 +33,9 @@ class StoreMainScreen extends StatefulWidget {
 class _StoreMainScreenState extends State<StoreMainScreen> {
   NavTab _selectedTab = NavTab.dashboard;
 
-  List<Widget> _screens = [];
-
   @override
   void initState() {
     super.initState();
-    _screens = [
-      DashboardScreen(),
-      ManageStoreScreen(),
-      StoreQueueScreen(),
-      StoreSettingsScreen(),
-    ];
   }
 
   void _onTabSelected(NavTab tab) {
@@ -67,10 +59,17 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+
+    // 2. If there's no user yet, STOP and show a spinner.
+    // This prevents the ProxyProviders below from failing or returning null.
+    if (userProvider.currentUser == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return MultiProvider(
       providers: [
         ProxyProvider<UserProvider, RestaurantService>(
-          update: (context, userProvider, restaurantService) {
+          update: (context, userProvider, prev) {
             return RestaurantService(
               userProvider: userProvider,
               restaurantRepository: context.read<RestaurantRepository>(),
@@ -80,15 +79,21 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         ),
 
         ProxyProvider<UserProvider, QueueService>(
-          update: (context, userProvider, queueService) => QueueService(
-            userProvider: userProvider,
-            queueEntryRepository: context.read<QueueEntryRepository>(),
-          ),
+          update: (context, userProvider, prev) {
+            if (prev == null) {
+              return QueueService(
+                userProvider: userProvider,
+                queueEntryRepository: context.read<QueueEntryRepository>(),
+              );
+            }
+            prev.updateDependencies(userProvider);
+            return prev;
+          },
           dispose: (context, value) => value.dispose(),
         ),
 
         ProxyProvider<UserProvider, StoreProfileService>(
-          update: (context, userProvider, restaurantService) {
+          update: (context, userProvider, prev) {
             return StoreProfileService(
               userProvider: userProvider,
               userRepository: context.read<UserRepository<StoreUser>>(),
@@ -97,7 +102,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         ),
 
         ProxyProvider<UserProvider, TableService>(
-          update: (context, userProvider, queueService) => TableService(
+          update: (context, userProvider, prev) => TableService(
             userProvider: userProvider,
             queueTableRepository: context.read<QueueTableRepository>(),
             tableCategoryRepository: context.read<TableCategoryRepository>(),
@@ -106,7 +111,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         ),
 
         ProxyProvider<UserProvider, MenuService>(
-          update: (context, userProvider, menuService) => MenuService(
+          update: (context, userProvider, prev) => MenuService(
             userProvider: userProvider,
             menuItemRepository: context.read<MenuItemRepository>(),
             menuCategoryRepository: context.read<MenuCategoryRepository>(),
@@ -117,7 +122,12 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
       child: Scaffold(
         body: IndexedStack(
           index: _getTabIndex(_selectedTab),
-          children: _screens,
+          children: const [
+            DashboardScreen(),
+            ManageStoreScreen(),
+            StoreQueueScreen(),
+            StoreSettingsScreen(),
+          ],
         ),
         bottomNavigationBar: BottomNavBar(
           selectedTab: _selectedTab,

@@ -22,15 +22,18 @@ class RestaurantService {
     _initStream();
   }
 
-  String get _restId => _userProvider.asStoreUser?.restaurantId ?? "";
+  String get restId => _userProvider.asStoreUser?.restaurantId ?? "";
 
   void _initStream() {
-    if (_restId.isNotEmpty) {
+    if (restId.isNotEmpty) {
       _subscription = _restaurantRepository
-          .watchCurrent(_restId)
+          .watchCurrent(restId)
           .listen(
             (data) => _controller.add(data),
-            onError: (error) => _controller.addError(error),
+            onError: (error) {
+              print("ERROR:$error");
+              _controller.addError(error);
+            },
           );
     }
   }

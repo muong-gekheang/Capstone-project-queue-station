@@ -49,11 +49,11 @@ List<Customer> mockCustomers = [
 // --- 5 STORE USERS ---
 List<StoreUser> mockStoreUsers = [
   StoreUser(
-    id: "2fc46d2f-e126-4d20-ab07-eac1696fb295",
-    name: "Jackie",
+    id: "user_s_1",
+    name: "alex@store.com",
     email: "JackieStore@queuestation.com",
     phone: "012589745",
-    restaurantId: "2fc46d2f-e126-4d20-ab07-eac1696fb295",
+    restaurantId: "rest_kh_1",
   ),
   StoreUser(
     id: uuid.v4(),

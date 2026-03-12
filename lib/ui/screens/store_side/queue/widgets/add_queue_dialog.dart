@@ -55,6 +55,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
   void onJoinTap() {
     if (_formKey.currentState!.validate()) {
       StoreUser user = context.read<UserProvider>().asStoreUser!;
+      QueueViewModel vm = context.read<QueueViewModel>();
       widget.onJoin(
         QueueEntry.walkIn(
           expectedTableReadyAt: DateTime.now(),
@@ -65,7 +66,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
           status: QueueStatus.waiting,
           customerId: user.id,
           joinedMethod: JoinedMethod.walkIn,
-          restId: user.rest!.id,
+          restId: vm.restId,
           customerName: nameController.text,
           phoneNumber: phoneController.text,
         ),

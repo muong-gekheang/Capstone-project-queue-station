@@ -22,6 +22,8 @@ class QueueViewModel extends ChangeNotifier {
 
   String _searchKeyword = "";
 
+  String get restId => _restaurantService.restId;
+
   QueueViewModel({
     required RestaurantService restaurantService,
     required QueueService queueService,
@@ -40,11 +42,13 @@ class QueueViewModel extends ChangeNotifier {
   void _subscribeToRestaurant() {
     _restaurantSubscription = _restaurantService.streamRestaurant.listen(
       (restaurant) {
+        if (_isDisposed) return;
         _currentRestaurant = restaurant;
         _isLoading = false;
         notifyListeners(); // Updates the UI
       },
       onError: (error) {
+        if (_isDisposed) return;
         // Handle potential stream errors here
         _isLoading = false;
         notifyListeners();
@@ -84,7 +88,7 @@ class QueueViewModel extends ChangeNotifier {
 
   Duration get avgWaitTime => _avgWaitTime;
 
-  int get biggestTableSize => _currentRestaurant?.biggestTableSize ?? 0;
+  int get biggestTableSize => _currentRestaurant?.biggestTableSize ?? 1;
 
   DateTime getQueueEstimatedTime(QueueEntry queue) {
     return queue.joinTime.add(avgWaitTime);
@@ -96,6 +100,7 @@ class QueueViewModel extends ChangeNotifier {
   }
 
   List<QueueEntry> get filteredQueue {
+    print("QUEUE: ${_currentQueue.length}");
     return currentQueue
         .where(
           (q) => q.customerName!.toLowerCase().startsWith(

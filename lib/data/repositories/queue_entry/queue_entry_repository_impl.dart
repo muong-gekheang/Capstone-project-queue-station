@@ -188,9 +188,10 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
 
   @override
   Stream<List<QueueEntry>> watchCurrentActiveQueue(String restId) {
-    return fireStore
+    print("REST: $restId");
+    final result = fireStore
         .collection('queueEntries')
-        .where('restaurantId', isEqualTo: restId)
+        .where('restId', isEqualTo: restId)
         .where('status', isEqualTo: 'waiting')
         .orderBy('expectedTableReadyAt', descending: true)
         .snapshots()
@@ -201,6 +202,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
             return QueueEntry.fromJson(json);
           }).toList();
         });
+    return result;
   }
 
   @override

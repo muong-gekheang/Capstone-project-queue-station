@@ -44,10 +44,16 @@ class MenuService {
     if (_restId.isNotEmpty) {
       _menuItemSubscription = _menuItemRepository
           .watchAllMenuItem(_restId)
-          .listen((data) {
-            _menuItemController.add(data);
-            _menuItems = data;
-          }, onError: (error) => _menuItemController.addError(error));
+          .listen(
+            (data) {
+              _menuItemController.add(data);
+              _menuItems = data;
+            },
+            onError: (error) {
+              print("ERROR:$error");
+              _menuItemController.addError(error);
+            },
+          );
 
       _menuCategorySubscription = _menuCategoryRepository
           .watchAllMenuCategory(_restId)

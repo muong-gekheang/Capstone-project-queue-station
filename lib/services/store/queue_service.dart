@@ -36,16 +36,31 @@ class QueueService {
     if (_restId.isNotEmpty) {
       _queueEntrySubscription = _queueEntryRepository
           .watchCurrentActiveQueue(_restId)
-          .listen((data) {
-            _queueEntryStreamController.add(data);
-            _currentEntries = data;
-          }, onError: (error) => _queueEntryStreamController.addError(error));
+          .listen(
+            (data) {
+              _queueEntryStreamController.add(data);
+              _currentEntries = data;
+            },
+            onError: (error) {
+              print("ERROR:$error");
+              _queueEntryStreamController.addError(error);
+            },
+          );
     }
   }
 
   void dispose() {
     _queueEntrySubscription?.cancel();
     _queueEntryStreamController.close();
+  }
+
+  void updateDependencies(UserProvider newUserProvider) {
+    // Only restart the stream if the restaurant ID actually changed
+    final newId = newUserProvider.asStoreUser?.restaurantId ?? "";
+    if (newId != _restId && newId.isNotEmpty) {
+      _queueEntrySubscription?.cancel();
+      _initStream(); // This uses the updated _restId logic
+    }
   }
 
   // Queue Entry Operations
@@ -67,7 +82,7 @@ class QueueService {
         "partySize": newQueue.partySize,
         "customerName": newQueue.customerName,
         "phoneNumber": newQueue.phoneNumber,
-        "joinTime": newQueue.joinTime,
+        "joinTime": newQueue.joinTime.toIso8601String(),
         "queueNumber": newQueue.id.substring(0, 4),
       });
 
@@ -120,7 +135,11 @@ class QueueService {
       Duration waitTime = hist.joinTime.difference(hist.servedTime!);
       avgMinutes += waitTime.inMinutes;
     }
-    avgMinutes = (avgMinutes / todayHistory.length).round();
+    if (todayHistory.isNotEmpty) {
+      avgMinutes = (avgMinutes / todayHistory.length).round();
+    } else {
+      avgMinutes = 0; // Or whatever your default should be
+    }
 
     return Duration(minutes: avgMinutes);
   }

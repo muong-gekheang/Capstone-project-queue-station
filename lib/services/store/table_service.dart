@@ -49,10 +49,16 @@ class TableService {
 
       _tableCategorySubscription = _tableCategoryRepository
           .watchAllCategory(_restId)
-          .listen((data) {
-            _tableCategoryController.add(data);
-            _tableCategories = data;
-          }, onError: (error) => _queueTableController.addError(error));
+          .listen(
+            (data) {
+              _tableCategoryController.add(data);
+              _tableCategories = data;
+            },
+            onError: (error) {
+              print("ERROR:$error");
+              _queueTableController.addError(error);
+            },
+          );
     }
   }
 

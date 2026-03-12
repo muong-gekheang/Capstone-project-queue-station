@@ -41,13 +41,13 @@ class MenuManagementViewModel extends ChangeNotifier {
   void _subscribe() {
     _menuSubscription = _menuService.streamMenuItems.listen(
       (items) {
-        if (!_isDisposed) return;
+        if (_isDisposed) return;
         _allMenuItems = items;
         _isLoading = false;
         notifyListeners(); // Updates the UI
       },
       onError: (error) {
-        if (!_isDisposed) return;
+        if (_isDisposed) return;
         // Handle potential stream errors here
         _isLoading = false;
         notifyListeners();
@@ -56,13 +56,13 @@ class MenuManagementViewModel extends ChangeNotifier {
 
     _menuCategorySubscription = _menuService.streamMenuCategories.listen(
       (categories) {
-        if (!_isDisposed) return;
+        if (_isDisposed) return;
         _allCategories = categories;
         _isLoading = false;
         notifyListeners(); // Updates the UI
       },
       onError: (error) {
-        if (!_isDisposed) return;
+        if (_isDisposed) return;
         // Handle potential stream errors here
         _isLoading = false;
         notifyListeners();
