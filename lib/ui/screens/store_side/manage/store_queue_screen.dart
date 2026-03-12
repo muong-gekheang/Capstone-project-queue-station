@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:queue_station_app/ui/widgets/search_box.dart';
 import '../dialogs/add_queue_dialog.dart';
 import '../dialogs/edit_queue_dialog.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
+import 'package:queue_station_app/services/store_profile_service.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import '../../../../models/nav_tab.dart';
 
 class StoreQueueScreen extends StatefulWidget {
-  final VoidCallback? onClose; // This is used to back to the parent screen
-  const StoreQueueScreen({super.key, this.onClose});
+  final bool isPushed;
+  final VoidCallback? onClose;
+  const StoreQueueScreen({super.key, this.isPushed = false, this.onClose});
+
   @override
   State<StoreQueueScreen> createState() => _StoreQueueScreenState();
 }
 
 class _StoreQueueScreenState extends State<StoreQueueScreen> {
+  late final StoreProfileService _storeService;
   List<Map<String, dynamic>> allQueues = [
     {
       "time": "9:00 am",
@@ -40,7 +48,19 @@ class _StoreQueueScreenState extends State<StoreQueueScreen> {
   @override
   void initState() {
     super.initState();
+    _storeService = StoreProfileService();
+    _storeService.addListener(_onProfileChanged);
     filteredList = allQueues;
+  }
+
+  @override
+  void dispose() {
+    _storeService.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  void _onProfileChanged() {
+    if (mounted) setState(() {});
   }
 
   void _runFilter(String query) {
@@ -81,92 +101,127 @@ class _StoreQueueScreenState extends State<StoreQueueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return PopScope(
+      canPop: !widget.isPushed,
+      onPopInvoked: (didPop) {
+        if (widget.isPushed && !didPop) {
+          Navigator.pop(context, NavTab.queue);
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        toolbarHeight: 80,
-        leading: const Icon(
-          Icons.dashboard,
-          color: Color(0xFF0D47A1),
-          size: 32,
-        ),
-        title: const Text(
-          "Queue",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-          ),
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 18),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(10),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          toolbarHeight: 80,
+          automaticallyImplyLeading: widget.isPushed,
+          leading: widget.isPushed
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () {
+                    Navigator.pop(context, NavTab.queue);
+                  },
+                )
+              : null,
+          title: const Text(
+            "Queue",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
             ),
-            child: const Center(
-              child: Text(
-                "DORI\nDORI",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  height: 1.0,
-                ),
+          ),
+          actions: [
+            _buildStoreProfileImage(),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.notifications_none, color: Colors.black),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationScreen(isPushed: false,),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+          ],
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: SearchBox(onSearch: _runFilter),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(top: 10, bottom: 100),
+                itemCount: filteredList.length,
+                itemBuilder: (context, index) =>
+                    _queueCard(filteredList[index]),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: 54,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0D47A1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              elevation: 4,
+            ),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (ctx) => AddQueueDialog(onJoin: _addToQueue),
+            ),
+            child: const Text(
+              "Add queue",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          const Icon(Icons.notifications_none, color: Colors.black, size: 30),
-          const SizedBox(width: 16),
-        ],
-      ),
-      
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SearchBox(onSearch: _runFilter),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 10, bottom: 100),
-              itemCount: filteredList.length,
-              itemBuilder: (context, index) => _queueCard(filteredList[index]),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8,
-        height: 54,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0D47A1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            elevation: 4,
-          ),
-          onPressed: () => showDialog(
-            context: context,
-            builder: (ctx) => AddQueueDialog(onJoin: _addToQueue),
-          ),
-          child: const Text(
-            "Add queue",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildStoreProfileImage() {
+    final storeName = _storeService.storeName;
+
+    ImageProvider? imageProvider;
+    if (kIsWeb) {
+      final bytes = _storeService.storeProfileImageBytes;
+      if (bytes != null) imageProvider = MemoryImage(bytes);
+    } else {
+      final file = _storeService.storeProfileImage;
+      if (file != null) imageProvider = FileImage(file);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: CircleAvatar(
+        radius: 18,
+        backgroundColor: const Color(0xFFFF6835).withValues(alpha: 0.1),
+        backgroundImage: imageProvider,
+        child: imageProvider == null
+            ? Text(
+                storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
+                style: const TextStyle(
+                  color: Color(0xFFFF6835),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              )
+            : null,
       ),
     );
   }
