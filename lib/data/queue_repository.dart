@@ -1,25 +1,20 @@
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
-import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
-import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
 class QueueRepository {
-  // In-memory storage using Maps for fast lookup
   final Map<String, QueueEntry> _queueEntriesById = {};
   final Map<String, QueueTable> _tablesByNumber = {};
-  final Map<String, dynamic> _ordersById =
-      {}; // Using dynamic until StoreOrder is defined
+  final Map<String, dynamic> _ordersById = {};
 
   QueueRepository() {
     _initializeSampleData();
   }
 
   void _initializeSampleData() {
-    // Queue entries
     final queueEntries = [
       QueueEntry(
         id: '101',
@@ -127,16 +122,7 @@ class QueueRepository {
       _queueEntriesById[entry.id] = entry;
     }
 
-    // Create standard table category
-    final standardCategory = TableCategory(
-      type: 'Standard',
-      minSeat: 1,
-      seatAmount: 4,
-    );
-
-    // Tables - Using QueueTable consistently
     final tables = mockTables;
-
     for (var table in tables) {
       _tablesByNumber[table.tableNum] = table;
     }
@@ -176,7 +162,6 @@ class QueueRepository {
 
   Future<void> removeQueueEntry(String id) async {
     _queueEntriesById.remove(id);
-    // Also remove references from tables
     for (var table in _tablesByNumber.values) {
       if (table.queueEntryIds.contains(id)) {
         final updatedQueueIds = [...table.queueEntryIds]..remove(id);
@@ -296,6 +281,5 @@ class QueueRepository {
   }
 
   Future<dynamic> getAverageOrderValueData(String orderValueTimeframe) async {}
-
   Future<dynamic> getOrderSummary(String ordersTimeframe) async {}
 }

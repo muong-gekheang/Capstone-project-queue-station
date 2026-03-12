@@ -79,5 +79,11 @@ class MenuItem {
   factory MenuItem.fromJson(Map<String, dynamic> json) =>
       _$MenuItemFromJson(json);
 
+  Null get sizes => null;
+
+  Null get addOns => null;
+
+  set category(MenuItemCategory? category) {}
+
   Map<String, dynamic> toJson() => _$MenuItemToJson(this);
 }

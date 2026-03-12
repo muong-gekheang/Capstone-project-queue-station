@@ -18,7 +18,7 @@ import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class MenuForm extends StatefulWidget {
-  final MenuItem? initialMenu; // null = Add, not null = Edit
+  final MenuItem? initialMenu;
   final void Function(MenuItem menu) onSubmit;
 
   const MenuForm({super.key, this.initialMenu, required this.onSubmit});
@@ -36,14 +36,12 @@ class _MenuFormState extends State<MenuForm> {
   late TextEditingController _minTimeController = TextEditingController();
   late TextEditingController _maxTimeController = TextEditingController();
 
-  late String? selectedImageFile;
+  String? selectedImageFile;
   List<MenuSize> menuSizes = [];
   List<AddOn> addOns = [];
-  List<int> addOnIds = [];
   MenuItemCategory? selectedCategory;
   final addCategory = MenuItemCategory(id: "-1", name: ' + Add New');
 
-  // Controllers for SizesPriceList
   final Map<MenuSize, TextEditingController> menuSizeController = {};
   final Map<AddOn, TextEditingController> addOnController = {};
 
@@ -63,23 +61,18 @@ class _MenuFormState extends State<MenuForm> {
 
     if (menu != null) {
       selectedCategory = mockMenuCategories.firstWhere(
-        (c) => c.id == menu.category.id,
+        (c) => c.id == menu.categoryId,
         orElse: () => mockMenuCategories.isNotEmpty
             ? mockMenuCategories.first
-            : MenuItemCategory(id: Uuid().v4(), name: 'Unknown'),
+            : MenuItemCategory(id: const Uuid().v4(), name: 'Unknown'),
       );
     } else {
       selectedCategory = mockMenuCategories.isNotEmpty
           ? mockMenuCategories.first
-          : MenuItemCategory(id: Uuid().v4(), name: 'Unknown');
+          : MenuItemCategory(id: const Uuid().v4(), name: 'Unknown');
     }
 
-    if (menu?.image != null && menu!.image!.isNotEmpty) {
-      selectedImageFile = menu.image;
-    } else {
-      selectedImageFile = null;
-    }
-
+    selectedImageFile = menu?.image;
     menuSizes = menu?.sizes.toList() ?? [];
     addOns = menu?.addOns ?? [];
   }
@@ -87,31 +80,24 @@ class _MenuFormState extends State<MenuForm> {
   String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
-    } else {
-      return null;
     }
+    return null;
   }
 
   String? _descriptionValidator(String? value) {
     if (value != null && value.length > 200) {
       return 'The description should be less than 200';
-    } else {
-      return null;
     }
+    return null;
   }
 
   String? _preparationTimeValidator(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
+    if (value == null || value.trim().isEmpty) return null;
     final int? minutes = int.tryParse(value);
-    if (minutes == null) {
-      return 'preparation time must be a number';
-    }
+    if (minutes == null) return 'preparation time must be a number';
     if (minutes < 0 || minutes > 60) {
       return 'preparation must be in the range of 0 and 60';
     }
-
     return null;
   }
 
@@ -125,7 +111,6 @@ class _MenuFormState extends State<MenuForm> {
 
     final String name = _nameController.text.trim();
     final String description = _descriptionController.text.trim();
-    // final double? parsedPrice = double.tryParse(_priceController.text.trim());
     final int minPrep = int.tryParse(_minTimeController.text.trim()) ?? 0;
     final int maxPrep = int.tryParse(_maxTimeController.text.trim()) ?? 0;
 
@@ -142,52 +127,51 @@ class _MenuFormState extends State<MenuForm> {
           content: Text("Min preparation time cannot be greater than max time"),
         ),
       );
-      return; // prevent saving
+      return;
     }
 
-    // Update menuSizes price from controllers
+    // Update prices from controllers
     for (var menuSize in menuSizes) {
       final controller = menuSizeController[menuSize];
       if (controller != null) {
         final price = double.tryParse(controller.text);
-        if (price != null) {
-          menuSize.price = price;
-        }
+        if (price != null) menuSize.price = price;
       }
     }
-
     for (var add in addOns) {
       final controller = addOnController[add];
       if (controller != null) {
         final price = double.tryParse(controller.text);
-        if (price != null) {
-          add.price = price;
-        }
+        if (price != null) add.price = price;
       }
     }
 
-    final MenuItem newMenu = MenuItem(
-      id: Uuid().v4(),
-      name: name,
-      description: description,
-      category: selectedCategory!,
-      minPrepTimeMinutes: minPrep,
-      maxPrepTimeMinutes: maxPrep,
-      sizes: menuSizes,
-      addOns: addOns,
-    );
+    // Build MenuItem and populate transient fields via copyWith
+    final newMenu =
+        MenuItem(
+            id: widget.initialMenu!.id,
+            name: name,
+            description: description,
+            image: selectedImageFile,
+            categoryId: selectedCategory!.id,
+            sizeOptionIds: menuSizes.map((ms) => ms.sizeOption.id).toList(),
+            addOnIds: addOns.map((ao) => ao.id).toList(),
+            minPrepTimeMinutes: minPrep,
+            maxPrepTimeMinutes: maxPrep,
+            isAvailable: widget.initialMenu?.isAvailable ?? true,
+          )
+          ..category = selectedCategory
+          ..sizes = menuSizes
+          ..addOns = addOns;
 
-    Navigator.pop(context, newMenu);
+    widget.onSubmit(newMenu);
   }
 
   Future<void> onEdit() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
     if (image != null) {
-      setState(() {
-        selectedImageFile = image.path;
-      });
+      setState(() => selectedImageFile = image.path);
     }
   }
 
@@ -196,7 +180,11 @@ class _MenuFormState extends State<MenuForm> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          ProfileEditorWidget(onEdit: onEdit, imagePath: selectedImageFile),
+          ProfileEditorWidget(
+            onEdit: onEdit,
+            imagePath: selectedImageFile,
+            imageBytes: null,
+          ),
           Form(
             key: _formKey,
             child: Column(
@@ -212,7 +200,7 @@ class _MenuFormState extends State<MenuForm> {
                 const SizedBox(height: 10),
                 TextFieldWidget(
                   title: 'Description',
-                  hintText: 'Add details customers should know ',
+                  hintText: 'Add details customers should know',
                   color: Theme.of(context).colorScheme.secondary.withAlpha(127),
                   validator: _descriptionValidator,
                   textController: _descriptionController,
@@ -220,18 +208,6 @@ class _MenuFormState extends State<MenuForm> {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    // Expanded(
-                    //   child: TextFieldWidget(
-                    //     title: 'Price',
-                    //     hintText: '9.9',
-                    //     prefixText: '\$',
-                    //     color: Theme.of(
-                    //       context,
-                    //     ).colorScheme.secondary.withAlpha(127),
-                    //     validator: _nullValidator,
-                    //     textController: _priceController,
-                    //   ),
-                    // ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
@@ -278,14 +254,12 @@ class _MenuFormState extends State<MenuForm> {
                                     );
                                 if (newCategory != null) {
                                   mockMenuCategories.add(newCategory);
-                                  setState(() {
-                                    selectedCategory = newCategory;
-                                  });
+                                  setState(
+                                    () => selectedCategory = newCategory,
+                                  );
                                 }
                               } else {
-                                setState(() {
-                                  selectedCategory = value;
-                                });
+                                setState(() => selectedCategory = value);
                               }
                             },
                             decoration: InputDecoration(
@@ -337,9 +311,7 @@ class _MenuFormState extends State<MenuForm> {
                   getName: (item) => item.sizeOption.name,
                   getPrice: (item) => item.price,
                   onPriceChanged: (item, newPrice) {
-                    setState(() {
-                      item.price = newPrice;
-                    });
+                    setState(() => item.price = newPrice);
                   },
                   onDelete: (item) {
                     setState(() {
@@ -348,7 +320,6 @@ class _MenuFormState extends State<MenuForm> {
                     });
                   },
                 ),
-
                 SizedBox(
                   width: double.infinity,
                   child: ButtonWidget(
@@ -358,20 +329,20 @@ class _MenuFormState extends State<MenuForm> {
                       final returnedMenuSizes =
                           await showModalBottomSheet<List<SizeOption>>(
                             context: context,
-                            builder: (context) {
-                              return AddSizeScreen(
-                                existingMenu: widget.initialMenu,
-                              );
-                            },
+                            builder: (context) =>
+                                AddSizeScreen(existingMenu: widget.initialMenu),
                           );
 
                       if (returnedMenuSizes != null &&
                           returnedMenuSizes.isNotEmpty) {
                         setState(() {
-                          // Convert MenuSizeOption -> MenuSize with default price 0
                           menuSizes.addAll(
                             returnedMenuSizes.map(
-                              (e) => MenuSize(sizeOption: e, price: 0),
+                              (e) => MenuSize(
+                                sizeOption: e,
+                                price: 0,
+                                // id is auto-generated by MenuSize constructor
+                              ),
                             ),
                           );
                         });
@@ -394,9 +365,7 @@ class _MenuFormState extends State<MenuForm> {
                 AddOnTileWidget(
                   addOns: addOns,
                   onDelete: (addOn) {
-                    setState(() {
-                      addOns.remove(addOn);
-                    });
+                    setState(() => addOns.remove(addOn));
                   },
                 ),
                 const SizedBox(height: 10),
@@ -409,28 +378,23 @@ class _MenuFormState extends State<MenuForm> {
                       final List<AddOn>? newAddOns =
                           await showModalBottomSheet<List<AddOn>>(
                             context: context,
-                            builder: (BuildContext context) {
-                              return AddOnsManagement(
-                                existingMenu: widget.initialMenu,
-                              );
-                            },
+                            builder: (BuildContext context) => AddOnsManagement(
+                              existingMenu: widget.initialMenu,
+                            ),
                           );
-
                       if (newAddOns != null) {
-                        setState(() {
-                          for (AddOn addOn in newAddOns) {
-                            addOns.add(addOn);
-                          }
-                        });
+                        setState(() => addOns.addAll(newAddOns));
                       }
                     },
                     backgroundColor: AppTheme.secondaryColor.withAlpha(127),
                     textColor: AppTheme.secondaryColor,
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 5,
+                    ),
                     borderRadius: 5,
                   ),
                 ),
-
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),

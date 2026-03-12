@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/models/user/abstracts/user.dart';
 import '../store_management/edit_store_screen.dart';
 import '../../user_side/setting/change_password_screen.dart';
 import 'store_subscription_screen.dart';
@@ -8,7 +9,7 @@ import '../../../widgets/setting_card.dart';
 import '../../../widgets/custom_success_snackbar.dart';
 
 class StoreSettingsScreen extends StatefulWidget {
-  const StoreSettingsScreen({super.key});
+  const StoreSettingsScreen({super.key, required User user});
 
   @override
   State<StoreSettingsScreen> createState() => _StoreSettingsScreenState();

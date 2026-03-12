@@ -7,7 +7,7 @@ class ProfileEditorWidget extends StatelessWidget {
   const ProfileEditorWidget({
     super.key,
     required this.onEdit,
-    required this.imagePath,
+    required this.imagePath, required imageBytes,
   });
 
   @override

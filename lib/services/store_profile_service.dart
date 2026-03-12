@@ -13,6 +13,8 @@ class StoreProfileService extends ChangeNotifier {
   File? get storeProfileImage => _storeProfileImage;
   String get storeName => _storeName;
 
+  Null get storeProfileImageBytes => null;
+
   void setStoreProfileImage(File? image) {
     _storeProfileImage = image;
     notifyListeners();
@@ -32,4 +34,6 @@ class StoreProfileService extends ChangeNotifier {
   void removeListener(void Function() onProfileChanged) {
     super.removeListener(onProfileChanged);
   }
+
+  void setStoreProfileImageBytes(Uint8List? selectedImageBytes) {}
 }

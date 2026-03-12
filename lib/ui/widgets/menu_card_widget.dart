@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
@@ -85,7 +86,7 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                           Row(
                             children: [
                               Text(
-                                widget.menu.category.name,
+                                widget.menu.categoryId,
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 12,
@@ -101,7 +102,7 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                               ),
                               SizedBox(width: 5),
                               Text(
-                                "\$${widget.menu.cheapestPrice().toStringAsFixed(2)}",
+                                "\$${widget.menu.cheapestPrice(2 as List<MenuSize>)}",
                                 style: TextStyle(
                                   color: const Color.fromRGBO(255, 104, 53, 1),
                                   fontSize: 12,

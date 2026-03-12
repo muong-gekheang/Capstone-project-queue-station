@@ -18,11 +18,9 @@ class TableManagementScreen extends StatefulWidget {
 }
 
 class _TableManagementScreenState extends State<TableManagementScreen> {
-  // Master Data
   late List<TableCategory> tableCategories;
   late List<QueueTable> allTables;
 
-  // State for currently viewed data
   late TableCategory currentCategoryTable;
   late List<QueueTable> filteredTables;
 
@@ -33,7 +31,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   bool isFiltered = false;
   bool isEditMode = false;
 
-  // Controllers
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _seatController = TextEditingController();
   String? selectedCategory;
@@ -42,15 +39,14 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   void initState() {
     super.initState();
     allTables = List.from(widget.initialTables);
-    tableCategories = List.from(
-      widget.initialTables.map((t) => t.tableCategory).toSet().toList(),
-    );
+    tableCategories = [];
+    filteredTables = [];
+    _initCategories();
+    _applyFilters();
+  }
 
-    if (tableCategories.isNotEmpty) {
-      currentCategoryTable = tableCategories.first;
-      categoryNames = tableCategories.map((c) => c.type).toList();
-    } else {
-      // Create default category if none exists
+  void _initCategories() {
+    if (tableCategories.isEmpty) {
       final defaultCategory = TableCategory(
         type: 'Standard',
         minSeat: 1,
@@ -58,10 +54,10 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       );
       tableCategories = [defaultCategory];
       currentCategoryTable = defaultCategory;
-      categoryNames = [defaultCategory.type];
+    } else {
+      currentCategoryTable = tableCategories.first;
     }
-
-    _applyFilters();
+    categoryNames = tableCategories.map((c) => c.type).toList();
   }
 
   @override
@@ -71,15 +67,12 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     super.dispose();
   }
 
-  // Central logic to update what is shown on screen
   void _applyFilters() {
     setState(() {
-      // 1. Filter by the selected Category
       var result = allTables
-          .where((t) => t.tableCategory.id == currentCategoryTable.id)
+          .where((t) => t.tableCategoryId == currentCategoryTable.id)
           .toList();
 
-      // 2. Filter by Search Query
       if (searchQuery.isNotEmpty) {
         result = result
             .where(
@@ -89,7 +82,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
             .toList();
       }
 
-      // 3. Filter by Status
       if (isFiltered && currentFilter != FilterOption.clear) {
         result = result.where((t) {
           if (currentFilter == FilterOption.available) {
@@ -105,41 +97,28 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     });
   }
 
-  // Chip Category
   void onSelectedChip(int chipIndex) {
     if (isEditMode && chipIndex == selectedChipIndex) {
-      setState(() {
-        selectedChipIndex = chipIndex;
-        currentCategoryTable = tableCategories[chipIndex];
-        _applyFilters();
-      });
-
       showEditCategoryDialog(category: tableCategories[chipIndex]);
       return;
     }
-
     setState(() {
       selectedChipIndex = chipIndex;
       currentCategoryTable = tableCategories[chipIndex];
-      _applyFilters();
     });
+    _applyFilters();
   }
 
-  // Search
   void onSearch(String query) {
     searchQuery = query;
     _applyFilters();
   }
 
-  // Edit Mode
   void onEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-    });
+    setState(() => isEditMode = !isEditMode);
     _showSnackBar(isEditMode ? "Editing Mode" : "Normal Mode");
   }
 
-  // Filter Popup
   Widget onFilterBy() {
     return PopupMenuButton<FilterOption>(
       tooltip: "Filter by status",
@@ -152,8 +131,8 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         setState(() {
           currentFilter = status;
           isFiltered = status != FilterOption.clear;
-          _applyFilters();
         });
+        _applyFilters();
       },
       itemBuilder: (context) => const [
         PopupMenuItem<FilterOption>(
@@ -198,23 +177,21 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     }
   }
 
-  // --- CRUD Operations ---
+  // --- CRUD ---
 
   void _addNewTable(String tableNum, String categoryName) {
-    setState(() {
-      final categoryObj = tableCategories.firstWhere(
-        (c) => c.type == categoryName,
-      );
-      final newTable = QueueTable(
-        tableNum: tableNum,
-        tableStatus: TableStatus.available,
-        tableCategory: categoryObj,
-        queueEntryIds: [],
-      );
-      allTables.add(newTable);
-      _applyFilters();
-      _showSnackBar("Table $tableNum added to $categoryName");
-    });
+    final categoryObj = tableCategories.firstWhere(
+      (c) => c.type == categoryName,
+    );
+    final newTable = QueueTable(
+      tableNum: tableNum,
+      tableStatus: TableStatus.available,
+      tableCategoryId: categoryObj.id,
+      queueEntryIds: [],
+    );
+    setState(() => allTables.add(newTable));
+    _applyFilters();
+    _showSnackBar("Table $tableNum added to $categoryName");
   }
 
   void _updateTable(
@@ -222,48 +199,46 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     String newTableNum,
     String newCategoryName,
   ) {
-    setState(() {
-      final index = allTables.indexWhere(
-        (t) =>
-            t.tableNum == oldTableNum &&
-            t.tableCategory.id == currentCategoryTable.id,
+    final index = allTables.indexWhere(
+      (t) =>
+          t.tableNum == oldTableNum &&
+          t.tableCategoryId == currentCategoryTable.id,
+    );
+
+    if (index != -1) {
+      final newCategoryObj = tableCategories.firstWhere(
+        (c) => c.type == newCategoryName,
       );
-
-      if (index != -1) {
-        final newCategoryObj = tableCategories.firstWhere(
-          (c) => c.type == newCategoryName,
-        );
-
+      setState(() {
         allTables[index] = allTables[index].copyWith(
           tableNum: newTableNum,
-          tableCategory: newCategoryObj,
+          tableCategoryId: newCategoryObj.id,
         );
-
-        _applyFilters();
-        _showSnackBar("Table updated and moved to $newCategoryName");
-      }
-    });
+      });
+      _applyFilters();
+      _showSnackBar("Table updated and moved to $newCategoryName");
+    }
   }
 
   void _updateTableStatus(String tableNum, TableStatus newStatus) {
-    setState(() {
-      final index = allTables.indexWhere(
-        (t) =>
-            t.tableNum == tableNum &&
-            t.tableCategory.id == currentCategoryTable.id,
-      );
+    final index = allTables.indexWhere(
+      (t) =>
+          t.tableNum == tableNum &&
+          t.tableCategoryId == currentCategoryTable.id,
+    );
 
-      if (index != -1) {
+    if (index != -1) {
+      setState(() {
         allTables[index] = allTables[index].copyWith(
           tableStatus: newStatus,
           queueEntryIds: newStatus == TableStatus.occupied
               ? allTables[index].queueEntryIds
               : [],
         );
-        _applyFilters();
-        _showSnackBar("Table $tableNum is ${newStatus.name}");
-      }
-    });
+      });
+      _applyFilters();
+      _showSnackBar("Table $tableNum is ${newStatus.name}");
+    }
   }
 
   void _deleteTable(String tableNum) {
@@ -271,27 +246,27 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
       allTables.removeWhere(
         (t) =>
             t.tableNum == tableNum &&
-            t.tableCategory.id == currentCategoryTable.id,
-      );
-      _applyFilters();
-      _showSnackBar(
-        "Table $tableNum deleted",
-        backgroundColor: AppTheme.accentRed,
+            t.tableCategoryId == currentCategoryTable.id,
       );
     });
+    _applyFilters();
+    _showSnackBar(
+      "Table $tableNum deleted",
+      backgroundColor: AppTheme.accentRed,
+    );
   }
 
   void _addNewCategory(String categoryName, int amountOfSeat) {
+    final newCategory = TableCategory(
+      type: categoryName,
+      minSeat: 1,
+      seatAmount: amountOfSeat,
+    );
     setState(() {
-      final newCategory = TableCategory(
-        type: categoryName,
-        minSeat: 1,
-        seatAmount: amountOfSeat,
-      );
       tableCategories.add(newCategory);
       categoryNames = tableCategories.map((c) => c.type).toList();
-      _showSnackBar("Category $categoryName added");
     });
+    _showSnackBar("Category $categoryName added");
   }
 
   void _updateCategory(
@@ -299,54 +274,36 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     String newCategoryName,
     int amountOfSeat,
   ) {
-    setState(() {
-      final index = tableCategories.indexWhere(
-        (c) => c.type == oldCategoryName,
+    final index = tableCategories.indexWhere((c) => c.type == oldCategoryName);
+
+    if (index != -1) {
+      final oldId = tableCategories[index].id;
+      final updatedCategory = TableCategory(
+        categoryId: oldId,
+        type: newCategoryName,
+        minSeat: tableCategories[index].minSeat,
+        seatAmount: amountOfSeat,
       );
-
-      if (index != -1) {
-        final updatedCategory = TableCategory(
-          categoryId: tableCategories[index].id,
-          type: newCategoryName,
-          minSeat: tableCategories[index].minSeat,
-          seatAmount: amountOfSeat,
-        );
-
+      setState(() {
         tableCategories[index] = updatedCategory;
-
-        // Update all tables with this category
-        for (int i = 0; i < allTables.length; i++) {
-          if (allTables[i].tableCategory.id == tableCategories[index].id) {
-            allTables[i] = allTables[i].copyWith(
-              tableCategory: updatedCategory,
-            );
-          }
-        }
-
         categoryNames = tableCategories.map((c) => c.type).toList();
-
-        if (selectedChipIndex == index) {
-          currentCategoryTable = updatedCategory;
-        }
-
-        _applyFilters();
-        _showSnackBar("Category updated: $newCategoryName");
-      }
-    });
+        if (selectedChipIndex == index) currentCategoryTable = updatedCategory;
+      });
+      _applyFilters();
+      _showSnackBar("Category updated: $newCategoryName");
+    }
   }
 
   void _deleteCategory(String categoryId) {
     setState(() {
       tableCategories.removeWhere((c) => c.id == categoryId);
-      allTables.removeWhere((t) => t.tableCategory.id == categoryId);
+      allTables.removeWhere((t) => t.tableCategoryId == categoryId);
       categoryNames = tableCategories.map((c) => c.type).toList();
 
       if (tableCategories.isNotEmpty) {
         selectedChipIndex = 0;
         currentCategoryTable = tableCategories[0];
-        _applyFilters();
       } else {
-        // Create default category if all are deleted
         final defaultCategory = TableCategory(
           type: 'Standard',
           minSeat: 1,
@@ -357,19 +314,16 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         categoryNames = [defaultCategory.type];
         filteredTables = [];
       }
-
-      _showSnackBar(
-        "Category and its tables deleted",
-        backgroundColor: AppTheme.accentRed,
-      );
     });
+    _applyFilters();
+    _showSnackBar(
+      "Category and its tables deleted",
+      backgroundColor: AppTheme.accentRed,
+    );
   }
 
-  // --- Dialogs & UI Helpers ---
-
   void _showSnackBar(String message, {Color? backgroundColor}) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double snackBarEstimatedHeight = AppTheme.spacingXL;
+    final screenHeight = MediaQuery.of(context).size.height;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -385,12 +339,11 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         margin: EdgeInsets.only(
           bottom: (screenHeight - 150).clamp(
             0.0,
-            screenHeight - snackBarEstimatedHeight,
+            screenHeight - AppTheme.spacingXL,
           ),
           left: AppTheme.spacingXL,
           right: AppTheme.spacingXL,
         ),
-        // margin: const EdgeInsets.all(AppTheme.spacingXL),
         duration: const Duration(milliseconds: 1200),
       ),
     );
@@ -464,7 +417,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
                       fontWeight: FontWeight.bold,
                       fontSize: AppTheme.heading2,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -769,12 +721,12 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
               title: "Delete",
               color: AppTheme.accentRed,
               onPressed: () {
+                Navigator.pop(context);
                 if (isTable) {
                   _deleteTable(tableNum!);
                 } else {
                   _deleteCategory(currentCategoryTable.id);
                 }
-                Navigator.pop(context);
               },
             ),
           ),
@@ -910,7 +862,6 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   }
 }
 
-// CustomRecButton
 class CustomRecButton extends StatelessWidget {
   const CustomRecButton({
     super.key,

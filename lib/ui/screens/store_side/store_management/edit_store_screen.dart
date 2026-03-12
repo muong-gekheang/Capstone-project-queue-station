@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../services/store_profile_service.dart';
@@ -19,15 +20,22 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
       TextEditingController();
   final TextEditingController _storeEmailController = TextEditingController();
   String _selectedBranch = "IFL";
+
+  // For mobile: File
   File? _selectedImage;
+  // For web: Uint8List
+  Uint8List? _selectedImageBytes;
+
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    // Initialize with existing store data
-    _storeNameController.text = "Kungfu Kitchen - BKK";
-    _storeDescriptionController.text = "Chinese dine in restauraunt";
+    // Initialize with existing store data from service
+    final storeService = StoreProfileService();
+    _storeNameController.text = storeService.storeName;
+    // You might want to store these in the service too
+    _storeDescriptionController.text = "Chinese dine in restaurant";
     _storePasswordController.text = "********";
     _storeEmailController.text = "KungfuKitchen@gmail.com";
   }
@@ -77,71 +85,22 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                             width: 200,
                             height: 200,
                             decoration: BoxDecoration(
-                              color: _selectedImage == null
+                              color:
+                                  (_selectedImage == null &&
+                                      _selectedImageBytes == null)
                                   ? const Color(0xFF0D47A1)
                                   : Colors.transparent,
                               shape: BoxShape.circle,
-                              border: _selectedImage != null
+                              border:
+                                  (_selectedImage != null ||
+                                      _selectedImageBytes != null)
                                   ? Border.all(
                                       color: Colors.grey.shade300,
                                       width: 2,
                                     )
                                   : null,
                             ),
-                            child: _selectedImage != null
-                                ? ClipOval(
-                                    child: Image.file(
-                                      _selectedImage!,
-                                      width: 200,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "功夫",
-                                          style: TextStyle(
-                                            color: Color(0xFFFF6835),
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.2,
-                                          ),
-                                        ),
-                                        const Text(
-                                          "KUNGFU",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
-                                          ),
-                                        ),
-                                        const Text(
-                                          "KITCHEN",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        const Text(
-                                          "MODERN CHINESE CUISINE & HOT POT",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                            child: _buildProfileImage(),
                           ),
                           // Edit icon overlay
                           Positioned(
@@ -318,18 +277,7 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                 // Save Button
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Save store profile image
-                      final storeService = StoreProfileService();
-                      storeService.setStoreProfileImage(_selectedImage);
-                      storeService.setStoreName(_storeNameController.text);
-                      CustomSuccessSnackbar.show(context, "Added Successfully");
-                      Future.delayed(const Duration(milliseconds: 800), () {
-                        if (mounted) {
-                          Navigator.of(context).pop(true); // Indicate success
-                        }
-                      });
-                    },
+                    onPressed: _saveStoreProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF6835),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -349,6 +297,80 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    if (kIsWeb) {
+      // Web: Use MemoryImage if bytes are available
+      if (_selectedImageBytes != null) {
+        return ClipOval(
+          child: Image.memory(
+            _selectedImageBytes!,
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
+        );
+      }
+    } else {
+      // Mobile: Use FileImage if file is available
+      if (_selectedImage != null) {
+        return ClipOval(
+          child: Image.file(
+            _selectedImage!,
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
+        );
+      }
+    }
+
+    // Default placeholder
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            "功夫",
+            style: TextStyle(
+              color: Color(0xFFFF6835),
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+          ),
+          const Text(
+            "KUNGFU",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+            ),
+          ),
+          const Text(
+            "KITCHEN",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            "MODERN CHINESE CUISINE & HOT POT",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -394,9 +416,20 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _selectedImage = File(image.path);
-        });
+        if (kIsWeb) {
+          // For web: read as bytes
+          final bytes = await image.readAsBytes();
+          setState(() {
+            _selectedImageBytes = bytes;
+            _selectedImage = null; // Clear file for web
+          });
+        } else {
+          // For mobile: use file
+          setState(() {
+            _selectedImage = File(image.path);
+            _selectedImageBytes = null; // Clear bytes for mobile
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -408,5 +441,36 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
         );
       }
     }
+  }
+
+  void _saveStoreProfile() {
+    // Save store profile to service
+    final storeService = StoreProfileService();
+
+    // Update store name
+    storeService.setStoreName(_storeNameController.text);
+
+    // Update profile image based on platform
+    if (kIsWeb) {
+      // For web: save bytes
+      if (_selectedImageBytes != null) {
+        storeService.setStoreProfileImageBytes(_selectedImageBytes);
+      }
+    } else {
+      // For mobile: save file
+      if (_selectedImage != null) {
+        storeService.setStoreProfileImage(_selectedImage);
+      }
+    }
+
+    // Show success message
+    CustomSuccessSnackbar.show(context, "Store Updated Successfully");
+
+    // Return to previous screen with success indication
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    });
   }
 }

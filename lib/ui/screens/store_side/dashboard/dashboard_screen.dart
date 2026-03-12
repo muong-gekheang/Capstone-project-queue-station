@@ -3,10 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
 import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/add_ons_management.dart';
-import 'package:queue_station_app/ui/store_main_screen.dart';
 import '../../../../models/analytic/dashboard_stats.dart';
 import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/services/store_profile_service.dart';
+import 'package:flutter/foundation.dart';
+import '../../../widgets/dashboard_stat_card.dart';
+import '../../../../models/nav_tab.dart'; // Add this import
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,15 +19,27 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final QueueService _queueService = QueueService(QueueRepository());
+  late final StoreProfileService _storeService;
   DashboardStats? _stats;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _storeService = StoreProfileService();
+    _storeService.addListener(_onProfileChanged);
     _loadDashboardStats();
-    // Refresh stats every 30 seconds
     _startPeriodicRefresh();
+  }
+
+  @override
+  void dispose() {
+    _storeService.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  void _onProfileChanged() {
+    if (mounted) setState(() {});
   }
 
   void _loadDashboardStats() async {
@@ -81,18 +95,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         actions: [
-          // Store Profile Image
           _buildStoreProfileImage(),
-          // Notification Icon
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotificationScreen()),
+                MaterialPageRoute(builder: (context) => NotificationScreen(isPushed:true))
               );
             },
-            // onPressed: widget.onManageQueuePressed,
           ),
         ],
       ),
@@ -103,42 +114,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Dashboard Stats Cards
-                  _buildStatCard(
-                    'Queue Status',
-                    '${_stats?.queueEntries ?? 0}',
-                    'entries',
+                  DashboardStatCard(
+                    label: 'Queue Status',
+                    value: '${_stats?.queueEntries ?? 0}',
+                    unit: 'entries',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'People Waiting',
-                    '${_stats?.peopleWaiting ?? 0}',
-                    '',
+                  DashboardStatCard(
+                    label: 'People Waiting',
+                    value: '${_stats?.peopleWaiting ?? 0}',
+                    unit: '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Active Tables',
-                    '${_stats?.activeTables ?? 0}',
-                    '',
+                  DashboardStatCard(
+                    label: 'Active Tables',
+                    value: '${_stats?.activeTables ?? 0}',
+                    unit: '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Average Wait Time',
-                    '${_stats?.averageWaitTimeMinutes ?? 0}',
-                    'min',
+                  DashboardStatCard(
+                    label: 'Average Wait Time',
+                    value: '${_stats?.averageWaitTimeMinutes ?? 0}',
+                    unit: 'min',
                   ),
                   const SizedBox(height: 24),
-                  // Manage Queue Button
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to manage queue page
-                        Navigator.push(
+                      onPressed: () async {
+                        // Push StoreQueueScreen and wait for result
+                        final result = await Navigator.push<NavTab>(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => StoreQueueScreen(),
+                            builder: (context) => const StoreQueueScreen(isPushed: true,),
                           ),
                         );
                       },
@@ -164,71 +173,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, String unit) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.05).toInt()),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0D47A1),
-                ),
-              ),
-              if (unit.isNotEmpty) ...[
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
-                    unit,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildStoreProfileImage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    final storeName = _storeService.storeName;
+
+    ImageProvider? imageProvider;
+    if (kIsWeb) {
+      final bytes = _storeService.storeProfileImageBytes;
+      if (bytes != null) imageProvider = MemoryImage(bytes);
+    } else {
+      final file = _storeService.storeProfileImage;
+      if (file != null) imageProvider = FileImage(file);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
       child: CircleAvatar(
-        radius: 18,
-        backgroundColor: Colors.grey[300],
-        child: const Icon(Icons.person, color: Colors.white),
+        radius: 20,
+        backgroundColor: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
+        backgroundImage: imageProvider,
+        child: imageProvider == null
+            ? Text(
+                storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
+                style: const TextStyle(
+                  color: Color(0xFFFF6835),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              )
+            : null,
       ),
     );
   }

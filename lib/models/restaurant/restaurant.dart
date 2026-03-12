@@ -1,10 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:queue_station_app/models/restaurant/add_on.dart';
-import 'package:queue_station_app/models/restaurant/size_option.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 
-import 'menu_item.dart';
-import 'queue_table.dart';
 
 part 'restaurant.g.dart';
 

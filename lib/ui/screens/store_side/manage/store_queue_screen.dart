@@ -4,7 +4,6 @@ import '../dialogs/add_queue_dialog.dart';
 import '../dialogs/edit_queue_dialog.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/services/store_profile_service.dart';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../../models/nav_tab.dart';
 

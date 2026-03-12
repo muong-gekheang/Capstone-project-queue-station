@@ -3,7 +3,6 @@ import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:uuid/uuid.dart';
 
 final uuid = const Uuid();

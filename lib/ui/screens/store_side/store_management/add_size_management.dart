@@ -58,7 +58,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     }
 
     if (existingSize == null) {
-      existingSize = SizeOption(name: sizeName);
+      existingSize = SizeOption(name: sizeName, id: '');
       globalSizes.add(existingSize);
     }
 

@@ -87,7 +87,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                     alignment: Alignment.center,
                     child: ProfileEditorWidget(
                       onEdit: onEdit,
-                      imagePath: _selectedImage,
+                      imagePath: _selectedImage, imageBytes: null,
                     ),
                   ),
                   TextFieldWidget(

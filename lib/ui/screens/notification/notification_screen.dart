@@ -6,7 +6,7 @@ import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/notification_tile_widget.dart';
 
 class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+  const NotificationScreen({super.key, required bool isPushed});
 
   @override
   Widget build(BuildContext context) {
@@ -14,19 +14,10 @@ class NotificationScreen extends StatelessWidget {
         .watch<StoreOrderNotificationProvider>()
         .queueEntries;
 
-    debugPrint('StoreOrders length: ${storeOrders.length}');
-
-    for (var order in storeOrders) {
-      debugPrint('Queue: ${order.queueNumber}');
-      debugPrint('Table: ${order.tableNumber}');
-      debugPrint('Items: ${order.order?.inCart.length}');
-      debugPrint('-------------------');
-    }
-
     return Scaffold(
       appBar: AppBarWidget(title: 'New Order'),
       body: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -36,7 +27,7 @@ class NotificationScreen extends StatelessWidget {
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {},
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -47,7 +38,7 @@ class NotificationScreen extends StatelessWidget {
                           color: AppTheme.naturalBlack,
                         ),
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Icon(
                         Icons.filter_alt_outlined,
                         color: AppTheme.naturalBlack,
@@ -59,9 +50,9 @@ class NotificationScreen extends StatelessWidget {
             ),
             Expanded(
               child: ListView.separated(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 itemCount: storeOrders.length,
-                separatorBuilder: (_, __) => SizedBox(height: 10),
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   return NotificationTileWidget(queueEntry: storeOrders[index]);
                 },
@@ -72,17 +63,4 @@ class NotificationScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget get _filterWidget {
-  return TextButton(
-    onPressed: () {},
-    child: Text(
-      'Filter',
-      style: TextStyle(
-        color: AppTheme.secondaryColor,
-        fontSize: AppTheme.heading2,
-      ),
-    ),
-  );
 }

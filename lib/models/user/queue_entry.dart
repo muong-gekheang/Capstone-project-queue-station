@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:queue_station_app/models/restaurant/restaurant.dart';
 
 import '../order/order.dart';
 

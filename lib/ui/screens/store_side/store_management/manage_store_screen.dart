@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:queue_station_app/data/mock_table_data.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/restaurant/queue_table.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management_screen.dart';
@@ -9,7 +9,7 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/menu_ma
 import 'package:queue_station_app/ui/screens/store_side/store_management/store_queue_history.dart';
 import '../../../../services/store_profile_service.dart';
 import 'analytics_screen.dart';
-
+import 'package:flutter/foundation.dart';
 class ManageStorePage extends StatefulWidget {
   const ManageStorePage({super.key});
 
@@ -38,6 +38,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
   }
 
   bool isStoreOpen = true;
+
+  late List<QueueTable> tableData;
+
+  late Restaurant restaurant1;
 
   void _showCloseStoreDialog() {
     showDialog(
@@ -167,7 +171,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NotificationScreen()),
+              MaterialPageRoute(builder: (context) => const NotificationScreen(isPushed: true)),
             );
           },
         ),
@@ -342,13 +346,32 @@ class _ManageStorePageState extends State<ManageStorePage> {
   }
 
   // Placeholder for store profile image widget
-  Widget _buildStoreProfileImage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+Widget _buildStoreProfileImage() {
+    final storeName = _storeService.storeName;
+    ImageProvider? imageProvider;
+    if (kIsWeb) {
+      final bytes = _storeService.storeProfileImageBytes;
+      if (bytes != null) imageProvider = MemoryImage(bytes);
+    } else {
+      final file = _storeService.storeProfileImage;
+      if (file != null) imageProvider = FileImage(file);
+    }
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
       child: CircleAvatar(
         radius: 18,
-        backgroundColor: Colors.grey[300],
-        child: const Icon(Icons.person, color: Colors.white),
+        backgroundColor: const Color(0xFFFF6835).withValues(alpha: 0.1),
+        backgroundImage: imageProvider,
+        child: imageProvider == null
+            ? Text(
+                storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
+                style: const TextStyle(
+                  color: Color(0xFFFF6835),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              )
+            : null,
       ),
     );
   }
@@ -407,7 +430,7 @@ class _ActionCard extends StatelessWidget {
   final Color iconColor;
   final VoidCallback? onTap;
 
-  const _ActionCard(this.icon, this.label, this.iconColor, {this.onTap});
+  const _ActionCard(this.icon, this.label, this.iconColor);
 
   @override
   Widget build(BuildContext context) {

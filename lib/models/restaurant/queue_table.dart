@@ -1,11 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import 'table_category.dart';
-
 part 'queue_table.g.dart';
 
-final uuid = Uuid();
+final _uuid = Uuid();
 
 enum TableStatus { available, occupied }
 
@@ -25,7 +23,7 @@ class QueueTable {
     required this.tableStatus,
     required this.tableCategoryId,
     required this.queueEntryIds,
-  }) : id = id ?? uuid.v4();
+  }) : id = id ?? _uuid.v4();
 
   QueueTable copyWith({
     String? tableNum,
@@ -46,6 +44,4 @@ class QueueTable {
       _$QueueTableFromJson(json);
 
   Map<String, dynamic> toJson() => _$QueueTableToJson(this);
-
-  void operator []=(String other, QueueTable value) {}
 }

@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 
 part 'table_category.g.dart';
 
-var uuid = Uuid();
+final _uuid = Uuid();
 
 @JsonSerializable()
 class TableCategory {
@@ -13,18 +13,14 @@ class TableCategory {
   final int seatAmount;
 
   TableCategory({
-    @JsonKey(name: 'id') String? categoryId,
+    String? categoryId,
     required this.type,
     required this.minSeat,
     required this.seatAmount,
-  }) : id = categoryId ?? uuid.v4();
+  }) : id = categoryId ?? _uuid.v4();
 
   factory TableCategory.fromJson(Map<String, dynamic> json) =>
       _$TableCategoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$TableCategoryToJson(this);
-
-  static TableCategory? get small => null;
-
-  static TableCategory? get standard => null;
 }

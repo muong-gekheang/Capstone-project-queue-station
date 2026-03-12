@@ -1,7 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 

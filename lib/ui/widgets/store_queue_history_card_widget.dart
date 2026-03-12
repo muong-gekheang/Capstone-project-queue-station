@@ -7,6 +7,8 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/store_q
 class StoreQueueHistoryCard extends StatelessWidget {
   final QueueEntry queueEntry;
   const StoreQueueHistoryCard({super.key, required this.queueEntry});
+  
+  Null get mockUsers => null;
 
   String formattedtime(DateTime date) {
     return DateFormat('hh:mm a').format(date);

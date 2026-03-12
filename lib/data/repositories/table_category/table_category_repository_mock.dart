@@ -1,8 +1,10 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
+import 'package:uuid/uuid.dart';
+
+final _uuid = Uuid();
 
 class TableCategoryRepositoryMock implements TableCategoryRepository {
   Map<String, TableCategory> tableCategories = {};
@@ -12,21 +14,19 @@ class TableCategoryRepositoryMock implements TableCategoryRepository {
       tableCategories[tableCat.id] = tableCat;
     }
   }
+
   @override
   Future<void> create(TableCategory category) {
-    // TODO: implement create
     throw UnimplementedError();
   }
 
   @override
   Future<void> delete(String categoryId) {
-    // TODO: implement delete
     throw UnimplementedError();
   }
 
   @override
   Future<void> deleteMany(List<String> ids) {
-    // TODO: implement deleteMany
     throw UnimplementedError();
   }
 
@@ -36,13 +36,11 @@ class TableCategoryRepositoryMock implements TableCategoryRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   ) {
-    // TODO: implement getAll
     throw UnimplementedError();
   }
 
   @override
   Future<List<TableCategory>> getManyTableCategoriesById(List<String> ids) {
-    // TODO: implement getManyTableCategoriesById
     throw UnimplementedError();
   }
 
@@ -54,7 +52,6 @@ class TableCategoryRepositoryMock implements TableCategoryRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   ) {
-    // TODO: implement getSearchCategories
     throw UnimplementedError();
   }
 
@@ -65,37 +62,34 @@ class TableCategoryRepositoryMock implements TableCategoryRepository {
 
   @override
   Future<TableCategory> update(TableCategory category) {
-    // TODO: implement update
     throw UnimplementedError();
   }
 
   @override
   Stream<List<TableCategory>> watchAllCategory(String restaurantId) {
-    // TODO: implement watchAllCategory
     throw UnimplementedError();
   }
 
   @override
   Stream<TableCategory> watchCurrentCategory(String categoryId) {
-    // TODO: implement watchCurrentCategory
     throw UnimplementedError();
   }
 }
 
 final categoryA = TableCategory(
-  categoryId: uuid.v4(),
+  categoryId: _uuid.v4(),
   type: "Type A",
   minSeat: 1,
   seatAmount: 2,
 );
 final categoryB = TableCategory(
-  categoryId: uuid.v4(),
+  categoryId: _uuid.v4(),
   type: "Type B",
   minSeat: 3,
   seatAmount: 4,
 );
 final categoryC = TableCategory(
-  categoryId: uuid.v4(),
+  categoryId: _uuid.v4(),
   type: "Type C",
   minSeat: 5,
   seatAmount: 6,
