@@ -8,18 +8,17 @@ class RestaurantTile extends StatefulWidget {
   final Restaurant rest;
 
   @override
-  State<RestaurantTile> createState() => _RestaurantCardState();
+  State<RestaurantTile> createState() => _RestaurantTileState();
 }
 
-class _RestaurantCardState extends State<RestaurantTile> {
+class _RestaurantTileState extends State<RestaurantTile> {
   bool _isPressed = false;
-  Future<void> onRestTap(Restaurant rest) async {
+
+  Future<void> onRestTap() async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) {
-          return JoinQueueScreen(rest: widget.rest);
-        },
+        builder: (context) => JoinQueueScreen(rest: widget.rest),
       ),
     );
   }
@@ -33,7 +32,7 @@ class _RestaurantCardState extends State<RestaurantTile> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.25),
-            offset: Offset(0, 0),
+            offset: const Offset(0, 0),
             blurRadius: 4,
             spreadRadius: 0,
           ),
@@ -44,7 +43,7 @@ class _RestaurantCardState extends State<RestaurantTile> {
         onTapUp: (_) => setState(() => _isPressed = false),
         onTapCancel: () => setState(() => _isPressed = false),
         behavior: HitTestBehavior.opaque,
-        onTap: () => onRestTap(widget.rest),
+        onTap: onRestTap,
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 10),
           opacity: _isPressed ? 0.6 : 1.0,
@@ -66,23 +65,27 @@ class _RestaurantCardState extends State<RestaurantTile> {
                     children: [
                       Text(
                         widget.rest.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
                       ),
                       Row(
                         children: [
-                          Icon(Icons.location_pin),
+                          const Icon(Icons.location_pin),
                           Text(widget.rest.address),
                         ],
                       ),
                       Row(
                         children: [
-                          Icon(Icons.hourglass_empty, color: Color(0xFFFF6835)),
+                          const Icon(
+                            Icons.hourglass_empty,
+                            color: Color(0xFFFF6835),
+                          ),
                           Text(
-                            "${widget.rest.curWait} people waiting",
-                            style: TextStyle(color: Color(0xFFFF6835)),
+                            // Replace curWait with a proper field; here using a placeholder
+                            "? people waiting",
+                            style: const TextStyle(color: Color(0xFFFF6835)),
                           ),
                         ],
                       ),

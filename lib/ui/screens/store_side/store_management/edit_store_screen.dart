@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,20 +22,15 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
   final TextEditingController _storeEmailController = TextEditingController();
   String _selectedBranch = "IFL";
 
-  // For mobile: File
   File? _selectedImage;
-  // For web: Uint8List
   Uint8List? _selectedImageBytes;
-
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    // Initialize with existing store data from service
     final storeService = StoreProfileService();
     _storeNameController.text = storeService.storeName;
-    // You might want to store these in the service too
     _storeDescriptionController.text = "Chinese dine in restaurant";
     _storePasswordController.text = "********";
     _storeEmailController.text = "KungfuKitchen@gmail.com";
@@ -102,7 +98,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                             ),
                             child: _buildProfileImage(),
                           ),
-                          // Edit icon overlay
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -133,7 +128,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Form Fields with labels on left
                   _buildFormField(
                     label: "Name:",
                     child: TextField(
@@ -185,11 +179,8 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                         ),
                         DropdownMenuItem(value: "BKK", child: Text("BKK")),
                       ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedBranch = value!;
-                        });
-                      },
+                      onChanged: (value) =>
+                          setState(() => _selectedBranch = value!),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -227,7 +218,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
             ),
           ),
 
-          // Bottom Action Buttons
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -242,7 +232,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
             ),
             child: Row(
               children: [
-                // Cancel Button
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
@@ -274,7 +263,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Save Button
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _saveStoreProfile,
@@ -305,7 +293,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
 
   Widget _buildProfileImage() {
     if (kIsWeb) {
-      // Web: Use MemoryImage if bytes are available
       if (_selectedImageBytes != null) {
         return ClipOval(
           child: Image.memory(
@@ -317,7 +304,6 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
         );
       }
     } else {
-      // Mobile: Use FileImage if file is available
       if (_selectedImage != null) {
         return ClipOval(
           child: Image.file(
@@ -329,13 +315,11 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
         );
       }
     }
-
-    // Default placeholder
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
+        children: const [
+          Text(
             "功夫",
             style: TextStyle(
               color: Color(0xFFFF6835),
@@ -344,7 +328,7 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
               height: 1.2,
             ),
           ),
-          const Text(
+          Text(
             "KUNGFU",
             style: TextStyle(
               color: Colors.white,
@@ -353,7 +337,7 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
               letterSpacing: 2,
             ),
           ),
-          const Text(
+          Text(
             "KITCHEN",
             style: TextStyle(
               color: Colors.white,
@@ -362,8 +346,8 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
               letterSpacing: 2,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             "MODERN CHINESE CUISINE & HOT POT",
             style: TextStyle(
               color: Colors.white,
@@ -414,20 +398,17 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
         maxHeight: 800,
         imageQuality: 85,
       );
-
       if (image != null) {
         if (kIsWeb) {
-          // For web: read as bytes
           final bytes = await image.readAsBytes();
           setState(() {
             _selectedImageBytes = bytes;
-            _selectedImage = null; // Clear file for web
+            _selectedImage = null;
           });
         } else {
-          // For mobile: use file
           setState(() {
             _selectedImage = File(image.path);
-            _selectedImageBytes = null; // Clear bytes for mobile
+            _selectedImageBytes = null;
           });
         }
       }
@@ -444,32 +425,25 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
   }
 
   void _saveStoreProfile() {
-    // Save store profile to service
     final storeService = StoreProfileService();
-
-    // Update store name
     storeService.setStoreName(_storeNameController.text);
 
-    // Update profile image based on platform
     if (kIsWeb) {
-      // For web: save bytes
       if (_selectedImageBytes != null) {
         storeService.setStoreProfileImageBytes(_selectedImageBytes);
       }
     } else {
-      // For mobile: save file
       if (_selectedImage != null) {
         storeService.setStoreProfileImage(_selectedImage);
       }
     }
 
-    // Show success message
+    // Show success message and then pop
     CustomSuccessSnackbar.show(context, "Store Updated Successfully");
 
-    // Return to previous screen with success indication
     Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) {
-        Navigator.of(context).pop(true);
+        Navigator.of(context).pop(); 
       }
     });
   }

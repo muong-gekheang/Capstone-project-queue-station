@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart'; // for restaurant1
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
@@ -8,6 +8,12 @@ class TicketQueueInfo extends StatelessWidget {
   const TicketQueueInfo({super.key, required this.queueEntry});
 
   final QueueEntry queueEntry;
+
+  // Mock function – replace with actual logic
+  int _getCurrentSpot() {
+    // This is a placeholder. In a real app, you'd compute the spot from the queue.
+    return 1;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +33,7 @@ class TicketQueueInfo extends StatelessWidget {
                   spacing: 10,
                   children: [
                     Text(
-                      queueEntry
-                          .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                      restaurant1.name,
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -44,8 +49,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            queueEntry
-                                .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                            restaurant1.address,
                             softWrap: true,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -60,7 +64,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           IntrinsicHeight(
             child: Row(
               children: [
@@ -90,7 +94,6 @@ class TicketQueueInfo extends StatelessWidget {
                   flex: 1,
                   child: VerticalDivider(thickness: 2, color: Colors.white),
                 ),
-
                 Expanded(
                   flex: 2,
                   child: Column(
@@ -103,9 +106,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        queueEntry
-                            .currentSpot(restaurant1)
-                            .toString(), // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                        _getCurrentSpot().toString(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,
@@ -137,7 +138,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -155,7 +156,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -173,7 +174,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -191,13 +192,13 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
-          Text(
+          const SizedBox(height: 20),
+          const Text(
             "We reserve the right to skip the queue position in case of no show",
             softWrap: true,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: const Color.fromARGB(255, 253, 154, 154),
+              color: Color.fromARGB(255, 253, 154, 154),
               fontSize: 13,
             ),
           ),

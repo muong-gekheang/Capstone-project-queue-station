@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart'; // for getHistoryById
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/user_provider.dart';
@@ -56,7 +56,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
           SearchWidget<QueueEntry>(
             filterLogic: (String search) {
-              // TODO: Use Repos in VM to fetch and create Rest obj
               Set<QueueEntry> filteredList = (user?.historyIds ?? [])
                   .map(getHistoryById)
                   .whereType<QueueEntry>()

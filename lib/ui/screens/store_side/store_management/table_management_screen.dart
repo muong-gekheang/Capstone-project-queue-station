@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
+import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart'; // for mockTableCategories
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/search_bar.dart';
 import 'package:queue_station_app/ui/widgets/table_chip_category.dart';
 import 'package:queue_station_app/ui/widgets/table_search_result.dart';
+import 'package:uuid/uuid.dart';
 
 enum FilterOption { available, occupied, clear }
 
@@ -39,25 +41,23 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
   void initState() {
     super.initState();
     allTables = List.from(widget.initialTables);
-    tableCategories = [];
-    filteredTables = [];
-    _initCategories();
-    _applyFilters();
-  }
-
-  void _initCategories() {
-    if (tableCategories.isEmpty) {
+    // Use mock categories or extract from tables
+    tableCategories = List.from(mockTableCategories);
+    if (tableCategories.isNotEmpty) {
+      currentCategoryTable = tableCategories.first;
+      categoryNames = tableCategories.map((c) => c.type).toList();
+    } else {
       final defaultCategory = TableCategory(
+        id: const Uuid().v4(),
         type: 'Standard',
         minSeat: 1,
         seatAmount: 4,
       );
       tableCategories = [defaultCategory];
       currentCategoryTable = defaultCategory;
-    } else {
-      currentCategoryTable = tableCategories.first;
+      categoryNames = [defaultCategory.type];
     }
-    categoryNames = tableCategories.map((c) => c.type).toList();
+    _applyFilters();
   }
 
   @override
@@ -260,7 +260,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
     final newCategory = TableCategory(
       type: categoryName,
       minSeat: 1,
-      seatAmount: amountOfSeat,
+      seatAmount: amountOfSeat, id: '',
     );
     setState(() {
       tableCategories.add(newCategory);
@@ -282,7 +282,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         categoryId: oldId,
         type: newCategoryName,
         minSeat: tableCategories[index].minSeat,
-        seatAmount: amountOfSeat,
+        seatAmount: amountOfSeat, id: '',
       );
       setState(() {
         tableCategories[index] = updatedCategory;
@@ -307,7 +307,7 @@ class _TableManagementScreenState extends State<TableManagementScreen> {
         final defaultCategory = TableCategory(
           type: 'Standard',
           minSeat: 1,
-          seatAmount: 4,
+          seatAmount: 4, id: '',
         );
         tableCategories = [defaultCategory];
         currentCategoryTable = defaultCategory;

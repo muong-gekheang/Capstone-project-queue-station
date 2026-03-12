@@ -77,10 +77,6 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
   ),
   Restaurant(
     id: uuid.v4(),
@@ -89,10 +85,6 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
   ),
   Restaurant(
     id: uuid.v4(),
@@ -101,10 +93,6 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
   ),
   Restaurant(
     id: uuid.v4(),
@@ -113,10 +101,6 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
   ),
   Restaurant(
     id: uuid.v4(),
@@ -125,9 +109,5 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    items: [],
-    tables: [],
-    globalAddOns: [],
-    globalSizeOptions: [],
   ),
 ];

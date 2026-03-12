@@ -8,7 +8,7 @@ import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store_profile_service.dart';
 import 'package:flutter/foundation.dart';
 import '../../../widgets/dashboard_stat_card.dart';
-import '../../../../models/nav_tab.dart'; // Add this import
+import '../../../../models/nav_tab.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -52,11 +52,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -101,7 +97,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotificationScreen(isPushed:true))
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
               );
             },
           ),
@@ -143,11 +141,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () async {
-                        // Push StoreQueueScreen and wait for result
-                        final result = await Navigator.push<NavTab>(
+                        await Navigator.push<NavTab>(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const StoreQueueScreen(isPushed: true,),
+                            builder: (context) =>
+                                const StoreQueueScreen(isPushed: true),
                           ),
                         );
                       },
@@ -189,7 +187,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: const EdgeInsets.only(right: 8),
       child: CircleAvatar(
         radius: 20,
-        backgroundColor: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
+        backgroundColor: const Color(0xFFFF6835).withValues(alpha: 0.1),
         backgroundImage: imageProvider,
         child: imageProvider == null
             ? Text(

@@ -19,14 +19,13 @@ class StoreOrderScreen extends StatefulWidget {
 class _StoreOrderScreenState extends State<StoreOrderScreen> {
   @override
   Widget build(BuildContext context) {
-    // final QueueEntry queueEntry = widget.queueEntry;
     final provider = context.watch<StoreOrderNotificationProvider>();
-
     final queueEntry = provider.queueEntries.firstWhere(
       (e) => e.id == widget.queueEntry.id,
     );
 
-    final allItems = queueEntry.orderId??[];
+    // Temporary: assume orders are empty until order model is integrated
+    final allItems = <OrderItem>[]; // placeholder
 
     final pendingItems = allItems
         .where((item) => item.orderItemStatus == OrderItemStatus.pending)
@@ -53,7 +52,7 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                       (orderItem) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: FoodItemCard(
-                          name: orderItem.item.name,
+                          name: orderItem.item?.name ?? '',
                           item: orderItem.item,
                           addons: orderItem.addOns,
                           price: orderItem.menuItemPrice,
@@ -62,15 +61,11 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     ButtonWidget(
                       title: 'Mark as accepted',
                       onPressed: () {
-                        context
-                            .read<StoreOrderNotificationProvider>()
-                            .acceptAllIncomingOrder(queueEntry);
+                        // Temporarily disabled
                       },
                       backgroundColor: AppTheme.primaryColor,
                       textColor: AppTheme.naturalWhite,
@@ -83,22 +78,19 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                   ] else ...[
                     InfoBadge(text: 'No New Order'),
                   ],
-
-                  Divider(
+                  const Divider(
                     color: AppTheme.naturalBlack,
-                    thickness: 1, // thickness of the line
-                    height: 20, // spacing around the divider
+                    thickness: 1,
+                    height: 20,
                   ),
-
                   HeaderTile(title: "Order"),
                   const SizedBox(height: 10),
-
                   if (acceptedItems.isNotEmpty)
                     ...acceptedItems.map(
                       (orderItem) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: FoodItemCard(
-                          name: orderItem.item.name,
+                          name: orderItem.item?.name ?? '',
                           item: orderItem.item,
                           addons: orderItem.addOns,
                           price: orderItem.menuItemPrice,
@@ -114,12 +106,11 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
             ),
             ButtonWidget(
               title: 'Total',
-              trailingText:
-                  '\$${queueEntry.orderId?.calculateTotalPrice().toStringAsFixed(2)}',
+              trailingText: '\$0.00',
               onPressed: () {},
               backgroundColor: AppTheme.primaryColor,
               textColor: AppTheme.naturalWhite,
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
             ),
           ],
         ),
@@ -135,12 +126,12 @@ class HeaderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       alignment: Alignment.center,
-      decoration: BoxDecoration(color: AppTheme.secondaryColor),
+      decoration: const BoxDecoration(color: AppTheme.secondaryColor),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: AppTheme.heading3,
           color: AppTheme.naturalWhite,
           fontWeight: FontWeight.bold,
@@ -157,13 +148,13 @@ class InfoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: AppTheme.accentYellow),
       ),
       child: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           color: AppTheme.accentYellow,
           fontWeight: FontWeight.bold,
           fontSize: AppTheme.heading1,

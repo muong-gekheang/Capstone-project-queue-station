@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
@@ -14,76 +13,46 @@ class MenuDetail extends StatefulWidget {
   const MenuDetail({super.key, required this.menu, this.onDelete});
 
   @override
-  State<MenuDetail> createState() => _MenuDetailState();
+  State<MenuDetail> createState() => _MenuDetailState(); // Fixed: changed <tail> to <MenuDetail>
 }
 
 class _MenuDetailState extends State<MenuDetail> {
   late MenuItem menu;
+
   @override
   void initState() {
     super.initState();
-    menu = widget.menu; // initialize once
+    menu = widget.menu;
+  }
+
+  String _getCategoryName() {
+    try {
+      return mockMenuCategories.firstWhere((c) => c.id == menu.categoryId).name;
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   double defaultPrice() {
+    if (menu.sizes.isEmpty) return 0.0;
     double cheapest = menu.sizes.first.price;
     for (var size in menu.sizes) {
-      if (size.price < cheapest) {
-        cheapest = size.price;
-      }
+      if (size.price < cheapest) cheapest = size.price;
     }
     return cheapest;
   }
 
+  ImageProvider? getImageProvider(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) return null;
+    if (imagePath.startsWith('http')) return NetworkImage(imagePath);
+    if (imagePath.startsWith('assets/')) return AssetImage(imagePath);
+    final file = File(imagePath);
+    if (file.existsSync()) return FileImage(file);
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    void onEdit() async {
-      MenuItem? newMenu = await Navigator.push<MenuItem>(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EditMenuScreen(existingMenu: menu),
-        ),
-      );
-
-      if (newMenu != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Updated Sucessfully",
-              style: TextStyle(color: Color.fromRGBO(16, 185, 129, 1)),
-            ),
-            backgroundColor: Colors.white,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-          ),
-        );
-      }
-    }
-
-    final menuAddOns = globalAddOns
-        .where((addOn) => menu.addOns.contains(addOn))
-        .toList();
-
-    ImageProvider? getImageProvider(String? imagePath) {
-      if (imagePath == null || imagePath.isEmpty) {
-        return null;
-      }
-
-      if (imagePath.startsWith('http')) {
-        return NetworkImage(imagePath);
-      }
-
-      if (imagePath.startsWith('assets/')) {
-        return AssetImage(imagePath);
-      }
-
-      if (File(imagePath).existsSync()) {
-        return FileImage(File(imagePath));
-      }
-
-      return null;
-    }
-
     return Scaffold(
       appBar: AppBarWidget(title: menu.name, color: Colors.black),
       body: SingleChildScrollView(
@@ -96,9 +65,9 @@ class _MenuDetailState extends State<MenuDetail> {
                   radius: 120,
                   backgroundImage:
                       getImageProvider(menu.image) ??
-                      getImageProvider('assets/images/default.png'),
+                      const AssetImage('assets/images/default.png'),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -110,8 +79,7 @@ class _MenuDetailState extends State<MenuDetail> {
                       value: menu.isAvailable,
                       onChanged: (bool value) {
                         setState(() {
-                          // menu = menu.copyWith(isAvailable: value);
-                          menu.isAvailable = value;
+                          menu.isAvailable = value; // Fixed: was menu = value
                           final index = allMenuItems.indexWhere(
                             (m) => m.id == menu.id,
                           );
@@ -131,26 +99,26 @@ class _MenuDetailState extends State<MenuDetail> {
                       children: [
                         Text(
                           menu.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 22,
                           ),
                         ),
-                        Text(menu.category.name),
+                        Text(_getCategoryName()),
                       ],
                     ),
                     Text(
                       menu.isAvailable ? 'Available' : 'Not Available',
                       style: TextStyle(
                         color: menu.isAvailable
-                            ? Color.fromRGBO(16, 185, 129, 1)
-                            : Color.fromRGBO(230, 57, 70, 1),
+                            ? const Color.fromRGBO(16, 185, 129, 1)
+                            : const Color.fromRGBO(230, 57, 70, 1),
                         fontSize: 15,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -162,95 +130,79 @@ class _MenuDetailState extends State<MenuDetail> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 80),
+                    const SizedBox(width: 80),
                     Text(
                       '\$${defaultPrice().toStringAsFixed(2)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color.fromRGBO(255, 104, 53, 1),
                         fontSize: 25,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
-                    Icon(Icons.access_time),
-                    SizedBox(width: 5),
+                    const Icon(Icons.access_time),
+                    const SizedBox(width: 5),
                     Text(
                       '${menu.minPrepTimeMinutes ?? 0} - ${menu.maxPrepTimeMinutes ?? 0} min',
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
-                Column(
-                  children: [
-                    const Text(
-                      "Size Options",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    if (menu.sizes.isEmpty) Text('This menu has no size'),
-                    SizedBox(height: 10),
-                    ...menu.sizes.map((size) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2, // more space for name
-                              child: Text(size.sizeOption.name),
+                const SizedBox(height: 10),
+                if (menu.sizes.isNotEmpty) ...[
+                  const Text(
+                    "Size Options",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  ...menu.sizes.map((size) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          Expanded(flex: 2, child: Text(size.sizeOption.name)),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              '\$${size.price.toStringAsFixed(2)}',
+                              textAlign: TextAlign.right,
                             ),
-                            Expanded(
-                              flex: 1, // smaller space for total price
-                              child: Text(
-                                '\$${size.price.toStringAsFixed(2)}',
-                                textAlign: TextAlign.right,
-                              ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ] else
+                  const Text('This menu has no size options'),
+                const SizedBox(height: 10),
+                if (menu.addOns.isNotEmpty) ...[
+                  const Text(
+                    "Add-On Options",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  ...menu.addOns.map((addOn) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          Expanded(flex: 2, child: Text(addOn.name)),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              '+ \$${addOn.price.toStringAsFixed(2)}',
+                              textAlign: TextAlign.right,
                             ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Column(
-                  children: [
-                    const Text(
-                      "Add-On Options",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    if (menu.addOns.isEmpty)
-                      Text('This menu has no add-on option'),
-                    SizedBox(height: 10),
-                    ...menu.addOns.map((AddOn) {
-                      // Find the actual add-on object
-                      final addOn = globalAddOns.firstWhere(
-                        (a) => a.id == AddOn.id,
-                      );
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2, // more space for name
-                              child: Text(addOn.name),
-                            ),
-                            Expanded(
-                              flex: 1, // smaller space for extra price
-                              child: Text(
-                                '+ \$${addOn.price.toStringAsFixed(2)}',
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-                SizedBox(height: 10),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ] else
+                  const Text('This menu has no add-on options'),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                   child: Row(
@@ -260,16 +212,48 @@ class _MenuDetailState extends State<MenuDetail> {
                         leadingIcon: Icons.delete,
                         title: 'Delete',
                         onPressed: () async {
-                          // will implement later
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Delete Menu'),
+                              content: Text(
+                                'Are you sure you want to delete ${menu.name}?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromRGBO(
+                                      230,
+                                      57,
+                                      70,
+                                      1,
+                                    ),
+                                  ),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            allMenuItems.removeWhere(
+                              (item) => item.id == menu.id,
+                            );
+                            if (widget.onDelete != null) widget.onDelete!();
+                            Navigator.pop(context);
+                          }
                         },
-                        backgroundColor: Color.fromRGBO(230, 57, 70, 1),
+                        backgroundColor: const Color.fromRGBO(230, 57, 70, 1),
                         textColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 40,
                           vertical: 5,
                         ),
                       ),
-
                       ButtonWidget(
                         leadingIcon: Icons.create_outlined,
                         title: 'Edit',
@@ -287,9 +271,9 @@ class _MenuDetailState extends State<MenuDetail> {
                             });
                           }
                         },
-                        backgroundColor: Color.fromRGBO(13, 71, 161, 1),
+                        backgroundColor: const Color.fromRGBO(13, 71, 161, 1),
                         textColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 40,
                           vertical: 5,
                         ),

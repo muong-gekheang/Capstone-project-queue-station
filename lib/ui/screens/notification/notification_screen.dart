@@ -6,7 +6,7 @@ import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/notification_tile_widget.dart';
 
 class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key, required bool isPushed});
+  const NotificationScreen({super.key}); // ← removed isPushed
 
   @override
   Widget build(BuildContext context) {

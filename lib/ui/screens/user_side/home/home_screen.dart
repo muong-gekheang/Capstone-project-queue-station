@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/mock_restaurant.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
 import 'package:queue_station_app/data/store_queue_history_data.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
@@ -8,9 +8,6 @@ import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
 import 'package:queue_station_app/ui/widgets/search_widget.dart';
-import 'package:uuid/uuid.dart';
-
-var uuid = Uuid();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
             "Restaurants",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-
           Expanded(
             child: CustomScrollView(
               clipBehavior: Clip.antiAlias,
@@ -103,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: RestaurantJoinedTile(user: user),
                     ),
                   ),
-
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8.0,
@@ -114,7 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       return RestaurantTile(rest: mockRestaurants[index]);
                     },
-                    separatorBuilder: (context, index) => SizedBox(height: 10),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
                   ),
                 ),
               ],

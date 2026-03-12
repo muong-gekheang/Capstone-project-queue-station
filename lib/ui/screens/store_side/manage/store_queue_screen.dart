@@ -117,9 +117,7 @@ class _StoreQueueScreenState extends State<StoreQueueScreen> {
           leading: widget.isPushed
               ? IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: () {
-                    Navigator.pop(context, NavTab.queue);
-                  },
+                  onPressed: () => Navigator.pop(context, NavTab.queue),
                 )
               : null,
           title: const Text(
@@ -139,7 +137,7 @@ class _StoreQueueScreenState extends State<StoreQueueScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NotificationScreen(isPushed: false,),
+                    builder: (context) => const NotificationScreen(),
                   ),
                 );
               },

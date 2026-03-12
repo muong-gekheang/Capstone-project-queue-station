@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:queue_station_app/ui/store_main_screen.dart';
+import 'package:queue_station_app/models/nav_tab.dart';
 
 class BottomNavBar extends StatelessWidget {
   final NavTab selectedTab;
@@ -27,36 +27,29 @@ class BottomNavBar extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 0,
-          ), // No horizontal padding
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // even spacing
             children: [
               _buildNavItem(
                 NavTab.dashboard,
                 'assets/icons/Dashboard.svg',
                 'Dashboard',
-                4,
               ),
               _buildNavItem(
                 NavTab.analytics,
                 'assets/icons/Store_Management.svg',
                 'Manage',
-                3,
               ),
               _buildNavItem(
                 NavTab.queue,
                 'assets/icons/queue_blue.svg',
                 'Queue',
-                3,
               ),
               _buildNavItem(
                 NavTab.settings,
                 'assets/icons/Setting.svg',
                 'Settings',
-                4,
               ),
             ],
           ),
@@ -65,11 +58,10 @@ class BottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(NavTab tab, String iconAsset, String label, int flex) {
+  Widget _buildNavItem(NavTab tab, String iconAsset, String label) {
     final isSelected = selectedTab == tab;
 
     return Expanded(
-      flex: flex,
       child: GestureDetector(
         onTap: () => onTabSelected(tab),
         behavior: HitTestBehavior.opaque,
@@ -80,36 +72,41 @@ class BottomNavBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon
+              // Fixed-size container for icon
               SizedBox(
                 width: 26,
                 height: 26,
-                child: SvgPicture.asset(
-                  iconAsset,
-                  width: 26,
-                  height: 26,
-                  fit: BoxFit.contain,
-                  allowDrawingOutsideViewBox: false,
-                  colorFilter: ColorFilter.mode(
-                    isSelected ? const Color(0xFFFF6835) : Colors.grey,
-                    BlendMode.srcIn,
+                child: Center(
+                  child: SvgPicture.asset(
+                    iconAsset,
+                    width: 26,
+                    height: 26,
+                    fit: BoxFit.contain, // maintain aspect ratio
+                    allowDrawingOutsideViewBox: false,
+                    colorFilter: ColorFilter.mode(
+                      isSelected ? const Color(0xFFFF6835) : Colors.grey,
+                      BlendMode.srcIn,
+                    ),
+                    placeholderBuilder: (context) => const SizedBox.shrink(),
                   ),
-                  placeholderBuilder: (context) => const SizedBox.shrink(),
                 ),
               ),
               const SizedBox(height: 4),
-              // Text with no extra width constraints
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: isSelected ? const Color(0xFFFF6835) : Colors.grey,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                  letterSpacing: 0.2,
+            
+              SizedBox(
+                width: 70, 
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isSelected ? const Color(0xFFFF6835) : Colors.grey,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                    letterSpacing: 0.2,
+                  ),
                 ),
               ),
             ],

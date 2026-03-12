@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 class StoreProfileService extends ChangeNotifier {
@@ -8,15 +8,20 @@ class StoreProfileService extends ChangeNotifier {
   StoreProfileService._internal();
 
   File? _storeProfileImage;
+  Uint8List? _storeProfileImageBytes;
   String _storeName = 'Kungfu Kitchen';
 
   File? get storeProfileImage => _storeProfileImage;
+  Uint8List? get storeProfileImageBytes => _storeProfileImageBytes;
   String get storeName => _storeName;
-
-  Null get storeProfileImageBytes => null;
 
   void setStoreProfileImage(File? image) {
     _storeProfileImage = image;
+    notifyListeners();
+  }
+
+  void setStoreProfileImageBytes(Uint8List? bytes) {
+    _storeProfileImageBytes = bytes;
     notifyListeners();
   }
 
@@ -24,16 +29,4 @@ class StoreProfileService extends ChangeNotifier {
     _storeName = name;
     notifyListeners();
   }
-
-  @override
-  void addListener(void Function() onProfileChanged) {
-    super.addListener(onProfileChanged);
-  }
-
-  @override
-  void removeListener(void Function() onProfileChanged) {
-    super.removeListener(onProfileChanged);
-  }
-
-  void setStoreProfileImageBytes(Uint8List? selectedImageBytes) {}
 }

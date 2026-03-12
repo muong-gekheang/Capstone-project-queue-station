@@ -1,49 +1,39 @@
-import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_mock.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:uuid/uuid.dart';
 
-final uuid = const Uuid();
+const uuid = Uuid();
 
-// --- 5 CUSTOMERS ---
+// --- 5 CUSTOMERS (with hardcoded IDs matching those in queue entries) ---
 List<Customer> mockCustomers = [
   Customer(
-    id: uuid.v4(),
+    id: 'cust-1', // matches queueEntry above
     name: "Sok Dara",
     email: "dara.sok@gmail.com",
     phone: "012888777",
-    historyIds: mockQueueEntries
-        .where(
-          (q) =>
-              q.status == QueueStatus.completed ||
-              q.status == QueueStatus.cancelled,
-        )
-        .map((q) => q.id)
-        .take(3)
-        .toList(),
+    historyIds: ['hist-1'], // hardcoded history ID
   ),
   Customer(
-    id: uuid.v4(),
+    id: 'cust-2',
     name: "Chan Bopha",
     email: "bopha.chan@outlook.com",
     phone: "015222333",
     historyIds: [], // New user, no history yet
   ),
   Customer(
-    id: uuid.v4(),
+    id: 'cust-3',
     name: "Keo Pich",
     email: "pich.keo@yahoo.com",
     phone: "099444555",
-    historyIds: [mockQueueEntries.first.id],
+    historyIds: ['hist-2'],
   ),
   Customer(
     id: uuid.v4(),
     name: "Vannak Nimol",
     email: "nimol.v@gmail.com",
     phone: "088777666",
-    historyIds: mockQueueEntries.map((q) => q.id).toList(),
+    historyIds: [],
   ),
   Customer(
     id: uuid.v4(),
@@ -54,7 +44,7 @@ List<Customer> mockCustomers = [
   ),
 ];
 
-// --- 5 STORE USERS ---
+// --- 5 STORE USERS (without storeName/storeAddress) ---
 List<StoreUser> mockStoreUsers = [
   StoreUser(
     id: uuid.v4(),
@@ -88,5 +78,5 @@ List<StoreUser> mockStoreUsers = [
   ),
 ];
 
-// Combine them into your global mockUsers list if needed
+// Combined list
 List<User> mockUsers = [...mockCustomers, ...mockStoreUsers];

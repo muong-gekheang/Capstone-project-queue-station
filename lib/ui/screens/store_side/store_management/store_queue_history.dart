@@ -50,45 +50,32 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
     return filteredHistories;
   }
 
-  //   String searchValue = '';
   Widget filteredQueueHistory() {
     final results = getHistoriesForRestaurant(mockUsers);
     final now = DateTime.now();
 
     final filteredResults = results.where((history) {
-      // 🔎 1️⃣ Filter by user name
       final user = mockUsers.firstWhere((u) => u.id == history.customerId);
       final matchesSearch = user.name.toLowerCase().contains(
         searchQuery.toLowerCase(),
       );
-
       if (!matchesSearch) return false;
 
       final joinTime = history.joinTime;
 
-      // 0️⃣ ALL → return everything
-      if (selectedIndex == 0) {
-        return true;
-      }
-
-      // 1️⃣ TODAY
+      if (selectedIndex == 0) return true;
       if (selectedIndex == 1) {
         return joinTime.year == now.year &&
             joinTime.month == now.month &&
             joinTime.day == now.day;
       }
-
-      // 2️⃣ LAST 7 DAYS
       if (selectedIndex == 2) {
         final sevenDaysAgo = now.subtract(const Duration(days: 7));
         return joinTime.isAfter(sevenDaysAgo);
       }
-
-      // 3️⃣ THIS MONTH
       if (selectedIndex == 3) {
         return joinTime.year == now.year && joinTime.month == now.month;
       }
-
       return true;
     }).toList();
 
@@ -112,15 +99,8 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
 
   Widget buildTab(String title, int index) {
     final isSelected = selectedIndex == index;
-
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-
-        print("Selected: $title");
-      },
+      onTap: () => setState(() => selectedIndex = index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -133,7 +113,7 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Container(
             height: 2,
             width: 40,
@@ -152,7 +132,7 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
         color: AppTheme.naturalBlack,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           children: [
             IntrinsicHeight(
@@ -168,11 +148,11 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
                       },
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   DropdownButton<SortOption>(
-                    hint: Text("Sort by"),
+                    hint: const Text("Sort by"),
                     value: selectedSortOption,
-                    items: [
+                    items: const [
                       DropdownMenuItem(
                         value: SortOption.oldest,
                         child: Text("Oldest"),
@@ -191,7 +171,7 @@ class _StoreQueueHistoryState extends State<StoreQueueHistory> {
                 ],
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

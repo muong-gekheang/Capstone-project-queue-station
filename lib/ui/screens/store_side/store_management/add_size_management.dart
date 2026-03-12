@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart'; // for globalSizeOptions
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
+
+final _uuid = Uuid();
 
 class AddSizeScreen extends StatefulWidget {
   final MenuItem? existingMenu;
@@ -18,6 +21,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   List<SizeOption> selectedSizes = [];
+
   @override
   void initState() {
     super.initState();
@@ -31,9 +35,8 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
-    } else {
-      return null;
     }
+    return null;
   }
 
   void onSave() {
@@ -43,14 +46,13 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
           content: Text("Please fill all required fields correctly"),
         ),
       );
-
       return;
     }
     final sizeName = _sizeController.text.trim();
 
     SizeOption? existingSize;
     try {
-      existingSize = globalSizes.firstWhere(
+      existingSize = globalSizeOptions.firstWhere(
         (s) => s.name.toLowerCase() == sizeName.toLowerCase(),
       );
     } catch (e) {
@@ -58,24 +60,24 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     }
 
     if (existingSize == null) {
-      existingSize = SizeOption(name: sizeName, id: '');
-      globalSizes.add(existingSize);
+      existingSize = SizeOption(id: _uuid.v4(), name: sizeName);
+      // Optionally add to global list – but globalSizeOptions is const-like, better not modify
+      // globalSizeOptions.add(existingSize); // avoid modifying global list
     }
 
     Navigator.pop(context, existingSize);
   }
 
   Widget existingSize() {
-    final globalMenuSizes = globalSizes;
-
-    if (globalMenuSizes.isEmpty) {
-      return Center(child: Text("This menu has no size yet"));
+    // Use globalSizeOptions for existing sizes
+    if (globalSizeOptions.isEmpty) {
+      return const Center(child: Text("This menu has no size yet"));
     }
 
     return ListView.builder(
-      itemCount: globalMenuSizes.length,
+      itemCount: globalSizeOptions.length,
       itemBuilder: (context, index) {
-        final globalMenuSize = globalSizes[index];
+        final globalMenuSize = globalSizeOptions[index];
         final isSelected = selectedSizes.contains(globalMenuSize);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -91,12 +93,12 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
                       selectedSizes.remove(globalMenuSize);
                     }
                   });
-                }, // checkbox also triggers parent
+                },
               ),
               Expanded(
                 child: Text(
                   globalMenuSize.name,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -137,24 +139,24 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          Text(
+          const Text(
             "Existing Size",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Expanded(child: existingSize()),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ButtonWidget(
             title: 'Add',
             onPressed: isAddDisabled ? null : onAdd,
             backgroundColor: Theme.of(context).colorScheme.primary,
             textColor: Theme.of(context).colorScheme.surface,
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ExpansionTile(
             title: Text(
               'Add new size',
@@ -178,14 +180,13 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
                       validator: _nullValidator,
                       textController: _sizeController,
                     ),
-                    SizedBox(height: 10),
-
+                    const SizedBox(height: 10),
                     ButtonWidget(
                       title: 'Save',
                       onPressed: onSave,
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       textColor: Theme.of(context).colorScheme.surface,
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 40,
                         vertical: 5,
                       ),
@@ -196,7 +197,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );

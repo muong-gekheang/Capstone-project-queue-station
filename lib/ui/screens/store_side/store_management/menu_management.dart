@@ -22,43 +22,18 @@ class _MenuManagementState extends State<MenuManagement> {
   @override
   void initState() {
     super.initState();
-    selectedCategoryId = mockMenuCategories[selectedIndex].id;
-  }
-
-  Widget filteredMenuList() {
-    final result = allMenuItems.where((m) {
-      if (searchValue.isNotEmpty) {
-        return m.name.toLowerCase().contains(searchValue.toLowerCase());
-      } else {
-        return m.category.id == selectedCategoryId;
-      }
-    }).toList();
-
-    for (var r in result) {
-      print(r.name);
+    if (mockMenuCategories.isNotEmpty) {
+      selectedCategoryId = mockMenuCategories[selectedIndex].id;
     }
-
-    return ListView.builder(
-      itemCount: result.length,
-      itemBuilder: (context, index) {
-        final menu = result[index];
-        return MenuCardWidget(
-          menu: menu,
-          onDelete: () {
-            setState(() {
-              allMenuItems.removeAt(index);
-            });
-          },
-        );
-      },
-    );
   }
 
-  void onAddItem() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddNewMenu()),
-    );
+  List<MenuItem> get filteredMenuItems {
+    return allMenuItems.where((item) {
+      if (searchValue.isNotEmpty) {
+        return item.name.toLowerCase().contains(searchValue.toLowerCase());
+      }
+      return item.categoryId == selectedCategoryId;
+    }).toList();
   }
 
   @override
@@ -66,12 +41,10 @@ class _MenuManagementState extends State<MenuManagement> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
         ),
-        title: Text(
+        title: const Text(
           "Menu Management",
           style: TextStyle(
             color: Colors.black,
@@ -82,7 +55,7 @@ class _MenuManagementState extends State<MenuManagement> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -93,37 +66,39 @@ class _MenuManagementState extends State<MenuManagement> {
                     child: SearchbarWidget(
                       hintText: "search...",
                       onChanged: (String value) {
-                        setState(() {
-                          searchValue = value;
-                        });
+                        setState(() => searchValue = value);
                       },
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   ButtonWidget(
                     leadingIcon: Icons.add,
                     title: "Add Item",
                     onPressed: () async {
                       final newMenu = await Navigator.push<MenuItem>(
                         context,
-                        MaterialPageRoute(builder: (context) => AddNewMenu()),
+                        MaterialPageRoute(
+                          builder: (context) => const AddNewMenu(),
+                        ),
                       );
                       if (newMenu != null) {
-                        print("Returned menu: ${newMenu.name}");
                         setState(() {
                           allMenuItems.add(newMenu);
                         });
                       }
                     },
-                    backgroundColor: Color.fromRGBO(255, 104, 53, 1),
+                    backgroundColor: const Color.fromRGBO(255, 104, 53, 1),
                     textColor: Colors.white,
                     borderRadius: 50,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -140,16 +115,15 @@ class _MenuManagementState extends State<MenuManagement> {
                           });
                         },
                       ),
-                      // Add spacing after each card except the last one
                       if (index != mockMenuCategories.length - 1)
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                     ],
                   );
                 }),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Menu List",
               style: TextStyle(
                 fontSize: 18,
@@ -157,8 +131,27 @@ class _MenuManagementState extends State<MenuManagement> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
-            Expanded(child: filteredMenuList()),
+            const SizedBox(height: 20),
+            Expanded(
+              child: filteredMenuItems.isEmpty
+                  ? const Center(child: Text('No menu items found'))
+                  : ListView.builder(
+                      itemCount: filteredMenuItems.length,
+                      itemBuilder: (context, index) {
+                        final menu = filteredMenuItems[index];
+                        return MenuCardWidget(
+                          menu: menu,
+                          onDelete: () {
+                            setState(() {
+                              allMenuItems.removeWhere(
+                                (item) => item.id == menu.id,
+                              );
+                            });
+                          },
+                        );
+                      },
+                    ),
+            ),
           ],
         ),
       ),

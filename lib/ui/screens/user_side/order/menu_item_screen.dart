@@ -11,7 +11,7 @@ class MenuItemScreen extends StatefulWidget {
 
   const MenuItemScreen({super.key, this.item, this.cartItem});
 
-  MenuItem get menuItem => item ?? cartItem!.item;
+  MenuItem get menuItem => item ?? cartItem!.item!;
 
   @override
   State<MenuItemScreen> createState() => _MenuItemScreenState();
@@ -26,12 +26,9 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   @override
   void initState() {
     super.initState();
-
-    // init add-ons
     for (final addOn in widget.menuItem.addOns) {
       _selectedAddOns[addOn.id] = false;
     }
-
     if (widget.cartItem != null) {
       _loadFromOrderItem(widget.cartItem!);
     } else {
@@ -53,12 +50,10 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   void _loadFromOrderItem(OrderItem orderItem) {
     _quantity = orderItem.quantity;
     _noteController.text = orderItem.note ?? "";
-
     _selectedSize = widget.menuItem.sizes.firstWhere(
-      (s) => s.sizeOption.name == orderItem.size.name,
+      (s) => s.sizeOption.name == orderItem.size?.name,
       orElse: () => widget.menuItem.sizes.first,
     );
-
     for (final entry in orderItem.addOns.entries) {
       _selectedAddOns[entry.key] = true;
     }
@@ -66,17 +61,14 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
 
   double get _totalPrice {
     final basePrice = _selectedSize?.price ?? 0.0;
-
     final addOnsPrice = widget.menuItem.addOns
         .where((a) => _selectedAddOns[a.id] == true)
         .fold(0.0, (sum, a) => sum + a.price);
-
     return (basePrice + addOnsPrice) * _quantity;
   }
 
   double _getStartingPrice() {
     if (widget.menuItem.sizes.isEmpty) return 0.0;
-
     return widget.menuItem.sizes
         .map((s) => s.price)
         .reduce((a, b) => a < b ? a : b);
@@ -85,37 +77,31 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   void _saveItem(BuildContext context) {
     final cart = context.read<CartProvider>();
     if (_selectedSize == null) return;
-
     final selectedAddOns = widget.menuItem.addOns
         .where((a) => _selectedAddOns[a.id] == true)
         .toList();
-
     final Map<String, double> addOnsMap = {
       for (final a in selectedAddOns) a.id: a.price,
     };
-
     final orderItem = OrderItem(
       menuItemId: widget.menuItem.id,
       item: widget.menuItem,
       size: _selectedSize!.sizeOption,
-      menuItemPrice: _selectedSize!.price, // snapshot
+      menuItemPrice: _selectedSize!.price,
       addOns: addOnsMap,
       quantity: _quantity,
       note: _noteController.text.isNotEmpty ? _noteController.text : null,
       orderItemStatus: OrderItemStatus.pending,
     );
-
     if (widget.cartItem == null) {
       cart.addToCart(orderItem);
     } else {
       cart.updateCartItem(widget.cartItem!, orderItem);
     }
-
     Navigator.pop(context);
   }
 
   void _incrementQuantity() => setState(() => _quantity++);
-
   void _decrementQuantity() {
     if (_quantity > 1) setState(() => _quantity--);
   }
@@ -131,7 +117,6 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image section
                 Container(
                   width: double.infinity,
                   height: 250,
@@ -156,14 +141,11 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         ),
                 ),
                 const SizedBox(height: 20),
-
-                // Content section
                 Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Name and price
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -198,10 +180,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 15),
-
-                      // Preparation time
                       Row(
                         children: [
                           const Icon(
@@ -222,8 +201,6 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         ],
                       ),
                       const SizedBox(height: 15),
-
-                      // Description
                       Text(
                         widget.menuItem.description,
                         style: const TextStyle(
@@ -233,13 +210,11 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // Sizes section
                       if (widget.menuItem.sizes.isNotEmpty) ...[
                         Text(
                           'Sizes',
-                          style: TextStyle(
-                            color: const Color(0xFF0D47A1),
+                          style: const TextStyle(
+                            color: Color(0xFF0D47A1),
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -278,13 +253,11 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         ),
                         const SizedBox(height: 25),
                       ],
-
-                      // Add-ons section
                       if (widget.menuItem.addOns.isNotEmpty) ...[
                         Text(
                           'Add-ons',
-                          style: TextStyle(
-                            color: const Color(0xFF0D47A1),
+                          style: const TextStyle(
+                            color: Color(0xFF0D47A1),
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -348,12 +321,10 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                         ),
                         const SizedBox(height: 25),
                       ],
-
-                      // Note section
                       Text(
                         'Note',
-                        style: TextStyle(
-                          color: const Color(0xFF0D47A1),
+                        style: const TextStyle(
+                          color: Color(0xFF0D47A1),
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -374,15 +345,13 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 100), // Space for fixed button
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-
-          // Fixed bottom button
           Positioned(
             left: 20,
             right: 20,
@@ -403,7 +372,6 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
               ),
               child: Row(
                 children: [
-                  // Quantity controls
                   Row(
                     children: [
                       IconButton(
@@ -431,15 +399,10 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(width: 8),
-
-                  // Add/Update button
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        _saveItem(context);
-                      },
+                      onPressed: () => _saveItem(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF6835),
                         foregroundColor: Colors.white,
@@ -451,7 +414,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             widget.cartItem == null ? 'Add' : 'Update',
                             style: const TextStyle(

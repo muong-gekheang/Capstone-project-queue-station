@@ -17,14 +17,16 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  String selectedCategoryId = mockMenuCategories[0].id;
+  String selectedCategoryId = mockMenuCategories.isNotEmpty
+      ? mockMenuCategories[0].id
+      : '';
   String searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  //must match both search and category
   List<MenuItem> get filteredMenuItems {
     return allMenuItems.where((item) {
-      final matchesCategory = item.category.id == selectedCategoryId;
+      final matchesCategory =
+          selectedCategoryId.isEmpty || item.categoryId == selectedCategoryId;
       final matchesSearch =
           searchQuery.isEmpty ||
           item.name.toLowerCase().contains(searchQuery.toLowerCase());
@@ -45,21 +47,18 @@ class _MenuScreenState extends State<MenuScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        //title
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Color(0xFFFF6835).withOpacity(0.1),
+                color: const Color(0xFFFF6835).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.store, color: Color(0xFFFF6835)),
+              child: Icon(Icons.store, color: const Color(0xFFFF6835)),
             ),
-
             const SizedBox(width: 12),
-
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,15 +76,12 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Hello, Jennie", style: TextStyle(fontSize: 28)),
-
+            Text("Hello, Jennie", style: const TextStyle(fontSize: 28)),
             const SizedBox(height: 16),
-
-            //search
             Row(
               children: [
                 Expanded(
@@ -93,11 +89,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     color: Colors.white,
                     child: TextField(
                       controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {
-                          searchQuery = value;
-                        });
-                      },
+                      onChanged: (value) => setState(() => searchQuery = value),
                       decoration: InputDecoration(
                         hintText: 'Search',
                         prefixIcon: const Icon(Icons.search),
@@ -127,21 +119,17 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 16),
-
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => OrderScreen()),
-                      );
-                    },
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const OrderScreen()),
+                    ),
                     style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFF0D47A1),
-                      padding: EdgeInsets.symmetric(
+                      backgroundColor: const Color(0xFF0D47A1),
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 0,
                       ),
@@ -161,10 +149,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
-            //filter section
             Container(
               height: 40,
               color: Colors.white,
@@ -174,15 +159,11 @@ class _MenuScreenState extends State<MenuScreen> {
                 itemBuilder: (context, index) {
                   final category = mockMenuCategories[index];
                   final isSelected = category.id == selectedCategoryId;
-
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          selectedCategoryId = category.id;
-                        });
-                      },
+                      onTap: () =>
+                          setState(() => selectedCategoryId = category.id),
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -191,11 +172,11 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Color(0xFFFF6835)
+                              ? const Color(0xFFFF6835)
                               : Colors.grey[100],
                           borderRadius: BorderRadius.circular(20),
                           border: isSelected
-                              ? Border.all(color: Color(0xFFFF6835))
+                              ? Border.all(color: const Color(0xFFFF6835))
                               : null,
                         ),
                         child: Text(
@@ -214,9 +195,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 },
               ),
             ),
-
             const SizedBox(height: 16),
-
             Expanded(
               child: filteredMenuItems.isEmpty
                   ? Center(
@@ -242,24 +221,23 @@ class _MenuScreenState extends State<MenuScreen> {
                       ),
                     )
                   : GridView.builder(
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 200, // max width of each card
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 0.75,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.75,
+                          ),
                       itemCount: filteredMenuItems.length,
                       itemBuilder: (context, index) {
                         final item = filteredMenuItems[index];
                         return GestureDetector(
-                          onTap: () {
-                            Navigator.push<OrderItem>(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MenuItemScreen(item: item),
-                              ),
-                            );
-                          },
+                          onTap: () => Navigator.push<OrderItem>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => MenuItemScreen(item: item),
+                            ),
+                          ),
                           child: MenuItemCard(item: item),
                         );
                       },
@@ -268,8 +246,6 @@ class _MenuScreenState extends State<MenuScreen> {
           ],
         ),
       ),
-
-      //floating button + badge
       floatingActionButton: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -291,12 +267,10 @@ class _MenuScreenState extends State<MenuScreen> {
               color: Colors.transparent,
               shape: const CircleBorder(),
               child: InkWell(
-                onTap: () {
-                  Navigator.push<OrderItem>(
-                    context,
-                    MaterialPageRoute(builder: (_) => CartScreen()),
-                  );
-                },
+                onTap: () => Navigator.push<OrderItem>(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CartScreen()),
+                ),
                 borderRadius: BorderRadius.circular(28),
                 child: const Center(
                   child: Icon(
@@ -308,15 +282,12 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
             ),
           ),
-
-          //badge
           Positioned(
             right: -2,
             top: -2,
             child: Consumer<CartProvider>(
               builder: (context, cartProvider, child) {
                 if (cartProvider.items.isEmpty) return const SizedBox.shrink();
-
                 return Container(
                   width: 20,
                   height: 20,

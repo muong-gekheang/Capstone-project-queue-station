@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart'; // for mockMenuCategories
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_detail.dart';
@@ -16,6 +16,16 @@ class MenuCardWidget extends StatefulWidget {
 }
 
 class _MenuCardWidgetState extends State<MenuCardWidget> {
+  String _getCategoryName() {
+    try {
+      return mockMenuCategories
+          .firstWhere((c) => c.id == widget.menu.categoryId)
+          .name;
+    } catch (e) {
+      return 'Unknown';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -26,11 +36,8 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                 MaterialPageRoute(
                   builder: (context) => MenuDetail(menu: widget.menu),
                 ),
-              ).then((_) {
-                setState(() {
-                  print('menu Availability ${widget.menu.isAvailable}');
-                });
-              });
+              );
+              // No need for .then or setState here
             }
           : null,
       child: Stack(
@@ -44,13 +51,13 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                 boxShadow: [
                   BoxShadow(
                     color: AppTheme.naturalBlack.withAlpha(64),
-                    offset: Offset(0, 0),
+                    offset: const Offset(0, 0),
                     blurRadius: 4,
                     spreadRadius: 0,
                   ),
                 ],
               ),
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -63,21 +70,23 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                           image: widget.menu.image != null
                               ? DecorationImage(
                                   image: AssetImage(widget.menu.image!),
+                                  fit: BoxFit.cover,
                                 )
-                              : DecorationImage(
+                              : const DecorationImage(
                                   image: AssetImage(
                                     'assets/images/default_menu.jpg',
                                   ),
-                                ), // - will implement later
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.menu.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                               fontSize: 18,
@@ -86,25 +95,25 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                           Row(
                             children: [
                               Text(
-                                widget.menu.categoryId,
-                                style: TextStyle(
+                                _getCategoryName(),
+                                style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 12,
                                 ),
                               ),
-                              SizedBox(width: 5),
-                              Text(
+                              const SizedBox(width: 5),
+                              const Text(
                                 "•",
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 12,
                                 ),
                               ),
-                              SizedBox(width: 5),
+                              const SizedBox(width: 5),
                               Text(
-                                "\$${widget.menu.cheapestPrice(2 as List<MenuSize>)}",
-                                style: TextStyle(
-                                  color: const Color.fromRGBO(255, 104, 53, 1),
+                                "\$${widget.menu.cheapestPrice(widget.menu.sizes).toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                  color: Color.fromRGBO(255, 104, 53, 1),
                                   fontSize: 12,
                                 ),
                               ),
@@ -116,8 +125,8 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                                 : "Not Available",
                             style: TextStyle(
                               color: widget.menu.isAvailable
-                                  ? Color.fromRGBO(16, 185, 129, 1)
-                                  : Color.fromRGBO(230, 57, 70, 1),
+                                  ? const Color.fromRGBO(16, 185, 129, 1)
+                                  : const Color.fromRGBO(230, 57, 70, 1),
                               fontSize: 13,
                             ),
                           ),
@@ -137,12 +146,12 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                             ),
                           );
                         },
-                        icon: Icon(Icons.create_outlined),
-                        color: Color.fromRGBO(13, 71, 161, 1),
+                        icon: const Icon(Icons.create_outlined),
+                        color: const Color.fromRGBO(13, 71, 161, 1),
                         padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
+                        constraints: const BoxConstraints(),
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       IconButton(
                         onPressed: () async {
                           final deleteConfirmation = await showDialog<bool>(
@@ -157,12 +166,12 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                             widget.onDelete!();
                           }
                         },
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.delete,
                           color: Color.fromRGBO(230, 57, 70, 1),
                         ),
                         padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
+                        constraints: const BoxConstraints(),
                       ),
                     ],
                   ),

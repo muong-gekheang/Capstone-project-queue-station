@@ -11,7 +11,7 @@ StoreUser _$StoreUserFromJson(Map<String, dynamic> json) => StoreUser(
   email: json['email'] as String,
   phone: json['phone'] as String,
   id: json['id'] as String,
-  restaurantId: json['restaurantId'] as String?,
+  restaurantId: json['restaurantId'] as String?, 
 );
 
 Map<String, dynamic> _$StoreUserToJson(StoreUser instance) => <String, dynamic>{

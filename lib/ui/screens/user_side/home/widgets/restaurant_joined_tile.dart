@@ -1,6 +1,7 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart'; // for getHistoryById
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
@@ -63,7 +64,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                           ),
                         ),
                         Text(
-                          "D025",
+                          currentHistory?.queueNumber ?? "D025",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
@@ -76,7 +77,6 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                   ],
                 ),
               ),
-
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -87,7 +87,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                     child: ClipRect(
                       clipper: HalfClipper(Side.bottom),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
                         ),
@@ -105,11 +105,10 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                     alignment: Alignment.topCenter,
                     widthFactor: 0.5,
                     heightFactor: 0,
-
                     child: ClipRect(
                       clipper: HalfClipper(Side.top),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
                         ),
@@ -120,7 +119,6 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                   ),
                 ],
               ),
-
               Expanded(
                 flex: 1,
                 child: Column(
@@ -133,8 +131,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                       ),
                     ),
                     Text(
-                      currentHistory?.restId ??
-                          "-", // TODO: Use Repos in VM to fetch and create Rest obj (Current Wait)
+                      currentHistory?.restId ?? "-",
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,

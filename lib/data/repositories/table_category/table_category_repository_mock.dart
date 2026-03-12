@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:uuid/uuid.dart';
@@ -77,19 +76,19 @@ class TableCategoryRepositoryMock implements TableCategoryRepository {
 }
 
 final categoryA = TableCategory(
-  categoryId: _uuid.v4(),
+  id: _uuid.v4(),  
   type: "Type A",
   minSeat: 1,
   seatAmount: 2,
 );
 final categoryB = TableCategory(
-  categoryId: _uuid.v4(),
+  id: _uuid.v4(),  
   type: "Type B",
   minSeat: 3,
   seatAmount: 4,
 );
 final categoryC = TableCategory(
-  categoryId: _uuid.v4(),
+  id: _uuid.v4(),  
   type: "Type C",
   minSeat: 5,
   seatAmount: 6,

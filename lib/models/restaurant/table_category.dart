@@ -16,7 +16,7 @@ class TableCategory {
     String? categoryId,
     required this.type,
     required this.minSeat,
-    required this.seatAmount,
+    required this.seatAmount, required String id,
   }) : id = categoryId ?? _uuid.v4();
 
   factory TableCategory.fromJson(Map<String, dynamic> json) =>

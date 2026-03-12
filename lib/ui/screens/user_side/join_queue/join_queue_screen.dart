@@ -1,10 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/data/store_queue_history_data.dart'; // for mockHistories, mockHistoriesById
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
@@ -13,6 +12,8 @@ import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
 import 'package:uuid/uuid.dart';
+
+final _uuid = Uuid();
 
 class JoinQueueScreen extends StatefulWidget {
   const JoinQueueScreen({super.key, required this.rest});
@@ -38,12 +39,13 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
     if (user != null) {
       final newHistory = QueueEntry(
         restId: widget.rest.id,
-        id: Uuid().v4(),
+        id: _uuid.v4(),
         partySize: numPeople,
         joinTime: DateTime.now(),
         status: QueueStatus.waiting,
         customerId: user.id,
-        queueNumber: '',
+        queueNumber:
+            'A${Random().nextInt(999)}', // generate a simple queue number
         joinedMethod: JoinedMethod.remote,
       );
       mockHistories.add(newHistory);
@@ -60,7 +62,6 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
       const snackBar = SnackBar(
         content: Text('You must have an account to join queue!'),
       );
-
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
@@ -179,7 +180,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                   ),
                 ),
                 Text(
-                  "${widget.rest.biggestTableSize.toString()} people per table",
+                  "${widget.rest.biggestTableSize} people per table",
                   style: TextStyle(fontSize: 16, color: Color(0xFFFF6835)),
                 ),
                 const Text(
@@ -199,9 +200,9 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
           ),
           const SizedBox(height: 16),
           ListTile(
-            tileColor: Color(0xFFFF6835),
+            tileColor: const Color(0xFFFF6835),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(10),
+              borderRadius: BorderRadius.circular(10),
             ),
             title: const Text(
               "Wait",
@@ -213,15 +214,16 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
             ),
             subtitle: Text(
               "Estimated waiting time: ${widget.rest.averageWaitingTime.inMinutes} min",
-              style: TextStyle(color: Colors.white, fontSize: 11),
+              style: const TextStyle(color: Colors.white, fontSize: 11),
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.rest.curWait.toString(),
-                  style: TextStyle(
+                  // Replace curWait – here using a placeholder
+                  "0",
+                  style: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                     height: 1.0,
@@ -281,14 +283,14 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                 color: Colors.white,
                 disabledColor: Colors.white,
                 style: IconButton.styleFrom(
-                  backgroundColor: Color(0xFFFF6835),
-                  disabledBackgroundColor: Color(0xFFD4D8D6),
+                  backgroundColor: const Color(0xFFFF6835),
+                  disabledBackgroundColor: const Color(0xFFD4D8D6),
                 ),
                 icon: const Icon(Icons.remove),
               ),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xFF73706E), width: 1),
+                  border: Border.all(color: const Color(0xFF73706E), width: 1),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Stack(
@@ -296,7 +298,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                   children: [
                     Text(
                       NumberFormat("00").format(numPeople),
-                      style: TextStyle(
+                      style: const TextStyle(
                         letterSpacing: 10,
                         fontSize: 70,
                         fontWeight: FontWeight.bold,
@@ -316,7 +318,9 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               IconButton(
                 onPressed: incrPeople,
                 color: Colors.white,
-                style: IconButton.styleFrom(backgroundColor: Color(0xFFFF6835)),
+                style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6835),
+                ),
                 icon: const Icon(Icons.add),
               ),
             ],

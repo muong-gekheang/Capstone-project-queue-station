@@ -1,11 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
+import 'package:queue_station_app/ui/widgets/dashboard_stat_card.dart';
 import '../../../../models/analytic/analytics_data.dart';
 import '../../../../models/analytic/dashboard_stats.dart';
 import '../../../../models/analytic/order_summary.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store_profile_service.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -17,6 +20,7 @@ class AnalyticsScreen extends StatefulWidget {
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
   final QueueService _queueService = QueueService(QueueRepository());
   final QueueRepository _repository = QueueRepository();
+  late final StoreProfileService _storeService;
 
   DashboardStats? _stats;
   bool _isLoading = true;
@@ -44,8 +48,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   void initState() {
     super.initState();
+    _storeService = StoreProfileService();
+    _storeService.addListener(_onProfileChanged);
     _loadAnalyticsData();
     _startPeriodicRefresh();
+  }
+
+  @override
+  void dispose() {
+    _storeService.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  void _onProfileChanged() {
+    if (mounted) setState(() {});
   }
 
   void _loadAnalyticsData() async {
@@ -81,11 +97,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -128,40 +140,34 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildStoreProfileImage() {
-    final storeService = StoreProfileService();
-    final profileImage = storeService.storeProfileImage;
-    final storeName = storeService.storeName;
+    final storeName = _storeService.storeName;
+
+    ImageProvider? imageProvider;
+    if (kIsWeb) {
+      final bytes = _storeService.storeProfileImageBytes;
+      if (bytes != null) imageProvider = MemoryImage(bytes);
+    } else {
+      final file = _storeService.storeProfileImage;
+      if (file != null) imageProvider = FileImage(file);
+    }
+
     return Container(
       margin: const EdgeInsets.only(right: 8),
-      child: profileImage != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                profileImage,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Container(
-              width: 40,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
-                  style: const TextStyle(
-                    color: Color(0xFFFF6835),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
+      child: CircleAvatar(
+        radius: 20,
+        backgroundColor: const Color(0xFFFF6835).withValues(alpha: 0.1),
+        backgroundImage: imageProvider,
+        child: imageProvider == null
+            ? Text(
+                storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
+                style: const TextStyle(
+                  color: Color(0xFFFF6835),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
-              ),
-            ),
+              )
+            : null,
+      ),
     );
   }
 
@@ -190,7 +196,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           _buildStoreProfileImage(),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -201,111 +214,48 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Stat Cards
-                  _buildStatCard(
-                    'People Waiting',
-                    '${_stats?.peopleWaiting ?? 0}',
-                    '',
+                  DashboardStatCard(
+                    label: 'People Waiting',
+                    value: '${_stats?.peopleWaiting ?? 0}',
+                    unit: '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Average Wait Time',
-                    '${_stats?.averageWaitTimeMinutes ?? 0}',
-                    'min',
+                  DashboardStatCard(
+                    label: 'Average Wait Time',
+                    value: '${_stats?.averageWaitTimeMinutes ?? 0}',
+                    unit: 'min',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Active Tables',
-                    '${_stats?.activeTables ?? 0}',
-                    '',
+                  DashboardStatCard(
+                    label: 'Active Tables',
+                    value: '${_stats?.activeTables ?? 0}',
+                    unit: '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard('Orders', '$_totalOrders', 'orders'),
+                  DashboardStatCard(
+                    label: 'Orders',
+                    value: '$_totalOrders',
+                    unit: 'orders',
+                  ),
                   const SizedBox(height: 24),
 
-                  // Queue Length Chart
+                  // Charts
                   _buildQueueLengthChart(),
                   const SizedBox(height: 24),
-
-                  // Table Occupancy Chart
                   _buildTableOccupancyChart(),
                   const SizedBox(height: 24),
-
-                  // Average Order Value Chart
                   _buildAverageOrderValueChart(),
                   const SizedBox(height: 24),
-
-                  // Orders Line Chart
                   _buildOrdersLineChart(),
                   const SizedBox(height: 24),
-
-                  // Order Summary Table
                   _buildOrderSummaryTable(),
-                  const SizedBox(height: 24),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildStatCard(String label, String value, String unit) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.05).toInt()),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0D47A1),
-                ),
-              ),
-              if (unit.isNotEmpty) ...[
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
-                    unit,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
+  // Chart methods (unchanged, but using .withValues for shadows)
   Widget _buildQueueLengthChart() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -314,7 +264,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.05).toInt()),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -362,11 +312,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   drawVerticalLine: true,
                   horizontalInterval: 10,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.withAlpha((255 * 0.2).toInt()),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     strokeWidth: 1,
                   ),
                   getDrawingVerticalLine: (value) => FlLine(
-                    color: Colors.grey.withAlpha((255 * 0.2).toInt()),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     strokeWidth: 1,
                   ),
                 ),
@@ -433,12 +383,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: _queueLengthData.asMap().entries.map((entry) {
-                      return FlSpot(
-                        entry.key.toDouble(),
-                        entry.value.queueLength.toDouble(),
-                      );
-                    }).toList(),
+                    spots: _queueLengthData
+                        .asMap()
+                        .entries
+                        .map(
+                          (entry) => FlSpot(
+                            entry.key.toDouble(),
+                            entry.value.queueLength.toDouble(),
+                          ),
+                        )
+                        .toList(),
                     isCurved: true,
                     color: const Color(0xFF7987FF),
                     barWidth: 3,
@@ -446,9 +400,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(
-                        0xFF7987FF,
-                      ).withAlpha((255 * 0.1).toInt()),
+                      color: const Color(0xFF7987FF).withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -461,6 +413,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       ),
     );
   }
+
 
   Widget _buildTableOccupancyChart() {
     return Container(

@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-
 import '../restaurant/menu_item.dart';
 import '../restaurant/menu_item_category.dart';
 import '../restaurant/size_option.dart';
@@ -39,7 +38,8 @@ class OrderItem {
   }) : addOns = addOns ?? {},
        sizeName = sizeName ?? size?.name ?? 'Regular',
        item = item ?? _placeholderMenuItem(menuItemId),
-       size = size ?? SizeOption(name: sizeName ?? 'Regular', id: 'Sizeoption 1');
+       size =
+           size ?? SizeOption(name: sizeName ?? 'Regular', id: 'Sizeoption 1');
 
   OrderItem copyWith({
     String? menuItemId,
@@ -91,6 +91,6 @@ MenuItem _placeholderMenuItem(String menuItemId) {
     id: menuItemId,
     name: 'Unknown item',
     description: '',
-    category: MenuItemCategory(id: 'unknown_category', name: 'Unknown'), categoryId: '',
+    categoryId: 'unknown', 
   );
 }

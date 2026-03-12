@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
-import 'package:queue_station_app/models/order/order.dart';
+import 'package:queue_station_app/models/order/order.dart'; // ← added
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:uuid/uuid.dart';
@@ -109,29 +109,32 @@ class OrderRepositoryMock implements OrderRepository {
     throw UnimplementedError();
   }
 }
+final _uuid = Uuid();
 
 List<Order> mockOrders = [
   Order(
-    id: Uuid().v4(),
-    timestamp: DateTime.now().subtract(Duration(minutes: 5)),
+    id: _uuid.v4(),
+    timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
     ordered: [],
     inCart: [
       OrderItem(
-        menuItemId: mockMenuItems[0].id, // Classic Burger
+        menuItemId: mockMenuItems[0].id,
         item: mockMenuItems[0],
-        size: mockMenuItems[0].sizes.first.sizeOption, // Small
-        addOns: {
-          mockMenuItems[0].addOns.first.name:
-              mockMenuItems[0].addOns.first.price,
-        }, // Extra Cheese
+        size: mockMenuItems[0].sizes.first.sizeOption,
+        addOns: mockMenuItems[0].addOns.isNotEmpty
+            ? {
+                mockMenuItems[0].addOns.first.id:
+                    mockMenuItems[0].addOns.first.price,
+              }
+            : {},
         menuItemPrice: mockMenuItems[0].sizes.first.price,
         quantity: 1,
         orderItemStatus: OrderItemStatus.pending,
       ),
       OrderItem(
-        menuItemId: mockMenuItems[4].id, // Cola
+        menuItemId: mockMenuItems[4].id,
         item: mockMenuItems[4],
-        size: SizeOption(name: 'Medium'), // default size
+        size: SizeOption(id: _uuid.v4(), name: 'Medium'),
         addOns: {},
         menuItemPrice: 0.0,
         quantity: 2,
@@ -140,17 +143,17 @@ List<Order> mockOrders = [
     ],
   ),
   Order(
-    id: Uuid().v4(),
-    timestamp: DateTime.now().subtract(Duration(minutes: 2)),
+    id: _uuid.v4(),
+    timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
     ordered: [],
     inCart: [
       OrderItem(
-        menuItemId: mockMenuItems[1].id, // Cheese Burger
+        menuItemId: mockMenuItems[1].id,
         item: mockMenuItems[1],
-        size: mockMenuItems[1].sizes.first.sizeOption, // Medium
-        addOns: {
-          mockMenuItems[1].addOns[1].name: mockMenuItems[1].addOns[1].price,
-        }, // Bacon
+        size: mockMenuItems[1].sizes.first.sizeOption,
+        addOns: mockMenuItems[1].addOns.length > 1
+            ? {mockMenuItems[1].addOns[1].id: mockMenuItems[1].addOns[1].price}
+            : {},
         menuItemPrice: mockMenuItems[1].sizes.first.price,
         quantity: 1,
         orderItemStatus: OrderItemStatus.pending,

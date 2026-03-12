@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:queue_station_app/models/restaurant/queue_table.dart';
-import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management_screen.dart';
@@ -10,6 +8,10 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/store_q
 import '../../../../services/store_profile_service.dart';
 import 'analytics_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'package:queue_station_app/data/mock_table_data.dart' show tableData;
+import 'package:queue_station_app/data/store_queue_history_data.dart'
+    show restaurant1;
+
 class ManageStorePage extends StatefulWidget {
   const ManageStorePage({super.key});
 
@@ -38,10 +40,6 @@ class _ManageStorePageState extends State<ManageStorePage> {
   }
 
   bool isStoreOpen = true;
-
-  late List<QueueTable> tableData;
-
-  late Restaurant restaurant1;
 
   void _showCloseStoreDialog() {
     showDialog(
@@ -146,32 +144,15 @@ class _ManageStorePageState extends State<ManageStorePage> {
         ],
       ),
       actions: [
-        // Store Profile Image - display only (set in settings)
         _buildStoreProfileImage(),
-        // Notification Icon - toggleable
         IconButton(
-          icon: Stack(
-            children: [
-              const Icon(Icons.notifications_outlined, color: Colors.black),
-              // Optional: Add notification badge
-              // Positioned(
-              //   right: 0,
-              //   top: 0,
-              //   child: Container(
-              //     width: 8,
-              //     height: 8,
-              //     decoration: BoxDecoration(
-              //       color: Colors.red,
-              //       shape: BoxShape.circle,
-              //     ),
-              //   ),
-              // ),
-            ],
-          ),
+          icon: const Icon(Icons.notifications_outlined, color: Colors.black),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationScreen(isPushed: true)),
+              MaterialPageRoute(
+                builder: (context) => const NotificationScreen(),
+              ),
             );
           },
         ),
@@ -241,10 +222,8 @@ class _ManageStorePageState extends State<ManageStorePage> {
             activeThumbColor: const Color(0xFF0D47A1),
             onChanged: (value) {
               if (value == false) {
-                // Show warning dialog when trying to close store
                 _showCloseStoreDialog();
               } else {
-                // Opening store doesn't need confirmation
                 setState(() => isStoreOpen = value);
               }
             },
@@ -279,12 +258,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
         _SvgActionCard(
           'assets/icons/Manage_menu.svg',
           'Manage\nMenu',
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MenuManagement()),
-            );
-          },
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MenuManagement()),
+          ),
         ),
         _SvgActionCard(
           'assets/icons/Queue_history.svg',
@@ -302,12 +279,10 @@ class _ManageStorePageState extends State<ManageStorePage> {
         _SvgActionCard(
           'assets/icons/Analytics_blue.svg',
           'Analytics',
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
-            );
-          },
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
+          ),
         ),
       ],
     );
@@ -327,10 +302,11 @@ class _ManageStorePageState extends State<ManageStorePage> {
           elevation: 0,
         ),
         onPressed: () {
-          // Navigate to manage queue page
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => StoreQueueScreen()),
+            MaterialPageRoute(
+              builder: (context) => const StoreQueueScreen(isPushed: true),
+            ),
           );
         },
         child: const Text(
@@ -345,8 +321,7 @@ class _ManageStorePageState extends State<ManageStorePage> {
     );
   }
 
-  // Placeholder for store profile image widget
-Widget _buildStoreProfileImage() {
+  Widget _buildStoreProfileImage() {
     final storeName = _storeService.storeName;
     ImageProvider? imageProvider;
     if (kIsWeb) {
@@ -377,12 +352,10 @@ Widget _buildStoreProfileImage() {
   }
 }
 
-// Moved outside the state class
 class _SvgActionCard extends StatelessWidget {
   final String svgAsset;
   final String label;
   final VoidCallback? onTap;
-
   const _SvgActionCard(this.svgAsset, this.label, {this.onTap});
 
   @override
@@ -406,53 +379,6 @@ class _SvgActionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset(svgAsset, width: 40, height: 40),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-                height: 1.2,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color iconColor;
-  final VoidCallback? onTap;
-
-  const _ActionCard(this.icon, this.label, this.iconColor);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: iconColor),
             const SizedBox(height: 8),
             Text(
               label,

@@ -4,7 +4,7 @@ import 'package:queue_station_app/models/restaurant/size_option.dart';
 
 class FoodItemCard extends StatelessWidget {
   final String name;
-  final MenuItem item;
+  final MenuItem? item;
   final String? image;
   final SizeOption? size;
   final Map<String, double> addons;
@@ -19,7 +19,7 @@ class FoodItemCard extends StatelessWidget {
   const FoodItemCard({
     super.key,
     required this.name,
-    required this.item, 
+    required this.item,
     required this.addons,
     required this.price,
     required this.quantity,
@@ -34,9 +34,7 @@ class FoodItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final addOnLookup = {
-      for (var addOn in item.addOns) addOn.id: addOn
-    };
+    final addOnLookup = {for (var addOn in item?.addOns ?? []) addOn.id: addOn};
 
     final addOnEntries = addons.entries.toList();
 
@@ -45,15 +43,11 @@ class FoodItemCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Colors.grey.shade100,
-          width: 1,
-        ),
+        side: BorderSide(color: Colors.grey.shade100, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // TOP ROW
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -65,16 +59,11 @@ class FoodItemCard extends StatelessWidget {
                   child: image != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            image!,
-                            fit: BoxFit.cover,
-                          ),
+                          child: Image.asset(image!, fit: BoxFit.cover),
                         )
                       : Icon(Icons.restaurant, color: Colors.grey[400]),
                 ),
-
                 const SizedBox(width: 10),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,14 +78,13 @@ class FoodItemCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-
                       if (size != null) ...[
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Text(
                               'Size:',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF0D47A1),
@@ -104,22 +92,19 @@ class FoodItemCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${size!.name} ',
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
+                              size!.name,
+                              style: const TextStyle(fontSize: 16),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Text(
                               'Quantity:',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF0D47A1),
@@ -128,9 +113,7 @@ class FoodItemCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               '$quantity',
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
+                              style: const TextStyle(fontSize: 16),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -140,9 +123,7 @@ class FoodItemCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 const SizedBox(width: 8),
-
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -154,9 +135,7 @@ class FoodItemCard extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-
                     const SizedBox(height: 8),
-
                     if (isEditable)
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -183,9 +162,7 @@ class FoodItemCard extends StatelessWidget {
                               onPressed: onDecrease,
                             ),
                           ),
-
                           const SizedBox(width: 2),
-
                           Container(
                             decoration: const BoxDecoration(
                               color: Color(0xFFFF6835),
@@ -213,15 +190,14 @@ class FoodItemCard extends StatelessWidget {
               ],
             ),
           ),
-
-          if (addons.isNotEmpty || (note != null && note!.isNotEmpty)) ...[
+          if (addons.isNotEmpty || (note != null && note!.isNotEmpty))
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (addons.isNotEmpty) ...[
-                    Text(
+                    const Text(
                       "Add-ons:",
                       style: TextStyle(
                         fontSize: 14,
@@ -229,22 +205,20 @@ class FoodItemCard extends StatelessWidget {
                         color: Color(0xFF0D47A1),
                       ),
                     ),
-                    
                     Column(
-
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: List.generate(addOnEntries.length, (index) {
                         final addOnId = addOnEntries[index].key;
                         final addOnPrice = addOnEntries[index].value;
-
                         final addOnModel = addOnLookup[addOnId];
-
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("${index + 1}. ${addOnModel?.name ?? 'Unknown'}"),
+                              Text(
+                                "${index + 1}. ${addOnModel?.name ?? 'Unknown'}",
+                              ),
                               Text(
                                 '+\$${addOnPrice.toStringAsFixed(2)}',
                                 style: const TextStyle(
@@ -258,10 +232,9 @@ class FoodItemCard extends StatelessWidget {
                       }),
                     ),
                   ],
-
                   if (note != null && note!.isNotEmpty) ...[
                     const SizedBox(height: 12),
-                    Text(
+                    const Text(
                       "Note:",
                       style: TextStyle(
                         fontSize: 14,
@@ -269,15 +242,11 @@ class FoodItemCard extends StatelessWidget {
                         color: Color(0xFF0D47A1),
                       ),
                     ),
-                    Text(
-                      "$note",
-                      style: TextStyle(fontSize: 14),
-                    ),
+                    Text(note!, style: const TextStyle(fontSize: 14)),
                   ],
                 ],
               ),
             ),
-          ],
         ],
       ),
     );
