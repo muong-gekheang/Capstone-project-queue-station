@@ -7,7 +7,7 @@ import 'package:queue_station_app/services/user_provider.dart';
 
 class RestaurantService {
   final RestaurantRepository _restaurantRepository;
-  final UserProvider _userProvider;
+  UserProvider _userProvider;
 
   final StreamController<Restaurant?> _controller =
       StreamController<Restaurant?>.broadcast();
@@ -29,7 +29,11 @@ class RestaurantService {
       _subscription = _restaurantRepository
           .watchCurrent(restId)
           .listen(
-            (data) => _controller.add(data),
+            (data) {
+              print("Data:${data?.isOpen}");
+              _controller.add(data);
+              _currentRest = data;
+            },
             onError: (error) {
               print("ERROR:$error");
               _controller.addError(error);
@@ -40,10 +44,28 @@ class RestaurantService {
 
   Stream<Restaurant?> get streamRestaurant => _controller.stream;
 
+  void updateStoreStatus(bool isOpen) {
+    if (_currentRest != null) {
+      _restaurantRepository.update(_currentRest!.copyWith(isOpen: isOpen));
+    }
+  }
+
   StoreUser? get storeUser => _userProvider.asStoreUser;
 
-  void dispose() {
-    _subscription?.cancel(); // Kill the Firebase connection immediately
-    _controller.close(); // Clean up memory
+  void updateDependencies(UserProvider newUserProvider) {
+    _userProvider = newUserProvider;
+    final newId = newUserProvider.asStoreUser?.restaurantId ?? "";
+    if (newId != restId && newId.isNotEmpty) {
+      _subscription?.cancel();
+      _initStream();
+    }
   }
+
+  void dispose() {
+    _controller.close();
+    _subscription?.cancel();
+  }
+
+  Restaurant? _currentRest;
+  Restaurant? get currentRest => _currentRest;
 }

@@ -23,10 +23,20 @@ class TableManagementViewModel extends ChangeNotifier {
 
   TableManagementViewModel({required TableService tableService})
     : _tableService = tableService {
+    init();
     _subscribe();
-    if (_tableCategories.isNotEmpty) {
-      currentSelectedCategory = _tableCategories.first;
+  }
+
+  void init() {
+    if (_tableService.tables.isNotEmpty) {
+      _tables = _tableService.tables;
     }
+
+    if (_tableService.tableCategories.isNotEmpty) {
+      _tableCategories = _tableService.tableCategories;
+    }
+    _isLoading = false;
+    notifyListeners();
   }
 
   void _subscribe() {
@@ -35,6 +45,7 @@ class TableManagementViewModel extends ChangeNotifier {
         if (_isDisposed) return;
         _tables = tables;
         _isLoading = false;
+        print("TAB: ${tables.length}");
         notifyListeners(); // Updates the UI
       },
       onError: (error) {
@@ -47,9 +58,13 @@ class TableManagementViewModel extends ChangeNotifier {
 
     _tableCategorySubscription = _tableService.streamTableCategories.listen(
       (categories) {
+        print("CAT: ${categories.length}");
         if (_isDisposed) return;
         _tableCategories = categories;
         _isLoading = false;
+        if (currentSelectedCategory == null && _tableCategories.isNotEmpty) {
+          currentSelectedCategory = categories.first;
+        }
         notifyListeners();
       },
       onError: (error) {
@@ -115,13 +130,13 @@ class TableManagementViewModel extends ChangeNotifier {
     List<QueueTable> result = [];
     // 1. Filter by the selected Category
     if (currentSelectedCategory != null) {
-      result = allTables
-          .where(
-            (t) =>
-                findTableCatById(t.tableCategoryId).id ==
-                currentSelectedCategory!.id,
-          )
-          .toList();
+      result = allTables.where((t) {
+        var result = findTableCatById(t.tableCategoryId);
+        if (result != null && currentSelectedCategory != null) {
+          return result.id == currentSelectedCategory!.id;
+        }
+        return false;
+      }).toList();
     }
 
     // 2. Filter by Search Query
@@ -148,8 +163,10 @@ class TableManagementViewModel extends ChangeNotifier {
     return result;
   }
 
-  TableCategory findTableCatById(String id) {
-    return _tableCategories.firstWhere((e) => e.id == id);
+  TableCategory? findTableCatById(String id) {
+    if (tableCategories.map((e) => e.id).contains((id))) {
+      return tableCategories.firstWhere((e) => e.id == id);
+    }
   }
 
   @override

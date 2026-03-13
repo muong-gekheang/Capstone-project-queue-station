@@ -9,7 +9,7 @@ import 'package:queue_station_app/data/repositories/table_category/table_categor
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
@@ -61,8 +61,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
 
-    // 2. If there's no user yet, STOP and show a spinner.
-    // This prevents the ProxyProviders below from failing or returning null.
     if (userProvider.currentUser == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -70,20 +68,10 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
       providers: [
         ProxyProvider<UserProvider, RestaurantService>(
           update: (context, userProvider, prev) {
-            return RestaurantService(
-              userProvider: userProvider,
-              restaurantRepository: context.read<RestaurantRepository>(),
-            );
-          },
-          dispose: (context, value) => value.dispose(),
-        ),
-
-        ProxyProvider<UserProvider, QueueService>(
-          update: (context, userProvider, prev) {
             if (prev == null) {
-              return QueueService(
+              return RestaurantService(
                 userProvider: userProvider,
-                queueEntryRepository: context.read<QueueEntryRepository>(),
+                restaurantRepository: context.read<RestaurantRepository>(),
               );
             }
             prev.updateDependencies(userProvider);
@@ -94,28 +82,61 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
         ProxyProvider<UserProvider, StoreProfileService>(
           update: (context, userProvider, prev) {
-            return StoreProfileService(
-              userProvider: userProvider,
-              userRepository: context.read<UserRepository<StoreUser>>(),
-            );
+            if (prev == null) {
+              return StoreProfileService(
+                userProvider: userProvider,
+                userRepository: context.read<UserRepository<StoreUser>>(),
+              );
+            }
+            prev.updateDependencies(userProvider);
+            return prev;
           },
         ),
 
         ProxyProvider<UserProvider, TableService>(
-          update: (context, userProvider, prev) => TableService(
-            userProvider: userProvider,
-            queueTableRepository: context.read<QueueTableRepository>(),
-            tableCategoryRepository: context.read<TableCategoryRepository>(),
-          ),
+          update: (context, newUserProvider, prev) {
+            if (prev == null) {
+              return TableService(
+                userProvider: newUserProvider,
+                queueTableRepository: context.read<QueueTableRepository>(),
+                tableCategoryRepository: context
+                    .read<TableCategoryRepository>(),
+              );
+            }
+            prev.updateDependencies(newUserProvider);
+            return prev;
+          },
           dispose: (context, value) => value.dispose(),
         ),
 
         ProxyProvider<UserProvider, MenuService>(
-          update: (context, userProvider, prev) => MenuService(
-            userProvider: userProvider,
-            menuItemRepository: context.read<MenuItemRepository>(),
-            menuCategoryRepository: context.read<MenuCategoryRepository>(),
-          ),
+          update: (context, newUserProvider, prev) {
+            if (prev == null) {
+              return MenuService(
+                userProvider: newUserProvider,
+                menuItemRepository: context.read<MenuItemRepository>(),
+                menuCategoryRepository: context.read<MenuCategoryRepository>(),
+              );
+            }
+            prev.updateDependencies(newUserProvider);
+
+            return prev;
+          },
+          dispose: (context, value) => value.dispose(),
+        ),
+
+        ProxyProvider2<UserProvider, TableService, QueueService>(
+          update: (context, userProvider, tableService, prev) {
+            if (prev == null) {
+              return QueueService(
+                userProvider: userProvider,
+                queueEntryRepository: context.read<QueueEntryRepository>(),
+                tableService: tableService,
+              );
+            }
+            prev.updateDependencies(userProvider);
+            return prev;
+          },
           dispose: (context, value) => value.dispose(),
         ),
       ],

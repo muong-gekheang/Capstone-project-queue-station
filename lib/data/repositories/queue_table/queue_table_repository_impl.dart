@@ -165,9 +165,10 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
   Stream<List<QueueTable>> watchAllQueueTable(String restId) {
     return fireStore
         .collection('queue_tables')
-        .where('restaurantId', whereIn: [restId])
+        .where('restaurantId', isEqualTo: restId)
         .orderBy('tableNum')
         .snapshots()
+        .handleError((err) => print("Error $err"))
         .map(
           (snap) => snap.docs.map((doc) {
             final json = Map<String, dynamic>.from(doc.data());
@@ -210,5 +211,13 @@ class QueueTableRepositoryImpl implements QueueTableRepository {
 
     final nextCursor = snap.docs.isEmpty ? null : snap.docs.last;
     return (tables, nextCursor);
+  }
+
+  @override
+  Future<void> addCustomerToTable(QueueTable table, String queueEntryId) async {
+    final tableRef = fireStore.collection('queue_tables').doc(table.id);
+    await tableRef.update({
+      'queueEntryIds': [...table.queueEntryIds, queueEntryId],
+    });
   }
 }

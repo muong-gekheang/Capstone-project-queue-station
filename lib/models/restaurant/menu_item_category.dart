@@ -17,9 +17,9 @@ class MenuItemCategory {
   Map<String, dynamic> toJson() => _$MenuItemCategoryToJson(this);
 }
 
-final categories = [
-  MenuItemCategory(name: 'Burgers', id: Uuid().v4()),
-  MenuItemCategory(name: 'Pizza', id: Uuid().v4()),
-  MenuItemCategory(name: 'Drinks', id: Uuid().v4()),
-  MenuItemCategory(name: 'Desserts', id: Uuid().v4()),
-];
+// final categories = [
+//   MenuItemCategory(name: 'Burgers', id: Uuid().v4()),
+//   MenuItemCategory(name: 'Pizza', id: Uuid().v4()),
+//   MenuItemCategory(name: 'Drinks', id: Uuid().v4()),
+//   MenuItemCategory(name: 'Desserts', id: Uuid().v4()),
+// ];

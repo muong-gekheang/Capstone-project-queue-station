@@ -9,7 +9,7 @@ import 'package:queue_station_app/services/user_provider.dart';
 class TableService {
   final QueueTableRepository _queueTableRepository;
   final TableCategoryRepository _tableCategoryRepository;
-  final UserProvider _userProvider;
+  UserProvider _userProvider;
 
   final StreamController<List<QueueTable>> _queueTableController =
       StreamController<List<QueueTable>>.broadcast();
@@ -55,10 +55,18 @@ class TableService {
               _tableCategories = data;
             },
             onError: (error) {
-              print("ERROR:$error");
               _queueTableController.addError(error);
             },
           );
+    }
+  }
+
+  void updateDependencies(UserProvider newUserProvider) {
+    _userProvider = newUserProvider;
+    if (_restId.isNotEmpty) {
+      _queueTableSubscription?.cancel();
+      _tableCategorySubscription?.cancel();
+      _initStream();
     }
   }
 
@@ -76,6 +84,10 @@ class TableService {
 
   void updateTable(QueueTable newTable) {
     _queueTableRepository.update(newTable);
+  }
+
+  void updateTableCustomers(QueueTable table, String queueEntryId) {
+    _queueTableRepository.addCustomerToTable(table, queueEntryId);
   }
 
   void deleteTable(QueueTable table) {

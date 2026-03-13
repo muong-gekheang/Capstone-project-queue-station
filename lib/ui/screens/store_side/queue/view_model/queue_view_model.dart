@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 
 class QueueViewModel extends ChangeNotifier {
@@ -60,6 +60,9 @@ class QueueViewModel extends ChangeNotifier {
     _queueEntriesSubscription = _queueService.streamQueueEntries.listen(
       (queueEntries) {
         if (_isDisposed) return;
+        queueEntries.sort(
+          (a, b) => a.expectedTableReadyAt.compareTo(b.expectedTableReadyAt),
+        );
         _currentQueue = queueEntries;
         _isLoading = false;
         notifyListeners(); // Updates the UI
@@ -91,7 +94,7 @@ class QueueViewModel extends ChangeNotifier {
   int get biggestTableSize => _currentRestaurant?.biggestTableSize ?? 1;
 
   DateTime getQueueEstimatedTime(QueueEntry queue) {
-    return queue.joinTime.add(avgWaitTime);
+    return queue.expectedTableReadyAt.toLocal();
   }
 
   void onSearch(String keyword) {
@@ -100,10 +103,9 @@ class QueueViewModel extends ChangeNotifier {
   }
 
   List<QueueEntry> get filteredQueue {
-    print("QUEUE: ${_currentQueue.length}");
     return currentQueue
         .where(
-          (q) => q.customerName!.toLowerCase().startsWith(
+          (q) => (q.customerName ?? "").toLowerCase().startsWith(
             _searchKeyword.toLowerCase(),
           ),
         )
@@ -113,6 +115,10 @@ class QueueViewModel extends ChangeNotifier {
   void addQueue(QueueEntry newQueue) {
     _queueService.addCustomerToQueue(newQueue: newQueue);
     notifyListeners();
+  }
+
+  void serveQueue(QueueEntry queueEntry) {
+    _queueService.serveCustomer(queueEntry);
   }
 
   void removeQueue(QueueEntry queue) {

@@ -103,9 +103,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        queueEntry
-                            .currentSpot(mockRestaurants[1])
-                            .toString(), // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                        "", // TODO: Use Repos in ViewModel to fetch the Restaurant Object
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,

@@ -13,7 +13,7 @@ const db = getFirestore();
 exports.createQueue = onCall(async (request) => {
   const {
     customerId,
-    id, // Your UUID from Flutter
+    id,
     joinedMethod,
     orderId,
     restId,
@@ -72,7 +72,6 @@ exports.createQueue = onCall(async (request) => {
     // We use latestEstimatedReadyAt as our source of truth
     let tableSlots = eligibleTables.map((t) => {
       const avg = t.avgDiningTimeMinutes || 45;
-      const buffer = t.adminDelayMinutes || 0;
 
       // If the target is in the past, the table is free NOW.
       // If the target is in the future, it represents the end of the existing line.
@@ -84,7 +83,7 @@ exports.createQueue = onCall(async (request) => {
       return {
         tableId: t.id,
         startTime,
-        avg: avg + buffer,
+        avg: avg,
       };
     });
 
@@ -205,11 +204,10 @@ exports.updateTableAverage = onDocumentUpdated(
         latestEstimatedReadyAt: newTargetIso,
         tableStatus: "available",
         currentServedTime: null,
-        // Remove this entry from the table's active list
         queueEntryIds: FieldValue.arrayRemove(after.id),
       });
 
-      return updatedAvg; // Return for the logger
+      return updatedAvg;
     });
 
     console.log(

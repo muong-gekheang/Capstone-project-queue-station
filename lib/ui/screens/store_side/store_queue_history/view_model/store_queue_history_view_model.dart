@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 
 enum SortOption { oldest, newest }
 

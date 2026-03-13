@@ -30,11 +30,15 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
           ?.map((e) => e as String)
           .toList() ??
       [],
-  currentInQueueIds:
-      (json['currentInQueueIds'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      [],
+  isOpen: json['isOpen'] as bool? ?? true,
+  email: json['email'] as String? ?? '',
+  subscriptionDate: json['subscriptionDate'] as String? ?? '',
+  subscriptionStatus:
+      $enumDecodeNullable(
+        _$SubscriptionStatusEnumMap,
+        json['subscriptionStatus'],
+      ) ??
+      SubscriptionStatus.paid,
   description: json['description'] as String?,
 );
 
@@ -42,8 +46,8 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'description': instance.description,
       'address': instance.address,
+      'description': instance.description,
       'logoLink': instance.logoLink,
       'policy': instance.policy,
       'biggestTableSize': instance.biggestTableSize,
@@ -52,5 +56,14 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
       'tableIds': instance.tableIds,
       'globalAddOnIds': instance.globalAddOnIds,
       'globalSizeOptionIds': instance.globalSizeOptionIds,
-      'currentInQueueIds': instance.currentInQueueIds,
+      'isOpen': instance.isOpen,
+      'email': instance.email,
+      'subscriptionDate': instance.subscriptionDate,
+      'subscriptionStatus':
+          _$SubscriptionStatusEnumMap[instance.subscriptionStatus]!,
     };
+
+const _$SubscriptionStatusEnumMap = {
+  SubscriptionStatus.paid: 'paid',
+  SubscriptionStatus.expired: 'expired',
+};

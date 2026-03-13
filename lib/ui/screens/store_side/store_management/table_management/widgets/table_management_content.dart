@@ -200,7 +200,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
 
   @override
   Widget build(BuildContext context) {
-    var vm = context.read<TableManagementViewModel>();
+    var vm = context.watch<TableManagementViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Table List"),
@@ -248,7 +248,8 @@ class _TableManagementContentState extends State<TableManagementContent> {
                 ),
               ],
             ),
-            if (vm.tableCategories.isNotEmpty)
+            if (vm.tableCategories.isNotEmpty &&
+                vm.currentSelectedCategory != null)
               CategoryChips(
                 tableData: vm.tableCategories,
                 selectedCat: vm.currentSelectedCategory!,

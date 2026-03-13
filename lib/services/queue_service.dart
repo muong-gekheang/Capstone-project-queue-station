@@ -4,13 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 
 class QueueService {
   final FirebaseFunctions functions = FirebaseFunctions.instance;
-  final UserProvider _userProvider;
+  UserProvider _userProvider;
   final QueueEntryRepository _queueEntryRepository;
+  final TableService _tableService;
 
   List<QueueEntry> queueHistory = [];
   List<QueueEntry> todayFinishedQueue = [];
@@ -25,8 +27,10 @@ class QueueService {
   QueueService({
     required UserProvider userProvider,
     required QueueEntryRepository queueEntryRepository,
+    required TableService tableService,
   }) : _userProvider = userProvider,
-       _queueEntryRepository = queueEntryRepository {
+       _queueEntryRepository = queueEntryRepository,
+       _tableService = tableService {
     _initStream();
   }
 
@@ -42,7 +46,7 @@ class QueueService {
               _currentEntries = data;
             },
             onError: (error) {
-              print("ERROR:$error");
+              print("ERROR: $error");
               _queueEntryStreamController.addError(error);
             },
           );
@@ -55,11 +59,11 @@ class QueueService {
   }
 
   void updateDependencies(UserProvider newUserProvider) {
-    // Only restart the stream if the restaurant ID actually changed
+    _userProvider = newUserProvider;
     final newId = newUserProvider.asStoreUser?.restaurantId ?? "";
     if (newId != _restId && newId.isNotEmpty) {
       _queueEntrySubscription?.cancel();
-      _initStream(); // This uses the updated _restId logic
+      _initStream();
     }
   }
 
@@ -99,8 +103,13 @@ class QueueService {
     }
   }
 
-  void serveCustomer(String queueEntryId) {
-    _queueEntryRepository.updateStatus(queueEntryId, QueueStatus.serving);
+  void serveCustomer(QueueEntry queueEntry) {
+    _queueEntryRepository.updateStatus(queueEntry.id, QueueStatus.serving);
+
+    final table = _tableService.tables.firstWhere(
+      (e) => e.id == queueEntry.assignedTableId,
+    );
+    _tableService.updateTableCustomers(table, queueEntry.id);
   }
 
   void removeUserFromQueue(String queueEntryId) {
@@ -110,7 +119,7 @@ class QueueService {
   Future<Duration> get avgWaitingTime async {
     List<QueueEntry> todayHistory = [];
     if (retrieveAt != null &&
-        retrieveAt!.difference(DateTime.now()) <= Duration(minutes: 60) &&
+        retrieveAt!.difference(DateTime.now()).abs() <= Duration(minutes: 60) &&
         todayFinishedQueue.isNotEmpty) {
       todayHistory = todayFinishedQueue;
     } else {
@@ -132,13 +141,13 @@ class QueueService {
 
     int avgMinutes = 0;
     for (var hist in todayHistory) {
-      Duration waitTime = hist.joinTime.difference(hist.servedTime!);
+      Duration waitTime = hist.joinTime.difference(hist.servedTime!).abs();
       avgMinutes += waitTime.inMinutes;
     }
     if (todayHistory.isNotEmpty) {
       avgMinutes = (avgMinutes / todayHistory.length).round();
     } else {
-      avgMinutes = 0; // Or whatever your default should be
+      avgMinutes = 0;
     }
 
     return Duration(minutes: avgMinutes);

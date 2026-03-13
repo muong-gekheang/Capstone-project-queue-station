@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 
@@ -141,6 +142,7 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
         .collection('restaurants')
         .where('id', isEqualTo: id)
         .snapshots()
+        .handleError((err) => debugPrint("$err"))
         .map((snap) {
           if (snap.docs.isEmpty) return null; // Handle not found
 

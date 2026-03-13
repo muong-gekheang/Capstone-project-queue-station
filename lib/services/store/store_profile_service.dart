@@ -5,7 +5,7 @@ import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 
 class StoreProfileService {
-  final UserProvider _userProvider;
+  UserProvider _userProvider;
   final UserRepository<StoreUser> _userRepository;
 
   StoreUser? get storeUser => _userProvider.asStoreUser;
@@ -17,6 +17,10 @@ class StoreProfileService {
        _userRepository = userRepository;
 
   void setStoreProfileImage(File? image) {} // TODO: HOw do we store image
+
+  void updateDependencies(UserProvider newProvider) {
+    _userProvider = newProvider;
+  }
 
   void setStoreName(String name) {
     _userProvider.updateUser(storeUser?.copyWith(name: name));

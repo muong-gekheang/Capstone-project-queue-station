@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
 
 Future<void> seedDatabase({bool clearExisting = false}) async {
   final firestore = FirebaseFirestore.instance;
@@ -86,7 +87,10 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       'tableIds': [tableA1Id, tableB1Id],
       'globalAddOnIds': [addOnCheeseId, addOnBaconId],
       'globalSizeOptionIds': [sizeRegularId, sizeLargeId],
-      'currentInQueueIds': [queueEntry1Id],
+      'isOpen': true,
+      'email': "queuecafe@gmail.com",
+      'subscriptionDate': now.toIso8601String(),
+      'subscriptionStatus': SubscriptionStatus.paid.name,
     },
   };
 
@@ -231,6 +235,7 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       'id': queueEntry1Id,
       'queueNumber': 'A001',
       'restId': restId,
+      'assignedTableId': "table_a1",
       'customerId': 'user_c_1',
       'partySize': 2,
       'joinTime': now.toIso8601String(),
@@ -247,13 +252,14 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
     queueEntry2Id: {
       'id': queueEntry2Id,
       'queueNumber': 'A000',
+      'assignedTableId': "table_a1",
       'restId': restId,
       'customerId': 'user_c_1',
       'partySize': 2,
       'joinTime': now.subtract(const Duration(minutes: 40)).toIso8601String(),
       'servedTime': now.subtract(const Duration(minutes: 20)).toIso8601String(),
       'endedTime': now.subtract(const Duration(minutes: 10)).toIso8601String(),
-      'expectedTableReadyAt': null,
+      'expectedTableReadyAt': DateTime.now().toIso8601String(),
       'status': 'completed',
       'joinedMethod': 'walkIn',
       'tableNumber': 'A1',
@@ -315,7 +321,10 @@ Future<void> _deleteCollection(
 ) async {
   const pageSize = 200;
   while (true) {
-    final snapshot = await firestore.collection(collectionPath).limit(pageSize).get();
+    final snapshot = await firestore
+        .collection(collectionPath)
+        .limit(pageSize)
+        .get();
     if (snapshot.docs.isEmpty) break;
 
     final batch = firestore.batch();

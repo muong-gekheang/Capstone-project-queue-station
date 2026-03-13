@@ -5,17 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
-import 'package:queue_station_app/services/store/restaurant_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 
 class DashboardViewModel extends ChangeNotifier {
-  final RestaurantService _restaurantService;
   final TableService _tableService;
   final QueueService _queueService;
   bool _isDisposed = false;
 
-  Restaurant? _currentRestaurant;
   bool _isLoading = true;
   Duration _avgWaitTime = Duration.zero;
 
@@ -27,31 +24,13 @@ class DashboardViewModel extends ChangeNotifier {
   StreamSubscription<List<QueueTable>>? _queueTableSubscription;
 
   DashboardViewModel({
-    required RestaurantService restaurantService,
     required QueueService queueService,
     required TableService tableService,
-  }) : _restaurantService = restaurantService,
-       _queueService = queueService,
+  }) : _queueService = queueService,
        _tableService = tableService {
-    _subscribeToRestaurant();
+    _subscribeToQueueEntries();
+    _subscribeToQueueTable();
     init();
-  }
-
-  void _subscribeToRestaurant() {
-    _restaurantSubscription = _restaurantService.streamRestaurant.listen(
-      (restaurant) {
-        if (_isDisposed) return;
-        _currentRestaurant = restaurant;
-        _isLoading = false;
-        notifyListeners(); // Updates the UI
-      },
-      onError: (error) {
-        if (_isDisposed) return;
-        // Handle potential stream errors here
-        _isLoading = false;
-        notifyListeners();
-      },
-    );
   }
 
   void _subscribeToQueueEntries() {
@@ -107,7 +86,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   int get peopleWaiting {
     int result = 0;
-    for (QueueEntry queueEntry in _currentRestaurant?.currentInQueue ?? []) {
+    for (QueueEntry queueEntry in _currentQueue) {
       result += queueEntry.partySize;
     }
     return result;

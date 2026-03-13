@@ -83,6 +83,12 @@ class QueueTableRepositoryMock implements QueueTableRepository {
     // TODO: implement watchCurrentQueueTable
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> addCustomerToTable(QueueTable table, String queueEntryId) {
+    // TODO: implement addCustomerToTable
+    throw UnimplementedError();
+  }
 }
 
 List<QueueTable> mockTables = [

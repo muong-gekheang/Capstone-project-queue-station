@@ -142,7 +142,8 @@ class _QueueContentState extends State<QueueContent> {
                   value: queueViewModel,
                   child: EditQueueDialog(
                     item: item,
-                    onUpdate: () => queueViewModel.removeQueue(item),
+                    onUpdate: () => queueViewModel.serveQueue(item),
+                    onRemove: () => queueViewModel.removeQueue(item),
                   ),
                 ),
               ),

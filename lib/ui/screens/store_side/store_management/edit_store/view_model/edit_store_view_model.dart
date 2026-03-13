@@ -57,7 +57,7 @@ class EditStoreViewModel extends ChangeNotifier {
 
   String get storeName => _currentRestaurant?.name ?? "";
 
-  String get storeDescription => _currentRestaurant?.description ?? "";
+  String get storeDescription => "";
 
   String get adminEmail => _restaurantService.storeUser?.email ?? "";
 }

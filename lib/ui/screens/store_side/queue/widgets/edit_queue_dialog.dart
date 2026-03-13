@@ -9,10 +9,12 @@ import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
 class EditQueueDialog extends StatefulWidget {
   final QueueEntry item;
   final VoidCallback onUpdate;
+  final VoidCallback onRemove;
   const EditQueueDialog({
     super.key,
     required this.item,
     required this.onUpdate,
+    required this.onRemove,
   });
 
   @override
@@ -65,7 +67,6 @@ class _EditQueueDialogState extends State<EditQueueDialog> {
               ),
             ),
             const SizedBox(height: 15),
-            // TODO: Fetch customer using repos
             _infoLine("Email address:", widget.item.customerId),
             _infoLine("Customer name:", widget.item.customerId),
             _infoLine("Phone number:", widget.item.customerId),
@@ -245,7 +246,7 @@ class _EditQueueDialogState extends State<EditQueueDialog> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      widget.onUpdate();
+                      widget.onRemove();
                       Navigator.pop(ctx);
                       Navigator.pop(context);
                     },

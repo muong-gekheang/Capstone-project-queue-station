@@ -5,6 +5,7 @@ abstract class QueueTableRepository {
   Future<void> create(QueueTable table);
   Future<void> delete(String tableId);
   Future<QueueTable> update(QueueTable table);
+  Future<void> addCustomerToTable(QueueTable table, String queueEntryId);
   Future<QueueTable?> getQueueTableById(String tableId);
   Future<(List<QueueTable>, DocumentSnapshot<Map<String, dynamic>>?)>
   getSearchQueueTables(

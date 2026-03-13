@@ -13,6 +13,7 @@ class QueueEntry {
   final String queueNumber;
   final String restId;
   final String customerId;
+  final String assignedTableId;
   final int partySize;
   final DateTime joinTime;
   final DateTime expectedTableReadyAt;
@@ -24,10 +25,6 @@ class QueueEntry {
   final String? tableNumber;
   final String? customerName; // Only store when the joinedMethod is walkIn
   final String? phoneNumber; // Only store when the joinedMethod is walkIn
-
-  int currentSpot(Restaurant rest) {
-    return rest.getQueueSpot(this);
-  }
 
   const QueueEntry({
     required this.id,
@@ -44,7 +41,8 @@ class QueueEntry {
     required this.restId,
     this.customerName,
     this.phoneNumber,
-    required this.expectedTableReadyAt, // Added to constructor
+    required this.expectedTableReadyAt,
+    required this.assignedTableId, // Added to constructor
   });
 
   const QueueEntry.walkIn({
@@ -63,6 +61,7 @@ class QueueEntry {
     required this.customerName,
     required this.phoneNumber,
     required this.expectedTableReadyAt,
+    required this.assignedTableId,
   });
 
   Duration? get waitingTime {
@@ -122,6 +121,7 @@ class QueueEntry {
       customerName: customerName,
       phoneNumber: phoneNumber,
       expectedTableReadyAt: expectedTableReadyAt ?? this.expectedTableReadyAt,
+      assignedTableId: assignedTableId,
     );
   }
 
@@ -156,6 +156,7 @@ class QueueEntry {
       customerName: customerName ?? this.customerName!,
       phoneNumber: phoneNumber ?? this.phoneNumber!,
       expectedTableReadyAt: expectedTableReadyAt ?? this.expectedTableReadyAt,
+      assignedTableId: assignedTableId,
     );
   }
 

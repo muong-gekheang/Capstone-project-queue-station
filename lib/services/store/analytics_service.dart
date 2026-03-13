@@ -1,10 +1,9 @@
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
-import 'package:queue_station_app/services/store/queue_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 
-// Keep it last because we might have a prebuilt service that we can use later
 class AnalyticsService {
   final QueueService _queueService;
   final TableService _tableService;
@@ -38,7 +37,6 @@ class AnalyticsService {
     final Map<DateTime, int> buckets = {};
 
     for (var entry in _queueService.queueHistory) {
-      // This is the magic line: it rounds the time down to your bucket size
       final bucketTime = _roundToBucket(entry.joinTime, option.bucketSize);
 
       buckets[bucketTime] = (buckets[bucketTime] ?? 0) + 1;

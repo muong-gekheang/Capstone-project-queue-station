@@ -126,6 +126,7 @@ List<QueueEntry> mockQueueEntries = [
     orderId: mockOrders[0].id,
     tableNumber: 'T1',
     expectedTableReadyAt: DateTime.now(),
+    assignedTableId: '',
   ),
   QueueEntry(
     restId: mockRestaurants[0].id,
@@ -139,6 +140,7 @@ List<QueueEntry> mockQueueEntries = [
     orderId: mockOrders[1].id,
     tableNumber: 'T5',
     expectedTableReadyAt: DateTime.now(),
+    assignedTableId: '',
   ),
   QueueEntry(
     restId: mockRestaurants[0].id,
@@ -152,5 +154,6 @@ List<QueueEntry> mockQueueEntries = [
     orderId: "",
     tableNumber: 'T3',
     expectedTableReadyAt: DateTime.now(),
+    assignedTableId: '',
   ),
 ];

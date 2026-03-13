@@ -203,7 +203,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.rest.curWait.toString(),
+                  "10",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,

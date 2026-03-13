@@ -4,14 +4,12 @@ import 'package:queue_station_app/data/repositories/menu/menu_category/menu_cate
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
-import 'package:queue_station_app/models/restaurant/queue_table.dart';
-import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 
 class MenuService {
   final MenuItemRepository _menuItemRepository;
   final MenuCategoryRepository _menuCategoryRepository;
-  final UserProvider _userProvider;
+  UserProvider _userProvider;
 
   final StreamController<List<MenuItem>> _menuItemController =
       StreamController<List<MenuItem>>.broadcast();
@@ -61,6 +59,15 @@ class MenuService {
             _menuCategoryController.add(data);
             _menuCategories = data;
           }, onError: (error) => _menuItemController.addError(error));
+    }
+  }
+
+  void updateDependencies(UserProvider newUserProvider) {
+    _userProvider = newUserProvider;
+    if (_restId.isNotEmpty) {
+      _menuItemSubscription?.cancel();
+      _menuCategorySubscription?.cancel();
+      _initStream();
     }
   }
 

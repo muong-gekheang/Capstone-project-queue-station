@@ -69,6 +69,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
           restId: vm.restId,
           customerName: nameController.text,
           phoneNumber: phoneController.text,
+          assignedTableId: '',
         ),
       );
       Navigator.pop(context);

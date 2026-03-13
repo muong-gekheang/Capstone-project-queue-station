@@ -20,7 +20,6 @@ import 'package:queue_station_app/data/repositories/restaurant/restaurant_reposi
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository_impl.dart';
-import 'package:queue_station_app/data/repositories/user/mock/customer_repository_mock.dart';
 import 'package:queue_station_app/data/repositories/user/production/customer_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/user/production/store_user_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
@@ -43,6 +42,7 @@ import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
+import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<SingleChildWidget> dependencies = [
@@ -64,6 +64,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await seedDatabase(clearExisting: true);
   final GoRouter goRouter = GoRouter(
     routes: <RouteBase>[
       GoRoute(

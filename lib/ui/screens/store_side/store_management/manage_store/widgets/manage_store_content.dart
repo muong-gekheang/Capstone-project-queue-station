@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/services/store/analytics_service.dart';
+import 'package:queue_station_app/services/store/menu_service.dart';
+import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/analytics_screen.dart';
@@ -205,18 +209,20 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
               ),
             ],
           ),
-          Switch(
-            value: manageStoreViewModel.isStoreOpen,
-            activeThumbColor: const Color(0xFF0D47A1),
-            onChanged: (value) {
-              if (value == false) {
-                // Show warning dialog when trying to close store
-                _showCloseStoreDialog();
-              } else {
-                manageStoreViewModel.updateStoreStatus(true);
-              }
-            },
-          ),
+          manageStoreViewModel.isLoading
+              ? CircularProgressIndicator()
+              : Switch(
+                  value: manageStoreViewModel.isStoreOpen,
+                  activeThumbColor: const Color(0xFF0D47A1),
+                  onChanged: (value) {
+                    if (value == false) {
+                      // Show warning dialog when trying to close store
+                      _showCloseStoreDialog();
+                    } else {
+                      manageStoreViewModel.updateStoreStatus(true);
+                    }
+                  },
+                ),
         ],
       ),
     );
@@ -237,7 +243,12 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TableManagementScreen()),
+              MaterialPageRoute(
+                builder: (newScreenContext) => Provider.value(
+                  value: context.read<TableService>(),
+                  child: TableManagementScreen(),
+                ),
+              ),
             );
           },
         ),
@@ -247,7 +258,12 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MenuManagementScreen()),
+              MaterialPageRoute(
+                builder: (newScreenContext) => Provider.value(
+                  value: context.read<MenuService>(),
+                  child: MenuManagementScreen(),
+                ),
+              ),
             );
           },
         ),
@@ -258,8 +274,11 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => StoreQueueHistoryScreen(
-                  restaurant: mockRestaurants[0],
+                builder: (newScreenContext) => Provider.value(
+                  value: context.read<QueueService>(),
+                  child: StoreQueueHistoryScreen(
+                    restaurant: mockRestaurants[0],
+                  ),
                 ), // TODO: NO need init restaurant
               ),
             );
@@ -271,7 +290,14 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
+              MaterialPageRoute(
+                builder: (newScreenContext) {
+                  return Provider.value(
+                    value: context.read<AnalyticsService>(),
+                    child: AnalyticsScreen(),
+                  );
+                },
+              ),
             );
           },
         ),

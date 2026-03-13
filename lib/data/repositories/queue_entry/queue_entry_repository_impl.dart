@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
@@ -161,47 +162,59 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   ) async {
-    var query = fireStore
-        .collection('queueEntries')
-        .where('restaurantId', isEqualTo: restaurantId)
-        .where(
-          'status',
-          whereIn: [QueueStatus.completed.name, QueueStatus.serving.name],
-        ) // Filter for both statuses
-        .orderBy('joinTime', descending: true)
-        .limit(limit);
+    try {
+      var query = fireStore
+          .collection('queue_entries')
+          .where('restId', isEqualTo: restaurantId)
+          .where(
+            'status',
+            whereIn: [QueueStatus.completed.name, QueueStatus.serving.name],
+          )
+          .orderBy('joinTime', descending: true)
+          .limit(limit);
 
-    if (lastDoc != null) {
-      query = query.startAfterDocument(lastDoc);
+      if (lastDoc != null) {
+        query = query.startAfterDocument(lastDoc);
+      }
+
+      final snap = await query.get();
+      final queueEntries = snap.docs.map((doc) {
+        final json = Map<String, dynamic>.from(doc.data());
+        json['id'] ??= doc.id;
+        try {
+          return QueueEntry.fromJson(json);
+        } catch (e) {
+          debugPrint("Mapping failed for document: ${doc.id}");
+          debugPrint("JSON Data: $json"); // Look for fields that are null here!
+          rethrow;
+        }
+      }).toList();
+      print("RESULT: ${queueEntries.length}");
+      final nextCursor = snap.docs.isEmpty ? null : snap.docs.last;
+      return (queueEntries, nextCursor);
+    } catch (err) {
+      print("ERROR: $err");
+      return (<QueueEntry>[], null);
     }
-
-    final snap = await query.get();
-    final queueEntries = snap.docs.map((doc) {
-      final json = Map<String, dynamic>.from(doc.data());
-      json['id'] ??= doc.id;
-      return QueueEntry.fromJson(json);
-    }).toList();
-
-    final nextCursor = snap.docs.isEmpty ? null : snap.docs.last;
-    return (queueEntries, nextCursor);
   }
 
   @override
   Stream<List<QueueEntry>> watchCurrentActiveQueue(String restId) {
-    print("REST: $restId");
     final result = fireStore
-        .collection('queueEntries')
+        .collection('queue_entries')
         .where('restId', isEqualTo: restId)
         .where('status', isEqualTo: 'waiting')
-        .orderBy('expectedTableReadyAt', descending: true)
         .snapshots()
+        .handleError((err) => print("Stream Error: $err"))
         .map((snapshot) {
           return snapshot.docs.map((doc) {
             final json = Map<String, dynamic>.from(doc.data());
             json['id'] ??= doc.id;
-            return QueueEntry.fromJson(json);
+            var result = QueueEntry.fromJson(json);
+            return result;
           }).toList();
         });
+
     return result;
   }
 
@@ -227,7 +240,8 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     }
     await fireStore.collection('queue_entries').doc(id).update({
       'status': newStatus.name,
-      if (fieldToUpdate != null) fieldToUpdate: DateTime.now(),
+      if (fieldToUpdate != null)
+        fieldToUpdate: DateTime.now().toIso8601String(),
     });
   }
 }

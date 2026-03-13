@@ -28,6 +28,7 @@ QueueEntry _$QueueEntryFromJson(Map<String, dynamic> json) => QueueEntry(
   customerName: json['customerName'] as String?,
   phoneNumber: json['phoneNumber'] as String?,
   expectedTableReadyAt: DateTime.parse(json['expectedTableReadyAt'] as String),
+  assignedTableId: json['assignedTableId'] as String,
 );
 
 Map<String, dynamic> _$QueueEntryToJson(QueueEntry instance) =>
@@ -36,6 +37,7 @@ Map<String, dynamic> _$QueueEntryToJson(QueueEntry instance) =>
       'queueNumber': instance.queueNumber,
       'restId': instance.restId,
       'customerId': instance.customerId,
+      'assignedTableId': instance.assignedTableId,
       'partySize': instance.partySize,
       'joinTime': instance.joinTime.toIso8601String(),
       'expectedTableReadyAt': instance.expectedTableReadyAt.toIso8601String(),
