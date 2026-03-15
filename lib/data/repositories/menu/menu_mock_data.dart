@@ -99,6 +99,7 @@ final MenuItem classicBurger =
         image: "assets/images/burger.png",
         isAvailable: true,
         id: Uuid().v4(),
+        restaurantId: '',
       )
       ..sizes.addAll(burgerSizes)
       ..addOns.addAll([
@@ -118,6 +119,7 @@ final MenuItem cheeseBurger =
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/cheeseburger.png",
         isAvailable: true,
+        restaurantId: '',
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([
@@ -138,6 +140,7 @@ final MenuItem pepperoniPizza =
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza.png",
         isAvailable: true,
+        restaurantId: '',
       )
       ..sizes.addAll(pizzaSizes)
       ..addOns.addAll([
@@ -158,6 +161,7 @@ final MenuItem margheritaPizza =
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza(1).png",
         isAvailable: true,
+        restaurantId: '',
       )
       ..sizes.addAll([
         MenuSize(sizeOption: globalSizes[1], price: 1.0), // Medium
@@ -178,6 +182,7 @@ final MenuItem cola =
         category: mockMenuCategories[2], // Drinks category
         image: "assets/images/energy-drink.png",
         isAvailable: true,
+        restaurantId: '',
       )
       ..addOns.addAll([
         AddOn(name: 'Extra Ice', price: 0.25, image: "", id: Uuid().v4()),
@@ -194,6 +199,7 @@ final MenuItem veggieWrap =
             mockMenuCategories[0], // Burger category (or you can create a new category 'Wraps')
         image: "assets/images/burger.png",
         isAvailable: true,
+        restaurantId: '',
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([

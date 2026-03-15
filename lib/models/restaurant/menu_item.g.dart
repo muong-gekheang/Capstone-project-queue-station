@@ -14,8 +14,8 @@ MenuItem _$MenuItemFromJson(Map<String, dynamic> json) => MenuItem(
   minPrepTimeMinutes: (json['minPrepTimeMinutes'] as num?)?.toInt(),
   maxPrepTimeMinutes: (json['maxPrepTimeMinutes'] as num?)?.toInt(),
   categoryId: json['categoryId'] as String?,
-  sizeOptionIds:
-      (json['sizeOptionIds'] as List<dynamic>?)
+  menuSizeOptionIds:
+      (json['menuSizeOptionIds'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList() ??
       [],
@@ -23,6 +23,7 @@ MenuItem _$MenuItemFromJson(Map<String, dynamic> json) => MenuItem(
       (json['addOnIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       [],
   isAvailable: json['isAvailable'] as bool? ?? true,
+  restaurantId: json['restaurantId'] as String,
 );
 
 Map<String, dynamic> _$MenuItemToJson(MenuItem instance) => <String, dynamic>{
@@ -33,7 +34,8 @@ Map<String, dynamic> _$MenuItemToJson(MenuItem instance) => <String, dynamic>{
   'minPrepTimeMinutes': instance.minPrepTimeMinutes,
   'maxPrepTimeMinutes': instance.maxPrepTimeMinutes,
   'categoryId': instance.categoryId,
-  'sizeOptionIds': instance.sizeOptionIds,
+  'restaurantId': instance.restaurantId,
+  'menuSizeOptionIds': instance.menuSizeOptionIds,
   'addOnIds': instance.addOnIds,
   'isAvailable': instance.isAvailable,
 };

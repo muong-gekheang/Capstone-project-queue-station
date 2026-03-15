@@ -80,7 +80,8 @@ class MenuService {
   }
 
   void addMenuItem(MenuItem newMenu) {
-    _menuItemRepository.create(newMenu);
+    MenuItem menuToAdd = newMenu.copyWith(restaurantId: _restId);
+    _menuItemRepository.create(menuToAdd);
   }
 
   void updateMenuItem(MenuItem newMenuItem) {
@@ -92,6 +93,7 @@ class MenuService {
   }
 
   void addMenuCategory(MenuItemCategory newCategory) {
+    newCategory.restaurantId = _restId;
     _menuCategoryRepository.create(newCategory);
   }
 

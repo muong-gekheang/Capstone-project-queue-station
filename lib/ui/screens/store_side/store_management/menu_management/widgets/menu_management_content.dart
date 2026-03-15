@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_menu.dart';
+import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import '../view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/ui/widgets/category_card_widget.dart';
@@ -16,15 +19,43 @@ class MenuManagementContent extends StatelessWidget {
     final filteredList = vm.getFilteredMenuList();
 
     return Scaffold(
-      appBar: AppBar(title: Text("Managed Menu"), centerTitle: true),
+      appBar: AppBar(title: Text("Menu Management"), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SearchbarWidget(
-              hintText: "Search menu...",
-              onChanged: (value) => vm.updateSearchQuery(value),
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SearchbarWidget(
+                      hintText: "Search...",
+                      onChanged: (value) => vm.updateSearchQuery(value),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  ButtonWidget(
+                    leadingIcon: Icons.add,
+                    title: "Add Item",
+                    onPressed: () async {
+                      await Navigator.push<MenuItem>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChangeNotifierProvider.value(
+                            value: vm,
+                            child: AddNewMenu(),
+                          ),
+                        ),
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(255, 104, 53, 1),
+                    textColor: Colors.white,
+                    borderRadius: 50,
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             _buildCategoryList(vm),
@@ -56,8 +87,8 @@ class MenuManagementContent extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: List.generate(mockMenuCategories.length, (index) {
-          final category = mockMenuCategories[index];
+        children: List.generate(vm.allCategories.length, (index) {
+          final category = vm.allCategories[index];
           return Padding(
             padding: const EdgeInsets.only(right: 10),
             child: CategoryCardWidget(

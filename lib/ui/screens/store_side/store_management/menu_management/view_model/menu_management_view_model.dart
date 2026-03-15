@@ -26,6 +26,7 @@ class MenuManagementViewModel extends ChangeNotifier {
 
   // --- Getters ---
   List<MenuItem> get allMenuItems => _allMenuItems;
+  List<MenuItemCategory> get allCategories => _allCategories;
   int get selectedIndex => _selectedIndex;
   String get selectedCategoryId => _selectedCategoryId;
   String get searchQuery => _searchQuery;
@@ -43,6 +44,7 @@ class MenuManagementViewModel extends ChangeNotifier {
       (items) {
         if (_isDisposed) return;
         _allMenuItems = items;
+        debugPrint("MenuItems: ${items.length}");
         _isLoading = false;
         notifyListeners(); // Updates the UI
       },
@@ -129,7 +131,7 @@ class MenuManagementViewModel extends ChangeNotifier {
     _menuService.addMenuItem(newItem);
   }
 
-  void AddNewCategory(MenuItemCategory newCategory) {
+  void addNewCategory(MenuItemCategory newCategory) {
     _menuService.addMenuCategory(newCategory);
   }
 

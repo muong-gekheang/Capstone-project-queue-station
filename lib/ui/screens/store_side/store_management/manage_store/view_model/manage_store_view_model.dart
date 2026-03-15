@@ -45,8 +45,10 @@ class ManageStoreViewModel extends ChangeNotifier {
   }
 
   void updateStoreStatus(bool isOpen) {
-    _restaurantService.updateStoreStatus(isOpen);
     isLoading = true;
+    notifyListeners();
+    _restaurantService.updateStoreStatus(isOpen);
+    isLoading = false;
     notifyListeners();
   }
 }

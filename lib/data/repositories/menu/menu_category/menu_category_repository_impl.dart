@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 
@@ -10,6 +11,7 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
 
   @override
   Future<void> create(MenuItemCategory category) async {
+    debugPrint("Add Cat: $category");
     final categoryRef = fireStore
         .collection('menu_item_categories')
         .doc(category.id);

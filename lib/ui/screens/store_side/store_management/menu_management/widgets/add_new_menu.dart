@@ -10,17 +10,20 @@ class AddNewMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var vm = context.read<MenuManagementViewModel>();
+    var vm = context.watch<MenuManagementViewModel>();
     return Scaffold(
       appBar: AppBarWidget(title: "Add Menu Item", color: Colors.black),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: MenuForm(
-          initialMenu: null, // null = we are adding
-          onSubmit: (MenuItem newMenu) {
-            vm.addMenuItem(newMenu);
-            Navigator.pop(context); // close the page
-          },
+        child: ChangeNotifierProvider.value(
+          value: vm,
+          child: MenuForm(
+            initialMenu: null, // null = we are adding
+            onSubmit: (MenuItem newMenu) {
+              vm.addMenuItem(newMenu);
+              Navigator.pop(context); // close the page
+            },
+          ),
         ),
       ),
     );

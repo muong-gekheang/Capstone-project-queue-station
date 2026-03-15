@@ -26,14 +26,13 @@ class _AddNewCategoryState extends State<AddNewCategory> {
   }
 
   void onSave() {
-    var vm = context.read<MenuManagementViewModel>();
     if (!_formKey.currentState!.validate()) {
       return;
     }
     final categoryName = _categoryNameController.text;
     final newCategory = MenuItemCategory(id: Uuid().v4(), name: categoryName);
-    vm.AddNewCategory(newCategory);
-    Navigator.pop(context);
+
+    Navigator.pop(context, newCategory);
   }
 
   @override

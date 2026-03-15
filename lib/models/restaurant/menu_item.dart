@@ -15,9 +15,10 @@ class MenuItem {
   final int? minPrepTimeMinutes;
   final int? maxPrepTimeMinutes;
   final String categoryId;
+  final String restaurantId;
 
   @JsonKey(defaultValue: <String>[])
-  final List<String> sizeOptionIds;
+  final List<String> menuSizeOptionIds;
   @JsonKey(defaultValue: <String>[])
   final List<String> addOnIds;
 
@@ -39,11 +40,12 @@ class MenuItem {
     this.maxPrepTimeMinutes,
     String? categoryId,
     MenuItemCategory? category,
-    List<String>? sizeOptionIds,
+    List<String>? menuSizeOptionIds,
     List<String>? addOnIds,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
     this.isAvailable = true,
+    required this.restaurantId,
   }) : categoryId = categoryId ?? category?.id ?? 'unknown_category',
        category =
            category ??
@@ -53,8 +55,8 @@ class MenuItem {
            ),
        sizes = sizes ?? [],
        addOns = addOns ?? [],
-       sizeOptionIds =
-           sizeOptionIds ??
+       menuSizeOptionIds =
+           menuSizeOptionIds ??
            (sizes ?? []).map((s) => s.sizeOption.name).toList(),
        addOnIds = addOnIds ?? (addOns ?? []).map((a) => a.id).toList();
 
@@ -67,11 +69,12 @@ class MenuItem {
     int? maxPrepTimeMinutes,
     String? categoryId,
     MenuItemCategory? category,
-    List<String>? sizeOptionIds,
+    List<String>? menuSizeOptionIds,
     List<String>? addOnIds,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
     bool? isAvailable,
+    String? restaurantId,
   }) {
     return MenuItem(
       id: id ?? this.id,
@@ -82,11 +85,13 @@ class MenuItem {
       maxPrepTimeMinutes: maxPrepTimeMinutes ?? this.maxPrepTimeMinutes,
       categoryId: categoryId ?? this.categoryId,
       category: category ?? this.category,
-      sizeOptionIds: sizeOptionIds ?? List<String>.from(this.sizeOptionIds),
+      menuSizeOptionIds:
+          menuSizeOptionIds ?? List<String>.from(this.menuSizeOptionIds),
       addOnIds: addOnIds ?? List<String>.from(this.addOnIds),
       sizes: sizes ?? List<MenuSize>.from(this.sizes),
       addOns: addOns ?? List<AddOn>.from(this.addOns),
       isAvailable: isAvailable ?? this.isAvailable,
+      restaurantId: restaurantId ?? this.restaurantId,
     );
   }
 

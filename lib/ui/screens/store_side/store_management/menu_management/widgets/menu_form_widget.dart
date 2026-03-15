@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_ons_management.dart';
@@ -174,6 +176,7 @@ class _MenuFormState extends State<MenuForm> {
       maxPrepTimeMinutes: maxPrep,
       sizes: menuSizes,
       addOns: addOns,
+      restaurantId: '',
     );
 
     Navigator.pop(context, newMenu);
@@ -192,6 +195,7 @@ class _MenuFormState extends State<MenuForm> {
 
   @override
   Widget build(BuildContext context) {
+    var vm = context.watch<MenuManagementViewModel>();
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -232,68 +236,102 @@ class _MenuFormState extends State<MenuForm> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          DropdownButtonFormField<MenuItemCategory>(
-                            initialValue: selectedCategory,
-                            items: [
-                              DropdownMenuItem(
-                                value: addCategory,
-                                child: const Text("+ Add"),
-                              ),
-                              ...mockMenuCategories.map((category) {
-                                return DropdownMenuItem(
-                                  value: category,
-                                  child: Text(category.name),
-                                );
-                              }),
-                            ],
-                            onChanged: (value) async {
-                              if (value == null) return;
-                              if (value.id == '-1') {
-                                final newCategory =
-                                    await showModalBottomSheet<
-                                      MenuItemCategory
-                                    >(
-                                      context: context,
-                                      builder: (context) => Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: MediaQuery.of(
-                                            context,
-                                          ).viewInsets.bottom,
-                                        ),
-                                        child: AddNewCategory(),
+                          (vm.allCategories.isNotEmpty)
+                              ? DropdownButtonFormField<MenuItemCategory>(
+                                  initialValue: selectedCategory,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: addCategory,
+                                      child: const Text("+ Add"),
+                                    ),
+                                    ...vm.allCategories.map((category) {
+                                      return DropdownMenuItem(
+                                        value: category,
+                                        child: Text(category.name),
+                                      );
+                                    }),
+                                  ],
+                                  onChanged: (value) async {
+                                    if (value == null) return;
+                                    if (value.id == '-1') {
+                                      final newCategory =
+                                          await showModalBottomSheet<
+                                            MenuItemCategory
+                                          >(
+                                            context: context,
+                                            builder: (context) => Padding(
+                                              padding: EdgeInsets.only(
+                                                bottom: MediaQuery.of(
+                                                  context,
+                                                ).viewInsets.bottom,
+                                              ),
+                                              child: AddNewCategory(),
+                                            ),
+                                          );
+                                      if (newCategory != null) {
+                                        mockMenuCategories.add(newCategory);
+                                        setState(() {
+                                          selectedCategory = newCategory;
+                                        });
+                                      }
+                                    } else {
+                                      setState(() {
+                                        selectedCategory = value;
+                                      });
+                                    }
+                                  },
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        width: 0.5,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.secondary.withAlpha(127),
                                       ),
-                                    );
-                                if (newCategory != null) {
-                                  mockMenuCategories.add(newCategory);
-                                  setState(() {
-                                    selectedCategory = newCategory;
-                                  });
-                                }
-                              } else {
-                                setState(() {
-                                  selectedCategory = value;
-                                });
-                              }
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: 0.5,
-                                  color: Theme.of(
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.secondary.withAlpha(127),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : ButtonWidget(
+                                  title: '+ Add Category',
+                                  onPressed: () async {
+                                    final newCategory =
+                                        await showModalBottomSheet<
+                                          MenuItemCategory
+                                        >(
+                                          context: context,
+                                          builder: (context) => Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: MediaQuery.of(
+                                                context,
+                                              ).viewInsets.bottom,
+                                            ),
+                                            child: AddNewCategory(),
+                                          ),
+                                        );
+                                    if (newCategory != null) {
+                                      vm.addNewCategory(newCategory);
+                                    }
+                                  },
+                                  backgroundColor: Color.fromRGBO(
+                                    255,
+                                    104,
+                                    53,
+                                    1,
+                                  ),
+                                  textColor: Theme.of(
                                     context,
-                                  ).colorScheme.secondary.withAlpha(127),
+                                  ).colorScheme.onPrimary,
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  borderRadius: 10,
                                 ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: 1,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary.withAlpha(127),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
