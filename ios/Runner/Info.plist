@@ -45,5 +45,19 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+
+	    <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>queuestation</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>queuestation</string>
+        </array>
+		<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to location to show nearby queue stations on the map.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app needs access to location even in the background to alert you when your turn is near.</string>
 </dict>
 </plist>

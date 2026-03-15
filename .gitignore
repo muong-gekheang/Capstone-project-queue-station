@@ -53,3 +53,12 @@ android/app/google-services.json
 # iOS/macOS Secrets
 ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
+
+# Hide api IOS
+ios/Runner/Secrets.plist
+
+# Hide api Android
+/local.properties
+
+# Hide api app
+.env

@@ -1,9 +1,17 @@
+import 'dart:io';
+
+import 'package:latlong2/latlong.dart' hide LatLng;
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
 import 'queue_table.dart';
 import 'menu_item.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'package:uuid/uuid.dart';
+
+final uuid = Uuid();
 
 class Restaurant {
   final String id;
@@ -13,6 +21,9 @@ class Restaurant {
   final String policy;
   final int biggestTableSize;
   final String phone;
+  LatLng? location;
+  List<String> menuImageLinks;
+  List<SocialAccount> contactDetails;
   final List<MenuItem> items;
   final List<QueueTable> tables;
   final List<AddOn> globalAddOns;
@@ -20,7 +31,7 @@ class Restaurant {
   final List<QueueEntry> currentInQueue = [];
 
   Restaurant({
-    required this.id,
+    String? id,
     required this.name,
     required this.address,
     required this.logoLink,
@@ -31,7 +42,11 @@ class Restaurant {
     required this.tables,
     required this.globalAddOns,
     required this.globalSizeOptions,
-  });
+    required this.location,
+    required this.contactDetails,
+    List<String> menuImageLinks = const [],
+  }) : menuImageLinks = List<String>.from(menuImageLinks),
+       id = id ?? uuid.v4();
 
   void enqueue(QueueEntry queue) {
     if (!currentInQueue.contains(queue)) {
@@ -62,4 +77,11 @@ class Restaurant {
 
   @override
   int get hashCode => Object.hash(name, address, phone);
+}
+
+class SocialAccount {
+  final String platform;
+  final String username;
+
+  SocialAccount({required this.platform, required this.username});
 }

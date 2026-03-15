@@ -1,10 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/firebase_options.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repo_mock.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
+// import 'package:queue_station_app/firebase_options.dart';
 import 'package:queue_station_app/models/user/customer.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
+import 'package:queue_station_app/ui/screens/map/map_screen.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:queue_station_app/models/order/order.dart';
@@ -26,9 +31,13 @@ import 'package:queue_station_app/ui/store_main_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await dotenv.load(fileName: ".env");
 
   final GoRouter goRouter = GoRouter(
+    // --- THIS IS REQUIRED FOR GO_ROUTER DEEP LINKS TO WORK ---
+    // If you don't add this, go_router won't parse the deep link.
+    initialLocation: '/',
     routes: <RouteBase>[
       GoRoute(
         path: "/",
@@ -38,7 +47,13 @@ void main() async {
         },
         redirect: (context, state) {
           bool isLoggedIn = context.read<UserProvider>().currentUser != null;
-          if (!isLoggedIn) return "/login";
+          // if (!isLoggedIn) return "/login";
+          if (!isLoggedIn) {
+            // --- NEW: Save the exact URL they were trying to visit! ---
+            // If they clicked /map?id=123, we encode it and pass it to the login screen.
+            final String targetUrl = Uri.encodeComponent(state.uri.toString());
+            return "/login?from=$targetUrl";
+          }
           return null;
         },
         routes: <RouteBase>[
@@ -64,7 +79,29 @@ void main() async {
               },
             ),
           ),
-          GoRoute(path: "map", builder: (context, state) => Placeholder()),
+          // --- PERFECTED MAP ROUTE ---
+          GoRoute(
+            path: "map",
+            builder: (context, state) {
+              //http://localhost:55555/map?id=test-id-2
+              final String? deepLinkId = state.uri.queryParameters['id'];
+
+              final user = context.read<UserProvider>().currentUser;
+              String? myStoreId;
+
+              if (user != null && user is StoreUser) {
+                // For testing
+                // myStoreId = "test-id-1";
+                //real
+                myStoreId = user.rest.id;
+              }
+
+              return MapScreen(
+                initialRestaurantId: deepLinkId,
+                ownRestaurantId: myStoreId,
+              );
+            },
+          ),
           GoRoute(
             path: "order",
             builder: (context, state) => const OrderScreen(),
@@ -101,6 +138,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<RestaurantRepository>(
+          create: (_) => MockRestaurantRepository(),
+        ),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProxyProvider<OrderProvider, CartProvider>(
           create: (_) => CartProvider(
