@@ -1,23 +1,25 @@
 import 'dart:async';
 
+import 'package:flutter/rendering.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:rxdart/subjects.dart';
 
 class TableService {
   final QueueTableRepository _queueTableRepository;
   final TableCategoryRepository _tableCategoryRepository;
   UserProvider _userProvider;
 
-  final StreamController<List<QueueTable>> _queueTableController =
-      StreamController<List<QueueTable>>.broadcast();
+  final _queueTableController = BehaviorSubject<List<QueueTable>>.seeded([]);
 
   StreamSubscription<List<QueueTable>>? _queueTableSubscription;
 
-  final StreamController<List<TableCategory>> _tableCategoryController =
-      StreamController<List<TableCategory>>.broadcast();
+  final _tableCategoryController = BehaviorSubject<List<TableCategory>>.seeded(
+    [],
+  );
 
   StreamSubscription<List<TableCategory>>? _tableCategorySubscription;
 
@@ -31,7 +33,7 @@ class TableService {
     _initStream();
   }
 
-  String get _restId => _userProvider.asStoreUser?.restaurantId ?? "";
+  String get restId => _userProvider.asStoreUser?.restaurantId ?? "";
 
   Stream<List<QueueTable>> get streamQueueTable => _queueTableController.stream;
 
@@ -39,16 +41,17 @@ class TableService {
       _tableCategoryController.stream;
 
   void _initStream() {
-    if (_restId.isNotEmpty) {
+    if (restId.isNotEmpty) {
       _queueTableSubscription = _queueTableRepository
-          .watchAllQueueTable(_restId)
+          .watchAllQueueTable(restId)
           .listen((data) {
+            debugPrint("0: ${data.length}");
             _queueTableController.add(data);
             _tables = data;
           }, onError: (error) => _queueTableController.addError(error));
 
       _tableCategorySubscription = _tableCategoryRepository
-          .watchAllCategory(_restId)
+          .watchAllCategory(restId)
           .listen(
             (data) {
               _tableCategoryController.add(data);
@@ -61,9 +64,12 @@ class TableService {
     }
   }
 
+  String? _lastRestId;
+
   void updateDependencies(UserProvider newUserProvider) {
     _userProvider = newUserProvider;
-    if (_restId.isNotEmpty) {
+    if (restId.isNotEmpty && restId != _lastRestId) {
+      _lastRestId = restId; // Update the tracker
       _queueTableSubscription?.cancel();
       _tableCategorySubscription?.cancel();
       _initStream();

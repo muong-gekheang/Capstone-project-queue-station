@@ -19,7 +19,11 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
 
   @override
   Future<void> delete(String categoryId) async {
-    // will be handled later
+    final categoryRef = fireStore
+        .collection('table_categories')
+        .doc(categoryId);
+
+    await categoryRef.delete();
   }
 
   @override

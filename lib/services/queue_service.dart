@@ -7,6 +7,7 @@ import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class QueueService {
   final FirebaseFunctions functions = FirebaseFunctions.instance;
@@ -21,8 +22,9 @@ class QueueService {
   DocumentSnapshot<Map<String, dynamic>>? lastDoc;
 
   StreamSubscription<List<QueueEntry>>? _queueEntrySubscription;
-  final StreamController<List<QueueEntry>> _queueEntryStreamController =
-      StreamController<List<QueueEntry>>.broadcast();
+  final _queueEntryStreamController = BehaviorSubject<List<QueueEntry>>.seeded(
+    [],
+  );
 
   QueueService({
     required UserProvider userProvider,

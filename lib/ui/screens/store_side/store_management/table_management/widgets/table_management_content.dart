@@ -119,6 +119,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
       tableStatus: TableStatus.available,
       tableCategoryId: tableCategory.id,
       queueEntryIds: [],
+      restaurantId: vm.restId,
     );
     vm.addNewTable(newTable);
 
@@ -729,6 +730,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
                     type: _textController.text,
                     minSeat: int.tryParse(_minSeatController.text) ?? 1,
                     seatAmount: int.tryParse(_seatController.text) ?? 2,
+                    restaurantId: '',
                   );
                   _addNewCategory(newCategory);
                 }

@@ -18,6 +18,8 @@ class TableManagementViewModel extends ChangeNotifier {
 
   FilterOption currentFilter = FilterOption.clear;
 
+  String get restId => _tableService.restId;
+
   StreamSubscription<List<QueueTable>>? _queueTableSubscription;
   StreamSubscription<List<TableCategory>>? _tableCategorySubscription;
 
@@ -45,7 +47,6 @@ class TableManagementViewModel extends ChangeNotifier {
         if (_isDisposed) return;
         _tables = tables;
         _isLoading = false;
-        print("TAB: ${tables.length}");
         notifyListeners(); // Updates the UI
       },
       onError: (error) {
@@ -58,13 +59,13 @@ class TableManagementViewModel extends ChangeNotifier {
 
     _tableCategorySubscription = _tableService.streamTableCategories.listen(
       (categories) {
-        print("CAT: ${categories.length}");
         if (_isDisposed) return;
         _tableCategories = categories;
         _isLoading = false;
         if (currentSelectedCategory == null && _tableCategories.isNotEmpty) {
           currentSelectedCategory = categories.first;
         }
+        debugPrint("CATEGORY: ${categories.length}");
         notifyListeners();
       },
       onError: (error) {
@@ -102,7 +103,8 @@ class TableManagementViewModel extends ChangeNotifier {
   }
 
   void addNewCategory(TableCategory newCategory) {
-    _tableService.addTableCategory(newCategory);
+    var newCat = newCategory.copyWith(restaurantId: restId);
+    _tableService.addTableCategory(newCat);
   }
 
   void updateTableCategory(TableCategory newCategory) {
@@ -111,6 +113,9 @@ class TableManagementViewModel extends ChangeNotifier {
 
   void deleteTableCategory(TableCategory tableCategory) {
     _tableService.deleteTableCategory(tableCategory);
+    if (_tableCategories.length > 1) {
+      currentSelectedCategory = _tableCategories[1];
+    }
   }
 
   void onSearch(String keyword) {
@@ -127,17 +132,15 @@ class TableManagementViewModel extends ChangeNotifier {
   List<QueueTable> get allTables => _tables;
 
   List<QueueTable> get filteredTable {
-    List<QueueTable> result = [];
+    List<QueueTable> result = allTables;
+    debugPrint("0. ${result.length}");
     // 1. Filter by the selected Category
     if (currentSelectedCategory != null) {
-      result = allTables.where((t) {
-        var result = findTableCatById(t.tableCategoryId);
-        if (result != null && currentSelectedCategory != null) {
-          return result.id == currentSelectedCategory!.id;
-        }
-        return false;
+      result = result.where((t) {
+        return t.tableCategoryId == (currentSelectedCategory!.id);
       }).toList();
     }
+    debugPrint("1. ${result.length}");
 
     // 2. Filter by Search Query
     if (searchQuery.isNotEmpty) {
@@ -147,6 +150,7 @@ class TableManagementViewModel extends ChangeNotifier {
           )
           .toList();
     }
+    debugPrint("2. ${result.length}");
 
     // 3. Filter by Status
     if (isFiltered && currentFilter != FilterOption.clear) {
@@ -159,6 +163,7 @@ class TableManagementViewModel extends ChangeNotifier {
         return true;
       }).toList();
     }
+    debugPrint("3. ${result.length}");
 
     return result;
   }
@@ -166,6 +171,8 @@ class TableManagementViewModel extends ChangeNotifier {
   TableCategory? findTableCatById(String id) {
     if (tableCategories.map((e) => e.id).contains((id))) {
       return tableCategories.firstWhere((e) => e.id == id);
+    } else {
+      return null;
     }
   }
 

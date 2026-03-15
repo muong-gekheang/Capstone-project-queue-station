@@ -9,22 +9,31 @@ var uuid = Uuid();
 class TableCategory {
   final String id;
   final String type;
+  final String restaurantId;
   final int minSeat;
+
   final int seatAmount;
 
   TableCategory({
-    @JsonKey(name: 'id') String? categoryId,
+    String? id,
     required this.type,
     required this.minSeat,
     required this.seatAmount,
-  }) : id = categoryId ?? uuid.v4();
+    required this.restaurantId,
+  }) : id = id ?? uuid.v4();
 
-  TableCategory copyWith({String? type, int? minSeat, int? seatAmount}) {
+  TableCategory copyWith({
+    String? type,
+    int? minSeat,
+    int? seatAmount,
+    String? restaurantId,
+  }) {
     return TableCategory(
-      categoryId: id, // Keep the same ID
+      id: id, // Keep the same ID
       type: type ?? this.type,
       minSeat: minSeat ?? this.minSeat,
       seatAmount: seatAmount ?? this.seatAmount,
+      restaurantId: restaurantId ?? this.restaurantId,
     );
   }
 

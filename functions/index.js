@@ -1,5 +1,8 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
-const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const {
+  onDocumentUpdated,
+  onDocumentDeleted,
+} = require("firebase-functions/v2/firestore");
 const { logger } = require("firebase-functions");
 
 // 2. Firebase Admin - Core app and Firestore database
@@ -214,5 +217,22 @@ exports.updateTableAverage = onDocumentUpdated(
       `Table ${after.tableId} updated. New Average: ${newAverage} mins.`,
     );
     return null;
+  },
+);
+
+exports.deleteTableOnCascade = onDocumentDeleted(
+  "table_categories/{table_catId}",
+  async (event) => {
+    console.log("TRIGGER FIRED", event.params.table_catId);
+    const tableCategoryId = event.params.table_catId;
+
+    const tablesRef = db
+      .collection("queue_tables")
+      .where("tableCategoryId", "==", tableCategoryId);
+
+    const tablesSnap = await tablesRef.get();
+
+    const deletePromises = tablesSnap.docs.map((doc) => doc.ref.delete());
+    return Promise.all(deletePromises);
   },
 );

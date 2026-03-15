@@ -5,19 +5,19 @@ import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_rep
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MenuService {
   final MenuItemRepository _menuItemRepository;
   final MenuCategoryRepository _menuCategoryRepository;
   UserProvider _userProvider;
 
-  final StreamController<List<MenuItem>> _menuItemController =
-      StreamController<List<MenuItem>>.broadcast();
+  final _menuItemController = BehaviorSubject<List<MenuItem>>.seeded([]);
 
   StreamSubscription<List<MenuItem>>? _menuItemSubscription;
 
-  final StreamController<List<MenuItemCategory>> _menuCategoryController =
-      StreamController<List<MenuItemCategory>>.broadcast();
+  final _menuCategoryController =
+      BehaviorSubject<List<MenuItemCategory>>.seeded([]);
 
   StreamSubscription<List<MenuItemCategory>>? _menuCategorySubscription;
 

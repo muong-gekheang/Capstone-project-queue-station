@@ -81,22 +81,25 @@ class TableCategoryRepositoryMock implements TableCategoryRepository {
 }
 
 final categoryA = TableCategory(
-  categoryId: uuid.v4(),
+  id: uuid.v4(),
   type: "Type A",
   minSeat: 1,
   seatAmount: 2,
+  restaurantId: '',
 );
 final categoryB = TableCategory(
-  categoryId: uuid.v4(),
+  id: uuid.v4(),
   type: "Type B",
   minSeat: 3,
   seatAmount: 4,
+  restaurantId: '',
 );
 final categoryC = TableCategory(
-  categoryId: uuid.v4(),
+  id: uuid.v4(),
   type: "Type C",
   minSeat: 5,
   seatAmount: 6,
+  restaurantId: '',
 );
 
 List<TableCategory> mockTableCategories = [categoryA, categoryB, categoryC];

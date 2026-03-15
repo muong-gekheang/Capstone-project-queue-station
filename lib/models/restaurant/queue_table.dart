@@ -3,40 +3,56 @@ import 'package:uuid/uuid.dart';
 
 part 'queue_table.g.dart';
 
-final uuid = Uuid();
+const _uuid = Uuid();
 
-enum TableStatus { available, occupied }
+enum TableStatus {
+  @JsonValue('available')
+  available,
+  @JsonValue('occupied')
+  occupied,
+}
 
 @JsonSerializable(explicitToJson: true)
 class QueueTable {
   final String id;
   final String tableNum;
-  TableStatus tableStatus;
+  final String restaurantId; // Added
   final String tableCategoryId;
+  final TableStatus tableStatus;
 
-  @JsonKey(defaultValue: <String>[])
+  @JsonKey(defaultValue: [])
   final List<String> queueEntryIds;
+
+  // Handles the ISO8601 string from your data
+  final DateTime? latestEstimatedReadyAt; // Added
 
   QueueTable({
     String? id,
     required this.tableNum,
+    required this.restaurantId,
     required this.tableStatus,
     required this.tableCategoryId,
     required this.queueEntryIds,
-  }) : id = id ?? uuid.v4();
+    this.latestEstimatedReadyAt,
+  }) : id = id ?? _uuid.v4();
 
   QueueTable copyWith({
     String? tableNum,
     TableStatus? tableStatus,
     String? tableCategoryId,
     List<String>? queueEntryIds,
+    String? restaurantId,
+    DateTime? latestEstimatedReadyAt,
   }) {
     return QueueTable(
       id: id,
       tableNum: tableNum ?? this.tableNum,
+      restaurantId: restaurantId ?? this.restaurantId,
       tableStatus: tableStatus ?? this.tableStatus,
       tableCategoryId: tableCategoryId ?? this.tableCategoryId,
       queueEntryIds: queueEntryIds ?? this.queueEntryIds,
+      latestEstimatedReadyAt:
+          latestEstimatedReadyAt ?? this.latestEstimatedReadyAt,
     );
   }
 
@@ -44,6 +60,4 @@ class QueueTable {
       _$QueueTableFromJson(json);
 
   Map<String, dynamic> toJson() => _$QueueTableToJson(this);
-
-  void operator []=(String other, QueueTable value) {}
 }

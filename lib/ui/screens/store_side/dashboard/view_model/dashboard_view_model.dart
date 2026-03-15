@@ -39,6 +39,7 @@ class DashboardViewModel extends ChangeNotifier {
         if (_isDisposed) return;
         _currentQueue = queueEntries;
         _isLoading = false;
+        init();
         notifyListeners(); // Updates the UI
       },
       onError: (error) {

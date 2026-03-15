@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
+import 'package:queue_station_app/data/repositories/auth/auth_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
@@ -30,10 +32,12 @@ import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
 import 'package:queue_station_app/services/order_provider.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
-import 'package:queue_station_app/ui/screens/auth/login_screen.dart';
-import 'package:queue_station_app/ui/screens/auth/register_screen.dart';
+import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/login_screen.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/register_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/instruction_screen.dart';
@@ -46,6 +50,7 @@ import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<SingleChildWidget> dependencies = [
+  Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
   Provider<AddOnRepository>(create: (_) => AddOnRepositoryImpl()),
   Provider<RestaurantRepository>(create: (_) => RestaurantRepositoryImpl()),
   Provider<MenuCategoryRepository>(create: (_) => MenuCategoryRepositoryImpl()),
@@ -75,7 +80,7 @@ void main() async {
         },
         redirect: (context, state) {
           bool isLoggedIn = context.read<UserProvider>().currentUser != null;
-          if (!isLoggedIn) return "/login";
+          if (!isLoggedIn) return "/auth";
           return null;
         },
         routes: <RouteBase>[
@@ -133,13 +138,13 @@ void main() async {
           ),
         ],
       ),
-      GoRoute(path: "/login", builder: (context, state) => LoginScreen()),
-      GoRoute(path: "/register", builder: (context, state) => RegisterScreen()),
+      GoRoute(path: "/auth", builder: (context, state) => AuthScreen()),
     ],
   );
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProxyProvider<OrderProvider, CartProvider>(
           create: (_) => CartProvider(
@@ -154,13 +159,46 @@ void main() async {
             return cart;
           },
         ),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(
           create: (_) => StoreOrderNotificationProvider(
             orderRepository: OrderRepositoryMock(),
           ),
         ),
         ...dependencies,
+
+        ProxyProvider4<
+          UserProvider,
+          UserRepository<Customer>,
+          UserRepository<StoreUser>,
+          AuthRepository,
+          AuthService
+        >(
+          update:
+              (
+                context,
+                userProvider,
+                customerRepository,
+                storeUserRepository,
+                authRepository,
+                previous,
+              ) {
+                if (previous == null) {
+                  return AuthService(
+                    authRepository: authRepository,
+                    userProvider: userProvider,
+                    customerRepository: customerRepository,
+                    storeUserRepository: storeUserRepository,
+                  );
+                }
+                previous.updateDependencies(
+                  authRepository: authRepository,
+                  userProvider: userProvider,
+                  customerRepository: customerRepository,
+                  storeUserRepository: storeUserRepository,
+                );
+                return previous;
+              },
+        ),
       ],
       child: MaterialApp.router(
         scrollBehavior: GlobalScrollBehavior(),

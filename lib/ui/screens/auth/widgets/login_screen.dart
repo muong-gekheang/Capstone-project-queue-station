@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/services/auth_service.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
+import 'package:queue_station_app/ui/screens/auth/view_model/auth_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, required this.onSwitchTap});
+  final ValueChanged<AuthScreenTab> onSwitchTap;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -17,28 +20,21 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
-
-  bool _isLoading = false;
 
   Future<void> _handleLogin() async {
-    setState(() => _isLoading = true);
+    final vm = context.read<AuthViewModel>();
 
-    final user = await _authService.login(
-      _emailController.text,
-      _passwordController.text,
+    final result = await vm.login(
+      email: _emailController.text,
+      password: _passwordController.text,
     );
 
-    bool success = user != null;
-
-    setState(() => _isLoading = false);
-
+    debugPrint("Loading: ${vm.isLoading}");
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(success ? "Login successful" : "Login failed")),
+        SnackBar(content: Text(result ? "Login successful" : "Login failed")),
       );
-      if (user != null) {
-        context.read<UserProvider>().updateUser(user);
+      if (result) {
         context.go("/");
       }
     }
@@ -46,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var vm = context.watch<AuthViewModel>();
     return Scaffold(
       backgroundColor: AppTheme.naturalWhite,
       body: Center(
@@ -119,8 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: _isLoading ? null : _handleLogin,
-                        child: _isLoading
+                        onPressed: vm.isLoading ? null : _handleLogin,
+                        child: vm.isLoading
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
@@ -141,14 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const Text("Don’t have an account? "),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const RegisterScreen(),
-                              ),
-                            );
-                          },
+                          onTap: vm.isLoading
+                              ? null
+                              : () {
+                                  widget.onSwitchTap(AuthScreenTab.register);
+                                },
                           child: const Text(
                             "Register",
                             style: TextStyle(

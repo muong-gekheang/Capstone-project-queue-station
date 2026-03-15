@@ -4,13 +4,13 @@ import 'package:queue_station_app/data/repositories/restaurant/restaurant_reposi
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 class RestaurantService {
   final RestaurantRepository _restaurantRepository;
   UserProvider _userProvider;
 
-  final StreamController<Restaurant?> _controller =
-      StreamController<Restaurant?>.broadcast();
+  final _controller = BehaviorSubject<Restaurant?>.seeded(null);
 
   StreamSubscription<Restaurant?>? _subscription;
 

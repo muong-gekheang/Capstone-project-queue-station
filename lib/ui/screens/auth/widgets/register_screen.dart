@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/services/auth_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/user/customer.dart';
+import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
+import 'package:queue_station_app/ui/screens/auth/view_model/auth_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_form_field.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, required this.onSwitchTap});
+  final ValueChanged<AuthScreenTab> onSwitchTap;
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -16,11 +21,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String phoneNumber = "";
   String password = "";
   String confirmPassword = "";
-  final AuthService _authService = AuthService();
 
   final _formKey = GlobalKey<FormState>();
-
-  bool _isLoading = false;
 
   void _handleRegister() async {
     if (!_formKey.currentState!.validate()) {
@@ -29,24 +31,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     _formKey.currentState!.save();
 
-    final success = await _authService.register(
-      email: email,
-      username: username,
-      phoneNumber: phoneNumber,
+    var vm = context.read<AuthViewModel>();
+
+    final success = await vm.register(
+      customer: Customer(
+        name: username,
+        email: email,
+        phone: phoneNumber,
+        id: '',
+        historyIds: [],
+      ),
       password: password,
     );
 
-    setState(() => _isLoading = false);
-
-    if (success) Navigator.pop(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success ? "Registration successful" : "Registration failed",
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success ? "Registration successful" : "Registration failed",
+          ),
         ),
-      ),
-    );
+      );
+      if (success) context.go('/');
+    }
   }
 
   InputDecoration _inputStyle(String hint) {
@@ -64,6 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var vm = context.watch<AuthViewModel>();
     return Scaffold(
       backgroundColor: AppTheme.naturalWhite,
       body: Center(
@@ -156,8 +164,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: _isLoading ? null : _handleRegister,
-                          child: _isLoading
+                          onPressed: vm.isLoading ? null : _handleRegister,
+                          child: vm.isLoading
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
@@ -178,7 +186,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           const Text("Have an account? "),
                           GestureDetector(
-                            onTap: () => Navigator.pop(context),
+                            onTap: vm.isLoading
+                                ? null
+                                : () => widget.onSwitchTap(AuthScreenTab.login),
                             child: const Text(
                               "Login",
                               style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
