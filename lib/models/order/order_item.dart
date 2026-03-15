@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import '../restaurant/menu_item.dart';
-import '../restaurant/menu_item_category.dart';
 import '../restaurant/size_option.dart';
 
 part 'order_item.g.dart';

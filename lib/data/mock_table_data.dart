@@ -1,5 +1,6 @@
 /// This file provides a convenient export of mock table data for legacy UI screens.
 /// It re‑exports the `mockTables` list from the queue table repository mock.
+library;
 
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository_mock.dart'
     show mockTables;

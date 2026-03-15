@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/services/cart_provider.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu_item_screen.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
@@ -10,11 +11,34 @@ import 'package:queue_station_app/ui/widgets/food_item_card.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
-  void _handleConfirmOrder(BuildContext context, CartProvider cart) {
+  Future<void> _handleConfirmOrder(BuildContext context, CartProvider cart) async {
     final orderProvider = context.read<OrderProvider>();
+    // Capture the navigator before any async gap to avoid context-across-async issues
+    final navigator = Navigator.of(context);
+
+    // Capture state before confirming (confirmCurrentOrder clears the cart)
+    final itemCount = cart.items.length;
+    final isUpdate = orderProvider.orders.isNotEmpty;
+
     orderProvider.confirmCurrentOrder();
+
+    // Notify store: new order on first confirm, update on subsequent confirms
+    if (isUpdate) {
+      await NotificationService().notifyStoreOfOrderUpdate(
+        tableNumber: 'B202',   // TODO: replace with live QueueEntry.tableNumber
+        queueNumber: 'A001',   // TODO: replace with live QueueEntry.queueNumber
+        itemCount: itemCount,
+      );
+    } else {
+      await NotificationService().notifyStoreOfNewOrder(
+        tableNumber: 'B202',   // TODO: replace with live QueueEntry.tableNumber
+        queueNumber: 'A001',   // TODO: replace with live QueueEntry.queueNumber
+        itemCount: itemCount,
+      );
+    }
+
     Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pop(context);
+      navigator.pop();
     });
   }
 

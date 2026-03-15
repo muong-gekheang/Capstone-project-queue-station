@@ -2,7 +2,6 @@ import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:uuid/uuid.dart';
 
 /// Example restaurant used in store-side history and ticket widgets.
 final Restaurant restaurant1 = Restaurant(

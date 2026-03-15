@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/data/queue_repository.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/manage/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import '../../../../models/analytic/dashboard_stats.dart';
@@ -165,6 +167,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                   ),
+
+                  // ── Debug-only notification test panel ──────────────────
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 32),
+                    const Divider(),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        '🧪 Notification Test Panel (debug only)',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                    _DebugNotificationButton(
+                      label: 'Simulate New Order (store)',
+                      color: const Color(0xFF0D47A1),
+                      onPressed: () => NotificationService().notifyStoreOfNewOrder(
+                        tableNumber: 'B202',
+                        queueNumber: 'A123',
+                        itemCount: 3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _DebugNotificationButton(
+                      label: 'Simulate Order Update (store)',
+                      color: const Color(0xFF1976D2),
+                      onPressed: () => NotificationService().notifyStoreOfOrderUpdate(
+                        tableNumber: 'B202',
+                        queueNumber: 'A123',
+                        itemCount: 5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _DebugNotificationButton(
+                      label: 'Simulate Queue Joined (customer)',
+                      color: const Color(0xFFFF6835),
+                      onPressed: () => NotificationService().notifyCustomerQueueJoined(
+                        QueueEntry(
+                          id: 'test-${DateTime.now().millisecondsSinceEpoch}',
+                          queueNumber: 'A999',
+                          restId: 'mock-store-1',
+                          customerId: 'test-customer',
+                          partySize: 2,
+                          joinTime: DateTime.now(),
+                          status: QueueStatus.waiting,
+                          joinedMethod: JoinedMethod.remote,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ],
               ),
             ),
@@ -199,6 +255,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               )
             : null,
+      ),
+    );
+  }
+}
+
+// ── Private helper widget used only by the debug test panel ───────────────────
+class _DebugNotificationButton extends StatelessWidget {
+  const _DebugNotificationButton({
+    required this.label,
+    required this.color,
+    required this.onPressed,
+  });
+
+  final String label;
+  final Color color;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

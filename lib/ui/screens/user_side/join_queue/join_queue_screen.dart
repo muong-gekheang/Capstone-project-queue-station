@@ -7,6 +7,7 @@ import 'package:queue_station_app/data/store_queue_history_data.dart'; // for mo
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
@@ -56,8 +57,14 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
           historyIds: [...user.historyIds, newHistory.id],
         ),
       );
-      Navigator.pop(context);
-      context.go("/ticket");
+
+      // Notify the customer with a banner confirming they joined the queue
+      await NotificationService().notifyCustomerQueueJoined(newHistory);
+
+      if (mounted) {
+        Navigator.pop(context);
+        context.go("/ticket");
+      }
     } else {
       const snackBar = SnackBar(
         content: Text('You must have an account to join queue!'),

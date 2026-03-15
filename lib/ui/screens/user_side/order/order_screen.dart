@@ -35,7 +35,7 @@ class OrderScreen extends StatelessWidget {
                   Expanded(
                     child: ListView.separated(
                       itemCount: confirmedItems.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (_, _) =>
                           const Divider(indent: 20, endIndent: 20),
                       itemBuilder: (context, index) {
                         final item = confirmedItems[index];

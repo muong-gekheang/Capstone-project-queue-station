@@ -11,7 +11,7 @@ class MenuItemScreen extends StatefulWidget {
 
   const MenuItemScreen({super.key, this.item, this.cartItem});
 
-  MenuItem get menuItem => item ?? cartItem!.item!;
+  MenuItem get menuItem => item ?? cartItem!.item;
 
   @override
   State<MenuItemScreen> createState() => _MenuItemScreenState();
@@ -51,7 +51,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     _quantity = orderItem.quantity;
     _noteController.text = orderItem.note ?? "";
     _selectedSize = widget.menuItem.sizes.firstWhere(
-      (s) => s.sizeOption.name == orderItem.size?.name,
+      (s) => s.sizeOption.name == orderItem.size.name,
       orElse: () => widget.menuItem.sizes.first,
     );
     for (final entry in orderItem.addOns.entries) {

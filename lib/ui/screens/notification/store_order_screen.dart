@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
@@ -17,12 +18,39 @@ class StoreOrderScreen extends StatefulWidget {
 }
 
 class _StoreOrderScreenState extends State<StoreOrderScreen> {
+  bool _isAccepting = false;
+
+  Future<void> _acceptOrder(
+    BuildContext context,
+    StoreOrderNotificationProvider provider,
+    QueueEntry entry,
+  ) async {
+    setState(() => _isAccepting = true);
+
+    final navigator = Navigator.of(context);
+
+    // Remove from the store's notification list
+    provider.acceptAllIncomingOrder(entry);
+
+    // Notify the customer their order has been accepted
+    await NotificationService().notifyCustomerOrderAccepted(entry);
+
+    if (mounted) {
+      navigator.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<StoreOrderNotificationProvider>();
-    final queueEntry = provider.queueEntries.firstWhere(
+
+    // Guard: entry may have been removed after acceptance
+    final entryIndex = provider.queueEntries.indexWhere(
       (e) => e.id == widget.queueEntry.id,
     );
+    final queueEntry = entryIndex != -1
+        ? provider.queueEntries[entryIndex]
+        : widget.queueEntry;
 
     // Temporary: assume orders are empty until order model is integrated
     final allItems = <OrderItem>[]; // placeholder
@@ -52,7 +80,7 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                       (orderItem) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: FoodItemCard(
-                          name: orderItem.item?.name ?? '',
+                          name: orderItem.item.name ?? '',
                           item: orderItem.item,
                           addons: orderItem.addOns,
                           price: orderItem.menuItemPrice,
@@ -60,20 +88,6 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                           isEditable: false,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    ButtonWidget(
-                      title: 'Mark as accepted',
-                      onPressed: () {
-                        // Temporarily disabled
-                      },
-                      backgroundColor: AppTheme.primaryColor,
-                      textColor: AppTheme.naturalWhite,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      borderRadius: AppTheme.borderRadiusS,
                     ),
                   ] else ...[
                     InfoBadge(text: 'No New Order'),
@@ -90,7 +104,7 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                       (orderItem) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: FoodItemCard(
-                          name: orderItem.item?.name ?? '',
+                          name: orderItem.item.name ?? '',
                           item: orderItem.item,
                           addons: orderItem.addOns,
                           price: orderItem.menuItemPrice,
@@ -104,6 +118,20 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            // Accept order button — always visible so the store can act on the
+            // entry even before per-item order model integration is complete.
+            ButtonWidget(
+              title: _isAccepting ? 'Accepting…' : 'Accept Order',
+              onPressed: _isAccepting || entryIndex == -1
+                  ? null
+                  : () => _acceptOrder(context, provider, queueEntry),
+              backgroundColor: AppTheme.primaryColor,
+              textColor: AppTheme.naturalWhite,
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              borderRadius: AppTheme.borderRadiusS,
+            ),
+            const SizedBox(height: 10),
             ButtonWidget(
               title: 'Total',
               trailingText: '\$0.00',

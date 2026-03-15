@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -34,6 +33,14 @@ class _EditStoreScreenState extends State<EditStoreScreen> {
     _storeDescriptionController.text = "Chinese dine in restaurant";
     _storePasswordController.text = "********";
     _storeEmailController.text = "KungfuKitchen@gmail.com";
+
+    // Restore the previously saved profile image so the screen doesn't
+    // revert to the default placeholder on every navigation.
+    if (kIsWeb) {
+      _selectedImageBytes = storeService.storeProfileImageBytes;
+    } else {
+      _selectedImage = storeService.storeProfileImage;
+    }
   }
 
   @override

@@ -59,11 +59,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       existingSize = null;
     }
 
-    if (existingSize == null) {
-      existingSize = SizeOption(id: _uuid.v4(), name: sizeName);
-      // Optionally add to global list – but globalSizeOptions is const-like, better not modify
-      // globalSizeOptions.add(existingSize); // avoid modifying global list
-    }
+    existingSize ??= SizeOption(id: _uuid.v4(), name: sizeName);
 
     Navigator.pop(context, existingSize);
   }

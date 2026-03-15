@@ -45,6 +45,7 @@ class BottomNavBar extends StatelessWidget {
                 NavTab.queue,
                 'assets/icons/queue_blue.svg',
                 'Queue',
+                iconSize: 20,
               ),
               _buildNavItem(
                 NavTab.settings,
@@ -58,7 +59,7 @@ class BottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(NavTab tab, String iconAsset, String label) {
+  Widget _buildNavItem(NavTab tab, String iconAsset, String label, {double iconSize = 26}) {
     final isSelected = selectedTab == tab;
 
     return Expanded(
@@ -79,9 +80,9 @@ class BottomNavBar extends StatelessWidget {
                 child: Center(
                   child: SvgPicture.asset(
                     iconAsset,
-                    width: 26,
-                    height: 26,
-                    fit: BoxFit.contain, // maintain aspect ratio
+                    width: iconSize,
+                    height: iconSize,
+                    fit: BoxFit.fill,
                     allowDrawingOutsideViewBox: false,
                     colorFilter: ColorFilter.mode(
                       isSelected ? const Color(0xFFFF6835) : Colors.grey,

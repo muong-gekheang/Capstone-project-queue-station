@@ -52,7 +52,7 @@ class NotificationScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.all(10),
                 itemCount: storeOrders.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   return NotificationTileWidget(queueEntry: storeOrders[index]);
                 },
