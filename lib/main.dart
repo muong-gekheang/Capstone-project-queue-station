@@ -12,6 +12,8 @@ import 'package:queue_station_app/data/repositories/menu/menu_category/menu_cate
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
@@ -37,6 +39,7 @@ import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
+import 'package:queue_station_app/ui/screens/onboard/on_board_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/confirm_ticket_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/instruction_screen.dart';
@@ -63,21 +66,29 @@ List<SingleChildWidget> dependencies = [
   ),
   Provider<UserRepository<Customer>>(create: (_) => CustomerRepositoryImpl()),
   Provider<UserRepository<StoreUser>>(create: (_) => StoreUserRepositoryImpl()),
+  Provider<SizingOptionRepository>(create: (_) => SizingOptionRepositoryImpl()),
 ];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseAuth.instance.authStateChanges().first;
+
+  final userProvider = UserProvider();
   // await seedDatabase(clearExisting: true);
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+        ChangeNotifierProvider<UserProvider>.value(value: userProvider),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProxyProvider<OrderProvider, CartProvider>(
           create: (_) => CartProvider(
-            currentOrder: Order(id: '', timestamp: DateTime.now()),
+            currentOrder: Order(
+              id: '',
+              timestamp: DateTime.now(),
+              restaurantId: '',
+            ),
           ),
           update: (context, orderProvider, previousCart) {
             final cart =
@@ -129,101 +140,116 @@ void main() async {
               },
         ),
       ],
-      child: MaterialApp.router(
-        scrollBehavior: GlobalScrollBehavior(),
-        theme: AppTheme.lightTheme,
-        debugShowCheckedModeBanner: false,
-        routerConfig: GoRouter(
-          initialLocation: "/",
-          refreshListenable: GoRouterRefreshStream(
-            FirebaseAuth.instance.authStateChanges(),
-          ),
+      child: Builder(
+        builder: (context) {
+          context.read<AuthService>().restoreSession();
+          return MaterialApp.router(
+            scrollBehavior: GlobalScrollBehavior(),
+            theme: AppTheme.lightTheme,
+            debugShowCheckedModeBanner: false,
+            routerConfig: GoRouter(
+              initialLocation: "/onboard",
+              refreshListenable: userProvider,
 
-          redirect: (context, state) {
-            final bool loggedIn = FirebaseAuth.instance.currentUser != null;
-            final bool isLoggingIn = state.matchedLocation == '/auth';
+              redirect: (context, state) async {
+                if (userProvider.isRestoring) return '/onboard';
 
-            if (!loggedIn) return '/auth';
+                final bool loggedIn = userProvider.currentUser != null;
+                final bool isLoggingIn = state.matchedLocation == '/auth';
+                final bool isSplash = state.matchedLocation == '/onboard';
 
-            if (isLoggingIn) return '/';
+                // Once restored, leave the splash screen
+                if (!isSplash && loggedIn == false) return '/auth';
+                if (isSplash && !userProvider.isRestoring) {
+                  return loggedIn ? '/' : '/auth';
+                }
+                if (isLoggingIn && loggedIn) return '/';
 
-            // 3. No redirect needed
-            return null;
-          },
-          routes: <RouteBase>[
-            GoRoute(
-              path: "/",
-              builder: (context, state) {
-                User user = context.read<UserProvider>().currentUser!;
-                return user is Customer ? Placeholder() : StoreMainScreen();
-              },
-              redirect: (context, state) {
-                bool isLoggedIn =
-                    context.read<UserProvider>().currentUser != null;
-                if (!isLoggedIn) return "/auth";
                 return null;
               },
               routes: <RouteBase>[
                 GoRoute(
-                  path: "menu",
-                  builder: (context, state) => FutureBuilder<bool>(
-                    future: _checkHasSeenInstruction(),
-                    builder: (context, snapshot) {
-                      final hasSeenInstruction = snapshot.data ?? false;
-
-                      if (!hasSeenInstruction) {
-                        // Show instruction if not seen
-                        return Instruction(
-                          onContinue: () async {
-                            await _setHasSeenInstruction();
-                            // Navigate to menu after continue
-                            context.go('/menu');
-                          },
-                        );
-                      }
-
-                      return const MenuScreen();
-                    },
-                  ),
-                ),
-                GoRoute(
-                  path: "map",
-                  builder: (context, state) => Placeholder(),
-                ),
-                GoRoute(
-                  path: "order",
-                  builder: (context, state) => const OrderScreen(),
-                ),
-                GoRoute(
-                  path: "account",
-                  builder: (context, state) => const Account(),
-                ),
-                GoRoute(
-                  path: "ticket",
-                  redirect: (context, state) {
-                    Customer? user = context.read<UserProvider>().asCustomer;
-                    bool isLoggedIn = user != null;
-
-                    if (!isLoggedIn) return "/login";
-                    if (user.currentHistoryId == null) return "/";
-                    return null;
-                  },
+                  path: '/',
                   builder: (context, state) {
-                    UserProvider userProvider = context.read<UserProvider>();
-                    Customer? user = userProvider.asCustomer;
-
-                    return ConfirmTicketScreen(
-                      user: user!,
-                      queueEntry:
-                          mockQueueEntries[0], // TODO: USE MVVM TO handle this
-                    );
+                    User user = context.read<UserProvider>().currentUser!;
+                    return user is Customer ? Placeholder() : StoreMainScreen();
                   },
+                ),
+                GoRoute(
+                  path: "/onboard",
+                  builder: (context, state) {
+                    return OnBoardScreen();
+                  },
+                  routes: <RouteBase>[
+                    GoRoute(
+                      path: "menu",
+                      builder: (context, state) => FutureBuilder<bool>(
+                        future: _checkHasSeenInstruction(),
+                        builder: (context, snapshot) {
+                          final hasSeenInstruction = snapshot.data ?? false;
+
+                          if (!hasSeenInstruction) {
+                            // Show instruction if not seen
+                            return Instruction(
+                              onContinue: () async {
+                                await _setHasSeenInstruction();
+                                // Navigate to menu after continue
+                                context.go('/menu');
+                              },
+                            );
+                          }
+
+                          return const MenuScreen();
+                        },
+                      ),
+                    ),
+
+                    GoRoute(
+                      path: "map",
+                      builder: (context, state) => Placeholder(),
+                    ),
+                    GoRoute(
+                      path: "order",
+                      builder: (context, state) => const OrderScreen(),
+                    ),
+                    GoRoute(
+                      path: "account",
+                      builder: (context, state) => const Account(),
+                    ),
+                    GoRoute(
+                      path: "ticket",
+                      redirect: (context, state) {
+                        Customer? user = context
+                            .read<UserProvider>()
+                            .asCustomer;
+                        bool isLoggedIn = user != null;
+
+                        if (!isLoggedIn) return "/login";
+                        if (user.currentHistoryId == null) return "/";
+                        return null;
+                      },
+                      builder: (context, state) {
+                        UserProvider userProvider = context
+                            .read<UserProvider>();
+                        Customer? user = userProvider.asCustomer;
+
+                        return ConfirmTicketScreen(
+                          user: user!,
+                          queueEntry:
+                              mockQueueEntries[0], // TODO: USE MVVM TO handle this
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: "/auth",
+                  builder: (context, state) => AuthScreen(),
                 ),
               ],
             ),
-            GoRoute(path: "/auth", builder: (context, state) => AuthScreen()),
-          ],
-        ),
+          );
+        },
       ),
     ),
   );

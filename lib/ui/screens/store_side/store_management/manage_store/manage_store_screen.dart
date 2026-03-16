@@ -5,15 +5,15 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/manage_
 import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/widgets/manage_store_content.dart';
 
 class ManageStoreScreen extends StatelessWidget {
-  const ManageStoreScreen({super.key});
-
+  const ManageStoreScreen({super.key, required this.onManageQueue});
+  final VoidCallback onManageQueue;
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ManageStoreViewModel(
         restaurantService: context.read<RestaurantService>(),
       ),
-      child: ManageStoreContent(),
+      child: ManageStoreContent(onManageQueue: onManageQueue),
     );
   }
 }

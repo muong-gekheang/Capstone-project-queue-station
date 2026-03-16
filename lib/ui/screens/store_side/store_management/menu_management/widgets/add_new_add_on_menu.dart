@@ -59,6 +59,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
         name: name,
         price: parsedPrice,
         image: _selectedImage,
+        restaurantId: '',
       );
 
       Navigator.pop(context, newAddOn);
@@ -100,7 +101,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                   SizedBox(height: 10),
                   TextFieldWidget(
                     title: 'Price',
-                    hintText: '9.9',
+                    hintText: 'price',
                     prefixText: '\$',
                     color: Color.fromRGBO(13, 71, 161, 0.5),
                     validator: _nullvalidator,

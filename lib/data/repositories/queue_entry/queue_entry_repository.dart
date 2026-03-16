@@ -34,6 +34,8 @@ abstract class QueueEntryRepository {
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
 
+  Future<List<QueueEntry>> getTodayFinishedQueue(String restId);
+
   Future<void> create(QueueEntry queueEntry);
   Future<void> delete(QueueEntry queueEntry);
   Future<QueueEntry> update(QueueEntry queueEntry);

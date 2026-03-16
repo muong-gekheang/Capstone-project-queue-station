@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
 
 class EditQueueDialog extends StatefulWidget {
@@ -67,9 +68,10 @@ class _EditQueueDialogState extends State<EditQueueDialog> {
               ),
             ),
             const SizedBox(height: 15),
-            _infoLine("Email address:", widget.item.customerId),
-            _infoLine("Customer name:", widget.item.customerId),
-            _infoLine("Phone number:", widget.item.customerId),
+            if (widget.item.customerName != null)
+              _infoLine("Customer name:", widget.item.customerName!),
+            if (widget.item.phoneNumber != null)
+              _infoLine("Phone number:", widget.item.phoneNumber!),
             _infoLine(
               "Queued date:",
               DateFormat("dd/MMM/yyyy | hh:mm").format(widget.item.joinTime),
@@ -237,6 +239,7 @@ class _EditQueueDialogState extends State<EditQueueDialog> {
                     child: const Text(
                       "No, Don't",
                       style: TextStyle(
+                        fontSize: AppTheme.tinyText1,
                         color: Colors.black54,
                         fontWeight: FontWeight.bold,
                       ),
@@ -259,6 +262,7 @@ class _EditQueueDialogState extends State<EditQueueDialog> {
                     child: const Text(
                       "Yes, Remove",
                       style: TextStyle(
+                        fontSize: AppTheme.tinyText1,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),

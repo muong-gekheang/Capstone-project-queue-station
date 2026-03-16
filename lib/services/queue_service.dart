@@ -128,13 +128,9 @@ class QueueService {
       final now = DateTime.now();
       final startOfToday = DateTime(now.year, now.month, now.day);
 
-      final result = await _queueEntryRepository.getQueueHistory(
-        _restId,
-        100,
-        null,
-      );
+      final result = await _queueEntryRepository.getTodayFinishedQueue(_restId);
 
-      todayHistory = result.$1
+      todayHistory = result
           .where((e) => e.joinTime.compareTo(startOfToday) >= 0)
           .toList();
 

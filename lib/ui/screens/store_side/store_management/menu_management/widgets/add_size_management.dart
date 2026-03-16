@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/menu_management_content.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class AddSizeScreen extends StatefulWidget {
-  final MenuItem? existingMenu;
-  const AddSizeScreen({super.key, this.existingMenu});
+  final List<MenuSize> selectedMenuSizes;
+  const AddSizeScreen({super.key, required this.selectedMenuSizes});
 
   @override
   State<AddSizeScreen> createState() => _AddSizeScreenState();
@@ -17,14 +22,13 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _sizeController = TextEditingController();
   List<SizeOption> selectedSizes = [];
+
   @override
   void initState() {
     super.initState();
-    selectedSizes =
-        widget.existingMenu?.sizes
-            .map((menuSize) => menuSize.sizeOption)
-            .toList() ??
-        [];
+    for (var menuSize in widget.selectedMenuSizes) {
+      selectedSizes.add(menuSize.sizeOption);
+    }
   }
 
   String? _nullValidator(String? value) {
@@ -36,6 +40,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   }
 
   void onSave() {
+    var vm = context.read<MenuManagementViewModel>();
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -47,34 +52,22 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
     }
     final sizeName = _sizeController.text.trim();
 
-    SizeOption? existingSize;
-    try {
-      existingSize = globalSizes.firstWhere(
-        (s) => s.name.toLowerCase() == sizeName.toLowerCase(),
-      );
-    } catch (e) {
-      existingSize = null;
+    for (var sizeOption in vm.sizeOptions) {
+      if (sizeOption.name == sizeName) return;
     }
-
-    if (existingSize == null) {
-      existingSize = SizeOption(name: sizeName);
-      globalSizes.add(existingSize);
-    }
-
-    Navigator.pop(context, existingSize);
+    vm.addNewSizeOption(
+      SizeOption(name: sizeName, id: uuid.v4(), restaurantId: ''),
+    );
+    _sizeController.clear();
   }
 
   Widget existingSize() {
-    final globalMenuSizes = globalSizes;
-
-    if (globalMenuSizes.isEmpty) {
-      return Center(child: Text("This menu has no size yet"));
-    }
+    var vm = context.read<MenuManagementViewModel>();
 
     return ListView.builder(
-      itemCount: globalMenuSizes.length,
+      itemCount: vm.sizeOptions.length,
       itemBuilder: (context, index) {
-        final globalMenuSize = globalSizes[index];
+        final globalMenuSize = vm.sizeOptions[index];
         final isSelected = selectedSizes.contains(globalMenuSize);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -106,35 +99,19 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   }
 
   bool get isAddDisabled {
-    if (widget.existingMenu?.sizes == null) return false;
-
-    final nonSelected = selectedSizes.isEmpty;
-
-    final existingMenuSizes =
-        widget.existingMenu?.sizes
-            .map((existingSize) => existingSize.sizeOption.name.toLowerCase())
-            .toList() ??
-        [];
-
-    final hasDuplicate = selectedSizes.any(
-      (size) => existingMenuSizes.contains(size.name.toLowerCase()),
-    );
-
-    final allSelected = existingMenuSizes.every(
-      (existingSizeName) => selectedSizes.any(
-        (size) => size.name.toLowerCase() == existingSizeName,
-      ),
-    );
-
-    return nonSelected || hasDuplicate || allSelected;
+    return (selectedSizes.isEmpty);
   }
 
   void onAdd() {
-    Navigator.pop(context, selectedSizes);
+    Navigator.pop(
+      context,
+      selectedSizes.map((e) => MenuSize(price: 0, sizeOption: e)).toList(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<MenuManagementViewModel>();
     return Padding(
       padding: EdgeInsets.all(16),
       child: Column(

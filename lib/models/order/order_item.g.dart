@@ -15,6 +15,7 @@ OrderItem _$OrderItemFromJson(Map<String, dynamic> json) => OrderItem(
     _$OrderItemStatusEnumMap,
     json['orderItemStatus'],
   ),
+  orderId: json['orderId'] as String,
   addOns: _addOnsFromJson(json['addOns'] as Map<String, dynamic>),
   sizeName: json['sizeName'] as String?,
 );
@@ -27,6 +28,7 @@ Map<String, dynamic> _$OrderItemToJson(OrderItem instance) => <String, dynamic>{
   'quantity': instance.quantity,
   'note': instance.note,
   'orderItemStatus': _$OrderItemStatusEnumMap[instance.orderItemStatus]!,
+  'orderId': instance.orderId,
 };
 
 const _$OrderItemStatusEnumMap = {

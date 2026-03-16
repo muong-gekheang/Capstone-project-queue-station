@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
@@ -41,6 +43,12 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   void _onTabSelected(NavTab tab) {
     setState(() {
       _selectedTab = tab;
+    });
+  }
+
+  void onManageQueue() {
+    setState(() {
+      _selectedTab = NavTab.queue;
     });
   }
 
@@ -116,6 +124,8 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 userProvider: newUserProvider,
                 menuItemRepository: context.read<MenuItemRepository>(),
                 menuCategoryRepository: context.read<MenuCategoryRepository>(),
+                addOnRepository: context.read<AddOnRepository>(),
+                sizingOptionRepository: context.read<SizingOptionRepository>(),
               );
             }
             prev.updateDependencies(newUserProvider);
@@ -143,9 +153,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
       child: Scaffold(
         body: IndexedStack(
           index: _getTabIndex(_selectedTab),
-          children: const [
-            DashboardScreen(),
-            ManageStoreScreen(),
+          children: [
+            DashboardScreen(onManageQueue: onManageQueue),
+            ManageStoreScreen(onManageQueue: onManageQueue),
             StoreQueueScreen(),
             StoreSettingsScreen(),
           ],

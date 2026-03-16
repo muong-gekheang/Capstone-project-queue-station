@@ -236,3 +236,20 @@ exports.deleteTableOnCascade = onDocumentDeleted(
     return Promise.all(deletePromises);
   },
 );
+
+exports.deleteMenuOnCascade = onDocumentDeleted(
+  "menu_categories/{menu_catId}",
+  async (event) => {
+    console.log("TRIGGER FIRED", event.params.table_catId);
+    const menuCategoryId = event.params.table_catId;
+
+    const menusRef = db
+      .collection("queue_tables")
+      .where("categoryId", "==", menuCategoryId);
+
+    const menusSnap = await menusRef.get();
+
+    const deletePromises = menusSnap.docs.map((doc) => doc.ref.delete());
+    return Promise.all(deletePromises);
+  },
+);

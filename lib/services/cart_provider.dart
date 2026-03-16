@@ -10,7 +10,7 @@ class CartProvider extends ChangeNotifier {
   List<OrderItem> get items => List.unmodifiable(currentOrder.inCart);
 
   void updateOrder(Order newOrder) {
-    notifyListeners(); 
+    notifyListeners();
     currentOrder = newOrder;
   }
 
@@ -34,7 +34,8 @@ class CartProvider extends ChangeNotifier {
           size: existing.size,
           note: existing.note,
           quantity: existing.quantity + newItem.quantity,
-          orderItemStatus: OrderItemStatus.pending
+          orderItemStatus: OrderItemStatus.pending,
+          orderId: '',
         );
       } else {
         currentOrder.inCart.add(newItem);
@@ -64,7 +65,6 @@ class CartProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   double get totalAmount {
     return currentOrder.inCart.fold(0.0, (sum, item) {

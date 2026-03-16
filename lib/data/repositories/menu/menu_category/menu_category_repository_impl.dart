@@ -21,9 +21,7 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
 
   @override
   Future<void> delete(String categoryId) async {
-    // How should we handle it?
-    // cuz each category connects to many menuItem
-    // await fireStore.collection('menu_item_categories').doc(categoryId).delete();
+    await fireStore.collection('menu_item_categories').doc(categoryId).delete();
   }
 
   @override

@@ -89,6 +89,9 @@ class MenuManagementContent extends StatelessWidget {
       child: Row(
         children: List.generate(vm.allCategories.length, (index) {
           final category = vm.allCategories[index];
+          if (vm.selectedCategory == null) {
+            vm.updateSelectedIndex(0);
+          }
           return Padding(
             padding: const EdgeInsets.only(right: 10),
             child: CategoryCardWidget(

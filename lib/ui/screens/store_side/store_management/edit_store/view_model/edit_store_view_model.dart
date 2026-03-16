@@ -28,13 +28,13 @@ class EditStoreViewModel extends ChangeNotifier {
     _restaurantSubscription = _restaurantService.streamRestaurant.listen(
       (restaurant) {
         if (_isDisposed) return;
+        debugPrint("Rest: ${restaurant?.name}");
         _currentRestaurant = restaurant;
         _isLoading = false;
-        notifyListeners(); // Updates the UI
+        notifyListeners();
       },
       onError: (error) {
         if (_isDisposed) return;
-        // Handle potential stream errors here
         _isLoading = false;
         notifyListeners();
       },
@@ -48,16 +48,27 @@ class EditStoreViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> onSave(File? selectedImage, String newStoreName) async {
+  Future<void> onSave(
+    File? selectedImage,
+    String newStoreName,
+    String newDescription,
+  ) async {
     _storeProfileService.setStoreProfileImage(selectedImage);
-    _storeProfileService.setStoreName(newStoreName);
+    if (_currentRestaurant != null) {
+      _restaurantService.updateRestaurant(
+        _currentRestaurant!.copyWith(
+          name: newStoreName,
+          description: newDescription,
+        ),
+      );
+    }
   }
 
   bool get isLoading => _isLoading;
 
-  String get storeName => _currentRestaurant?.name ?? "";
+  String get storeName => _currentRestaurant?.name ?? "Unknown";
 
   String get storeDescription => "";
 
-  String get adminEmail => _restaurantService.storeUser?.email ?? "";
+  String get adminEmail => _restaurantService.storeUser?.email ?? "Unknown";
 }

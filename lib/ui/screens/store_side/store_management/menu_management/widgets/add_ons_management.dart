@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/ui/theme/app_theme.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_add_on_menu.dart';
-
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 
@@ -23,7 +23,6 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
   @override
   void initState() {
     super.initState();
-    selectedAddOns = widget.existingMenu?.addOns.toList() ?? [];
   }
 
   bool get isAddDisabled {
@@ -31,10 +30,10 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
   }
 
   Widget existingAddOns() {
-    // Filter add-ons: if search is not empty, filter; else show all
+    var vm = context.read<MenuManagementViewModel>();
     final filteredAddOns = searchValue.trim().isEmpty
-        ? globalAddOns
-        : globalAddOns
+        ? vm.allAddOns
+        : vm.allAddOns
               .where(
                 (addOn) => addOn.name.toLowerCase().contains(
                   searchValue.toLowerCase(),
@@ -59,15 +58,17 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
               Checkbox(
                 value: isSelected,
                 onChanged: (value) {
-                  setState(() {
-                    if (value == true) {
-                      if (!selectedAddOns.any((s) => s.id == addOn.id)) {
+                  if (value == true) {
+                    if (!selectedAddOns.any((s) => s.id == addOn.id)) {
+                      setState(() {
                         selectedAddOns.add(addOn);
-                      }
-                    } else {
-                      selectedAddOns.removeWhere((s) => s.id == addOn.id);
+                      });
                     }
-                  });
+                  } else {
+                    setState(() {
+                      selectedAddOns.removeWhere((s) => s.id == addOn.id);
+                    });
+                  }
                 }, // checkbox also triggers parent
               ),
               Expanded(
@@ -85,33 +86,24 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
   }
 
   void onAdd() {
-    final existingAddOnIds =
-        widget.existingMenu?.addOns.map((a) => a.id).toSet() ?? {};
-
-    // Keep only the new add-ons that aren't already in the existing menu
-    final List<AddOn> addOnsToAdd = selectedAddOns
-        .where((addOn) => !existingAddOnIds.contains(addOn.id))
-        .toList();
-
-    Navigator.pop(context, addOnsToAdd);
+    Navigator.pop(context, selectedAddOns);
   }
 
   void onCreate() async {
+    var vm = context.read<MenuManagementViewModel>();
     final AddOn? newAddOn = await Navigator.push<AddOn>(
       context,
       MaterialPageRoute(builder: (context) => const AddNewAddOnMenu()),
     );
 
     if (newAddOn != null) {
-      setState(() {
-        globalAddOns.add(newAddOn);
-        selectedAddOns.add(newAddOn);
-      });
+      vm.addNewAddOn(newAddOn);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<MenuManagementViewModel>();
     return Padding(
       padding: EdgeInsets.all(16),
       child: Column(

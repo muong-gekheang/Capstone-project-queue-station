@@ -12,12 +12,6 @@ class StoreQueueHistoryCard extends StatelessWidget {
     return DateFormat('hh:mm a').format(date);
   }
 
-  String getUserName() {
-    return mockUsers
-        .firstWhere((user) => user.id == queueEntry.customerId)
-        .name;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -42,7 +36,7 @@ class StoreQueueHistoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      getUserName(),
+                      queueEntry.customerName ?? "Unknown",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(

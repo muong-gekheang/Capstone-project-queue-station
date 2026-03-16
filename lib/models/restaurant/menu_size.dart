@@ -13,4 +13,14 @@ class MenuSize {
       _$MenuSizeFromJson(json);
 
   Map<String, dynamic> toJson() => _$MenuSizeToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuSize &&
+          runtimeType == other.runtimeType &&
+          sizeOption == other.sizeOption;
+
+  @override
+  int get hashCode => Object.hash(price, sizeOption);
 }

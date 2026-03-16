@@ -15,8 +15,8 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/menu_ma
 import 'package:queue_station_app/ui/screens/store_side/store_queue_history/store_queue_history_screen.dart';
 
 class ManageStoreContent extends StatefulWidget {
-  const ManageStoreContent({super.key});
-
+  const ManageStoreContent({super.key, required this.onManageQueue});
+  final VoidCallback onManageQueue;
   @override
   State<ManageStoreContent> createState() => _ManageStoreContentState();
 }
@@ -318,13 +318,7 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           ),
           elevation: 0,
         ),
-        onPressed: () {
-          // Navigate to manage queue page
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => StoreQueueScreen()),
-          );
-        },
+        onPressed: widget.onManageQueue,
         child: const Text(
           'Manage Queue',
           style: TextStyle(

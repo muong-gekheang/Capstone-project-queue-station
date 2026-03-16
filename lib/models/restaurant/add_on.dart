@@ -8,11 +8,13 @@ class AddOn {
   final String name;
   double price;
   final String? image;
+  String restaurantId;
 
   AddOn({
     required this.id,
     required this.name,
     required this.price,
+    required this.restaurantId,
     this.image,
   });
 

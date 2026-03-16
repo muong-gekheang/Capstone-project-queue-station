@@ -8,6 +8,7 @@ import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
+import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_ons_management.dart';
@@ -17,7 +18,6 @@ import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_size_tile_widget.dart';
 import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
-import 'package:uuid/uuid.dart';
 
 class MenuForm extends StatefulWidget {
   final MenuItem? initialMenu; // null = Add, not null = Edit
@@ -38,21 +38,25 @@ class _MenuFormState extends State<MenuForm> {
   late TextEditingController _maxTimeController = TextEditingController();
 
   late String? selectedImageFile;
-  List<MenuSize> menuSizes = [];
-  List<AddOn> addOns = [];
-  List<int> addOnIds = [];
-  MenuItemCategory? selectedCategory;
+
   final addCategory = MenuItemCategory(id: "-1", name: ' + Add New');
 
   // Controllers for SizesPriceList
   final Map<MenuSize, TextEditingController> menuSizeController = {};
   final Map<AddOn, TextEditingController> addOnController = {};
 
+  MenuItemCategory? selectedCategory;
+  List<AddOn> selectedAddOns = [];
+  List<MenuSize> availableMenuSizes = [];
+
   @override
   void initState() {
     super.initState();
+
+    var vm = context.read<MenuManagementViewModel>();
     final menu = widget.initialMenu;
 
+    selectedCategory = vm.selectedCategory;
     _nameController.text = menu?.name ?? '';
     _descriptionController.text = menu?.description ?? '';
     _minTimeController = TextEditingController(
@@ -62,27 +66,11 @@ class _MenuFormState extends State<MenuForm> {
       text: menu?.maxPrepTimeMinutes.toString() ?? '',
     );
 
-    if (menu != null) {
-      selectedCategory = mockMenuCategories.firstWhere(
-        (c) => c.id == menu.category.id,
-        orElse: () => mockMenuCategories.isNotEmpty
-            ? mockMenuCategories.first
-            : MenuItemCategory(id: Uuid().v4(), name: 'Unknown'),
-      );
-    } else {
-      selectedCategory = mockMenuCategories.isNotEmpty
-          ? mockMenuCategories.first
-          : MenuItemCategory(id: Uuid().v4(), name: 'Unknown');
-    }
-
     if (menu?.image != null && menu!.image!.isNotEmpty) {
       selectedImageFile = menu.image;
     } else {
       selectedImageFile = null;
     }
-
-    menuSizes = menu?.sizes.toList() ?? [];
-    addOns = menu?.addOns ?? [];
   }
 
   String? _nullValidator(String? value) {
@@ -116,90 +104,13 @@ class _MenuFormState extends State<MenuForm> {
     return null;
   }
 
-  void onSave() {
-    if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fix the errors in the form")),
-      );
-      return;
-    }
-
-    final String name = _nameController.text.trim();
-    final String description = _descriptionController.text.trim();
-    // final double? parsedPrice = double.tryParse(_priceController.text.trim());
-    final int minPrep = int.tryParse(_minTimeController.text.trim()) ?? 0;
-    final int maxPrep = int.tryParse(_maxTimeController.text.trim()) ?? 0;
-
-    if (selectedCategory == null || selectedCategory!.id == "-1") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a valid category")),
-      );
-      return;
-    }
-
-    if (minPrep > maxPrep) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Min preparation time cannot be greater than max time"),
-        ),
-      );
-      return; // prevent saving
-    }
-
-    // Update menuSizes price from controllers
-    for (var menuSize in menuSizes) {
-      final controller = menuSizeController[menuSize];
-      if (controller != null) {
-        final price = double.tryParse(controller.text);
-        if (price != null) {
-          menuSize.price = price;
-        }
-      }
-    }
-
-    for (var add in addOns) {
-      final controller = addOnController[add];
-      if (controller != null) {
-        final price = double.tryParse(controller.text);
-        if (price != null) {
-          add.price = price;
-        }
-      }
-    }
-
-    final MenuItem newMenu = MenuItem(
-      id: Uuid().v4(),
-      name: name,
-      description: description,
-      category: selectedCategory!,
-      minPrepTimeMinutes: minPrep,
-      maxPrepTimeMinutes: maxPrep,
-      sizes: menuSizes,
-      addOns: addOns,
-      restaurantId: '',
-    );
-
-    Navigator.pop(context, newMenu);
-  }
-
-  Future<void> onEdit() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      setState(() {
-        selectedImageFile = image.path;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var vm = context.watch<MenuManagementViewModel>();
     return SingleChildScrollView(
       child: Column(
         children: [
-          ProfileEditorWidget(onEdit: onEdit, imagePath: selectedImageFile),
+          ProfileEditorWidget(onEdit: () {}, imagePath: selectedImageFile),
           Form(
             key: _formKey,
             child: Column(
@@ -236,7 +147,8 @@ class _MenuFormState extends State<MenuForm> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          (vm.allCategories.isNotEmpty)
+                          (vm.allCategories.length > 1 &&
+                                  selectedCategory != null)
                               ? DropdownButtonFormField<MenuItemCategory>(
                                   initialValue: selectedCategory,
                                   items: [
@@ -269,10 +181,7 @@ class _MenuFormState extends State<MenuForm> {
                                             ),
                                           );
                                       if (newCategory != null) {
-                                        mockMenuCategories.add(newCategory);
-                                        setState(() {
-                                          selectedCategory = newCategory;
-                                        });
+                                        vm.addNewCategory(newCategory);
                                       }
                                     } else {
                                       setState(() {
@@ -299,38 +208,63 @@ class _MenuFormState extends State<MenuForm> {
                                     ),
                                   ),
                                 )
-                              : ButtonWidget(
-                                  title: '+ Add Category',
-                                  onPressed: () async {
-                                    final newCategory =
-                                        await showModalBottomSheet<
-                                          MenuItemCategory
-                                        >(
-                                          context: context,
-                                          builder: (context) => Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(
-                                                context,
-                                              ).viewInsets.bottom,
-                                            ),
-                                            child: AddNewCategory(),
+                              : Column(
+                                  spacing: 10,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      "Add at least 2 categories",
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.error,
+                                      ),
+                                    ),
+                                    Row(
+                                      spacing: 10,
+                                      children: [
+                                        ...vm.allCategories.map(
+                                          (e) => Chip(label: Text(e.name)),
+                                        ),
+                                        ButtonWidget(
+                                          title: '+ Add Category',
+                                          onPressed: () async {
+                                            final newCategory =
+                                                await showModalBottomSheet<
+                                                  MenuItemCategory
+                                                >(
+                                                  context: context,
+                                                  builder: (context) => Padding(
+                                                    padding: EdgeInsets.only(
+                                                      bottom: MediaQuery.of(
+                                                        context,
+                                                      ).viewInsets.bottom,
+                                                    ),
+                                                    child: AddNewCategory(),
+                                                  ),
+                                                );
+                                            if (newCategory != null) {
+                                              vm.addNewCategory(newCategory);
+                                            }
+                                          },
+                                          backgroundColor: Color.fromRGBO(
+                                            255,
+                                            104,
+                                            53,
+                                            1,
                                           ),
-                                        );
-                                    if (newCategory != null) {
-                                      vm.addNewCategory(newCategory);
-                                    }
-                                  },
-                                  backgroundColor: Color.fromRGBO(
-                                    255,
-                                    104,
-                                    53,
-                                    1,
-                                  ),
-                                  textColor: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary,
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  borderRadius: 10,
+                                          textColor: Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                          ),
+                                          borderRadius: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                         ],
                       ),
@@ -357,7 +291,7 @@ class _MenuFormState extends State<MenuForm> {
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 MenuSizeTileWidget<MenuSize>(
-                  items: menuSizes,
+                  items: availableMenuSizes,
                   controllers: menuSizeController,
                   getName: (item) => item.sizeOption.name,
                   getPrice: (item) => item.price,
@@ -368,7 +302,7 @@ class _MenuFormState extends State<MenuForm> {
                   },
                   onDelete: (item) {
                     setState(() {
-                      menuSizes.remove(item);
+                      availableMenuSizes.remove(item);
                       menuSizeController.remove(item);
                     });
                   },
@@ -381,11 +315,14 @@ class _MenuFormState extends State<MenuForm> {
                     title: 'Add Size',
                     onPressed: () async {
                       final returnedMenuSizes =
-                          await showModalBottomSheet<List<SizeOption>>(
+                          await showModalBottomSheet<List<MenuSize>>(
                             context: context,
                             builder: (context) {
-                              return AddSizeScreen(
-                                existingMenu: widget.initialMenu,
+                              return ChangeNotifierProvider.value(
+                                value: vm,
+                                child: AddSizeScreen(
+                                  selectedMenuSizes: availableMenuSizes,
+                                ),
                               );
                             },
                           );
@@ -393,12 +330,11 @@ class _MenuFormState extends State<MenuForm> {
                       if (returnedMenuSizes != null &&
                           returnedMenuSizes.isNotEmpty) {
                         setState(() {
-                          // Convert MenuSizeOption -> MenuSize with default price 0
-                          menuSizes.addAll(
-                            returnedMenuSizes.map(
-                              (e) => MenuSize(sizeOption: e, price: 0),
-                            ),
-                          );
+                          for (var menuSize in returnedMenuSizes) {
+                            if (!availableMenuSizes.contains(menuSize)) {
+                              availableMenuSizes.add(menuSize);
+                            }
+                          }
                         });
                       }
                     },
@@ -417,10 +353,10 @@ class _MenuFormState extends State<MenuForm> {
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 AddOnTileWidget(
-                  addOns: addOns,
+                  addOns: selectedAddOns,
                   onDelete: (addOn) {
                     setState(() {
-                      addOns.remove(addOn);
+                      selectedAddOns.remove(addOn);
                     });
                   },
                 ),
@@ -435,17 +371,18 @@ class _MenuFormState extends State<MenuForm> {
                           await showModalBottomSheet<List<AddOn>>(
                             context: context,
                             builder: (BuildContext context) {
-                              return AddOnsManagement(
-                                existingMenu: widget.initialMenu,
+                              return ChangeNotifierProvider.value(
+                                value: vm,
+                                child: AddOnsManagement(
+                                  existingMenu: widget.initialMenu,
+                                ),
                               );
                             },
                           );
 
                       if (newAddOns != null) {
                         setState(() {
-                          for (AddOn addOn in newAddOns) {
-                            addOns.add(addOn);
-                          }
+                          selectedAddOns = newAddOns;
                         });
                       }
                     },
@@ -474,7 +411,19 @@ class _MenuFormState extends State<MenuForm> {
                       ),
                       ButtonWidget(
                         title: 'Save',
-                        onPressed: onSave,
+                        onPressed:
+                            (selectedCategory != null &&
+                                availableMenuSizes.isNotEmpty)
+                            ? () => widget.onSubmit(
+                                MenuItem(
+                                  id: uuid.v4(),
+                                  name: _nameController.text,
+                                  description: _descriptionController.text,
+                                  categoryId: selectedCategory!.id,
+                                  restaurantId: '',
+                                ),
+                              )
+                            : null,
                         backgroundColor: AppTheme.primaryColor,
                         textColor: AppTheme.naturalWhite,
                         padding: const EdgeInsets.symmetric(

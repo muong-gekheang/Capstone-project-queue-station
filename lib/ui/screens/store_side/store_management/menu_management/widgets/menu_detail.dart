@@ -75,7 +75,7 @@ class MenuDetail extends StatelessWidget {
           leadingIcon: Icons.delete,
           title: 'Delete',
           onPressed: () {
-            vm.deleteMenu(menu);
+            vm.removeMenuItem(menu);
             Navigator.pop(context);
           },
           backgroundColor: const Color.fromRGBO(230, 57, 70, 1),

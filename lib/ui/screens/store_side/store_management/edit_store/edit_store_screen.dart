@@ -6,13 +6,16 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/edit_st
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/widgets/edit_store_content.dart';
 
 class EditStoreScreen extends StatelessWidget {
-  const EditStoreScreen({super.key});
+  final RestaurantService restaurantService;
+  final StoreProfileService storeProfileService;
+  const EditStoreScreen({
+    super.key,
+    required this.restaurantService,
+    required this.storeProfileService,
+  });
 
   @override
   Widget build(BuildContext context) {
-    RestaurantService restaurantService = context.read<RestaurantService>();
-    StoreProfileService storeProfileService = context
-        .read<StoreProfileService>();
     return ChangeNotifierProvider(
       create: (_) => EditStoreViewModel(
         restaurantService: restaurantService,

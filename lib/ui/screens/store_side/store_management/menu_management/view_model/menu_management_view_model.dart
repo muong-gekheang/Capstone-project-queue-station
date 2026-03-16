@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
@@ -13,6 +12,8 @@ class MenuManagementViewModel extends ChangeNotifier {
 
   StreamSubscription<List<MenuItem>>? _menuSubscription;
   StreamSubscription<List<MenuItemCategory>>? _menuCategorySubscription;
+  StreamSubscription<List<AddOn>>? _addOnSubscription;
+  StreamSubscription<List<SizeOption>>? _sizeOptionSubscription;
 
   bool _isLoading = true;
   bool _isDisposed = false;
@@ -20,6 +21,8 @@ class MenuManagementViewModel extends ChangeNotifier {
   // --- State Variables ---
   List<MenuItem> _allMenuItems = [];
   List<MenuItemCategory> _allCategories = [];
+  List<AddOn> _allAddOns = [];
+  List<SizeOption> _sizingOptions = [];
   int _selectedIndex = 0;
   String _selectedCategoryId = '';
   String _searchQuery = '';
@@ -27,8 +30,17 @@ class MenuManagementViewModel extends ChangeNotifier {
   // --- Getters ---
   List<MenuItem> get allMenuItems => _allMenuItems;
   List<MenuItemCategory> get allCategories => _allCategories;
+  List<AddOn> get allAddOns => _allAddOns;
+  List<SizeOption> get sizeOptions => _sizingOptions;
   int get selectedIndex => _selectedIndex;
   String get selectedCategoryId => _selectedCategoryId;
+  MenuItemCategory? get selectedCategory {
+    for (var cat in _allCategories) {
+      if (cat.id == _selectedCategoryId) return cat;
+    }
+    return null;
+  }
+
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
 
@@ -70,12 +82,42 @@ class MenuManagementViewModel extends ChangeNotifier {
         notifyListeners();
       },
     );
+
+    _addOnSubscription = _menuService.streamAddOns.listen(
+      (addOns) {
+        if (_isDisposed) return;
+        _allAddOns = addOns;
+        _isLoading = false;
+        notifyListeners(); // Updates the UI
+      },
+      onError: (error) {
+        if (_isDisposed) return;
+        // Handle potential stream errors here
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+
+    _sizeOptionSubscription = _menuService.streamSizeOptions.listen(
+      (data) {
+        if (_isDisposed) return;
+        _sizingOptions = data;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
   }
 
   @override
   void dispose() {
     _menuSubscription?.cancel();
     _menuCategorySubscription?.cancel();
+    _addOnSubscription?.cancel();
+    _sizeOptionSubscription?.cancel();
     _isDisposed = true;
     super.dispose();
   }
@@ -90,7 +132,7 @@ class MenuManagementViewModel extends ChangeNotifier {
   // --- Data Piping (State Setters) ---
   void updateSelectedIndex(int index) {
     _selectedIndex = index;
-    _selectedCategoryId = mockMenuCategories[index].id;
+    _selectedCategoryId = _allCategories[index].id;
     notifyListeners();
   }
 
@@ -112,15 +154,7 @@ class MenuManagementViewModel extends ChangeNotifier {
   }
 
   void toggleMenuAvailability(MenuItem menu, bool isAvailable) {
-    // Logic Piping: We create a modified copy and send it to the service
-    // menu.isAvailable = isAvailable; // If MenuItem is mutable
     _menuService.updateMenuItem(menu);
-    // Note: notifyListeners() isn't needed here because the
-    // stream listener above will catch the update and call it for us!
-  }
-
-  void deleteMenu(MenuItem menu) {
-    _menuService.deleteMenuItem(menu);
   }
 
   void removeMenuItem(MenuItem item) {
@@ -133,36 +167,16 @@ class MenuManagementViewModel extends ChangeNotifier {
 
   void addNewCategory(MenuItemCategory newCategory) {
     _menuService.addMenuCategory(newCategory);
-  }
-
-  // --- Subscreen State Piping ---
-  List<AddOn> _tempSelectedAddOns = [];
-  final List<SizeOption> _tempSelectedSizes = [];
-
-  List<AddOn> get tempSelectedAddOns => _tempSelectedAddOns;
-  List<SizeOption> get tempSelectedSizes => _tempSelectedSizes;
-
-  void setInitialAddOns(List<AddOn> initial) {
-    _tempSelectedAddOns = List.from(initial);
+    _selectedCategoryId = newCategory.id;
     notifyListeners();
   }
 
-  void toggleAddOn(AddOn addOn) {
-    if (_tempSelectedAddOns.contains(addOn)) {
-      _tempSelectedAddOns.remove(addOn);
-    } else {
-      _tempSelectedAddOns.add(addOn);
-    }
-    notifyListeners();
+  void addNewAddOn(AddOn newAddon) {
+    _menuService.addAddOn(newAddon);
   }
 
-  void saveAddOnsToMenu(MenuItem menu) {
-    MenuItem newMenu = menu.copyWith(
-      addOnIds: _tempSelectedAddOns.map((e) => e.id).toList(),
-    );
-    _tempSelectedAddOns.clear();
-
-    _menuService.updateMenuItem(newMenu);
+  void addNewSizeOption(SizeOption newSizeOption) {
+    _menuService.addSizeOption(newSizeOption);
   }
 
   double getCheapestPrice(MenuItem menu) {

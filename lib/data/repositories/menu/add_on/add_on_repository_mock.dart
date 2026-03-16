@@ -72,7 +72,7 @@ class AddOnRepositoryMock implements AddOnRepository {
   }
 
   @override
-  Stream<List<AddOn>> watchAllAddOn() {
+  Stream<List<AddOn>> watchAllAddOn(String restId) {
     // TODO: implement watchAllAddOn
     throw UnimplementedError();
   }

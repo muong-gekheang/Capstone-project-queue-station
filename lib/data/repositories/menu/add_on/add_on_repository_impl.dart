@@ -195,9 +195,10 @@ class AddOnRepositoryImpl implements AddOnRepository {
   }
 
   @override
-  Stream<List<AddOn>> watchAllAddOn() {
+  Stream<List<AddOn>> watchAllAddOn(String restId) {
     return fireStore
         .collection('add_ons')
+        .where('restaurantId', isEqualTo: restId)
         .orderBy('name')
         .snapshots()
         .map(

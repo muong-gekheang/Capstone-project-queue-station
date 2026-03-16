@@ -25,8 +25,21 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception("This user account doesn't exist");
       }
       return credential.user;
-    } catch (err) {
-      debugPrint(err.toString());
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          debugPrint('No user found for that email.');
+          break;
+        case 'wrong-password':
+          debugPrint('Wrong password provided.');
+          break;
+        case 'invalid-credential':
+          debugPrint('Credential is malformed or expired.');
+          break;
+        case 'user-disabled':
+          debugPrint('This account has been disabled.');
+          break;
+      }
       return null;
     }
   }

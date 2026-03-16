@@ -6,7 +6,8 @@ import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/das
 import 'package:queue_station_app/ui/screens/store_side/dashboard/widgets/dashboard_content.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, required this.onManageQueue});
+  final VoidCallback onManageQueue;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class DashboardScreen extends StatelessWidget {
         queueService: queueService,
         tableService: tableService,
       ),
-      child: DashboardContent(),
+      child: DashboardContent(onManageQueue: onManageQueue),
     );
   }
 }

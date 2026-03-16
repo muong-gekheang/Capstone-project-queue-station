@@ -30,7 +30,7 @@ class RestaurantService {
           .watchCurrent(restId)
           .listen(
             (data) {
-              print("Data:${data?.isOpen}");
+              print("Data:${data?.name}");
               _controller.add(data);
               _currentRest = data;
             },
@@ -48,6 +48,10 @@ class RestaurantService {
     if (_currentRest != null) {
       _restaurantRepository.update(_currentRest!.copyWith(isOpen: isOpen));
     }
+  }
+
+  void updateRestaurant(Restaurant newRestaurant) {
+    _restaurantRepository.update(newRestaurant);
   }
 
   StoreUser? get storeUser => _userProvider.asStoreUser;

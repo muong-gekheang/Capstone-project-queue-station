@@ -8,7 +8,9 @@ class StoreQueueHistoryViewModel extends ChangeNotifier {
   final QueueService _queueService;
 
   StoreQueueHistoryViewModel({required QueueService queueService})
-    : _queueService = queueService;
+    : _queueService = queueService {
+    loadMore();
+  }
 
   // State variables
   int _selectedIndex = 0;
@@ -20,7 +22,6 @@ class StoreQueueHistoryViewModel extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   SortOption? get selectedSortOption => _selectedSortOption;
 
-  // Logic to update state and notify UI
   void setSelectedIndex(int index) {
     _selectedIndex = index;
     notifyListeners();
@@ -76,7 +77,7 @@ class StoreQueueHistoryViewModel extends ChangeNotifier {
     final today = DateTime(now.year, now.month, now.day);
 
     results = results.where((entry) {
-      final entryDate = entry.joinTime; // Assuming entry has a DateTime field
+      final entryDate = entry.joinTime;
 
       switch (_selectedIndex) {
         case 1: // Today
@@ -97,6 +98,7 @@ class StoreQueueHistoryViewModel extends ChangeNotifier {
     } else if (_selectedSortOption == SortOption.oldest) {
       results.sort((a, b) => a.joinTime.compareTo(b.joinTime));
     }
+    debugPrint("Hist: ${results.length}");
 
     return results;
   }

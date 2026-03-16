@@ -111,6 +111,12 @@ class QueueEntryRepositoryMock implements QueueEntryRepository {
     // TODO: implement updateStatus
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<QueueEntry>> getTodayFinishedQueue(String restId) {
+    // TODO: implement getTodayFinishedQueue
+    throw UnimplementedError();
+  }
 }
 
 List<QueueEntry> mockQueueEntries = [

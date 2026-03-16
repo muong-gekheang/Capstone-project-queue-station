@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/customer.dart';
@@ -70,8 +71,41 @@ class AuthService {
     return user;
   }
 
-  void signOut(String email, String password) {
+  void signOut() {
     _authRepository.signOut();
+    _userProvider.updateUser(null);
+  }
+
+  Future<void> restoreSession() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      _userProvider.setRestored();
+      return;
+    }
+
+    debugPrint("Restore: $firebaseUser");
+
+    // Re-use your existing login logic to repopulate UserProvider
+    String? role = await getUserRole(firebaseUser);
+    if (role == null || role.isEmpty) return;
+
+    switch (role) {
+      case "customer":
+        Customer? customer = await _customerRepository.getUserById(
+          firebaseUser.uid,
+        );
+        if (customer == null) return;
+        _userProvider.updateUser(customer);
+        break;
+      case "store":
+        StoreUser? storeUser = await _storeUserRepository.getUserById(
+          firebaseUser.uid,
+        );
+        if (storeUser == null) return;
+        _userProvider.updateUser(storeUser);
+        break;
+    }
+    _userProvider.setRestored();
   }
 
   void updateDependencies({

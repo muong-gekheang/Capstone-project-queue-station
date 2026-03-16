@@ -103,6 +103,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       quantity: _quantity,
       note: _noteController.text.isNotEmpty ? _noteController.text : null,
       orderItemStatus: OrderItemStatus.pending,
+      orderId: '',
     );
 
     if (widget.cartItem == null) {

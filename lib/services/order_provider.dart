@@ -21,6 +21,7 @@ class OrderProvider with ChangeNotifier {
     return Order(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       timestamp: DateTime.now(),
+      restaurantId: '',
     );
   }
 

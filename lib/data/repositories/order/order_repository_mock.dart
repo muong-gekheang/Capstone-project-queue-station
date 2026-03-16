@@ -98,14 +98,14 @@ class OrderRepositoryMock implements OrderRepository {
   }
 
   @override
-  Stream<List<Order>> watchAllOrder() {
-    // TODO: implement watchAllOrder
+  Stream<Order?> watchOrderById(String orderId) {
+    // TODO: implement watchOrderById
     throw UnimplementedError();
   }
 
   @override
-  Stream<Order?> watchOrderById(String orderId) {
-    // TODO: implement watchOrderById
+  Stream<List<Order>> watchAllOrder(String restId) {
+    // TODO: implement watchAllOrder
     throw UnimplementedError();
   }
 }
@@ -127,17 +127,24 @@ List<Order> mockOrders = [
         menuItemPrice: mockMenuItems[0].sizes.first.price,
         quantity: 1,
         orderItemStatus: OrderItemStatus.pending,
+        orderId: '',
       ),
       OrderItem(
         menuItemId: mockMenuItems[4].id, // Cola
         item: mockMenuItems[4],
-        size: SizeOption(name: 'Medium'), // default size
+        size: SizeOption(
+          name: 'Medium',
+          id: '',
+          restaurantId: '',
+        ), // default size
         addOns: {},
         menuItemPrice: 0.0,
         quantity: 2,
         orderItemStatus: OrderItemStatus.pending,
+        orderId: '',
       ),
     ],
+    restaurantId: '',
   ),
   Order(
     id: Uuid().v4(),
@@ -154,7 +161,9 @@ List<Order> mockOrders = [
         menuItemPrice: mockMenuItems[1].sizes.first.price,
         quantity: 1,
         orderItemStatus: OrderItemStatus.pending,
+        orderId: '',
       ),
     ],
+    restaurantId: '',
   ),
 ];

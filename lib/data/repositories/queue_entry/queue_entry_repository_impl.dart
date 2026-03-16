@@ -156,6 +156,39 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   }
 
   @override
+  Future<List<QueueEntry>> getTodayFinishedQueue(String restaurantId) async {
+    try {
+      final now = DateTime.now();
+      final startOfToday = DateTime(now.year, now.month, now.day);
+
+      // 2. Build the query
+      var query = fireStore
+          .collection('queue_entries')
+          .where('restId', isEqualTo: restaurantId)
+          .where(
+            'status',
+            whereIn: [QueueStatus.completed.name, QueueStatus.serving.name],
+          ) // Only finished
+          .where(
+            'joinTime',
+            isGreaterThanOrEqualTo: startOfToday.toIso8601String(),
+          )
+          .orderBy('joinTime', descending: true);
+
+      final snap = await query.get();
+
+      return snap.docs.map((doc) {
+        final json = Map<String, dynamic>.from(doc.data());
+        json['id'] ??= doc.id;
+        return QueueEntry.fromJson(json);
+      }).toList();
+    } catch (err) {
+      debugPrint("ERROR in getTodayFinishedQueue: $err");
+      return [];
+    }
+  }
+
+  @override
   Future<(List<QueueEntry>, DocumentSnapshot<Map<String, dynamic>>?)>
   getQueueHistory(
     String restaurantId,
@@ -168,7 +201,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
           .where('restId', isEqualTo: restaurantId)
           .where(
             'status',
-            whereIn: [QueueStatus.completed.name, QueueStatus.serving.name],
+            whereIn: [QueueStatus.completed.name, QueueStatus.noShow.name],
           )
           .orderBy('joinTime', descending: true)
           .limit(limit);

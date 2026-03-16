@@ -9,20 +9,50 @@ import 'package:uuid/uuid.dart';
 /// GLOBAL SIZES
 /// ----------------------------
 final List<SizeOption> globalSizes = [
-  SizeOption(name: 'Small'),
-  SizeOption(name: 'Medium'),
-  SizeOption(name: 'Large'),
+  SizeOption(name: 'Small', id: '', restaurantId: ''),
+  SizeOption(name: 'Medium', id: '', restaurantId: ''),
+  SizeOption(name: 'Large', id: '', restaurantId: ''),
 ];
 
 /// ----------------------------
 /// GLOBAL SIZES
 /// ----------------------------
 final List<AddOn> globalAddOns = [
-  AddOn(name: 'Extra Cheese', price: 1.50, image: "", id: Uuid().v4()),
-  AddOn(name: 'Bacon', price: 2.00, image: "", id: Uuid().v4()),
-  AddOn(name: 'Avocado', price: 2.50, image: "", id: Uuid().v4()),
-  AddOn(name: 'Extra Sauce', price: 0.75, image: "", id: Uuid().v4()),
-  AddOn(name: 'Fried Egg', price: 1.25, image: "", id: Uuid().v4()),
+  AddOn(
+    name: 'Extra Cheese',
+    price: 1.50,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Bacon',
+    price: 2.00,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Avocado',
+    price: 2.50,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Extra Sauce',
+    price: 0.75,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Fried Egg',
+    price: 1.25,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
 ];
 
 /// ----------------------------
@@ -62,26 +92,36 @@ final List<AddOn> mockMenuAddOns = [
     price: 0.99,
     image: "assets/images/cheese.png",
     id: Uuid().v4(),
+    restaurantId: '',
   ),
   AddOn(
     name: 'Bacon Strips',
     price: 1.49,
     image: "assets/images/bacon.png",
     id: Uuid().v4(),
+    restaurantId: '',
   ),
   AddOn(
     name: 'Avocado',
     price: 1.29,
     image: "assets/images/avocado.png",
     id: Uuid().v4(),
+    restaurantId: '',
   ),
   AddOn(
     name: 'Extra Sauce',
     price: 0.59,
     image: "assets/images/sauces.png",
     id: Uuid().v4(),
+    restaurantId: '',
   ),
-  AddOn(name: 'Onion Rings', price: 1.99, image: "", id: Uuid().v4()),
+  AddOn(
+    name: 'Onion Rings',
+    price: 1.99,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
 ];
 
 /// ----------------------------
@@ -185,8 +225,20 @@ final MenuItem cola =
         restaurantId: '',
       )
       ..addOns.addAll([
-        AddOn(name: 'Extra Ice', price: 0.25, image: "", id: Uuid().v4()),
-        AddOn(name: 'Lemon Slice', price: 0.10, image: "", id: Uuid().v4()),
+        AddOn(
+          name: 'Extra Ice',
+          price: 0.25,
+          image: "",
+          id: Uuid().v4(),
+          restaurantId: '',
+        ),
+        AddOn(
+          name: 'Lemon Slice',
+          price: 0.10,
+          image: "",
+          id: Uuid().v4(),
+          restaurantId: '',
+        ),
       ]);
 final MenuItem veggieWrap =
     MenuItem(

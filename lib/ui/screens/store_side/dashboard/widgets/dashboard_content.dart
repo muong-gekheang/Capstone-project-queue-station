@@ -6,7 +6,8 @@ import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/das
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 
 class DashboardContent extends StatefulWidget {
-  const DashboardContent({super.key});
+  const DashboardContent({super.key, required this.onManageQueue});
+  final VoidCallback onManageQueue;
 
   @override
   State<DashboardContent> createState() => _DashboardContentState();
@@ -52,7 +53,6 @@ class _DashboardContentState extends State<DashboardContent> {
                 MaterialPageRoute(builder: (context) => NotificationScreen()),
               );
             },
-            // onPressed: widget.onManageQueuePressed,
           ),
         ],
       ),
@@ -93,15 +93,7 @@ class _DashboardContentState extends State<DashboardContent> {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to manage queue page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StoreQueueScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: widget.onManageQueue,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0D47A1),
                         shape: RoundedRectangleBorder(

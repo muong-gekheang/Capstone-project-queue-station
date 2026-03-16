@@ -229,8 +229,12 @@ class CartScreen extends StatelessWidget {
                                 addOns: cartItem.addOns,
                                 size: cartItem.size,
                                 orderItemStatus: OrderItemStatus.pending,
+                                orderId: '',
                               );
-                              cartProvider.updateCartItem(cartItem, updatedItem);
+                              cartProvider.updateCartItem(
+                                cartItem,
+                                updatedItem,
+                              );
                             },
                             onDecrease: () {
                               if (cartItem.quantity > 1) {
@@ -242,8 +246,12 @@ class CartScreen extends StatelessWidget {
                                   addOns: cartItem.addOns,
                                   size: cartItem.size,
                                   orderItemStatus: OrderItemStatus.pending,
+                                  orderId: '',
                                 );
-                                cartProvider.updateCartItem(cartItem, updatedItem);
+                                cartProvider.updateCartItem(
+                                  cartItem,
+                                  updatedItem,
+                                );
                               }
                             },
                           ),

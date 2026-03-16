@@ -41,6 +41,7 @@ class TextFieldWidget extends StatelessWidget {
           controller: textController,
           onChanged: onChanged,
           decoration: InputDecoration(
+            floatingLabelBehavior: FloatingLabelBehavior.always,
             hintText: hintText,
             prefix: prefixText != null
                 ? Padding(

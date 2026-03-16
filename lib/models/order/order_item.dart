@@ -20,6 +20,7 @@ class OrderItem {
   final int quantity;
   final String? note;
   final OrderItemStatus orderItemStatus;
+  String orderId;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   final MenuItem item;
@@ -32,6 +33,7 @@ class OrderItem {
     required this.quantity,
     this.note,
     required this.orderItemStatus,
+    required this.orderId,
     Map<String, double>? addOns,
     String? sizeName,
     MenuItem? item,
@@ -39,10 +41,13 @@ class OrderItem {
   }) : addOns = addOns ?? {},
        sizeName = sizeName ?? size?.name ?? 'Regular',
        item = item ?? _placeholderMenuItem(menuItemId),
-       size = size ?? SizeOption(name: sizeName ?? 'Regular');
+       size =
+           size ??
+           SizeOption(name: sizeName ?? 'Regular', id: '', restaurantId: '');
 
   OrderItem copyWith({
     String? menuItemId,
+    String? orderId,
     Map<String, double>? addOns,
     double? menuItemPrice,
     String? sizeName,
@@ -62,6 +67,7 @@ class OrderItem {
       sizeName: sizeName ?? this.sizeName,
       size: size ?? this.size,
       item: item ?? this.item,
+      orderId: orderId ?? this.orderId,
     );
   }
 

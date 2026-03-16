@@ -7,6 +7,7 @@ part 'order.g.dart';
 @JsonSerializable(explicitToJson: true)
 class Order {
   final String id;
+  String restaurantId;
 
   @JsonKey(defaultValue: <String>[])
   final List<String> orderedIds;
@@ -23,6 +24,7 @@ class Order {
   Order({
     required this.id,
     required this.timestamp,
+    required this.restaurantId,
     List<String>? orderedIds,
     List<String>? inCartIds,
     List<OrderItem>? ordered,
@@ -39,6 +41,7 @@ class Order {
     List<OrderItem>? ordered,
     List<OrderItem>? inCart,
     DateTime? timestamp,
+    String? restaurantId,
   }) {
     return Order(
       id: id ?? this.id,
@@ -47,6 +50,7 @@ class Order {
       inCartIds: inCartIds ?? List<String>.from(this.inCartIds),
       ordered: ordered ?? List<OrderItem>.from(this.ordered),
       inCart: inCart ?? List<OrderItem>.from(this.inCart),
+      restaurantId: restaurantId ?? this.restaurantId,
     );
   }
 

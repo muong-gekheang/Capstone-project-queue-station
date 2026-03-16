@@ -24,20 +24,15 @@ class _EditStoreContentState extends State<EditStoreContent> {
 
   void onSave() async {
     EditStoreViewModel editStoreViewModel = context.read<EditStoreViewModel>();
-    await editStoreViewModel.onSave(_selectedImage, _storeNameController.text);
-    CustomSuccessSnackbar.show(context, "Added Successfully");
-    if (mounted) {
-      Navigator.of(context).pop(true); // Indicate success
+    await editStoreViewModel.onSave(
+      _selectedImage,
+      _storeNameController.text,
+      _storeDescriptionController.text,
+    );
+    if (context.mounted) {
+      CustomSuccessSnackbar.show(context, "Added Successfully");
+      Navigator.of(context).pop(true);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    EditStoreViewModel editStoreViewModel = context.read<EditStoreViewModel>();
-    _storeNameController.text = editStoreViewModel.storeName;
-    _storeDescriptionController.text = editStoreViewModel.storeDescription;
-    _storeEmailController.text = editStoreViewModel.adminEmail;
   }
 
   @override
@@ -51,6 +46,9 @@ class _EditStoreContentState extends State<EditStoreContent> {
   @override
   Widget build(BuildContext context) {
     EditStoreViewModel editStoreViewModel = context.watch<EditStoreViewModel>();
+    _storeNameController.text = editStoreViewModel.storeName;
+    _storeDescriptionController.text = editStoreViewModel.storeDescription;
+    _storeEmailController.text = editStoreViewModel.adminEmail;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
