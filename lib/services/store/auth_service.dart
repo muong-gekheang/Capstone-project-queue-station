@@ -71,6 +71,14 @@ class AuthService {
     return user;
   }
 
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    await _authRepository.changePassword(
+      _userProvider.asStoreUser!.email,
+      oldPassword,
+      newPassword,
+    );
+  }
+
   void signOut() {
     _authRepository.signOut();
     _userProvider.updateUser(null);

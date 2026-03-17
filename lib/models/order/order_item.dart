@@ -11,6 +11,7 @@ enum OrderItemStatus { pending, accepted, rejected, cancelled }
 @JsonSerializable(explicitToJson: true)
 class OrderItem {
   final String menuItemId;
+  final String id;
 
   @JsonKey(fromJson: _addOnsFromJson, toJson: _addOnsToJson)
   final Map<String, double> addOns;
@@ -38,6 +39,7 @@ class OrderItem {
     String? sizeName,
     MenuItem? item,
     SizeOption? size,
+    required this.id,
   }) : addOns = addOns ?? {},
        sizeName = sizeName ?? size?.name ?? 'Regular',
        item = item ?? _placeholderMenuItem(menuItemId),
@@ -52,7 +54,7 @@ class OrderItem {
     double? menuItemPrice,
     String? sizeName,
     SizeOption? size,
-    MenuItem? item,
+    MenuItem? menuItem,
     int? quantity,
     String? note,
     OrderItemStatus? orderItemStatus,
@@ -68,6 +70,7 @@ class OrderItem {
       size: size ?? this.size,
       item: item ?? this.item,
       orderId: orderId ?? this.orderId,
+      id: id,
     );
   }
 

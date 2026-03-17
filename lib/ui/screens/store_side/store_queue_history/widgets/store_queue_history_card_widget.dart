@@ -1,7 +1,8 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/repositories/user/mock/mock_user_data.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_queue_history/view_model/store_queue_history_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_queue_history/widgets/store_queue_history_detail.dart';
 
 class StoreQueueHistoryCard extends StatelessWidget {
@@ -20,8 +21,10 @@ class StoreQueueHistoryCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  StoreQueueHistoryDetail(queueEntry: queueEntry),
+              builder: (_) => ChangeNotifierProvider.value(
+                value: context.read<StoreQueueHistoryViewModel>(),
+                child: StoreQueueHistoryDetail(queueEntry: queueEntry),
+              ),
             ),
           );
         },

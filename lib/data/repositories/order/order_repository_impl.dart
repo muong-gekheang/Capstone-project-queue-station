@@ -4,6 +4,11 @@ import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 
 class OrderRepositoryImpl implements OrderRepository {
+  final FirebaseFirestore firestore;
+
+  OrderRepositoryImpl({FirebaseFirestore? firestore})
+    : firestore = firestore ?? FirebaseFirestore.instance;
+
   @override
   Future<void> addItemToCart(String orderId, OrderItem item) {
     // TODO: implement addItemToCart
@@ -32,9 +37,11 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Future<Order?> getOrderById(String orderId) {
-    // TODO: implement getOrderById
-    throw UnimplementedError();
+  Future<Order?> getOrderById(String orderId) async {
+    final doc = await firestore.collection('orders').doc(orderId).get();
+    if (!doc.exists) return null;
+
+    return Order.fromJson(doc.data()!);
   }
 
   @override

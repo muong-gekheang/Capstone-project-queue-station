@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/analytics_service.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
@@ -274,12 +275,14 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (newScreenContext) => Provider.value(
-                  value: context.read<QueueService>(),
-                  child: StoreQueueHistoryScreen(
-                    restaurant: mockRestaurants[0],
-                  ),
-                ), // TODO: NO need init restaurant
+                builder: (newScreenContext) => MultiProvider(
+                  providers: [
+                    Provider.value(value: context.read<QueueService>()),
+                    Provider.value(value: context.read<OrderService>()),
+                  ],
+
+                  child: StoreQueueHistoryScreen(),
+                ),
               ),
             );
           },

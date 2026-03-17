@@ -15,7 +15,10 @@ import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_rep
 import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
+import 'package:queue_station_app/data/repositories/order/order_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
+import 'package:queue_station_app/data/repositories/order_item/order_item_repository.dart';
+import 'package:queue_station_app/data/repositories/order_item/order_item_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_mock.dart';
@@ -48,8 +51,6 @@ import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
-import 'package:queue_station_app/utils/go_router_refresh_stream.dart';
-import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<SingleChildWidget> dependencies = [
@@ -67,6 +68,8 @@ List<SingleChildWidget> dependencies = [
   Provider<UserRepository<Customer>>(create: (_) => CustomerRepositoryImpl()),
   Provider<UserRepository<StoreUser>>(create: (_) => StoreUserRepositoryImpl()),
   Provider<SizingOptionRepository>(create: (_) => SizingOptionRepositoryImpl()),
+  Provider<OrderRepository>(create: (_) => OrderRepositoryImpl()),
+  Provider<OrderItemRepository>(create: (_) => OrderItemRepositoryImpl()),
 ];
 
 void main() async {

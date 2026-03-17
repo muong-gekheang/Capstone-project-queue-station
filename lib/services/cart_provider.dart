@@ -36,6 +36,7 @@ class CartProvider extends ChangeNotifier {
           quantity: existing.quantity + newItem.quantity,
           orderItemStatus: OrderItemStatus.pending,
           orderId: '',
+          id: '',
         );
       } else {
         currentOrder.inCart.add(newItem);

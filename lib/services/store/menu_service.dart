@@ -70,6 +70,9 @@ class MenuService {
             (data) {
               _menuItemController.add(data);
               _menuItems = data;
+              _menuItemsMap = {
+                for (var menuItem in data) menuItem.id: menuItem,
+              };
             },
             onError: (error) {
               print("ERROR:$error");
@@ -123,6 +126,10 @@ class MenuService {
     _sizeOptionSubscription?.cancel();
   }
 
+  Future<MenuItem?> getMenuItemById(String menuItemId) async {
+    return await _menuItemRepository.getMenuItemById(menuItemId);
+  }
+
   void addMenuItem(MenuItem newMenu) {
     MenuItem menuToAdd = newMenu.copyWith(restaurantId: _restId);
     _menuItemRepository.create(menuToAdd);
@@ -173,5 +180,12 @@ class MenuService {
 
   // For Service-to-Service operation
   List<MenuItem> _menuItems = [];
+  List<MenuItem> get menuItems => _menuItems;
+  Map<String, MenuItem> _menuItemsMap = {};
+  Map<String, MenuItem> get menuItemsMap {
+    return _menuItemsMap;
+  }
+
   List<MenuItemCategory> _menuCategories = [];
+  List<MenuItemCategory> get menuItemCategories => _menuCategories;
 }

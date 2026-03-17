@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_queue_history/view_model/store_queue_history_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
@@ -8,8 +7,7 @@ import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_queue_history/widgets/store_queue_history_card_widget.dart';
 
 class StoreQueueHistoryContent extends StatelessWidget {
-  final Restaurant restaurant;
-  const StoreQueueHistoryContent({super.key, required this.restaurant});
+  const StoreQueueHistoryContent({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -4,12 +4,15 @@ import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repositor
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
+import 'package:queue_station_app/data/repositories/order/order_repository.dart';
+import 'package:queue_station_app/data/repositories/order_item/order_item_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
@@ -148,6 +151,13 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
             return prev;
           },
           dispose: (context, value) => value.dispose(),
+        ),
+        ProxyProvider<MenuService, OrderService>(
+          update: (context, value, previous) => OrderService(
+            orderRepository: context.read<OrderRepository>(),
+            menuService: value,
+            orderItemRepository: context.read<OrderItemRepository>(),
+          ),
         ),
       ],
       child: Scaffold(

@@ -9,4 +9,8 @@ class StoreSettingsViewModel extends ChangeNotifier {
   void signOut() {
     _authService.signOut();
   }
+
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    await _authService.changePassword(oldPassword, newPassword);
+  }
 }

@@ -128,6 +128,7 @@ List<Order> mockOrders = [
         quantity: 1,
         orderItemStatus: OrderItemStatus.pending,
         orderId: '',
+        id: '',
       ),
       OrderItem(
         menuItemId: mockMenuItems[4].id, // Cola
@@ -142,6 +143,7 @@ List<Order> mockOrders = [
         quantity: 2,
         orderItemStatus: OrderItemStatus.pending,
         orderId: '',
+        id: '',
       ),
     ],
     restaurantId: '',
@@ -162,6 +164,7 @@ List<Order> mockOrders = [
         quantity: 1,
         orderItemStatus: OrderItemStatus.pending,
         orderId: '',
+        id: '',
       ),
     ],
     restaurantId: '',

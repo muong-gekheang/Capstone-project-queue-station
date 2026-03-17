@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/forget_password_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -15,16 +17,45 @@ class _EditAccountState extends State<ChangePasswordScreen> {
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
-  void _onSave() {
+  void _onSave() async {
+    // 1. Added async
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Password updated successfully'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      final vm = context.read<StoreSettingsViewModel>();
+
+      try {
+        // 2. Await the result
+        await vm.changePassword(
+          oldPasswordController.text,
+          newPasswordController.text,
+        );
+
+        // 3. Check if the widget is still "mounted" before showing UI
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password updated successfully'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+        // Clear the fields after success
+        oldPasswordController.clear();
+        newPasswordController.clear();
+      } catch (err) {
+        // 4. Handle errors
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            // err.toString() will contain the specific message from your service
+            content: Text(err.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -147,8 +178,8 @@ class _EditAccountState extends State<ChangePasswordScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey, 
-                    decoration: TextDecoration.underline
+                    color: Colors.grey,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),

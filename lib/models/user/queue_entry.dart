@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 
 part 'queue_entry.g.dart';
@@ -26,6 +27,8 @@ class QueueEntry {
   final String? customerName; // Only store when the joinedMethod is walkIn
   final String? phoneNumber; // Only store when the joinedMethod is walkIn
 
+  final Order? order;
+
   const QueueEntry({
     required this.id,
     required this.queueNumber,
@@ -42,7 +45,9 @@ class QueueEntry {
     this.customerName,
     this.phoneNumber,
     required this.expectedTableReadyAt,
-    required this.assignedTableId, // Added to constructor
+    required this.assignedTableId,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    this.order, // Added to constructor
   });
 
   const QueueEntry.walkIn({
@@ -62,6 +67,7 @@ class QueueEntry {
     required this.phoneNumber,
     required this.expectedTableReadyAt,
     required this.assignedTableId,
+    this.order,
   });
 
   Duration? get waitingTime {
@@ -95,6 +101,7 @@ class QueueEntry {
   /// Use for Remote Users (App Account)
   QueueEntry remoteCopyWith({
     String? queueNumber,
+    Order? order,
     int? partySize,
     DateTime? servedTime,
     DateTime? endedTime,
@@ -107,6 +114,7 @@ class QueueEntry {
     return QueueEntry(
       id: id,
       restId: restId,
+      order: order ?? this.order,
       customerId: customerId, // Original User ID
       joinTime: joinTime,
       joinedMethod: JoinedMethod.remote,
@@ -128,6 +136,7 @@ class QueueEntry {
   /// Use for Walk-In Users (Created by the Store)
   QueueEntry walkInCopyWith({
     String? queueNumber,
+    Order? order,
     int? partySize,
     DateTime? servedTime,
     DateTime? endedTime,
@@ -140,6 +149,7 @@ class QueueEntry {
   }) {
     return QueueEntry.walkIn(
       id: id,
+      order: order ?? this.order,
       restId: restId,
       customerId: customerId, // This will be the storeId
       joinTime: joinTime,

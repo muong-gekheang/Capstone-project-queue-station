@@ -74,7 +74,12 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
   void onChangePassword() async {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ChangePasswordScreen()),
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: context.read<StoreSettingsViewModel>(),
+          child: ChangePasswordScreen(),
+        ),
+      ),
     );
   }
 

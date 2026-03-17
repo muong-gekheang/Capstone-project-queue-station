@@ -45,6 +45,50 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> changePassword(
+    String email,
+    String oldPassword,
+    String newPassword,
+  ) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+
+      // 1. Safe Check: Ensure user is logged in
+      if (user == null) {
+        throw Exception("No authenticated user found.");
+      }
+
+      // 2. Re-authenticate
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: oldPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      // 3. Update Password
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      // 4. Handle specific Firebase errors
+      switch (e.code) {
+        case 'wrong-password':
+          throw Exception("The old password you entered is incorrect.");
+        case 'weak-password':
+          throw Exception("The new password is too weak.");
+        case 'requires-recent-login':
+          throw Exception("Please log in again before changing your password.");
+        default:
+          throw Exception(
+            e.message ?? "An unknown authentication error occurred.",
+          );
+      }
+    } catch (e) {
+      // Handle non-Firebase errors (like network issues)
+      throw Exception("Connection failed. Please try again later.");
+    }
+  }
+
+  @override
   Future<User?> register(Customer customer, String password) async {
     try {
       final result = await _firebaseAuth.createUserWithEmailAndPassword(

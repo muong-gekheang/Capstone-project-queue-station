@@ -18,10 +18,12 @@ OrderItem _$OrderItemFromJson(Map<String, dynamic> json) => OrderItem(
   orderId: json['orderId'] as String,
   addOns: _addOnsFromJson(json['addOns'] as Map<String, dynamic>),
   sizeName: json['sizeName'] as String?,
+  id: json['id'] as String,
 );
 
 Map<String, dynamic> _$OrderItemToJson(OrderItem instance) => <String, dynamic>{
   'menuItemId': instance.menuItemId,
+  'id': instance.id,
   'addOns': _addOnsToJson(instance.addOns),
   'menuItemPrice': instance.menuItemPrice,
   'sizeName': instance.sizeName,

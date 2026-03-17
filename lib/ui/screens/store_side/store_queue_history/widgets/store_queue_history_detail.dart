@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_queue_history/view_model/store_queue_history_view_model.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -8,10 +10,12 @@ class StoreQueueHistoryDetail extends StatelessWidget {
   final QueueEntry queueEntry;
   const StoreQueueHistoryDetail({super.key, required this.queueEntry});
 
-  Widget orderDetail(BuildContext context) {
+  Future<Widget> orderDetail(BuildContext context) async {
     if (queueEntry.orderId != null) {
+      var vm = context.read<StoreQueueHistoryViewModel>();
+      QueueEntry filledDetails = await vm.viewHistoryDetail(queueEntry);
       return Column(
-        children: mockOrders[0].ordered.map((orderItem) {
+        children: filledDetails.order!.ordered.map((orderItem) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -29,6 +33,7 @@ class StoreQueueHistoryDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<StoreQueueHistoryViewModel>();
     return Scaffold(
       appBar: AppBarWidget(title: 'Customer Details', color: Colors.black),
       body: Padding(
@@ -223,7 +228,29 @@ class StoreQueueHistoryDetail extends StatelessWidget {
                   SizedBox(height: 5),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: orderDetail(context),
+                    child: FutureBuilder(
+                      future: orderDetail(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text("Error loading details"),
+                          );
+                        }
+
+                        if (!snapshot.hasData) {
+                          return const Center(child: Text("No data found"));
+                        }
+
+                        return snapshot.data!;
+                      },
+                    ),
                   ),
                 ],
               ),

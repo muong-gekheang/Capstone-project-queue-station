@@ -230,6 +230,7 @@ class CartScreen extends StatelessWidget {
                                 size: cartItem.size,
                                 orderItemStatus: OrderItemStatus.pending,
                                 orderId: '',
+                                id: '',
                               );
                               cartProvider.updateCartItem(
                                 cartItem,
@@ -247,6 +248,7 @@ class CartScreen extends StatelessWidget {
                                   size: cartItem.size,
                                   orderItemStatus: OrderItemStatus.pending,
                                   orderId: '',
+                                  id: '',
                                 );
                                 cartProvider.updateCartItem(
                                   cartItem,

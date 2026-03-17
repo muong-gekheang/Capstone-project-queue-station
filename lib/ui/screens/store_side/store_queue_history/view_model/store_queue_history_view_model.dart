@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 
 enum SortOption { oldest, newest }
 
 class StoreQueueHistoryViewModel extends ChangeNotifier {
   final QueueService _queueService;
+  final OrderService _orderService;
 
-  StoreQueueHistoryViewModel({required QueueService queueService})
-    : _queueService = queueService {
+  StoreQueueHistoryViewModel({
+    required QueueService queueService,
+    required OrderService orderService,
+  }) : _queueService = queueService,
+       _orderService = orderService {
     loadMore();
   }
 
@@ -30,6 +35,27 @@ class StoreQueueHistoryViewModel extends ChangeNotifier {
   void setSearchQuery(String query) {
     _searchQuery = query.toLowerCase();
     notifyListeners();
+  }
+
+  Future<QueueEntry> viewHistoryDetail(QueueEntry history) async {
+    switch (history.joinedMethod) {
+      case JoinedMethod.remote:
+        return history.orderId != null
+            ? history.remoteCopyWith(
+                order: await _orderService.getOrderDetailsById(
+                  history.orderId!,
+                ),
+              )
+            : history;
+      case JoinedMethod.walkIn:
+        return history.orderId != null
+            ? history.walkInCopyWith(
+                order: await _orderService.getOrderDetailsById(
+                  history.orderId!,
+                ),
+              )
+            : history;
+    }
   }
 
   bool _isFetching = false;

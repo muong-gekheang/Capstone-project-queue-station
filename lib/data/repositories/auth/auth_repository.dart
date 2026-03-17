@@ -5,4 +5,9 @@ abstract class AuthRepository {
   Future<User?> register(Customer customer, String password);
   Future<User?> login(String email, String password);
   Future<void> signOut();
+  Future<void> changePassword(
+    String email,
+    String oldPassword,
+    String newPassword,
+  );
 }
