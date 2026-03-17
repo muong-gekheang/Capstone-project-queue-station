@@ -58,13 +58,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception("No authenticated user found.");
       }
 
-      // 2. Re-authenticate
-      final credential = EmailAuthProvider.credential(
-        email: email,
-        password: oldPassword,
-      );
-
-      await user.reauthenticateWithCredential(credential);
+      await _reauthenticate(oldPassword);
 
       // 3. Update Password
       await user.updatePassword(newPassword);
@@ -124,5 +118,46 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
+  }
+
+  @override
+  Future<void> changeEmail(String newEmail, String password) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      // This is the modern replacement for updateEmail()
+      await user?.verifyBeforeUpdateEmail(newEmail);
+
+      // UI: "Check your new email to confirm the switch!"
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        // Re-authenticate logic here
+        await _reauthenticate(password);
+      }
+    }
+  }
+
+  Future<void> sendResetLink(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      // Success: Tell the user to check their inbox
+    } on FirebaseAuthException catch (e) {
+      // Handle specific errors
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'invalid-email') {
+        print('The email address is not valid.');
+      }
+    }
+  }
+
+  Future<void> _reauthenticate(String password) async {
+    final user = FirebaseAuth.instance.currentUser!;
+    AuthCredential credential = EmailAuthProvider.credential(
+      email: user.email!, // The current (potentially fake) email
+      password: password,
+    );
+
+    await user.reauthenticateWithCredential(credential);
   }
 }

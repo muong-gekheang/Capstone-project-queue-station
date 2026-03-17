@@ -5,6 +5,7 @@ import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/view_model/auth_view_model.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/forget_password_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'register_screen.dart';
@@ -20,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _loginFalse = false;
 
   Future<void> _handleLogin() async {
     final vm = context.read<AuthViewModel>();
@@ -36,6 +38,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (result) {
         context.go("/");
+      } else {
+        setState(() {
+          _loginFalse = true;
+        });
       }
     }
   }
@@ -106,7 +112,36 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 20),
-
+                    if (_loginFalse)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Forgot your password? "),
+                          GestureDetector(
+                            onTap: vm.isLoading
+                                ? null
+                                : () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => Provider.value(
+                                          value: context.read<AuthService>(),
+                                          child: ForgetPasswordScreen(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                            child: const Text(
+                              "Recover password",
+                              style: TextStyle(
+                                color: AppTheme.secondaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    SizedBox(height: 10),
                     SizedBox(
                       height: 48,
                       child: ElevatedButton(

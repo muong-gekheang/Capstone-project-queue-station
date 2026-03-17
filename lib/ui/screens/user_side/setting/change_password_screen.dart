@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/forget_password_screen.dart';
 
@@ -69,6 +70,7 @@ class _EditAccountState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<StoreSettingsViewModel>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -169,7 +171,10 @@ class _EditAccountState extends State<ChangePasswordScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ForgetPasswordScreen(),
+                      builder: (_) => Provider.value(
+                        value: context.read<AuthService>(),
+                        child: ForgetPasswordScreen(),
+                      ),
                     ),
                   );
                 },

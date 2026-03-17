@@ -13,4 +13,8 @@ class StoreSettingsViewModel extends ChangeNotifier {
   Future<void> changePassword(String oldPassword, String newPassword) async {
     await _authService.changePassword(oldPassword, newPassword);
   }
+
+  Future<void> sendResetPasswordLink(String email) async {
+    await _authService.sendResetPasswordLink(email);
+  }
 }

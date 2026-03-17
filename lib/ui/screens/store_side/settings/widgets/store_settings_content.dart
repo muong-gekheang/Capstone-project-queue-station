@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
-import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/subscreens/store_subscription_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/edit_store_screen.dart';
@@ -94,16 +92,14 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+
+        leading: const Icon(Icons.settings, size: 32),
         title: const Text(
           "Settings",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
           ),
         ),
       ),

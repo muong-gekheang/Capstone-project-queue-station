@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
@@ -20,6 +21,8 @@ import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/edit_store_screen.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
@@ -161,18 +164,82 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         ),
       ],
       child: Scaffold(
-        body: IndexedStack(
-          index: _getTabIndex(_selectedTab),
+        body: Column(
           children: [
-            DashboardScreen(onManageQueue: onManageQueue),
-            ManageStoreScreen(onManageQueue: onManageQueue),
-            StoreQueueScreen(),
-            StoreSettingsScreen(),
+            // 1. Add the Banner here
+            const EmailVerificationBanner(),
+
+            // 2. The rest of your content remains the same
+            Expanded(
+              child: IndexedStack(
+                index: _getTabIndex(_selectedTab),
+                children: [
+                  DashboardScreen(onManageQueue: onManageQueue),
+                  ManageStoreScreen(onManageQueue: onManageQueue),
+                  StoreQueueScreen(),
+                  StoreSettingsScreen(),
+                ],
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: BottomNavBar(
           selectedTab: _selectedTab,
           onTabSelected: _onTabSelected,
+        ),
+      ),
+    );
+  }
+}
+
+class EmailVerificationBanner extends StatelessWidget {
+  const EmailVerificationBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null || user.emailVerified) {
+      return const SizedBox.shrink();
+    }
+
+    return Material(
+      color: AppTheme.naturalTextGrey,
+      child: SafeArea(
+        bottom: false,
+        child: ListTile(
+          leading: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+          title: const Text(
+            "Account not verified! Verify so you can reset password through email.",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.naturalWhite,
+            ),
+          ),
+          trailing: SizedBox(
+            width: 100,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.naturalBlack,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditStoreScreen(
+                      restaurantService: context.read<RestaurantService>(),
+                      storeProfileService: context.read<StoreProfileService>(),
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                "Verify",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ),
       ),
     );

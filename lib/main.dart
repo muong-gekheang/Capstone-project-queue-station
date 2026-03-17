@@ -147,6 +147,7 @@ void main() async {
         builder: (context) {
           context.read<AuthService>().restoreSession();
           return MaterialApp.router(
+            title: "Queue Station",
             scrollBehavior: GlobalScrollBehavior(),
             theme: AppTheme.lightTheme,
             debugShowCheckedModeBanner: false,

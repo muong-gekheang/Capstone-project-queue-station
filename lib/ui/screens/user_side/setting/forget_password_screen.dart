@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
+import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -18,13 +21,18 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
     super.dispose();
   }
 
-  void _sendResetLink() {
+  void _sendResetLink() async {
     final formState = _formKey.currentState;
 
-  if (formState != null && formState.validate()) {
+    if (formState != null && formState.validate()) {
+      var vm = context.read<AuthService>();
+      await vm.sendResetPasswordLink(emailController.text);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Reset link sent to your email"),
+          content: Text(
+            "Reset link sent!\nMake sure the email you write here is linked to this account.",
+          ),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -37,7 +45,10 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Forgot Password", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Forgot Password",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         bottom: PreferredSize(
@@ -79,7 +90,7 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black
+                  color: Colors.black,
                 ),
               ),
 
@@ -91,7 +102,7 @@ class _ForgetPasswordState extends State<ForgetPasswordScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 

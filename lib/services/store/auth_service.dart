@@ -79,6 +79,14 @@ class AuthService {
     );
   }
 
+  Future<void> sendResetPasswordLink(String email) async {
+    await _authRepository.sendResetLink(email);
+  }
+
+  Future<void> changeEmail(String newEmail, String password) async {
+    await _authRepository.changeEmail(newEmail, password);
+  }
+
   void signOut() {
     _authRepository.signOut();
     _userProvider.updateUser(null);

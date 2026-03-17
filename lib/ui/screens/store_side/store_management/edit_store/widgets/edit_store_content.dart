@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/view_model/edit_store_view_model.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/custom_success_snackbar.dart';
 
 class EditStoreContent extends StatefulWidget {
@@ -243,6 +244,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
 
                   _buildFormField(
                     label: "Email:",
+                    isError: !editStoreViewModel.isEmailVerified,
                     child: TextField(
                       controller: _storeEmailController,
                       keyboardType: TextInputType.emailAddress,
@@ -254,6 +256,23 @@ class _EditStoreContentState extends State<EditStoreContent> {
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),
+                  const SizedBox(height: 10),
+
+                  if (!editStoreViewModel.isEmailVerified)
+                    FilledButton(
+                      onPressed: () {
+                        editStoreViewModel.sendVerifyEmail();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Email sent! \nPlease make sure this email is real.',
+                            ),
+                            backgroundColor: AppTheme.primaryColor,
+                          ),
+                        );
+                      },
+                      child: Text("Verify email"),
+                    ),
                 ],
               ),
             ),
@@ -335,7 +354,11 @@ class _EditStoreContentState extends State<EditStoreContent> {
     );
   }
 
-  Widget _buildFormField({required String label, required Widget child}) {
+  Widget _buildFormField({
+    required String label,
+    required Widget child,
+    bool isError = false,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -355,7 +378,9 @@ class _EditStoreContentState extends State<EditStoreContent> {
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(
+                color: isError ? AppTheme.accentRed : Colors.grey.shade300,
+              ),
             ),
             child: child,
           ),
