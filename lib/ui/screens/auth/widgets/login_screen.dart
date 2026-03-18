@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
-import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/view_model/auth_view_model.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/forget_password_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
-import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onSwitchTap});

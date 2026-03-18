@@ -84,7 +84,16 @@ class AuthService {
   }
 
   Future<void> changeEmail(String newEmail, String password) async {
-    await _authRepository.changeEmail(newEmail, password);
+    try {
+      await _authRepository.changeEmail(newEmail, password);
+      if (_userProvider.asStoreUser != null) {
+        await _storeUserRepository.update(
+          _userProvider.asStoreUser!.copyWith(email: newEmail),
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 
   void signOut() {

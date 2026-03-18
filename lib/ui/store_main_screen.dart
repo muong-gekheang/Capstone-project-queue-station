@@ -15,6 +15,7 @@ import 'package:queue_station_app/data/repositories/table_category/table_categor
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/order_service.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
@@ -232,6 +233,7 @@ class EmailVerificationBanner extends StatelessWidget {
                     builder: (_) => EditStoreScreen(
                       restaurantService: context.read<RestaurantService>(),
                       storeProfileService: context.read<StoreProfileService>(),
+                      authService: context.read<AuthService>(),
                     ),
                   ),
                 );

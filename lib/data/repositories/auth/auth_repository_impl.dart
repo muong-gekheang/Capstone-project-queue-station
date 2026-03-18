@@ -58,7 +58,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception("No authenticated user found.");
       }
 
-      await _reauthenticate(oldPassword);
+      await AuthRepository.reauthenticate(oldPassword);
 
       // 3. Update Password
       await user.updatePassword(newPassword);
@@ -123,6 +123,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> changeEmail(String newEmail, String password) async {
     try {
+      debugPrint("Email ERROR: $password");
+
+      await AuthRepository.reauthenticate(password);
       final user = FirebaseAuth.instance.currentUser;
 
       // This is the modern replacement for updateEmail()
@@ -130,10 +133,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // UI: "Check your new email to confirm the switch!"
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
-        // Re-authenticate logic here
-        await _reauthenticate(password);
-      }
+      debugPrint("Email ERROR: ${e.code}");
     }
   }
 
@@ -149,15 +149,5 @@ class AuthRepositoryImpl implements AuthRepository {
         print('The email address is not valid.');
       }
     }
-  }
-
-  Future<void> _reauthenticate(String password) async {
-    final user = FirebaseAuth.instance.currentUser!;
-    AuthCredential credential = EmailAuthProvider.credential(
-      email: user.email!, // The current (potentially fake) email
-      password: password,
-    );
-
-    await user.reauthenticateWithCredential(credential);
   }
 }

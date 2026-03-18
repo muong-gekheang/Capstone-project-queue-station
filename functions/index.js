@@ -23,9 +23,7 @@ exports.createQueue = onCall(async (request) => {
     partySize,
     customerName,
     phoneNumber,
-    joinTime,
     queueNumber,
-    tableNumber,
   } = request.data;
 
   if (!restId || !partySize || !id) {
@@ -39,7 +37,7 @@ exports.createQueue = onCall(async (request) => {
     const [tablesSnap, categoriesSnap] = await Promise.all([
       db.collection("queue_tables").where("restaurantId", "==", restId).get(),
       db
-        .collection("tableCategories")
+        .collection("table_categories")
         .where("restaurantId", "==", restId)
         .get(),
     ]);

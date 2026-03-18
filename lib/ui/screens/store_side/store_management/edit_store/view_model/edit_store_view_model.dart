@@ -3,13 +3,16 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
 
 class EditStoreViewModel extends ChangeNotifier {
   final RestaurantService _restaurantService;
   final StoreProfileService _storeProfileService;
+  final AuthService _authService;
   final FirebaseAuth _firebaseAuth;
   bool _isDisposed = false;
 
@@ -22,8 +25,10 @@ class EditStoreViewModel extends ChangeNotifier {
     required RestaurantService restaurantService,
     required StoreProfileService storeProfileService,
     FirebaseAuth? firebaseAuth,
+    required AuthService authService,
   }) : _restaurantService = restaurantService,
        _storeProfileService = storeProfileService,
+       _authService = authService,
        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance {
     _subscribeToRestaurant();
   }
@@ -54,29 +59,44 @@ class EditStoreViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  void sendVerifyEmail() {
+  void sendVerifyEmail(String password) async {
+    await AuthRepository.reauthenticate(password);
     _firebaseAuth.currentUser?.sendEmailVerification();
   }
 
-  Future<void> onSave(
+  Future<void> onSave({
     File? selectedImage,
-    String newStoreName,
-    String newDescription,
-  ) async {
+    required String newStoreName,
+    required String newDescription,
+    required String password,
+    required String userEmail,
+    required String storeEmail,
+  }) async {
     _storeProfileService.setStoreProfileImage(selectedImage);
     if (_currentRestaurant != null) {
       _restaurantService.updateRestaurant(
         _currentRestaurant!.copyWith(
           name: newStoreName,
           description: newDescription,
+          email: storeEmail,
         ),
       );
+
+      if (userEmail != adminEmail && userEmail != "Unknown") {
+        try {
+          await _authService.changeEmail(userEmail, password);
+        } catch (e) {
+          debugPrint("EMAIL: $e");
+        }
+      }
     }
   }
 
   bool get isLoading => _isLoading;
 
   String get storeName => _currentRestaurant?.name ?? "Unknown";
+
+  String get storeEmail => _currentRestaurant?.email ?? "Unknown";
 
   String get storeDescription => "";
 

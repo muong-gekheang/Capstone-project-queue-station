@@ -242,6 +242,8 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
         .map((snapshot) {
           return snapshot.docs.map((doc) {
             final json = Map<String, dynamic>.from(doc.data());
+            debugPrint(json.toString());
+
             json['id'] ??= doc.id;
             var result = QueueEntry.fromJson(json);
             return result;

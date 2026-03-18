@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/view_model/edit_store_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
+import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/custom_success_snackbar.dart';
 
 class EditStoreContent extends StatefulWidget {
@@ -18,29 +20,88 @@ class _EditStoreContentState extends State<EditStoreContent> {
   final TextEditingController _storeDescriptionController =
       TextEditingController();
 
-  final TextEditingController _storeEmailController = TextEditingController();
+  final TextEditingController _storePasswordController =
+      TextEditingController();
+
+  final TextEditingController _storeEmailcontroller = TextEditingController();
+
+  final TextEditingController _userEmailController = TextEditingController();
   String _selectedBranch = "IFL";
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
   void onSave() async {
     EditStoreViewModel editStoreViewModel = context.read<EditStoreViewModel>();
-    await editStoreViewModel.onSave(
-      _selectedImage,
-      _storeNameController.text,
-      _storeDescriptionController.text,
-    );
-    if (context.mounted) {
-      CustomSuccessSnackbar.show(context, "Added Successfully");
-      Navigator.of(context).pop(true);
+
+    final toContinue = await showPasswordDialog();
+    if (toContinue != null && toContinue) {
+      await editStoreViewModel.onSave(
+        selectedImage: _selectedImage,
+        newStoreName: _storeNameController.text,
+        newDescription: _storeDescriptionController.text,
+        userEmail: _userEmailController.text,
+        storeEmail: _storeEmailcontroller.text,
+        password: _storePasswordController.text,
+      );
+      if (mounted) {
+        CustomSuccessSnackbar.show(context, "Added Successfully");
+        Navigator.of(context).pop(true);
+      }
     }
+  }
+
+  void onVerify() async {
+    var editStoreViewModel = context.read<EditStoreViewModel>();
+    final toContinue = await showPasswordDialog();
+    if (toContinue != null && toContinue) {
+      _storePasswordController.clear();
+      editStoreViewModel.sendVerifyEmail(_storePasswordController.text);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Email sent! \nPlease make sure this email is real.'),
+            backgroundColor: AppTheme.primaryColor,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<bool?> showPasswordDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (context) => CustomDialog(
+        title: "Authentication Required",
+        content: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CustomTextField(
+            obscureText: true,
+            controller: _storePasswordController,
+            label: 'Password',
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            child: Text(
+              "Proceed",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   void dispose() {
     _storeNameController.dispose();
     _storeDescriptionController.dispose();
-    _storeEmailController.dispose();
+    _userEmailController.dispose();
+    _storeEmailcontroller.dispose();
+    _storePasswordController.dispose();
     super.dispose();
   }
 
@@ -49,7 +110,8 @@ class _EditStoreContentState extends State<EditStoreContent> {
     EditStoreViewModel editStoreViewModel = context.watch<EditStoreViewModel>();
     _storeNameController.text = editStoreViewModel.storeName;
     _storeDescriptionController.text = editStoreViewModel.storeDescription;
-    _storeEmailController.text = editStoreViewModel.adminEmail;
+    _userEmailController.text = editStoreViewModel.adminEmail;
+    _storeEmailcontroller.text = editStoreViewModel.storeEmail;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -211,42 +273,26 @@ class _EditStoreContentState extends State<EditStoreContent> {
                   const SizedBox(height: 20),
 
                   _buildFormField(
-                    label: "Branch:",
-                    child: DropdownButton<String>(
-                      value: _selectedBranch,
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                      icon: const Icon(Icons.arrow_drop_down),
-                      items: const [
-                        DropdownMenuItem(value: "IFL", child: Text("IFL")),
-                        DropdownMenuItem(
-                          value: "Daun Penh",
-                          child: Text("Daun Penh"),
-                        ),
-                        DropdownMenuItem(
-                          value: "Eden Garden",
-                          child: Text("Eden Garden"),
-                        ),
-                        DropdownMenuItem(
-                          value: "Aeon Mall Phnom Penh 1",
-                          child: Text("Aeon Mall Phnom Penh 1"),
-                        ),
-                        DropdownMenuItem(value: "BKK", child: Text("BKK")),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedBranch = value!;
-                        });
-                      },
+                    label: "Store Email:",
+                    child: TextField(
+                      controller: _storeEmailcontroller,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
+
                   const SizedBox(height: 20),
 
                   _buildFormField(
                     label: "Email:",
                     isError: !editStoreViewModel.isEmailVerified,
                     child: TextField(
-                      controller: _storeEmailController,
+                      controller: _userEmailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -260,17 +306,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
 
                   if (!editStoreViewModel.isEmailVerified)
                     FilledButton(
-                      onPressed: () {
-                        editStoreViewModel.sendVerifyEmail();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Email sent! \nPlease make sure this email is real.',
-                            ),
-                            backgroundColor: AppTheme.primaryColor,
-                          ),
-                        );
-                      },
+                      onPressed: onVerify,
                       child: Text("Verify email"),
                     ),
                 ],

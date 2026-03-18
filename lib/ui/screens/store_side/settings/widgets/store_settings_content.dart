@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/subscreens/store_subscription_screen.dart';
@@ -86,6 +87,7 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
     var vm = context.watch<StoreSettingsViewModel>();
     var restaurantService = context.read<RestaurantService>();
     var storeProfileService = context.read<StoreProfileService>();
+    var authService = context.read<AuthService>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -129,6 +131,7 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
                           builder: (context) => EditStoreScreen(
                             restaurantService: restaurantService,
                             storeProfileService: storeProfileService,
+                            authService: authService,
                           ),
                         ),
                       ).then((result) {
