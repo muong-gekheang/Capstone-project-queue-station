@@ -134,7 +134,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
           SizedBox(height: 10),
           ButtonWidget(
             title: 'Add',
-            onPressed: isAddDisabled ? null : onAdd,
+            onPressed: onAdd,
             backgroundColor: Theme.of(context).colorScheme.primary,
             textColor: Theme.of(context).colorScheme.surface,
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),

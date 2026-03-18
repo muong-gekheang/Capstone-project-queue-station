@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/edit_menu_screen.dart';
@@ -20,23 +21,24 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.menu.isAvailable
-          ? () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider.value(
-                    value: context.read<MenuManagementViewModel>(),
-                    child: MenuDetail(menu: widget.menu),
-                  ),
-                ),
-              ).then((_) {
-                setState(() {
-                  print('menu Availability ${widget.menu.isAvailable}');
-                });
-              });
-            }
-          : null,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChangeNotifierProvider.value(
+              value: context.read<MenuManagementViewModel>(),
+              child: Provider.value(
+                value: context.read<MenuService>(),
+                child: MenuDetail(menu: widget.menu),
+              ),
+            ),
+          ),
+        ).then((_) {
+          setState(() {
+            print('menu Availability ${widget.menu.isAvailable}');
+          });
+        });
+      },
       child: Stack(
         children: [
           Card(
@@ -132,14 +134,24 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EditMenuScreen(existingMenu: widget.menu),
-                            ),
-                          );
+                        onPressed: () async {
+                          var vm = context.read<MenuManagementViewModel>();
+                          MenuItem filledMenuDetails = await vm
+                              .getMenuitemDetails(widget.menu);
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChangeNotifierProvider.value(
+                                  value: context
+                                      .read<MenuManagementViewModel>(),
+                                  child: EditMenuScreen(
+                                    existingMenu: filledMenuDetails,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
                         },
                         icon: Icon(Icons.create_outlined),
                         color: Color.fromRGBO(13, 71, 161, 1),

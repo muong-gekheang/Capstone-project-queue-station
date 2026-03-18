@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/view_model/edit_menu_view_model.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/menu_form_widget.dart';
 
@@ -11,7 +11,7 @@ class EditMenuContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var vm = context.watch<EditMenuViewModel>();
+    var vm = context.watch<MenuManagementViewModel>();
     return Scaffold(
       appBar: AppBarWidget(title: 'Edit Item', color: Colors.black),
       body: Padding(
@@ -19,7 +19,7 @@ class EditMenuContent extends StatelessWidget {
         child: MenuForm(
           initialMenu: existingMenu, // not null because we are editing
           onSubmit: (MenuItem updatedMenu) {
-            vm.updateMenuItem(updatedMenu);
+            vm.updateMenuItem(updatedMenu, existingMenu);
             Navigator.pop(context); // close the page
           },
         ),

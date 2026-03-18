@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/services/store/menu_service.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/view_model/edit_menu_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/widgets/edit_menu_content.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 
 class EditMenuScreen extends StatelessWidget {
   final MenuItem existingMenu;
@@ -11,9 +10,8 @@ class EditMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MenuService menuService = context.read<MenuService>();
-    return ChangeNotifierProvider(
-      create: (_) => EditMenuViewModel(menuService: menuService),
+    return ChangeNotifierProvider.value(
+      value: context.read<MenuManagementViewModel>(),
       child: EditMenuContent(existingMenu: existingMenu),
     );
   }

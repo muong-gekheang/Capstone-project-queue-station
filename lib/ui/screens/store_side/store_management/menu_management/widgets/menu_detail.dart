@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/edit_menu_screen.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
+import 'package:queue_station_app/ui/widgets/custom_success_snackbar.dart';
 
 class MenuDetail extends StatefulWidget {
   final MenuItem menu;
@@ -16,17 +18,12 @@ class MenuDetail extends StatefulWidget {
 }
 
 class _MenuDetailState extends State<MenuDetail> {
-  late MenuItem menu;
-  @override
-  void initState() {
-    menu = widget.menu;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<MenuManagementViewModel>();
-
+    MenuItem menu = vm.allMenuItems.firstWhere(
+      (element) => element.id == widget.menu.id,
+    );
     return Scaffold(
       appBar: AppBarWidget(title: menu.name, color: Colors.black),
       body: FutureBuilder(
@@ -126,10 +123,16 @@ class _MenuDetailState extends State<MenuDetail> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditMenuScreen(existingMenu: menu),
+        builder: (_) => ChangeNotifierProvider.value(
+          value: context.read<MenuManagementViewModel>(),
+          child: EditMenuScreen(existingMenu: menu),
+        ),
       ),
     );
-    // Note: Success Snackbar can be triggered here or inside the VM
+    if (context.mounted) {
+      Navigator.pop(context);
+      CustomSuccessSnackbar.show(context, "Update Successfully");
+    }
   }
 
   // --- Helper Widgets (Piping only) ---
@@ -152,7 +155,7 @@ class _MenuDetailState extends State<MenuDetail> {
           ],
         ),
         Text(
-          '\$${vm.getCheapestPrice(menu).toStringAsFixed(2)}',
+          '\$${menu.minPrice}',
           style: const TextStyle(
             color: Color.fromRGBO(255, 104, 53, 1),
             fontSize: 25,
@@ -167,7 +170,7 @@ class _MenuDetailState extends State<MenuDetail> {
       children: [
         ...menu.sizes.map(
           (s) => _buildDataRow(
-            s.sizeOption!.name,
+            s.sizeOption?.name ?? "",
             '\$${s.price.toStringAsFixed(2)}',
           ),
         ),

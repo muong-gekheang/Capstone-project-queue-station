@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
@@ -102,6 +103,7 @@ class MenuService {
           .watchAllSizeOptions(_restId)
           .listen((data) {
             _sizeOptionController.add(data);
+            _sizeOptions = data;
           }, onError: (error) => _sizeOptionController.addError(error));
     }
   }
@@ -140,7 +142,12 @@ class MenuService {
     final List<AddOn> addOns = [];
     for (var menuSizeId in menuItem.menuSizeOptionIds) {
       var result = await _menuSizeRepository.getMenuSizeById(menuSizeId);
-      if (result != null) menuSizes.add(result);
+      if (result != null) {
+        result.sizeOption = _sizeOptions.firstWhere(
+          (e) => e.id == result.sizeOptionId,
+        );
+        menuSizes.add(result);
+      }
     }
 
     for (var addOnId in menuItem.addOnIds) {
@@ -159,8 +166,55 @@ class MenuService {
     }
   }
 
-  void updateMenuItem(MenuItem newMenuItem) {
-    _menuItemRepository.update(newMenuItem);
+  Future<void> updateMenuItem(
+    MenuItem newMenuItem,
+    MenuItem? oldMenuItem,
+  ) async {
+    newMenuItem = newMenuItem.copyWith(restaurantId: _restId);
+    oldMenuItem = oldMenuItem?.copyWith(restaurantId: _restId);
+    if (oldMenuItem != null) {
+      final batch = FirebaseFirestore.instance.batch();
+
+      // 1. Get references instead of calling 'update' directly
+      final itemRef = FirebaseFirestore.instance
+          .collection('menu_items')
+          .doc(newMenuItem.id);
+      batch.set(itemRef, newMenuItem.toJson(), SetOptions(merge: true));
+
+      final newSizeSet = newMenuItem.sizes.toSet();
+      final oldSizeSet = oldMenuItem.sizes.toSet();
+
+      // 2. Add all operations to the SAME batch
+      // Create new ones
+      for (var menuSize in newSizeSet.difference(oldSizeSet)) {
+        final ref = FirebaseFirestore.instance
+            .collection('sizes')
+            .doc(menuSize.id);
+        batch.set(ref, menuSize.toJson());
+      }
+
+      // Delete removed ones
+      for (var menuSize in oldSizeSet.difference(newSizeSet)) {
+        final ref = FirebaseFirestore.instance
+            .collection('sizes')
+            .doc(menuSize.id);
+        batch.delete(ref);
+      }
+
+      // Update existing ones
+      for (var menuSize in newSizeSet.intersection(oldSizeSet)) {
+        final ref = FirebaseFirestore.instance
+            .collection('sizes')
+            .doc(menuSize.id);
+        batch.update(ref, menuSize.toJson());
+      }
+
+      // 3. The Atomic Commit
+      // Even if the phone dies RIGHT NOW, Firestore has this saved in its local cache.
+      await batch.commit();
+    } else {
+      _menuItemRepository.update(newMenuItem);
+    }
   }
 
   void deleteMenuItem(MenuItem menuItem) {
@@ -173,6 +227,7 @@ class MenuService {
   }
 
   void updateMenuCategory(MenuItemCategory newCategory) {
+    newCategory.restaurantId = _restId;
     _menuCategoryRepository.update(newCategory);
   }
 
@@ -186,6 +241,7 @@ class MenuService {
   }
 
   void updateAddOn(AddOn newAddOn) {
+    newAddOn.restaurantId = _restId;
     _addOnRepository.update(newAddOn);
   }
 
@@ -209,6 +265,9 @@ class MenuService {
   Map<String, MenuItem> get menuItemsMap {
     return _menuItemsMap;
   }
+
+  List<SizeOption> _sizeOptions = [];
+  List<SizeOption> get sizeOPtions => _sizeOptions;
 
   List<MenuItemCategory> _menuCategories = [];
   List<MenuItemCategory> get menuItemCategories => _menuCategories;

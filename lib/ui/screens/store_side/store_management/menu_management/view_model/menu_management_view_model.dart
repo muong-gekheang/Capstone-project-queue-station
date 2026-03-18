@@ -153,8 +153,13 @@ class MenuManagementViewModel extends ChangeNotifier {
         .toList();
   }
 
+  void updateMenuItem(MenuItem newMenuItem, MenuItem oldMenuItem) {
+    _menuService.updateMenuItem(newMenuItem, oldMenuItem);
+  }
+
   void toggleMenuAvailability(MenuItem menu, bool isAvailable) {
-    _menuService.updateMenuItem(menu);
+    menu.isAvailable = isAvailable;
+    _menuService.updateMenuItem(menu, null);
   }
 
   void removeMenuItem(MenuItem item) {
@@ -180,12 +185,11 @@ class MenuManagementViewModel extends ChangeNotifier {
   }
 
   Future<MenuItem> getMenuitemDetails(MenuItem menuItem) {
-    return _menuService.getMenuItemDetails(menuItem);
-  }
-
-  double getCheapestPrice(MenuItem menu) {
-    if (menu.sizes.isEmpty) return 0.0;
-
-    return menu.sizes.first.price;
+    final category = _allCategories.firstWhere(
+      (e) => e.id == menuItem.categoryId,
+    );
+    return _menuService.getMenuItemDetails(
+      menuItem.copyWith(category: category),
+    );
   }
 }

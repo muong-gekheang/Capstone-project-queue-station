@@ -51,12 +51,14 @@ class _MenuFormState extends State<MenuForm> {
 
   @override
   void initState() {
-    super.initState();
-
     var vm = context.read<MenuManagementViewModel>();
     final menu = widget.initialMenu;
 
-    selectedCategory = vm.selectedCategory;
+    selectedAddOns.addAll(widget.initialMenu?.addOns ?? []);
+
+    availableMenuSizes.addAll(widget.initialMenu?.sizes ?? []);
+
+    selectedCategory = widget.initialMenu?.category ?? vm.selectedCategory;
     _nameController.text = menu?.name ?? '';
     _descriptionController.text = menu?.description ?? '';
     _minTimeController = TextEditingController(
@@ -71,6 +73,7 @@ class _MenuFormState extends State<MenuForm> {
     } else {
       selectedImageFile = null;
     }
+    super.initState();
   }
 
   String? _nullValidator(String? value) {
@@ -330,11 +333,34 @@ class _MenuFormState extends State<MenuForm> {
                       if (returnedMenuSizes != null &&
                           returnedMenuSizes.isNotEmpty) {
                         setState(() {
-                          for (var menuSize in returnedMenuSizes) {
-                            if (!availableMenuSizes.contains(menuSize)) {
-                              availableMenuSizes.add(menuSize);
-                            }
-                          }
+                          // 1. Create a Set of sizeOptions  for lightning-fast lookup
+                          final existingSizeOptions = availableMenuSizes
+                              .map((s) => s.sizeOption)
+                              .toSet();
+
+                          final newSizeOptions = returnedMenuSizes
+                              .map((e) => e.sizeOption)
+                              .toSet();
+
+                          // 2. Create add and delete list
+                          final toAddSizeOptions = newSizeOptions.difference(
+                            existingSizeOptions,
+                          );
+
+                          final toRemoveSizeOption = existingSizeOptions
+                              .difference(newSizeOptions);
+
+                          // 3. Update the MenuSize list
+
+                          availableMenuSizes.addAll(
+                            returnedMenuSizes.where(
+                              (e) => toAddSizeOptions.contains(e.sizeOption),
+                            ),
+                          );
+
+                          availableMenuSizes.removeWhere(
+                            (e) => toRemoveSizeOption.contains(e.sizeOption),
+                          );
                         });
                       }
                     },
@@ -374,7 +400,7 @@ class _MenuFormState extends State<MenuForm> {
                               return ChangeNotifierProvider.value(
                                 value: vm,
                                 child: AddOnsManagement(
-                                  existingMenu: widget.initialMenu,
+                                  selectedAddOns: selectedAddOns,
                                 ),
                               );
                             },
@@ -416,7 +442,7 @@ class _MenuFormState extends State<MenuForm> {
                                 availableMenuSizes.isNotEmpty)
                             ? () => widget.onSubmit(
                                 MenuItem(
-                                  id: uuid.v4(),
+                                  id: widget.initialMenu?.id ?? uuid.v4(),
                                   addOnIds: selectedAddOns
                                       .map((e) => e.id)
                                       .toList(),

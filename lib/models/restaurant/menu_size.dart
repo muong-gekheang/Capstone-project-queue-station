@@ -26,7 +26,8 @@ class MenuSize {
       identical(this, other) ||
       other is MenuSize &&
           runtimeType == other.runtimeType &&
-          sizeOption == other.sizeOption;
+          sizeOption == other.sizeOption &&
+          price == other.price;
 
   @override
   int get hashCode => Object.hash(price, sizeOption);

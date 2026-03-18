@@ -9,8 +9,8 @@ import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';
 
 class AddOnsManagement extends StatefulWidget {
-  final MenuItem? existingMenu;
-  const AddOnsManagement({super.key, required this.existingMenu});
+  final List<AddOn> selectedAddOns;
+  const AddOnsManagement({super.key, required this.selectedAddOns});
 
   @override
   State<AddOnsManagement> createState() => _AddOnsManagementState();
@@ -23,6 +23,7 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
   @override
   void initState() {
     super.initState();
+    selectedAddOns = [...widget.selectedAddOns];
   }
 
   bool get isAddDisabled {
@@ -126,7 +127,7 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
           Expanded(child: existingAddOns()),
           ButtonWidget(
             title: 'Add',
-            onPressed: isAddDisabled ? null : onAdd,
+            onPressed: onAdd,
             backgroundColor: AppTheme.primaryColor,
             textColor: AppTheme.naturalWhite,
             padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),

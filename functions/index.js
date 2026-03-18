@@ -238,13 +238,13 @@ exports.deleteTableOnCascade = onDocumentDeleted(
 );
 
 exports.deleteMenuOnCascade = onDocumentDeleted(
-  "menu_categories/{menu_catId}",
+  "menu_item_categories/{menu_catId}",
   async (event) => {
-    console.log("TRIGGER FIRED", event.params.table_catId);
-    const menuCategoryId = event.params.table_catId;
+    console.log("TRIGGER FIRED", event.params.menu_catId);
+    const menuCategoryId = event.params.menu_catId;
 
     const menusRef = db
-      .collection("queue_tables")
+      .collection("menu_items")
       .where("categoryId", "==", menuCategoryId);
 
     const menusSnap = await menusRef.get();
