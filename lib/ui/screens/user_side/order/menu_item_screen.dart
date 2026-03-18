@@ -55,7 +55,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     _noteController.text = orderItem.note ?? "";
 
     _selectedSize = widget.menuItem.sizes.firstWhere(
-      (s) => s.sizeOption.name == orderItem.size.name,
+      (s) => s.sizeOption?.name == orderItem.size.name,
       orElse: () => widget.menuItem.sizes.first,
     );
 
@@ -254,7 +254,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      size.sizeOption.name,
+                                      size.sizeOption!.name,
                                       style: const TextStyle(fontSize: 16),
                                     ),
                                   ),

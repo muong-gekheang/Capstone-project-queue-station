@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/edit_menu_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/menu_detail.dart';
@@ -23,7 +25,10 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MenuDetail(menu: widget.menu),
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: context.read<MenuManagementViewModel>(),
+                    child: MenuDetail(menu: widget.menu),
+                  ),
                 ),
               ).then((_) {
                 setState(() {
@@ -101,7 +106,7 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                               ),
                               SizedBox(width: 5),
                               Text(
-                                "\$${widget.menu.cheapestPrice().toStringAsFixed(2)}",
+                                "\$${widget.menu.minPrice}",
                                 style: TextStyle(
                                   color: const Color.fromRGBO(255, 104, 53, 1),
                                   fontSize: 12,

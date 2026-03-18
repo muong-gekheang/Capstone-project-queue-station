@@ -59,19 +59,54 @@ final List<AddOn> globalAddOns = [
 /// MENU-SIZE RELATIONS (PRICE PER MENU)
 /// ----------------------------
 final List<MenuSize> burgerSizes = [
-  MenuSize(sizeOption: globalSizes[0], price: 3.0), // Small
-  MenuSize(sizeOption: globalSizes[1], price: 4.0), // Medium
-  MenuSize(sizeOption: globalSizes[2], price: 4.75), // Large
+  MenuSize(
+    sizeOption: globalSizes[0],
+    price: 3.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Small
+  MenuSize(
+    sizeOption: globalSizes[1],
+    price: 4.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Medium
+  MenuSize(
+    sizeOption: globalSizes[2],
+    price: 4.75,
+    id: '',
+    sizeOptionId: '',
+  ), // Large
 ];
 
 final List<MenuSize> burgerMediumLarge = [
-  MenuSize(sizeOption: globalSizes[1], price: 1.0), // Medium
-  MenuSize(sizeOption: globalSizes[2], price: 1.25), // Large
+  MenuSize(
+    sizeOption: globalSizes[1],
+    price: 1.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Medium
+  MenuSize(
+    sizeOption: globalSizes[2],
+    price: 1.25,
+    id: '',
+    sizeOptionId: '',
+  ), // Large
 ];
 
 final List<MenuSize> pizzaSizes = [
-  MenuSize(sizeOption: globalSizes[0], price: 0.0), // Small
-  MenuSize(sizeOption: globalSizes[1], price: 2.0), // Medium
+  MenuSize(
+    sizeOption: globalSizes[0],
+    price: 0.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Small
+  MenuSize(
+    sizeOption: globalSizes[1],
+    price: 2.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Medium
 ];
 
 /// ----------------------------
@@ -140,6 +175,7 @@ final MenuItem classicBurger =
         isAvailable: true,
         id: Uuid().v4(),
         restaurantId: '',
+        minPrice: 0,
       )
       ..sizes.addAll(burgerSizes)
       ..addOns.addAll([
@@ -160,6 +196,7 @@ final MenuItem cheeseBurger =
         image: "assets/images/cheeseburger.png",
         isAvailable: true,
         restaurantId: '',
+        minPrice: 0,
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([
@@ -181,6 +218,7 @@ final MenuItem pepperoniPizza =
         image: "assets/images/pizza.png",
         isAvailable: true,
         restaurantId: '',
+        minPrice: 0,
       )
       ..sizes.addAll(pizzaSizes)
       ..addOns.addAll([
@@ -202,10 +240,21 @@ final MenuItem margheritaPizza =
         image: "assets/images/pizza(1).png",
         isAvailable: true,
         restaurantId: '',
+        minPrice: 0,
       )
       ..sizes.addAll([
-        MenuSize(sizeOption: globalSizes[1], price: 1.0), // Medium
-        MenuSize(sizeOption: globalSizes[2], price: 2.0), // Large
+        MenuSize(
+          sizeOption: globalSizes[1],
+          price: 1.0,
+          id: '',
+          sizeOptionId: '',
+        ), // Medium
+        MenuSize(
+          sizeOption: globalSizes[2],
+          price: 2.0,
+          id: '',
+          sizeOptionId: '',
+        ), // Large
       ])
       ..addOns.addAll([
         globalAddOns[0], // Extra Cheese
@@ -223,6 +272,7 @@ final MenuItem cola =
         image: "assets/images/energy-drink.png",
         isAvailable: true,
         restaurantId: '',
+        minPrice: 0,
       )
       ..addOns.addAll([
         AddOn(
@@ -252,6 +302,7 @@ final MenuItem veggieWrap =
         image: "assets/images/burger.png",
         isAvailable: true,
         restaurantId: '',
+        minPrice: 0,
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([

@@ -5,9 +5,16 @@ part 'menu_size.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class MenuSize {
+  final String id;
+  final String sizeOptionId;
   double price;
-  final SizeOption sizeOption;
-  MenuSize({required this.price, required this.sizeOption});
+  SizeOption? sizeOption;
+  MenuSize({
+    required this.price,
+    @JsonKey(includeFromJson: false, includeToJson: false) this.sizeOption,
+    required this.id,
+    required this.sizeOptionId,
+  });
 
   factory MenuSize.fromJson(Map<String, dynamic> json) =>
       _$MenuSizeFromJson(json);

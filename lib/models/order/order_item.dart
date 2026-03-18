@@ -102,5 +102,6 @@ MenuItem _placeholderMenuItem(String menuItemId) {
     description: '',
     category: MenuItemCategory(id: 'unknown_category', name: 'Unknown'),
     restaurantId: '',
+    minPrice: 0,
   );
 }

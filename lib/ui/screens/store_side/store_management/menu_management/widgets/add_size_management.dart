@@ -27,7 +27,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   void initState() {
     super.initState();
     for (var menuSize in widget.selectedMenuSizes) {
-      selectedSizes.add(menuSize.sizeOption);
+      if (menuSize.sizeOption != null) selectedSizes.add(menuSize.sizeOption!);
     }
   }
 
@@ -105,7 +105,16 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   void onAdd() {
     Navigator.pop(
       context,
-      selectedSizes.map((e) => MenuSize(price: 0, sizeOption: e)).toList(),
+      selectedSizes
+          .map(
+            (e) => MenuSize(
+              price: 0,
+              sizeOption: e,
+              id: uuid.v4(),
+              sizeOptionId: e.id,
+            ),
+          )
+          .toList(),
     );
   }
 

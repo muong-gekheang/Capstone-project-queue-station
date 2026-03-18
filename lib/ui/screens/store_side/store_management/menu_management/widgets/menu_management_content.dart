@@ -69,7 +69,11 @@ class MenuManagementContent extends StatelessWidget {
               child: ListView.builder(
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
-                  final item = filteredList[index];
+                  final item = filteredList[index].copyWith(
+                    category: vm.allCategories.firstWhere(
+                      (e) => e.id == filteredList[index].categoryId,
+                    ),
+                  );
                   return MenuCardWidget(
                     menu: item,
                     onDelete: () => vm.removeMenuItem(item),

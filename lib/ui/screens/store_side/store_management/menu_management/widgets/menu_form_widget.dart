@@ -293,7 +293,7 @@ class _MenuFormState extends State<MenuForm> {
                 MenuSizeTileWidget<MenuSize>(
                   items: availableMenuSizes,
                   controllers: menuSizeController,
-                  getName: (item) => item.sizeOption.name,
+                  getName: (item) => item.sizeOption!.name,
                   getPrice: (item) => item.price,
                   onPriceChanged: (item, newPrice) {
                     setState(() {
@@ -417,10 +417,22 @@ class _MenuFormState extends State<MenuForm> {
                             ? () => widget.onSubmit(
                                 MenuItem(
                                   id: uuid.v4(),
+                                  addOnIds: selectedAddOns
+                                      .map((e) => e.id)
+                                      .toList(),
+                                  sizes: availableMenuSizes,
                                   name: _nameController.text,
                                   description: _descriptionController.text,
                                   categoryId: selectedCategory!.id,
+                                  minPrepTimeMinutes: int.tryParse(
+                                    _minTimeController.text,
+                                  ),
+                                  maxPrepTimeMinutes: int.tryParse(
+                                    _maxTimeController.text,
+                                  ),
+
                                   restaurantId: '',
+                                  minPrice: _getMinPrice(availableMenuSizes),
                                 ),
                               )
                             : null,
@@ -441,4 +453,14 @@ class _MenuFormState extends State<MenuForm> {
       ),
     );
   }
+}
+
+double _getMinPrice(List<MenuSize> availableSizes) {
+  double result = availableSizes[0].price;
+  for (var menuSize in availableSizes) {
+    if (menuSize.price < result) {
+      result = menuSize.price;
+    }
+  }
+  return result;
 }

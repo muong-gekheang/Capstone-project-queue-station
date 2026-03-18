@@ -133,7 +133,7 @@ exports.createQueue = onCall(async (request) => {
         customerName: customerName || "Guest",
         phoneNumber: phoneNumber || "",
         status: "waiting",
-        joinTime: joinTime || now.toISOString(),
+        joinTime: now.toISOString(),
         queueNumber,
         tableNumber: tData.tableNumber || "",
         assignedTableId: bestTable.tableId,

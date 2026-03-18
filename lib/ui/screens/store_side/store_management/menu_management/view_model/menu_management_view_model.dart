@@ -179,6 +179,10 @@ class MenuManagementViewModel extends ChangeNotifier {
     _menuService.addSizeOption(newSizeOption);
   }
 
+  Future<MenuItem> getMenuitemDetails(MenuItem menuItem) {
+    return _menuService.getMenuItemDetails(menuItem);
+  }
+
   double getCheapestPrice(MenuItem menu) {
     if (menu.sizes.isEmpty) return 0.0;
 

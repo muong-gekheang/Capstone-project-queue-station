@@ -7,38 +7,66 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/edit_me
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 
-class MenuDetail extends StatelessWidget {
+class MenuDetail extends StatefulWidget {
   final MenuItem menu;
   const MenuDetail({super.key, required this.menu});
+
+  @override
+  State<MenuDetail> createState() => _MenuDetailState();
+}
+
+class _MenuDetailState extends State<MenuDetail> {
+  late MenuItem menu;
+  @override
+  void initState() {
+    menu = widget.menu;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<MenuManagementViewModel>();
 
-    // Find the current version of this menu from the VM's master list
-    final currentMenu = vm.getFilteredMenuList().firstWhere(
-      (m) => m.id == menu.id,
-      orElse: () => menu,
-    );
-
     return Scaffold(
-      appBar: AppBarWidget(title: currentMenu.name, color: Colors.black),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
-            children: [
-              _buildImageHeader(currentMenu.image),
-              const SizedBox(height: 10),
-              _buildAvailabilityToggle(context, vm, currentMenu),
-              _buildMenuInfo(currentMenu, vm),
-              const SizedBox(height: 10),
-              _buildDetailsList(currentMenu),
-              const SizedBox(height: 20),
-              _buildActionButtons(context, vm, currentMenu),
-            ],
-          ),
-        ),
+      appBar: AppBarWidget(title: menu.name, color: Colors.black),
+      body: FutureBuilder(
+        future: vm.getMenuitemDetails(menu),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text("Error loading details"));
+          }
+
+          // 1. Capture the data in a local variable
+          final menuItem = snapshot.data;
+
+          // 2. Check if the variable itself is null
+          if (menuItem == null) {
+            return const Center(child: Text("No data found"));
+          }
+
+          // Now 'menuItem' is safely treated as non-nullable
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                children: [
+                  _buildImageHeader(menuItem.image),
+                  const SizedBox(height: 10),
+                  _buildAvailabilityToggle(context, vm, menuItem),
+                  _buildMenuInfo(menuItem, vm),
+                  const SizedBox(height: 10),
+                  _buildDetailsList(menuItem),
+                  const SizedBox(height: 20),
+                  _buildActionButtons(context, vm, menuItem),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -105,7 +133,6 @@ class MenuDetail extends StatelessWidget {
   }
 
   // --- Helper Widgets (Piping only) ---
-
   Widget _buildImageHeader(String? image) {
     return CircleAvatar(radius: 120, backgroundImage: _getImageProvider(image));
   }
@@ -140,7 +167,7 @@ class MenuDetail extends StatelessWidget {
       children: [
         ...menu.sizes.map(
           (s) => _buildDataRow(
-            s.sizeOption.name,
+            s.sizeOption!.name,
             '\$${s.price.toStringAsFixed(2)}',
           ),
         ),

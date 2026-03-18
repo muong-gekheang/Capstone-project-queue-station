@@ -11,6 +11,7 @@ class MenuItem {
   final String id;
   final String? image;
   final String name;
+  final double minPrice;
   final String description;
   final int? minPrepTimeMinutes;
   final int? maxPrepTimeMinutes;
@@ -46,6 +47,7 @@ class MenuItem {
     List<AddOn>? addOns,
     this.isAvailable = true,
     required this.restaurantId,
+    required this.minPrice,
   }) : categoryId = categoryId ?? category?.id ?? 'unknown_category',
        category =
            category ??
@@ -56,8 +58,7 @@ class MenuItem {
        sizes = sizes ?? [],
        addOns = addOns ?? [],
        menuSizeOptionIds =
-           menuSizeOptionIds ??
-           (sizes ?? []).map((s) => s.sizeOption.name).toList(),
+           menuSizeOptionIds ?? (sizes ?? []).map((s) => s.id).toList(),
        addOnIds = addOnIds ?? (addOns ?? []).map((a) => a.id).toList();
 
   MenuItem copyWith({
@@ -75,6 +76,7 @@ class MenuItem {
     List<AddOn>? addOns,
     bool? isAvailable,
     String? restaurantId,
+    double? minPrice,
   }) {
     return MenuItem(
       id: id ?? this.id,
@@ -92,6 +94,7 @@ class MenuItem {
       addOns: addOns ?? List<AddOn>.from(this.addOns),
       isAvailable: isAvailable ?? this.isAvailable,
       restaurantId: restaurantId ?? this.restaurantId,
+      minPrice: minPrice ?? this.minPrice,
     );
   }
 

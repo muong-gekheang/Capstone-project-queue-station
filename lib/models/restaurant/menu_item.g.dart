@@ -24,12 +24,14 @@ MenuItem _$MenuItemFromJson(Map<String, dynamic> json) => MenuItem(
       [],
   isAvailable: json['isAvailable'] as bool? ?? true,
   restaurantId: json['restaurantId'] as String,
+  minPrice: (json['minPrice'] as num).toDouble(),
 );
 
 Map<String, dynamic> _$MenuItemToJson(MenuItem instance) => <String, dynamic>{
   'id': instance.id,
   'image': instance.image,
   'name': instance.name,
+  'minPrice': instance.minPrice,
   'description': instance.description,
   'minPrepTimeMinutes': instance.minPrepTimeMinutes,
   'maxPrepTimeMinutes': instance.maxPrepTimeMinutes,

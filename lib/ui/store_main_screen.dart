@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_size/menu_size_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/data/repositories/order_item/order_item_repository.dart';
@@ -132,6 +133,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 menuCategoryRepository: context.read<MenuCategoryRepository>(),
                 addOnRepository: context.read<AddOnRepository>(),
                 sizingOptionRepository: context.read<SizingOptionRepository>(),
+                menuSizeRepository: context.read<MenuSizeRepository>(),
               );
             }
             prev.updateDependencies(newUserProvider);

@@ -8,10 +8,12 @@ part of 'menu_size.dart';
 
 MenuSize _$MenuSizeFromJson(Map<String, dynamic> json) => MenuSize(
   price: (json['price'] as num).toDouble(),
-  sizeOption: SizeOption.fromJson(json['sizeOption'] as Map<String, dynamic>),
+  id: json['id'] as String,
+  sizeOptionId: json['sizeOptionId'] as String,
 );
 
 Map<String, dynamic> _$MenuSizeToJson(MenuSize instance) => <String, dynamic>{
+  'id': instance.id,
+  'sizeOptionId': instance.sizeOptionId,
   'price': instance.price,
-  'sizeOption': instance.sizeOption.toJson(),
 };

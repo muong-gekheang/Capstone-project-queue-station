@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_size/menu_size_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_size/menu_size_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
+import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -17,7 +20,7 @@ class MenuService {
   final AddOnRepository _addOnRepository;
   final MenuCategoryRepository _menuCategoryRepository;
   final SizingOptionRepository _sizingOptionRepository;
-
+  final MenuSizeRepository _menuSizeRepository;
   UserProvider _userProvider;
 
   final _addOnController = BehaviorSubject<List<AddOn>>.seeded([]);
@@ -42,11 +45,13 @@ class MenuService {
     required MenuCategoryRepository menuCategoryRepository,
     required AddOnRepository addOnRepository,
     required SizingOptionRepository sizingOptionRepository,
+    required MenuSizeRepository menuSizeRepository,
   }) : _userProvider = userProvider,
        _menuItemRepository = menuItemRepository,
        _menuCategoryRepository = menuCategoryRepository,
        _addOnRepository = addOnRepository,
-       _sizingOptionRepository = sizingOptionRepository {
+       _sizingOptionRepository = sizingOptionRepository,
+       _menuSizeRepository = menuSizeRepository {
     _initStream();
   }
 
@@ -130,9 +135,28 @@ class MenuService {
     return await _menuItemRepository.getMenuItemById(menuItemId);
   }
 
+  Future<MenuItem> getMenuItemDetails(MenuItem menuItem) async {
+    final List<MenuSize> menuSizes = [];
+    final List<AddOn> addOns = [];
+    for (var menuSizeId in menuItem.menuSizeOptionIds) {
+      var result = await _menuSizeRepository.getMenuSizeById(menuSizeId);
+      if (result != null) menuSizes.add(result);
+    }
+
+    for (var addOnId in menuItem.addOnIds) {
+      var result = await _addOnRepository.getAddOnById(addOnId);
+      if (result != null) addOns.add(result);
+    }
+    final result = menuItem.copyWith(sizes: menuSizes, addOns: addOns);
+    return result;
+  }
+
   void addMenuItem(MenuItem newMenu) {
     MenuItem menuToAdd = newMenu.copyWith(restaurantId: _restId);
     _menuItemRepository.create(menuToAdd);
+    for (var menuSize in newMenu.sizes) {
+      _menuSizeRepository.create(menuSize);
+    }
   }
 
   void updateMenuItem(MenuItem newMenuItem) {
