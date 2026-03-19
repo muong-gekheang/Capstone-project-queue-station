@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:queue_station_app/utils/timestamp_converter.dart';
+import 'menu_item.dart';
+import 'queue_table.dart';
 
 part 'restaurant.g.dart';
 
@@ -9,7 +13,6 @@ class Restaurant {
   final String id;
   final String name;
   final String address;
-  final String? description;
   final String logoLink;
   final String policy;
   final int biggestTableSize;
@@ -26,8 +29,13 @@ class Restaurant {
 
   final bool isOpen;
   final String email;
-  @JsonKey(defaultValue: '')
-  final String subscriptionDate;
+  @JsonKey(defaultValue: 0)
+  final int openingTime; // this need to be store in minute to handle the time like 8:30 which is equal to 510
+  @JsonKey(defaultValue: 0)
+  final int closingTime;
+  @JsonKey(defaultValue: DateTime.now)
+  @TimestampConverter()
+  final DateTime subscriptionDate;
   final SubscriptionStatus subscriptionStatus;
 
   Restaurant({
@@ -46,7 +54,8 @@ class Restaurant {
     this.email = '',
     required this.subscriptionDate,
     this.subscriptionStatus = SubscriptionStatus.paid,
-    this.description,
+    required this.openingTime,
+    required this.closingTime,
   }) : itemIds = itemIds ?? [],
        tableIds = tableIds ?? [],
        globalAddOnIds = globalAddOnIds ?? [],
@@ -54,14 +63,21 @@ class Restaurant {
 
   Duration get averageWaitingTime => const Duration(hours: 1);
 
-  @override
-  bool operator ==(Object other) {
-    return (other is Restaurant) &&
-        (other.name == name &&
-            other.id == id &&
-            other.address == address &&
-            other.isOpen == isOpen &&
-            other.phone == phone);
+  bool get isCurrentlyOpen {
+    if (!isOpen) return false;
+
+    final now = DateTime.now();
+    // convert hour to minute
+    final currentTimeInMinute = now.hour * 60 + now.minute;
+
+    if (openingTime < closingTime) {
+      return currentTimeInMinute >= openingTime &&
+          currentTimeInMinute <= closingTime;
+    } else {
+      // this is to handle restaurant with this opening time : 18:00 (6PM) - 2AM
+      return currentTimeInMinute <= openingTime ||
+          currentTimeInMinute >= closingTime;
+    }
   }
 
   Restaurant copyWith({
@@ -69,7 +85,6 @@ class Restaurant {
     String? name,
     String? address,
     String? logoLink,
-    String? description,
     String? policy,
     int? biggestTableSize,
     String? phone,
@@ -79,8 +94,10 @@ class Restaurant {
     List<String>? globalSizeOptionIds,
     bool? isOpen,
     String? email,
-    String? subscriptionDate,
+    DateTime? subscriptionDate,
     SubscriptionStatus? subscriptionStatus,
+    int? openingTime,
+    int? closingTime,
   }) {
     return Restaurant(
       id: id ?? this.id,
@@ -98,12 +115,10 @@ class Restaurant {
       email: email ?? this.email,
       subscriptionDate: subscriptionDate ?? this.subscriptionDate,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
-      description: description ?? this.description,
+      openingTime: openingTime ?? this.openingTime,
+      closingTime: closingTime ?? this.closingTime,
     );
   }
-
-  @override
-  int get hashCode => Object.hash(name, address, phone, isOpen);
 
   factory Restaurant.fromJson(Map<String, dynamic> json) =>
       _$RestaurantFromJson(json);

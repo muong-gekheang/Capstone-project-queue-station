@@ -53,6 +53,7 @@ import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
+import 'package:queue_station_app/utils/seed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<SingleChildWidget> dependencies = [

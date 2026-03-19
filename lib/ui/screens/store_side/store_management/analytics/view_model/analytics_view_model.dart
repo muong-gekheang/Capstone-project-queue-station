@@ -142,7 +142,7 @@ class AnalyticsViewModel extends ChangeNotifier {
     try {
       final results = [
         await _analyticsService.dashboardStats,
-        _analyticsService.totalOrders,
+        _analyticsService.todayTotalOrders,
         await loadQueueLength(timeFrame: queueLengthTimeframe),
         await loadTableOccupancy(timeFrame: tableOccupancyTimeframe),
         await loadAverageOrderValue(timeFrame: orderValueTimeframe),

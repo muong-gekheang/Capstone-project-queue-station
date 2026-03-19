@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:queue_station_app/utils/timestamp_converter.dart';
 
 import 'order_item.dart';
 
@@ -13,7 +14,6 @@ class Order {
   final List<String> orderedIds;
   @JsonKey(defaultValue: <String>[])
   final List<String> inCartIds;
-
   final DateTime timestamp;
 
   @JsonKey(includeFromJson: false, includeToJson: false)

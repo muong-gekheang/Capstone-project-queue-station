@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/utils/nullable_timestamp_converter.dart';
+import 'package:queue_station_app/utils/timestamp_converter.dart';
 
 part 'queue_entry.g.dart';
 
@@ -16,10 +18,15 @@ class QueueEntry {
   final String customerId;
   final String assignedTableId;
   final int partySize;
+  @TimestampConverter()
   final DateTime joinTime;
+  @TimestampConverter()
   final DateTime expectedTableReadyAt;
+  @NullableTimestampConverter()
   final DateTime? servedTime;
+  @NullableTimestampConverter()
   final DateTime? endedTime;
+
   final QueueStatus status;
   final String? orderId;
   final JoinedMethod joinedMethod;

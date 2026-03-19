@@ -76,7 +76,9 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    subscriptionDate: '',
+    subscriptionDate: DateTime.now(),
+    openingTime: 10,
+    closingTime: 10,
   ),
   Restaurant(
     id: uuid.v4(),
@@ -85,7 +87,9 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    subscriptionDate: '',
+    subscriptionDate: DateTime.now(),
+    openingTime: 10,
+    closingTime: 10,
   ),
   Restaurant(
     id: uuid.v4(),
@@ -94,7 +98,9 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    subscriptionDate: '',
+    subscriptionDate: DateTime.now(),
+    openingTime: 10,
+    closingTime: 10,
   ),
   Restaurant(
     id: uuid.v4(),
@@ -103,7 +109,9 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    subscriptionDate: '',
+    subscriptionDate: DateTime.now(),
+    openingTime: 10,
+    closingTime: 10,
   ),
   Restaurant(
     id: uuid.v4(),
@@ -112,6 +120,8 @@ List<Restaurant> mockRestaurants = [
     logoLink: '',
     biggestTableSize: 10,
     phone: "012255007",
-    subscriptionDate: '',
+    subscriptionDate: DateTime.now(),
+    openingTime: 10,
+    closingTime: 10,
   ),
 ];

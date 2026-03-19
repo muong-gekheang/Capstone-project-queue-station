@@ -1,5 +1,6 @@
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
@@ -7,11 +8,14 @@ import 'package:queue_station_app/ui/screens/store_side/store_management/analyti
 class AnalyticsService {
   final QueueService _queueService;
   final TableService _tableService;
+  final OrderService _orderService;
   AnalyticsService({
     required QueueService queueService,
     required TableService tableService,
+    required OrderService orderService,
   }) : _queueService = queueService,
-       _tableService = tableService;
+       _tableService = tableService,
+       _orderService = orderService;
 
   Future<DashboardStats> get dashboardStats async {
     int activeTables = 0;
@@ -25,12 +29,13 @@ class AnalyticsService {
       queueEntries: _queueService.currentEntries.length,
       peopleWaiting: _queueService.peopleWaiting,
       activeTables: activeTables,
+      totalOrders: _orderService.todayOrder.length,
       averageWaitTimeMinutes: (await _queueService.avgWaitingTime).inMinutes,
     );
   }
 
-  int get totalOrders {
-    return 100; // TODO: Implement Order Service
+  int get todayTotalOrders {
+    return _orderService.todayOrder.length;
   }
 
   List<QueueLengthDataPoint> getQueueLengthData(TimeFrameOption option) {

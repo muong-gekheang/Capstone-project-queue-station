@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+import 'package:flutter/rendering.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
@@ -96,9 +97,26 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Stream<List<Order>> watchAllOrder(String restId) {
-    // TODO: implement watchAllOrder
-    throw UnimplementedError();
+  Stream<List<Order>> watchTodayOrders(String restId) {
+    final startOfToday = DateTime.now().copyWith(
+      hour: 0,
+      minute: 0,
+      microsecond: 0,
+      millisecond: 0,
+    );
+    final result = firestore
+        .collection('orders')
+        .where('restId', isEqualTo: restId)
+        .where('timestamp', isGreaterThan: startOfToday)
+        .snapshots()
+        .handleError((err) => debugPrint("Stream Error: $err"))
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            var result = Order.fromJson(doc.data());
+            return result;
+          }).toList();
+        });
+    return result;
   }
 
   @override

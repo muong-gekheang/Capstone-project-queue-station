@@ -75,11 +75,7 @@ class EditStoreViewModel extends ChangeNotifier {
     _storeProfileService.setStoreProfileImage(selectedImage);
     if (_currentRestaurant != null) {
       _restaurantService.updateRestaurant(
-        _currentRestaurant!.copyWith(
-          name: newStoreName,
-          description: newDescription,
-          email: storeEmail,
-        ),
+        _currentRestaurant!.copyWith(name: newStoreName, email: storeEmail),
       );
 
       if (userEmail != adminEmail && userEmail != "Unknown") {

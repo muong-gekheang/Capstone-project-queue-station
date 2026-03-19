@@ -17,22 +17,23 @@ QueueTable _$QueueTableFromJson(Map<String, dynamic> json) => QueueTable(
           ?.map((e) => e as String)
           .toList() ??
       [],
-  latestEstimatedReadyAt: json['latestEstimatedReadyAt'] == null
-      ? null
-      : DateTime.parse(json['latestEstimatedReadyAt'] as String),
+  latestEstimatedReadyAt: const NullableTimestampConverter().fromJson(
+    json['latestEstimatedReadyAt'],
+  ),
 );
 
-Map<String, dynamic> _$QueueTableToJson(
-  QueueTable instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'tableNum': instance.tableNum,
-  'restaurantId': instance.restaurantId,
-  'tableCategoryId': instance.tableCategoryId,
-  'tableStatus': _$TableStatusEnumMap[instance.tableStatus]!,
-  'queueEntryIds': instance.queueEntryIds,
-  'latestEstimatedReadyAt': instance.latestEstimatedReadyAt?.toIso8601String(),
-};
+Map<String, dynamic> _$QueueTableToJson(QueueTable instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'tableNum': instance.tableNum,
+      'restaurantId': instance.restaurantId,
+      'tableCategoryId': instance.tableCategoryId,
+      'tableStatus': _$TableStatusEnumMap[instance.tableStatus]!,
+      'queueEntryIds': instance.queueEntryIds,
+      'latestEstimatedReadyAt': const NullableTimestampConverter().toJson(
+        instance.latestEstimatedReadyAt,
+      ),
+    };
 
 const _$TableStatusEnumMap = {
   TableStatus.available: 'available',

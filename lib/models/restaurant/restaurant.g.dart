@@ -32,14 +32,17 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
       [],
   isOpen: json['isOpen'] as bool? ?? true,
   email: json['email'] as String? ?? '',
-  subscriptionDate: json['subscriptionDate'] as String? ?? '',
+  subscriptionDate: json['subscriptionDate'] == null
+      ? DateTime.now()
+      : const TimestampConverter().fromJson(json['subscriptionDate']),
   subscriptionStatus:
       $enumDecodeNullable(
         _$SubscriptionStatusEnumMap,
         json['subscriptionStatus'],
       ) ??
       SubscriptionStatus.paid,
-  description: json['description'] as String?,
+  openingTime: (json['openingTime'] as num?)?.toInt() ?? 0,
+  closingTime: (json['closingTime'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
@@ -47,7 +50,6 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
       'id': instance.id,
       'name': instance.name,
       'address': instance.address,
-      'description': instance.description,
       'logoLink': instance.logoLink,
       'policy': instance.policy,
       'biggestTableSize': instance.biggestTableSize,
@@ -58,7 +60,11 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
       'globalSizeOptionIds': instance.globalSizeOptionIds,
       'isOpen': instance.isOpen,
       'email': instance.email,
-      'subscriptionDate': instance.subscriptionDate,
+      'openingTime': instance.openingTime,
+      'closingTime': instance.closingTime,
+      'subscriptionDate': const TimestampConverter().toJson(
+        instance.subscriptionDate,
+      ),
       'subscriptionStatus':
           _$SubscriptionStatusEnumMap[instance.subscriptionStatus]!,
     };

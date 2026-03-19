@@ -11,8 +11,7 @@ class AnalyticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AnalyticsViewModel(
-        analyticsService: context
-            .read<AnalyticsService>(), // Inject the service here
+        analyticsService: context.read<AnalyticsService>(),
       ),
       child: const AnalyticsContent(),
     );

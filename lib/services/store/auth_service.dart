@@ -102,15 +102,31 @@ class AuthService {
   }
 
   Future<void> restoreSession() async {
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser == null) {
+    try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) {
+        _userProvider.setRestored();
+        return;
+      }
+
+      debugPrint("Restore attempt for: ${firebaseUser.uid}");
+
+      // Wrap the entire restoration logic in a timeout
+      await _performRestoration(firebaseUser).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          debugPrint("Restoration timed out. Forcing navigation to Auth.");
+        },
+      );
+    } catch (e) {
+      debugPrint("Restoration failed with error: $e");
+    } finally {
       _userProvider.setRestored();
-      return;
     }
+  }
 
-    debugPrint("Restore: $firebaseUser");
-
-    // Re-use your existing login logic to repopulate UserProvider
+  /// Helper method to keep the main method clean
+  Future<void> _performRestoration(User firebaseUser) async {
     String? role = await getUserRole(firebaseUser);
     if (role == null || role.isEmpty) return;
 
@@ -119,18 +135,15 @@ class AuthService {
         Customer? customer = await _customerRepository.getUserById(
           firebaseUser.uid,
         );
-        if (customer == null) return;
-        _userProvider.updateUser(customer);
+        if (customer != null) _userProvider.updateUser(customer);
         break;
       case "store":
         StoreUser? storeUser = await _storeUserRepository.getUserById(
           firebaseUser.uid,
         );
-        if (storeUser == null) return;
-        _userProvider.updateUser(storeUser);
+        if (storeUser != null) _userProvider.updateUser(storeUser);
         break;
     }
-    _userProvider.setRestored();
   }
 
   void updateDependencies({

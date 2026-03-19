@@ -32,5 +32,5 @@ abstract class OrderRepository {
   );
 
   Stream<Order?> watchOrderById(String orderId);
-  Stream<List<Order>> watchAllOrder(String restId);
+  Stream<List<Order>> watchTodayOrders(String restId);
 }

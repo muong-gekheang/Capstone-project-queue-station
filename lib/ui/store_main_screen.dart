@@ -15,6 +15,7 @@ import 'package:queue_station_app/data/repositories/table_category/table_categor
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/order_service.dart';
+import 'package:queue_station_app/services/store/analytics_service.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
@@ -158,12 +159,35 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
           },
           dispose: (context, value) => value.dispose(),
         ),
-        ProxyProvider<MenuService, OrderService>(
-          update: (context, value, previous) => OrderService(
-            orderRepository: context.read<OrderRepository>(),
-            menuService: value,
-            orderItemRepository: context.read<OrderItemRepository>(),
-          ),
+        ProxyProvider2<MenuService, UserProvider, OrderService>(
+          update: (context, menuService, userProvider, previous) {
+            if (previous == null) {
+              return OrderService(
+                orderRepository: context.read<OrderRepository>(),
+                menuService: menuService,
+                orderItemRepository: context.read<OrderItemRepository>(),
+                userProvider: userProvider,
+              );
+            }
+            previous.updateDependencies(userProvider, menuService);
+            return previous;
+          },
+          dispose: (context, value) => value.dispose(),
+        ),
+
+        ProxyProvider3<
+          QueueService,
+          TableService,
+          OrderService,
+          AnalyticsService
+        >(
+          update:
+              (context, queueService, tableService, orderService, previous) =>
+                  AnalyticsService(
+                    queueService: queueService,
+                    tableService: tableService,
+                    orderService: orderService,
+                  ),
         ),
       ],
       child: Scaffold(

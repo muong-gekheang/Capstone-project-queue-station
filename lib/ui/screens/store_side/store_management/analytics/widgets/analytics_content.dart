@@ -43,45 +43,45 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildStoreProfileImage() {
-    var storeService = context.read<StoreProfileService>();
-    final profileImage = "assets/home_screen";
-    final storeName = storeService.storeUser?.name;
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: //!= null
-          // ? ClipRRect(
-          //     borderRadius: BorderRadius.circular(20),
-          //     child: Image.file(
-          //       profileImage,
-          //       width: 40,
-          //       height: 40,
-          //       fit: BoxFit.cover,
-          //     ),
-          //   )
-          Container(
-            width: 40,
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Center(
-              child: Text(
-                storeName != null && storeName.isNotEmpty
-                    ? storeName[0].toUpperCase()
-                    : 'S',
-                style: const TextStyle(
-                  color: Color(0xFFFF6835),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-    );
-  }
+  // Widget _buildStoreProfileImage() {
+  //   var storeService = context.read<StoreProfileService>();
+  //   final profileImage = "assets/home_screen";
+  //   final storeName = storeService.storeUser?.name;
+  //   return Container(
+  //     margin: const EdgeInsets.only(right: 8),
+  //     child: //!= null
+  //         // ? ClipRRect(
+  //         //     borderRadius: BorderRadius.circular(20),
+  //         //     child: Image.file(
+  //         //       profileImage,
+  //         //       width: 40,
+  //         //       height: 40,
+  //         //       fit: BoxFit.cover,
+  //         //     ),
+  //         //   )
+  //         Container(
+  //           width: 40,
+  //           height: 40,
+  //           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+  //           decoration: BoxDecoration(
+  //             color: const Color(0xFFFF6835).withAlpha((255 * 0.1).toInt()),
+  //             borderRadius: BorderRadius.circular(20),
+  //           ),
+  //           child: Center(
+  //             child: Text(
+  //               storeName != null && storeName.isNotEmpty
+  //                   ? storeName[0].toUpperCase()
+  //                   : 'S',
+  //               style: const TextStyle(
+  //                 color: Color(0xFFFF6835),
+  //                 fontWeight: FontWeight.w600,
+  //                 fontSize: 16,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -105,13 +105,6 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
             ),
           ],
         ),
-        actions: [
-          _buildStoreProfileImage(),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: vm.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -312,7 +305,8 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                         final index = value.toInt();
                         if (index >= 0 && index < vm.queueLengthData.length) {
                           final time = vm.queueLengthData[index].time;
-                          if (vm.queueLengthTimeframe == 'Today') {
+                          if (vm.queueLengthTimeframe ==
+                              TimeFrameOption.today) {
                             final hour = time.hour;
                             if (hour == 8 ||
                                 hour == 10 ||

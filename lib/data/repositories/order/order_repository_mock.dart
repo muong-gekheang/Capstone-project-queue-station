@@ -104,7 +104,7 @@ class OrderRepositoryMock implements OrderRepository {
   }
 
   @override
-  Stream<List<Order>> watchAllOrder(String restId) {
+  Stream<List<Order>> watchTodayOrders(String restId) {
     // TODO: implement watchAllOrder
     throw UnimplementedError();
   }
