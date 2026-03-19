@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +23,7 @@ import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 
 class MenuForm extends StatefulWidget {
   final MenuItem? initialMenu; // null = Add, not null = Edit
-  final void Function(MenuItem menu) onSubmit;
+  final void Function(MenuItem menu, Uint8List? pickedLogoBytes) onSubmit;
 
   const MenuForm({super.key, this.initialMenu, required this.onSubmit});
 
@@ -48,6 +50,7 @@ class _MenuFormState extends State<MenuForm> {
   MenuItemCategory? selectedCategory;
   List<AddOn> selectedAddOns = [];
   List<MenuSize> availableMenuSizes = [];
+  Uint8List? pickedLogoBytes;
 
   @override
   void initState() {
@@ -107,13 +110,32 @@ class _MenuFormState extends State<MenuForm> {
     return null;
   }
 
+  void onPickImage() async {
+    final ImagePicker picker = ImagePicker();
+    Uint8List? selectedImageBytes;
+
+    final XFile? pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedImage == null) return;
+
+    selectedImageBytes = await pickedImage.readAsBytes();
+    setState(() {
+      pickedLogoBytes = selectedImageBytes;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var vm = context.watch<MenuManagementViewModel>();
     return SingleChildScrollView(
       child: Column(
         children: [
-          ProfileEditorWidget(onEdit: () {}, imagePath: selectedImageFile),
+          ProfileEditorWidget(
+            image: pickedLogoBytes != null
+                        ? MemoryImage(pickedLogoBytes!)
+                        : null, 
+            onPickImage: onPickImage,),
           Form(
             key: _formKey,
             child: Column(
@@ -460,6 +482,7 @@ class _MenuFormState extends State<MenuForm> {
                                   restaurantId: '',
                                   minPrice: _getMinPrice(availableMenuSizes),
                                 ),
+                                pickedLogoBytes
                               )
                             : null,
                         backgroundColor: AppTheme.primaryColor,

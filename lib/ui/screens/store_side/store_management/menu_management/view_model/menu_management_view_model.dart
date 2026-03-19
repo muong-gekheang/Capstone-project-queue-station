@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
@@ -166,8 +167,8 @@ class MenuManagementViewModel extends ChangeNotifier {
     _menuService.deleteMenuItem(item);
   }
 
-  void addMenuItem(MenuItem newItem) {
-    _menuService.addMenuItem(newItem);
+  void addMenuItem(MenuItem newItem, Uint8List? selectedImageBytes) {
+    _menuService.addMenuItem(newItem, selectedImageBytes);
   }
 
   void addNewCategory(MenuItemCategory newCategory) {

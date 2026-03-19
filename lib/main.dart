@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
 import 'package:queue_station_app/data/repositories/auth/auth_repository_impl.dart';
+import 'package:queue_station_app/data/repositories/image/image_repository.dart';
+import 'package:queue_station_app/data/repositories/image/image_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
@@ -74,6 +76,7 @@ List<SingleChildWidget> dependencies = [
   Provider<OrderRepository>(create: (_) => OrderRepositoryImpl()),
   Provider<OrderItemRepository>(create: (_) => OrderItemRepositoryImpl()),
   Provider<MenuSizeRepository>(create: (_) => MenuSizeRepositoryImpl()),
+  Provider<ImageRepository>(create: (_) => ImageRepositoryImpl(),),
 ];
 
 void main() async {

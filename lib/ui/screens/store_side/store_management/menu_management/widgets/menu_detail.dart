@@ -194,6 +194,9 @@ class _MenuDetailState extends State<MenuDetail> {
 
   ImageProvider _getImageProvider(String? path) {
     // TODO: Insert your ImageProvider logic here
-    return const AssetImage('assets/images/default.png');
+    if (path != null && path.isNotEmpty) {
+      return NetworkImage(path);
+    }
+    return const AssetImage('assets/images/default_menu_profile.jpg');
   }
 }

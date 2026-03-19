@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/image/image_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
@@ -135,7 +136,8 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 menuCategoryRepository: context.read<MenuCategoryRepository>(),
                 addOnRepository: context.read<AddOnRepository>(),
                 sizingOptionRepository: context.read<SizingOptionRepository>(),
-                menuSizeRepository: context.read<MenuSizeRepository>(),
+                menuSizeRepository: context.read<MenuSizeRepository>(), 
+                imageRepository: context.read<ImageRepository>(),
               );
             }
             prev.updateDependencies(newUserProvider);

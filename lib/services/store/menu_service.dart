@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:queue_station_app/data/repositories/image/image_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
@@ -22,6 +24,7 @@ class MenuService {
   final MenuCategoryRepository _menuCategoryRepository;
   final SizingOptionRepository _sizingOptionRepository;
   final MenuSizeRepository _menuSizeRepository;
+  final ImageRepository _imageRepository;
   UserProvider _userProvider;
 
   final _addOnController = BehaviorSubject<List<AddOn>>.seeded([]);
@@ -47,11 +50,13 @@ class MenuService {
     required AddOnRepository addOnRepository,
     required SizingOptionRepository sizingOptionRepository,
     required MenuSizeRepository menuSizeRepository,
+    required ImageRepository imageRepository,
   }) : _userProvider = userProvider,
        _menuItemRepository = menuItemRepository,
        _menuCategoryRepository = menuCategoryRepository,
        _addOnRepository = addOnRepository,
        _sizingOptionRepository = sizingOptionRepository,
+       _imageRepository = imageRepository,
        _menuSizeRepository = menuSizeRepository {
     _initStream();
   }
@@ -158,7 +163,22 @@ class MenuService {
     return result;
   }
 
-  void addMenuItem(MenuItem newMenu) {
+  void addMenuItem(MenuItem newMenu, Uint8List? pickedLogoBytes) {
+    if (pickedLogoBytes != null && pickedLogoBytes.isNotEmpty) {
+      _imageRepository
+          .uploadLogo(pickedLogoBytes, 'menu_item_${newMenu.id}')
+          .then((imageUrl) {
+            final menuWithLogo = newMenu.copyWith(
+              image: imageUrl,
+              restaurantId: _restId,
+            );
+            _menuItemRepository.create(menuWithLogo);
+            for (var menuSize in newMenu.sizes) {
+              _menuSizeRepository.create(menuSize);
+            }
+          });
+      return;
+    }
     MenuItem menuToAdd = newMenu.copyWith(restaurantId: _restId);
     _menuItemRepository.create(menuToAdd);
     for (var menuSize in newMenu.sizes) {

@@ -66,13 +66,14 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          image: widget.menu.image != null
+                          image:  (widget.menu.image != null &&
+                                  widget.menu.image!.isNotEmpty)
                               ? DecorationImage(
-                                  image: AssetImage(widget.menu.image!),
+                                  image: NetworkImage(widget.menu.image!),
                                 )
                               : DecorationImage(
                                   image: AssetImage(
-                                    'assets/images/default_menu.jpg',
+                                    'assets/images/default_menu_profile.jpg',
                                   ),
                                 ), // - will implement later
                         ),
