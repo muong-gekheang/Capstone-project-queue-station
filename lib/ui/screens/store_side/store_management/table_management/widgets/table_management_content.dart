@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
+import 'package:queue_station_app/services/order_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/ui/screens/store_side/order_screen/store_order_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/view_model/table_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
@@ -106,7 +109,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
     if (vm.isEditMode) {
       showEditTableDialog(table: table);
     } else {
-      showTableStatusDialog(table: table, status: status);
+      showTableStatusDialog(table: table, status: status, vm: vm);
     }
   }
 
@@ -369,6 +372,7 @@ class _TableManagementContentState extends State<TableManagementContent> {
   void showTableStatusDialog({
     required QueueTable table,
     required TableStatus status,
+    required TableManagementViewModel vm,
   }) {
     _clearControllers();
     showDialog(
@@ -453,8 +457,31 @@ class _TableManagementContentState extends State<TableManagementContent> {
                     title: "View order",
                     color: AppTheme.secondaryColor,
                     onPressed: () {
-                      Navigator.pop(context);
-                      // TODO: Implement view order
+                      final String? targetId = table.queueEntryIds.firstOrNull;
+
+                      if (targetId != null && targetId.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MultiProvider(
+                              providers: [
+                                Provider.value(
+                                  value: context.read<QueueService>(),
+                                ),
+                                Provider.value(
+                                  value: context.read<OrderService>(),
+                                ),
+                              ],
+                              child: StoreOrderScreen(
+                                queueEntryId: targetId,
+                              ), // Use the snapshot
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                        _showSnackBar("No one occupied the table.");
+                      }
                     },
                   ),
                 ),

@@ -67,7 +67,11 @@ class EditStoreViewModel extends ChangeNotifier {
   Future<void> onSave({
     File? selectedImage,
     required String newStoreName,
-    required String newDescription,
+    required String newPolicy,
+    required String newAddress,
+    required String newPhone,
+    required int newOpeningTime,
+    required int newClosingTime,
     required String password,
     required String userEmail,
     required String storeEmail,
@@ -75,7 +79,15 @@ class EditStoreViewModel extends ChangeNotifier {
     _storeProfileService.setStoreProfileImage(selectedImage);
     if (_currentRestaurant != null) {
       _restaurantService.updateRestaurant(
-        _currentRestaurant!.copyWith(name: newStoreName, email: storeEmail),
+        _currentRestaurant!.copyWith(
+          name: newStoreName,
+          email: storeEmail,
+          policy: newPolicy,
+          address: newAddress,
+          phone: newPhone,
+          closingTime: newClosingTime,
+          openingTime: newOpeningTime,
+        ),
       );
 
       if (userEmail != adminEmail && userEmail != "Unknown") {

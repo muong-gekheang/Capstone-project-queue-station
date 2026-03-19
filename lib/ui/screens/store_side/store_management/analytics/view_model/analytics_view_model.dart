@@ -130,7 +130,7 @@ class AnalyticsViewModel extends ChangeNotifier {
     if (notifyListener) {
       notifyListeners();
     }
-    return [];
+    return await _analyticsService.getTodayOrderSummary();
   }
 
   Future<void> loadAllData({bool showLoading = true}) async {

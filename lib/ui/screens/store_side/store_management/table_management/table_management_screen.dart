@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/order_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/view_model/table_management_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/widgets/table_management_content.dart';
@@ -10,9 +12,15 @@ class TableManagementScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TableService tableService = context.read<TableService>();
-    return ChangeNotifierProvider(
-      create: (_) => TableManagementViewModel(tableService: tableService),
-      child: TableManagementContent(),
+    return MultiProvider(
+      providers: [
+        Provider.value(value: context.read<OrderService>()),
+        Provider.value(value: context.read<QueueService>()),
+      ],
+      child: ChangeNotifierProvider(
+        create: (_) => TableManagementViewModel(tableService: tableService),
+        child: TableManagementContent(),
+      ),
     );
   }
 }

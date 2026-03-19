@@ -245,8 +245,13 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (newScreenContext) => Provider.value(
-                  value: context.read<TableService>(),
+                builder: (newScreenContext) => MultiProvider(
+                  providers: [
+                    Provider.value(value: context.read<TableService>()),
+                    Provider.value(value: context.read<QueueService>()),
+                    Provider.value(value: context.read<OrderService>()),
+                  ],
+
                   child: TableManagementScreen(),
                 ),
               ),

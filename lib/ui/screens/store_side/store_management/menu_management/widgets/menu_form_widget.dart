@@ -249,6 +249,9 @@ class _MenuFormState extends State<MenuForm> {
                                                 );
                                             if (newCategory != null) {
                                               vm.addNewCategory(newCategory);
+                                              setState(() {
+                                                selectedCategory = newCategory;
+                                              });
                                             }
                                           },
                                           backgroundColor: Color.fromRGBO(

@@ -14,6 +14,7 @@ class Order {
   final List<String> orderedIds;
   @JsonKey(defaultValue: <String>[])
   final List<String> inCartIds;
+  @TimestampConverter()
   final DateTime timestamp;
 
   @JsonKey(includeFromJson: false, includeToJson: false)

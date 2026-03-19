@@ -136,16 +136,16 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                   const SizedBox(height: 24),
 
                   // Queue Length Chart
-                  _buildQueueLengthChart(vm),
-                  const SizedBox(height: 24),
+                  // _buildQueueLengthChart(vm),
+                  // const SizedBox(height: 24),
 
                   // Table Occupancy Chart
-                  _buildTableOccupancyChart(vm),
-                  const SizedBox(height: 24),
+                  // _buildTableOccupancyChart(vm),
+                  // const SizedBox(height: 24),
 
                   // Average Order Value Chart
-                  _buildAverageOrderValueChart(vm),
-                  const SizedBox(height: 24),
+                  // _buildAverageOrderValueChart(vm),
+                  // const SizedBox(height: 24),
 
                   // Orders Line Chart
                   _buildOrdersLineChart(vm),
@@ -218,294 +218,293 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildQueueLengthChart(AnalyticsViewModel vm) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.05).toInt()),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'QUEUE LENGTH',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => _showTimeframeSelector(
-                  'queueLength',
-                  vm.queueLengthTimeframe,
-                  (value) => vm.queueLengthTimeframe = value,
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      vm.queueLengthTimeframe.label,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: true,
-                  horizontalInterval: 10,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.withAlpha((255 * 0.2).toInt()),
-                    strokeWidth: 1,
-                  ),
-                  getDrawingVerticalLine: (value) => FlLine(
-                    color: Colors.grey.withAlpha((255 * 0.2).toInt()),
-                    strokeWidth: 1,
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) => Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      getTitlesWidget: (value, meta) {
-                        if (vm.queueLengthData.isEmpty) return const Text('');
-                        final index = value.toInt();
-                        if (index >= 0 && index < vm.queueLengthData.length) {
-                          final time = vm.queueLengthData[index].time;
-                          if (vm.queueLengthTimeframe ==
-                              TimeFrameOption.today) {
-                            final hour = time.hour;
-                            if (hour == 8 ||
-                                hour == 10 ||
-                                hour == 13 ||
-                                hour == 15 ||
-                                hour == 17 ||
-                                hour == 19) {
-                              return Text(
-                                '$hour:00',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey,
-                                ),
-                              );
-                            }
-                          } else {
-                            return Text(
-                              '${time.day}/${time.month}',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey,
-                              ),
-                            );
-                          }
-                        }
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: vm.queueLengthData.asMap().entries.map((entry) {
-                      return FlSpot(
-                        entry.key.toDouble(),
-                        entry.value.queueLength.toDouble(),
-                      );
-                    }).toList(),
-                    isCurved: true,
-                    color: const Color(0xFF7987FF),
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: const Color(
-                        0xFF7987FF,
-                      ).withAlpha((255 * 0.1).toInt()),
-                    ),
-                  ),
-                ],
-                minY: 0,
-                maxY: 30,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildQueueLengthChart(AnalyticsViewModel vm) {
+  //   return Container(
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withAlpha((255 * 0.05).toInt()),
+  //           blurRadius: 8,
+  //           offset: const Offset(0, 2),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             const Text(
+  //               'QUEUE LENGTH',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Colors.black,
+  //               ),
+  //             ),
+  //             GestureDetector(
+  //               onTap: () => _showTimeframeSelector(
+  //                 'queueLength',
+  //                 vm.queueLengthTimeframe,
+  //                 (value) => vm.queueLengthTimeframe = value,
+  //               ),
+  //               child: Row(
+  //                 children: [
+  //                   Text(
+  //                     vm.queueLengthTimeframe.label,
+  //                     style: const TextStyle(fontSize: 14, color: Colors.grey),
+  //                   ),
+  //                   const Icon(Icons.arrow_drop_down, color: Colors.grey),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 20),
+  //         SizedBox(
+  //           height: 200,
+  //           child: LineChart(
+  //             LineChartData(
+  //               gridData: FlGridData(
+  //                 show: true,
+  //                 drawVerticalLine: true,
+  //                 horizontalInterval: 10,
+  //                 getDrawingHorizontalLine: (value) => FlLine(
+  //                   color: Colors.grey.withAlpha((255 * 0.2).toInt()),
+  //                   strokeWidth: 1,
+  //                 ),
+  //                 getDrawingVerticalLine: (value) => FlLine(
+  //                   color: Colors.grey.withAlpha((255 * 0.2).toInt()),
+  //                   strokeWidth: 1,
+  //                 ),
+  //               ),
+  //               titlesData: FlTitlesData(
+  //                 leftTitles: AxisTitles(
+  //                   sideTitles: SideTitles(
+  //                     showTitles: true,
+  //                     reservedSize: 40,
+  //                     getTitlesWidget: (value, meta) => Text(
+  //                       value.toInt().toString(),
+  //                       style: const TextStyle(
+  //                         fontSize: 12,
+  //                         color: Colors.grey,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 bottomTitles: AxisTitles(
+  //                   sideTitles: SideTitles(
+  //                     showTitles: true,
+  //                     reservedSize: 30,
+  //                     getTitlesWidget: (value, meta) {
+  //                       if (vm.queueLengthData.isEmpty) return const Text('');
+  //                       final index = value.toInt();
+  //                       if (index >= 0 && index < vm.queueLengthData.length) {
+  //                         final time = vm.queueLengthData[index].time;
+  //                         if (vm.queueLengthTimeframe ==
+  //                             TimeFrameOption.today) {
+  //                           final hour = time.hour;
+  //                           if (hour == 8 ||
+  //                               hour == 10 ||
+  //                               hour == 13 ||
+  //                               hour == 15 ||
+  //                               hour == 17 ||
+  //                               hour == 19) {
+  //                             return Text(
+  //                               '$hour:00',
+  //                               style: const TextStyle(
+  //                                 fontSize: 10,
+  //                                 color: Colors.grey,
+  //                               ),
+  //                             );
+  //                           }
+  //                         } else {
+  //                           return Text(
+  //                             '${time.day}/${time.month}',
+  //                             style: const TextStyle(
+  //                               fontSize: 10,
+  //                               color: Colors.grey,
+  //                             ),
+  //                           );
+  //                         }
+  //                       }
+  //                       return const Text('');
+  //                     },
+  //                   ),
+  //                 ),
+  //                 rightTitles: const AxisTitles(
+  //                   sideTitles: SideTitles(showTitles: false),
+  //                 ),
+  //                 topTitles: const AxisTitles(
+  //                   sideTitles: SideTitles(showTitles: false),
+  //                 ),
+  //               ),
+  //               borderData: FlBorderData(show: false),
+  //               lineBarsData: [
+  //                 LineChartBarData(
+  //                   spots: vm.queueLengthData.asMap().entries.map((entry) {
+  //                     return FlSpot(
+  //                       entry.key.toDouble(),
+  //                       entry.value.queueLength.toDouble(),
+  //                     );
+  //                   }).toList(),
+  //                   isCurved: true,
+  //                   color: const Color(0xFF7987FF),
+  //                   barWidth: 3,
+  //                   isStrokeCapRound: true,
+  //                   dotData: const FlDotData(show: false),
+  //                   belowBarData: BarAreaData(
+  //                     show: true,
+  //                     color: const Color(
+  //                       0xFF7987FF,
+  //                     ).withAlpha((255 * 0.1).toInt()),
+  //                   ),
+  //                 ),
+  //               ],
+  //               minY: 0,
+  //               maxY: 30,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildTableOccupancyChart(AnalyticsViewModel vm) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.05).toInt()),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'TABLE OCCUPANCY',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => _showTimeframeSelector(
-                  'tableOccupancy',
-                  vm.tableOccupancyTimeframe,
-                  (value) => setState(() => vm.tableOccupancyTimeframe = value),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      vm.tableOccupancyTimeframe.label,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: BarChart(
-              BarChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: 25,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.withAlpha((255 * 0.2).toInt()),
-                    strokeWidth: 1,
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) => Text(
-                        '${value.toInt()}%',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      getTitlesWidget: (value, meta) {
-                        if (vm.tableOccupancyData.isEmpty) {
-                          return const Text('');
-                        }
-
-                        final index = value.toInt();
-                        if (index >= 0 &&
-                            index < vm.tableOccupancyData.length) {
-                          return Text(
-                            DateFormat(
-                              "d",
-                            ).format(vm.tableOccupancyData[index].day),
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey,
-                            ),
-                          );
-                        }
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                barGroups: vm.tableOccupancyData.asMap().entries.map((entry) {
-                  return BarChartGroupData(
-                    x: entry.key,
-                    barRods: [
-                      BarChartRodData(
-                        toY: entry.value.occupancyPercentage,
-                        color: const Color(0xFF7987FF),
-                        width: 16,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(4),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-                maxY: 100,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildTableOccupancyChart(AnalyticsViewModel vm) {
+  //   return Container(
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withAlpha((255 * 0.05).toInt()),
+  //           blurRadius: 8,
+  //           offset: const Offset(0, 2),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             const Text(
+  //               'TABLE OCCUPANCY',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Colors.black,
+  //               ),
+  //             ),
+  //             GestureDetector(
+  //               onTap: () => _showTimeframeSelector(
+  //                 'tableOccupancy',
+  //                 vm.tableOccupancyTimeframe,
+  //                 (value) => setState(() => vm.tableOccupancyTimeframe = value),
+  //               ),
+  //               child: Row(
+  //                 children: [
+  //                   Text(
+  //                     vm.tableOccupancyTimeframe.label,
+  //                     style: const TextStyle(fontSize: 14, color: Colors.grey),
+  //                   ),
+  //                   const Icon(Icons.arrow_drop_down, color: Colors.grey),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 20),
+  //         SizedBox(
+  //           height: 200,
+  //           child: BarChart(
+  //             BarChartData(
+  //               gridData: FlGridData(
+  //                 show: true,
+  //                 drawVerticalLine: false,
+  //                 horizontalInterval: 25,
+  //                 getDrawingHorizontalLine: (value) => FlLine(
+  //                   color: Colors.grey.withAlpha((255 * 0.2).toInt()),
+  //                   strokeWidth: 1,
+  //                 ),
+  //               ),
+  //               titlesData: FlTitlesData(
+  //                 leftTitles: AxisTitles(
+  //                   sideTitles: SideTitles(
+  //                     showTitles: true,
+  //                     reservedSize: 40,
+  //                     getTitlesWidget: (value, meta) => Text(
+  //                       '${value.toInt()}%',
+  //                       style: const TextStyle(
+  //                         fontSize: 12,
+  //                         color: Colors.grey,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 bottomTitles: AxisTitles(
+  //                   sideTitles: SideTitles(
+  //                     showTitles: true,
+  //                     reservedSize: 30,
+  //                     getTitlesWidget: (value, meta) {
+  //                       if (vm.tableOccupancyData.isEmpty) {
+  //                         return const Text('');
+  //                       }
+  //                       final index = value.toInt();
+  //                       if (index >= 0 &&
+  //                           index < vm.tableOccupancyData.length) {
+  //                         return Text(
+  //                           DateFormat(
+  //                             "d",
+  //                           ).format(vm.tableOccupancyData[index].day),
+  //                           style: const TextStyle(
+  //                             fontSize: 10,
+  //                             color: Colors.grey,
+  //                           ),
+  //                         );
+  //                       }
+  //                       return const Text('');
+  //                     },
+  //                   ),
+  //                 ),
+  //                 rightTitles: const AxisTitles(
+  //                   sideTitles: SideTitles(showTitles: false),
+  //                 ),
+  //                 topTitles: const AxisTitles(
+  //                   sideTitles: SideTitles(showTitles: false),
+  //                 ),
+  //               ),
+  //               borderData: FlBorderData(show: false),
+  //               barGroups: vm.tableOccupancyData.asMap().entries.map((entry) {
+  //                 return BarChartGroupData(
+  //                   x: entry.key,
+  //                   barRods: [
+  //                     BarChartRodData(
+  //                       toY: entry.value.occupancyPercentage,
+  //                       color: const Color(0xFF7987FF),
+  //                       width: 16,
+  //                       borderRadius: const BorderRadius.vertical(
+  //                         top: Radius.circular(4),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 );
+  //               }).toList(),
+  //               maxY: 100,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildAverageOrderValueChart(AnalyticsViewModel vm) {
     return Container(
@@ -634,8 +633,6 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
   }
 
   Widget _buildOrdersLineChart(AnalyticsViewModel vm) {
-    if (vm.ordersLineData.isEmpty) return const SizedBox();
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(

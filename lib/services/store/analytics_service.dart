@@ -1,5 +1,6 @@
 import 'package:queue_station_app/models/analytic/analytics_data.dart';
 import 'package:queue_station_app/models/analytic/dashboard_stats.dart';
+import 'package:queue_station_app/models/analytic/order_summary.dart';
 import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
@@ -64,6 +65,35 @@ class AnalyticsService {
 
     return buckets.entries
         .map((e) => TableOccupancyDataPoint(day: e.key, occupancyPercentage: 1))
+        .toList();
+  }
+
+  Future<List<OrderSummary>> getTodayOrderSummary() async {
+    final Map<DateTime, double> buckets = {};
+    for (var order in _orderService.todayOrder) {
+      final bucketTime = _roundToBucket(
+        order.timestamp,
+        TimeFrameOption.today.bucketSize,
+      );
+      order = await _orderService.getOrderDetailsById(order.id) ?? order;
+      double amount = 0;
+      for (var orderItem in order.ordered) {
+        double addOnsPrice = orderItem.addOns.values.fold(
+          0,
+          (previousValue, element) => previousValue + element,
+        );
+        amount += (orderItem.menuItemPrice * orderItem.quantity) + addOnsPrice;
+      }
+      buckets[bucketTime] = (buckets[bucketTime] ?? 0) + amount;
+    }
+    return buckets.entries
+        .map(
+          (e) => OrderSummary(
+            time: e.key,
+            tableNumber: "tableNumber",
+            amount: e.value,
+          ),
+        )
         .toList();
   }
 
