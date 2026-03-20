@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../store_management/edit_store_screen.dart';
-import '../../user_side/setting/change_password_screen.dart';
+import '../../user_side/setting/change_password/change_password_screen.dart';
 import 'store_subscription_screen.dart';
-import '../../user_side/setting/contact_us_screen.dart';
-import '../../user_side/setting/terms_of_service_screen.dart';
+import '../../user_side/setting/contact_us/contact_us_screen.dart';
+import '../../user_side/setting/terms_of_service/terms_of_service_screen.dart';
 import '../../../widgets/setting_card.dart';
 import '../../../widgets/custom_success_snackbar.dart';
 

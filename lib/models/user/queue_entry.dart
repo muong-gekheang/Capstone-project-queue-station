@@ -24,6 +24,7 @@ class QueueEntry {
   final JoinedMethod joinedMethod;
   final String? tableNumber;
   final DateTime? expectedTableReadyAt;
+  final String? assignedTableId;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   final Order? order;
@@ -47,6 +48,7 @@ class QueueEntry {
     this.tableNumber,
     this.expectedTableReadyAt,
     required this.restId,
+    this.assignedTableId,
   }) : orderId = orderId ?? order?.id;
 
   Duration? get waitingTime {

@@ -56,9 +56,9 @@ class _RestaurantCardState extends State<RestaurantTile> {
                 SizedBox.square(
                   dimension: 75,
                   child: Image.asset(
-                    "assets/home_screen/kungfu.png",
-                    fit: BoxFit.fitHeight,
-                  ),
+                    "assets/home_screen/burger-logo.jpg",
+                    fit: BoxFit.cover
+                  )
                 ),
                 Expanded(
                   child: Column(

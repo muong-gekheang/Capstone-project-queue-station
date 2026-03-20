@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/data/store_queue_history_data.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class TicketQueueInfo extends StatelessWidget {
-  const TicketQueueInfo({super.key, required this.queueEntry});
+  const TicketQueueInfo({
+    super.key,
+    required this.queueEntry,
+    required this.restaurant,
+  });
 
   final QueueEntry queueEntry;
+  final Restaurant restaurant;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +24,32 @@ class TicketQueueInfo extends StatelessWidget {
             children: [
               SizedBox.square(
                 dimension: 70,
-                child: Image.asset("assets/home_screen/kungfu.png"),
+                child: SizedBox.square(
+                  dimension: 160,
+                  child: restaurant.logoLink != null && restaurant.logoLink.isNotEmpty
+                      ? Image.network(
+                          restaurant.logoLink,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.restaurant,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.restaurant,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                        ),
+                ),
               ),
               Expanded(
                 child: Column(
@@ -27,8 +57,7 @@ class TicketQueueInfo extends StatelessWidget {
                   spacing: 10,
                   children: [
                     Text(
-                      queueEntry
-                          .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                      restaurant.name, 
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -44,8 +73,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            queueEntry
-                                .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                            restaurant.address,
                             softWrap: true,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -104,8 +132,8 @@ class TicketQueueInfo extends StatelessWidget {
                       ),
                       Text(
                         queueEntry
-                            .currentSpot(restaurant1)
-                            .toString(), // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                            .currentSpot(restaurant)
+                            .toString(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,

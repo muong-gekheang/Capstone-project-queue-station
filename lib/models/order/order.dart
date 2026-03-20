@@ -29,8 +29,10 @@ class Order {
     List<OrderItem>? inCart,
   }) : ordered = ordered ?? [],
        inCart = inCart ?? [],
-       orderedIds = orderedIds ?? (ordered ?? []).map(_orderItemRef).toList(),
-       inCartIds = inCartIds ?? (inCart ?? []).map(_orderItemRef).toList();
+       orderedIds = orderedIds ?? (ordered ?? []).map(orderItemRef).toList(),
+       inCartIds = inCartIds ?? (inCart ?? []).map(orderItemRef).toList();
+
+    Order.empty() : this(id: '', timestamp: DateTime.now());
 
   Order copyWith({
     String? id,
@@ -65,5 +67,5 @@ class Order {
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 }
 
-String _orderItemRef(OrderItem item) =>
+String orderItemRef(OrderItem item) =>
     '${item.menuItemId}_${item.sizeName}_${item.quantity}';

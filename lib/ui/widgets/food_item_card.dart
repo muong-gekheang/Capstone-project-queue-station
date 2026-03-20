@@ -65,10 +65,22 @@ class FoodItemCard extends StatelessWidget {
                   child: image != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
+                          child: Image.network(
                             image!,
                             fit: BoxFit.cover,
-                          ),
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey[200],
+                                child: Icon(
+                                  Icons.restaurant,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
+                              );
+                            },
+                          )
                         )
                       : Icon(Icons.restaurant, color: Colors.grey[400]),
                 ),

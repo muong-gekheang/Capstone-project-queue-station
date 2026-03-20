@@ -111,7 +111,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     final snap = await fireStore
         .collection('queue_entries')
         .where('customerId', isEqualTo: customerId)
-        .where('status', isEqualTo: 'waiting')
+        .where('status', whereIn: ['waiting', 'serving']) 
         .orderBy('joinTime', descending: true)
         .limit(1)
         .get();
@@ -151,8 +151,21 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   }
 
   @override
-  Stream<QueueEntry?> watchCurrentHistory() {
-    // TODO: implement watchCurrentHistory
-    throw UnimplementedError();
+  Stream<QueueEntry?> watchCurrentHistory(String customerId) {
+    return fireStore
+        .collection('queue_entries')
+        .where('customerId', isEqualTo: customerId)
+        .where('status', whereIn: ['waiting', 'serving'])
+        .orderBy('joinTime', descending: true)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
+          if (snapshot.docs.isEmpty) return null;
+
+          final json = Map<String, dynamic>.from(snapshot.docs.first.data());
+          json['id'] ??= snapshot.docs.first.id;
+
+          return QueueEntry.fromJson(json);
+        });
   }
 }
