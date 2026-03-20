@@ -65,7 +65,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
         restaurantId: '',
       );
 
-      Navigator.pop(context, newAddOn);
+      Navigator.pop(context, (newAddOn, pickedLogoBytes));
     } else {
       print('Please fix the errors in the form');
     }

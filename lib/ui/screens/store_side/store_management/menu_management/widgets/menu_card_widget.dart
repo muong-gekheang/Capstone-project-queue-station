@@ -60,77 +60,85 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          image:  (widget.menu.image != null &&
-                                  widget.menu.image!.isNotEmpty)
-                              ? DecorationImage(
-                                  image: NetworkImage(widget.menu.image!),
-                                )
-                              : DecorationImage(
-                                  image: AssetImage(
-                                    'assets/images/default_menu_profile.jpg',
-                                  ),
-                                ), // - will implement later
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.menu.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: 18,
-                            ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            image:  (widget.menu.image != null &&
+                                    widget.menu.image!.isNotEmpty)
+                                ? DecorationImage(
+                                    image: NetworkImage(widget.menu.image!),
+                                  )
+                                : DecorationImage(
+                                    image: AssetImage(
+                                      'assets/images/default_menu_profile.jpg',
+                                    ),
+                                  ), // - will implement later
                           ),
-                          Row(
+                        ),
+                        SizedBox(width: 10),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.menu.category.name,
+                                widget.menu.name,
                                 style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                  fontSize: 18,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(width: 5),
-                              Text(
-                                "•",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      widget.menu.category.name,
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    "•",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    "\$${widget.menu.minPrice}",
+                                    style: TextStyle(
+                                      color: const Color.fromRGBO(255, 104, 53, 1),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(width: 5),
                               Text(
-                                "\$${widget.menu.minPrice}",
+                                widget.menu.isAvailable
+                                    ? "Available"
+                                    : "Not Available",
                                 style: TextStyle(
-                                  color: const Color.fromRGBO(255, 104, 53, 1),
-                                  fontSize: 12,
+                                  color: widget.menu.isAvailable
+                                      ? Color.fromRGBO(16, 185, 129, 1)
+                                      : Color.fromRGBO(230, 57, 70, 1),
+                                  fontSize: 13,
                                 ),
                               ),
                             ],
                           ),
-                          Text(
-                            widget.menu.isAvailable
-                                ? "Available"
-                                : "Not Available",
-                            style: TextStyle(
-                              color: widget.menu.isAvailable
-                                  ? Color.fromRGBO(16, 185, 129, 1)
-                                  : Color.fromRGBO(230, 57, 70, 1),
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
                     children: [

@@ -76,7 +76,11 @@ class MenuManagementContent extends StatelessWidget {
                   );
                   return MenuCardWidget(
                     menu: item,
-                    onDelete: () => vm.removeMenuItem(item),
+                    onDelete: () {
+                      vm.removeMenuItem(item);
+                      print("delete vm is called");
+                      print("Item image: ${item.image}");
+                    },
                   );
                 },
               ),
@@ -91,20 +95,30 @@ class MenuManagementContent extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: List.generate(vm.allCategories.length, (index) {
-          final category = vm.allCategories[index];
-          if (vm.selectedCategory == null) {
-            vm.updateSelectedIndex(0);
-          }
-          return Padding(
+        children: [
+          Padding(
             padding: const EdgeInsets.only(right: 10),
             child: CategoryCardWidget(
-              name: category.name,
-              isSelected: vm.selectedIndex == index,
-              onTap: () => vm.updateSelectedIndex(index),
+              name: 'All',
+              isSelected: vm.selectedIndex == -1,
+              onTap: () => vm.updateSelectedIndex(-1),
             ),
-          );
-        }),
+          ),
+          ...List.generate(vm.allCategories.length, (index) {
+            final category = vm.allCategories[index];
+            return Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: CategoryCardWidget(
+                profile: category.imageLink != null
+                    ? NetworkImage(category.imageLink!)
+                    : null,
+                name: category.name,
+                isSelected: vm.selectedIndex == index,
+                onTap: () => vm.updateSelectedIndex(index),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }

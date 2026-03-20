@@ -1,6 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
+import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,13 +18,28 @@ class AddNewCategory extends StatefulWidget {
 class _AddNewCategoryState extends State<AddNewCategory> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _categoryNameController = TextEditingController();
-
+  Uint8List? pickedLogoBytes;
   String? _nullValidtor(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
     } else {
       return null;
     }
+  }
+
+  void onPickImage() async {
+    final ImagePicker picker = ImagePicker();
+    Uint8List? selectedImageBytes;
+
+    final XFile? pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedImage == null) return;
+
+    selectedImageBytes = await pickedImage.readAsBytes();
+    setState(() {
+      pickedLogoBytes = selectedImageBytes;
+    });
   }
 
   void onSave() {
@@ -30,7 +49,7 @@ class _AddNewCategoryState extends State<AddNewCategory> {
     final categoryName = _categoryNameController.text;
     final newCategory = MenuItemCategory(id: Uuid().v4(), name: categoryName);
 
-    Navigator.pop(context, newCategory);
+    Navigator.pop(context, (newCategory, pickedLogoBytes));
   }
 
   @override
@@ -45,6 +64,12 @@ class _AddNewCategoryState extends State<AddNewCategory> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
+          ProfileEditorWidget(
+            image: pickedLogoBytes != null
+                ? MemoryImage(pickedLogoBytes!)
+                : null,
+            onPickImage: onPickImage,
+          ),
           Form(
             key: _formKey,
             child: TextFieldWidget(

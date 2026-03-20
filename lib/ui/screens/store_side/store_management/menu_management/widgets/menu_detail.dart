@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
@@ -168,6 +169,15 @@ class _MenuDetailState extends State<MenuDetail> {
   Widget _buildDetailsList(MenuItem menu) {
     return Column(
       children: [
+        Text(
+          'Sizes',
+          style: TextStyle(
+            fontSize: AppTheme.heading2,
+            color: AppTheme.primaryColor,
+          ),
+        ),
+        const SizedBox(height: 10),
+
         ...menu.sizes.map(
           (s) => _buildDataRow(
             s.sizeOption?.name ?? "",
@@ -175,9 +185,16 @@ class _MenuDetailState extends State<MenuDetail> {
           ),
         ),
         const SizedBox(height: 10),
-        ...menu.addOns.map(
-          (a) => _buildDataRow(a.name, '+ \$${a.price.toStringAsFixed(2)}'),
+        Text(
+          'Add Ons',
+          style: TextStyle(
+            fontSize: AppTheme.heading2,
+            color: AppTheme.primaryColor,
+          ),
         ),
+
+        const SizedBox(height: 10),
+        ...menu.addOns.map((a) => _buildAddOnRow(a)),
       ],
     );
   }
@@ -188,6 +205,37 @@ class _MenuDetailState extends State<MenuDetail> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [Text(label), Text(value)],
+      ),
+    );
+  }
+
+  Widget _buildAddOnRow(AddOn addOn) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  image: DecorationImage(
+                    image: addOn.image != null && addOn.image!.isNotEmpty
+                        ? NetworkImage(addOn.image!) as ImageProvider
+                        : AssetImage('assets/images/default_menu_profile.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(addOn.name),
+            ],
+          ),
+          Text('+ \$${addOn.price.toStringAsFixed(2)}'),
+        ],
       ),
     );
   }

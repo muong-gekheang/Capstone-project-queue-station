@@ -61,7 +61,14 @@ class _MenuFormState extends State<MenuForm> {
 
     availableMenuSizes.addAll(widget.initialMenu?.sizes ?? []);
 
-    selectedCategory = widget.initialMenu?.category ?? vm.selectedCategory;
+    // in here we have 3 fallbacks
+    // 1. try initialMenu.category
+    // 2. if it fails, try vm.selectedCategory
+    // 3. if it fails, choose the first category
+    selectedCategory =
+        widget.initialMenu?.category ??
+        vm.selectedCategory ??
+        (vm.allCategories.isNotEmpty ? vm.allCategories.first : null);
     _nameController.text = menu?.name ?? '';
     _descriptionController.text = menu?.description ?? '';
     _minTimeController = TextEditingController(
@@ -133,9 +140,12 @@ class _MenuFormState extends State<MenuForm> {
         children: [
           ProfileEditorWidget(
             image: pickedLogoBytes != null
-                        ? MemoryImage(pickedLogoBytes!)
-                        : null, 
-            onPickImage: onPickImage,),
+                ? MemoryImage(pickedLogoBytes!)
+                : (selectedImageFile != null && selectedImageFile!.isNotEmpty)
+                  ? NetworkImage(selectedImageFile!) as ImageProvider
+                  : null,
+            onPickImage: onPickImage,
+          ),
           Form(
             key: _formKey,
             child: Column(
@@ -191,9 +201,9 @@ class _MenuFormState extends State<MenuForm> {
                                   onChanged: (value) async {
                                     if (value == null) return;
                                     if (value.id == '-1') {
-                                      final newCategory =
+                                      final result =
                                           await showModalBottomSheet<
-                                            MenuItemCategory
+                                            (MenuItemCategory, Uint8List?)
                                           >(
                                             context: context,
                                             builder: (context) => Padding(
@@ -205,8 +215,14 @@ class _MenuFormState extends State<MenuForm> {
                                               child: AddNewCategory(),
                                             ),
                                           );
-                                      if (newCategory != null) {
-                                        vm.addNewCategory(newCategory);
+                                      if (result != null) {
+                                        final newCategory = result.$1;
+                                        final selectedImageBytes = result.$2;
+
+                                        vm.addNewCategory(
+                                          newCategory,
+                                          selectedImageBytes,
+                                        );
                                       }
                                     } else {
                                       setState(() {
@@ -255,9 +271,10 @@ class _MenuFormState extends State<MenuForm> {
                                         ButtonWidget(
                                           title: '+ Add Category',
                                           onPressed: () async {
-                                            final newCategory =
+                                            final result =
                                                 await showModalBottomSheet<
-                                                  MenuItemCategory
+                                                  (MenuItemCategory,
+                                                  Uint8List?)
                                                 >(
                                                   context: context,
                                                   builder: (context) => Padding(
@@ -269,8 +286,11 @@ class _MenuFormState extends State<MenuForm> {
                                                     child: AddNewCategory(),
                                                   ),
                                                 );
-                                            if (newCategory != null) {
-                                              vm.addNewCategory(newCategory);
+                                            if (result != null) {
+                                              final newCategory = result.$1;
+                                              final selectedImageBytes =
+                                                  result.$2;
+                                              vm.addNewCategory(newCategory, selectedImageBytes);
                                             }
                                           },
                                           backgroundColor: Color.fromRGBO(
@@ -478,11 +498,10 @@ class _MenuFormState extends State<MenuForm> {
                                   maxPrepTimeMinutes: int.tryParse(
                                     _maxTimeController.text,
                                   ),
-
                                   restaurantId: '',
                                   minPrice: _getMinPrice(availableMenuSizes),
                                 ),
-                                pickedLogoBytes
+                                pickedLogoBytes,
                               )
                             : null,
                         backgroundColor: AppTheme.primaryColor,

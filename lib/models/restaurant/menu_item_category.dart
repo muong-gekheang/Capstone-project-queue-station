@@ -12,6 +12,19 @@ class MenuItemCategory {
 
   MenuItemCategory({required this.id, required this.name, this.imageLink});
 
+  MenuItemCategory copyWith({
+    String? id,
+    String? name,
+    String? restaurantId,
+    String? imageLink,
+  }) {
+    return MenuItemCategory(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      imageLink: imageLink ?? this.imageLink,
+    )..restaurantId = restaurantId ?? this.restaurantId;
+  }
+
   factory MenuItemCategory.fromJson(Map<String, dynamic> json) =>
       _$MenuItemCategoryFromJson(json);
 

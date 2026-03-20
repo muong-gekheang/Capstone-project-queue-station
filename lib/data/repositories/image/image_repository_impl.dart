@@ -28,4 +28,17 @@ class ImageRepositoryImpl implements ImageRepository {
     final docRef = fireStore.collection('restaurants').doc(restaurantId);
     await docRef.update({'logoLink': logoUrl});
   }
+  
+  @override
+  Future<void> deleteLogo(String imageUrl) async {
+    final ref = firebaseStorage.refFromURL(imageUrl);
+    await ref.delete();
+  }
+
+
+
+
+
+
+
 }

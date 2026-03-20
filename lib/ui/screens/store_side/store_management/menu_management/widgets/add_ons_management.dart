@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
@@ -72,6 +74,18 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
                   }
                 }, // checkbox also triggers parent
               ),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: addOn.image != null 
+                      ? NetworkImage(addOn.image!)
+                      : AssetImage('assets/images/default_menu_profile.jpg'),
+                  fit: BoxFit.cover)
+                ),
+              ),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(
                   globalMenuAddOns.name,
@@ -92,13 +106,15 @@ class _AddOnsManagementState extends State<AddOnsManagement> {
 
   void onCreate() async {
     var vm = context.read<MenuManagementViewModel>();
-    final AddOn? newAddOn = await Navigator.push<AddOn>(
+    final createdAddOn = await Navigator.push<(AddOn, Uint8List?)>(
       context,
       MaterialPageRoute(builder: (context) => const AddNewAddOnMenu()),
     );
 
-    if (newAddOn != null) {
-      vm.addNewAddOn(newAddOn);
+    if (createdAddOn != null) {
+      final addOn = createdAddOn.$1;
+      final selectedImageBytes = createdAddOn.$2;
+      vm.addNewAddOn(addOn, selectedImageBytes);
     }
   }
 

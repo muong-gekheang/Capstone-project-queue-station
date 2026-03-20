@@ -21,7 +21,7 @@ class EditMenuContent extends StatelessWidget {
         child: MenuForm(
           initialMenu: existingMenu, // not null because we are editing
           onSubmit: (MenuItem updatedMenu, Uint8List? pickedLogoBytes) {
-            vm.updateMenuItem(updatedMenu, existingMenu);
+            vm.updateMenuItem(updatedMenu, existingMenu, pickedLogoBytes);
             Navigator.pop(context); // close the page
           },
         ),
