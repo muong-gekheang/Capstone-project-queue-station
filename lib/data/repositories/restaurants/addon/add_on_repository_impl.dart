@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/add_on_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurants/addon/add_on_repository.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 
 class AddOnRepositoryImpl implements AddOnRepository {

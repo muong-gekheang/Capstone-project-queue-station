@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/menu_category_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurants/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 
 class MenuCategoryRepositoryImpl implements MenuCategoryRepository {

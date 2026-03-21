@@ -1,8 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/store_queue_entry_data.dart';
+import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 
+List<QueueEntry> mockQueueEntries() {
+  return [
+    QueueEntry(
+      id: 'q1',
+      queueNumber: 'A001',
+      restId: 'r1',
+      customerId: 'c1',
+      partySize: 2,
+      joinTime: DateTime.now().subtract(const Duration(minutes: 10)),
+      status: QueueStatus.waiting,
+      joinedMethod: JoinedMethod.walkIn,
+      order: Order(
+        id: 'o1',
+        timestamp: DateTime.now(),
+        ordered: [
+          OrderItem(
+            menuItemId: 'm1',
+            menuItemPrice: 5.0,
+            quantity: 1,
+            orderItemStatus: OrderItemStatus.pending,
+            addOns: {'Cheese': 1.0},
+            sizeName: 'Medium',
+          ),
+          OrderItem(
+            menuItemId: 'm2',
+            menuItemPrice: 2.0,
+            quantity: 2,
+            orderItemStatus: OrderItemStatus.pending,
+          ),
+        ],
+        inCart: [
+          OrderItem(
+            menuItemId: 'm3',
+            menuItemPrice: 3.5,
+            quantity: 1,
+            orderItemStatus: OrderItemStatus.pending,
+          ),
+        ],
+      ),
+    ),
+
+    QueueEntry(
+      id: 'q2',
+      queueNumber: 'A002',
+      restId: 'r1',
+      customerId: 'c2',
+      partySize: 4,
+      joinTime: DateTime.now().subtract(const Duration(minutes: 5)),
+      status: QueueStatus.waiting,
+      joinedMethod: JoinedMethod.remote,
+      order: Order(
+        id: 'o2',
+        ordered: [
+          OrderItem(
+            menuItemId: 'm4',
+            menuItemPrice: 8.0,
+            quantity: 1,
+            orderItemStatus: OrderItemStatus.pending,
+            addOns: {'Extra sauce': 0.5},
+          ),
+        ],
+        timestamp: DateTime.now(),
+        inCart: [],
+      ),
+    ),
+  ];
+}
 
 enum NotificationStatus { read, unread }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
-import 'package:queue_station_app/data/repositories/restaurants/restaurant_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurants/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/data/repositories/user/customer_repository_impl.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/services/user_provider.dart';

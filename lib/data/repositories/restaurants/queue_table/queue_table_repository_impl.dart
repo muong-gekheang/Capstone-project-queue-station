@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:queue_station_app/data/repositories/restaurants/queue_table.dart';
+import 'package:queue_station_app/data/repositories/restaurants/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 
 class QueueTableRepositoryImpl implements QueueTableRepository {

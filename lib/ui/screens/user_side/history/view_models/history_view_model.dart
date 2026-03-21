@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
-import 'package:queue_station_app/data/repositories/restaurants/menu_item_repository.dart';
-import 'package:queue_station_app/data/repositories/restaurants/restaurant_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurants/menu_item/menu_item_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurants/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/data/repositories/user/customer_repository_impl.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';

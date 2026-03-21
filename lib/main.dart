@@ -44,7 +44,7 @@ void main() async {
         path: "/",
         builder: (context, state) {
           User user = context.read<UserProvider>().currentUser!;
-          return user is Customer ? NormalUserApp() : StoreMainScreen();
+          return user is Customer ? NormalUserApp() : NormalUserApp();
         },
         redirect: (context, state) {
           bool isLoggedIn = context.read<UserProvider>().currentUser != null;
