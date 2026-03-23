@@ -1,9 +1,14 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
 
 Future<void> seedDatabase({bool clearExisting = false}) async {
   final firestore = FirebaseFirestore.instance;
   final now = DateTime.now();
+  final restId = 'rest_kh_1';
+  final storeUserId = 'vDDDAYtdcvTn9Dg2YNkkSqvbLVI3';
 
   if (clearExisting) {
     await _deleteCollection(firestore, 'users');
@@ -20,7 +25,21 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
     await _deleteCollection(firestore, 'orders');
   }
 
-  final restId = 'rest_kh_1';
+  final restaurant = Restaurant(
+    id: restId,
+    name: 'Queue Cafe',
+    address: 'Phnom Penh',
+    logoLink: '',
+    policy: 'Please arrive within 10 minutes of your call.',
+    biggestTableSize: 8,
+    phone: '023900001',
+    isOpen: true,
+    email: "queuecafe@gmail.com",
+    subscriptionDate: now,
+    subscriptionStatus: SubscriptionStatus.paid,
+    openingTime: 8,
+    closingTime: 11,
+  );
 
   final tableCategorySmallId = 'tbl_cat_small_1';
   final tableCategoryFamilyId = 'tbl_cat_family_1';
@@ -356,8 +375,29 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       entry.value,
     );
   }
+  // 2. Create the Store User (linked to the restaurant)
+  final storeUser = StoreUser(
+    id: storeUserId,
+    name: 'Alex ',
+    email: 'sophanithmeas91@gmail.com',
+    phone: '077000111',
+    restaurantId: restId,
+  );
 
+  //final batch = firestore.batch();
+
+  // 3. Add to batch using .toJson()
+
+  batch.set(
+    firestore.collection('restaurants').doc(restId),
+    restaurant.toJson(),
+  );
+
+  batch.set(firestore.collection('users').doc(storeUserId), storeUser.toJson());
+
+  // 4. Commit the changes
   await batch.commit();
+  print('Seed successful: Restaurant and User created.');
 }
 
 Future<void> _deleteCollection(

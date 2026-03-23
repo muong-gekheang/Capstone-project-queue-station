@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/services/order_provider.dart';
+import '../../../../../../data/repositories/queue_entry/queue_entry_repository.dart';
 
 class MenuItemViewModel extends ChangeNotifier {
   final MenuItem menuItem;
   final OrderItem? cartItem;
   final OrderProvider orderProvider;
+  final QueueEntryRepository queueEntryRepository;
 
   MenuItemViewModel({
     required this.menuItem,
     required this.orderProvider,
     this.cartItem,
+    required this.queueEntryRepository
   }) {
     _initialize();
   }
@@ -45,7 +49,7 @@ class MenuItemViewModel extends ChangeNotifier {
     noteController.text = item.note ?? "";
 
     _selectedSize = menuItem.sizes.firstWhere(
-      (s) => s.sizeOption.name == item.size.name,
+      (s) => s.sizeOption?.name == item.size.name,
       orElse: () => menuItem.sizes.first,
     );
 
@@ -105,6 +109,8 @@ class MenuItemViewModel extends ChangeNotifier {
     final addOnsMap = {for (final a in selectedAddOns) a.id: a.price};
 
     final orderItem = OrderItem(
+      id: Uuid().v4(),
+      orderId: ,
       menuItemId: menuItem.id,
       item: menuItem,
       size: _selectedSize!.sizeOption,

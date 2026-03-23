@@ -38,6 +38,10 @@ abstract class OrderRepository {
   );
 
   Stream<Order?> watchOrderById(String orderId);
+<<<<<<< HEAD
   Stream<List<Order>> watchAllOrder();
   Stream<Order?> watchCurrentOrder(String orderId);
+=======
+  Stream<List<Order>> watchTodayOrders(String restId);
+>>>>>>> origin/store-side_mvvm
 }

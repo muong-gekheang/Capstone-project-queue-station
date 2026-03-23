@@ -1,8 +1,12 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+<<<<<<< HEAD
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+=======
+import 'package:queue_station_app/models/user/customer.dart';
+>>>>>>> origin/store-side_mvvm
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
 class RestaurantJoinedTile extends StatefulWidget {
@@ -24,6 +28,10 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
+=======
+    // final currentHistory = getHistoryById(widget.user.currentHistoryId);
+>>>>>>> origin/store-side_mvvm
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -133,7 +141,11 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                       ),
                     ),
                     Text(
+<<<<<<< HEAD
                       widget.restaurant.curWait.toString(),
+=======
+                      "-", // TODO: Use Repos in VM to fetch and create Rest obj (Current Wait)
+>>>>>>> origin/store-side_mvvm
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,

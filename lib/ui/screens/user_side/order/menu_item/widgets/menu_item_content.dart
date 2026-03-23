@@ -138,7 +138,7 @@ class MenuItemContent extends StatelessWidget {
                               },
                               title: Row(
                                 children: [
-                                  Expanded(child: Text(size.sizeOption.name)),
+                                  Expanded(child: Text(size.sizeOption?.name ?? "" )),
                                   Text("\$${size.price}"),
                                 ],
                               ),

@@ -1,62 +1,60 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:queue_station_app/utils/nullable_timestamp_converter.dart';
 import 'package:uuid/uuid.dart';
-
-import 'table_category.dart';
 
 part 'queue_table.g.dart';
 
-final uuid = Uuid();
+const _uuid = Uuid();
 
-enum TableStatus { available, occupied }
+enum TableStatus {
+  @JsonValue('available')
+  available,
+  @JsonValue('occupied')
+  occupied,
+}
 
 @JsonSerializable(explicitToJson: true)
 class QueueTable {
   final String id;
   final String tableNum;
-  TableStatus tableStatus;
+  final String restaurantId; // Added
   final String tableCategoryId;
+  final TableStatus tableStatus;
 
-  @JsonKey(defaultValue: <String>[])
+  @JsonKey(defaultValue: [])
   final List<String> queueEntryIds;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final TableCategory tableCategory;
+  // Handles the ISO8601 string from your data
+  @NullableTimestampConverter()
+  final DateTime? latestEstimatedReadyAt; // Added
 
   QueueTable({
     String? id,
     required this.tableNum,
+    required this.restaurantId,
     required this.tableStatus,
-    String? tableCategoryId,
-    TableCategory? tableCategory,
-    required List<String>? queueEntryIds,
-  }) : id = id ?? uuid.v4(),
-       tableCategoryId =
-           tableCategoryId ?? tableCategory?.id ?? 'unknown_table_category',
-       tableCategory =
-           tableCategory ??
-           TableCategory(
-             categoryId:
-                 tableCategoryId ?? tableCategory?.id ?? 'unknown_table_category',
-             type: 'Unknown',
-             minSeat: 1,
-             seatAmount: 1,
-           ),
-       queueEntryIds = queueEntryIds ?? [];
+    required this.tableCategoryId,
+    required this.queueEntryIds,
+    this.latestEstimatedReadyAt,
+  }) : id = id ?? _uuid.v4();
 
   QueueTable copyWith({
     String? tableNum,
     TableStatus? tableStatus,
     String? tableCategoryId,
-    TableCategory? tableCategory,
     List<String>? queueEntryIds,
+    String? restaurantId,
+    DateTime? latestEstimatedReadyAt,
   }) {
     return QueueTable(
       id: id,
       tableNum: tableNum ?? this.tableNum,
+      restaurantId: restaurantId ?? this.restaurantId,
       tableStatus: tableStatus ?? this.tableStatus,
       tableCategoryId: tableCategoryId ?? this.tableCategoryId,
-      tableCategory: tableCategory ?? this.tableCategory,
       queueEntryIds: queueEntryIds ?? this.queueEntryIds,
+      latestEstimatedReadyAt:
+          latestEstimatedReadyAt ?? this.latestEstimatedReadyAt,
     );
   }
 

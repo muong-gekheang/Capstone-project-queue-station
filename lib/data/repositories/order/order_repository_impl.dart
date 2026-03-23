@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/models/order/order.dart'
-    as order_model show Order, OrderItem, orderItemRef;
+    as order_model
+    show Order, OrderItem, orderItemRef;
 import 'package:queue_station_app/models/order/order_item.dart';
 
 class OrderRepositoryImpl extends OrderRepository {
@@ -19,7 +20,6 @@ class OrderRepositoryImpl extends OrderRepository {
   order_model.Order? _currentOrder;
   order_model.Order get currentOrder =>
       _currentOrder ??= order_model.Order.empty();
-      
 
   // CREATE ORDER
   @override
@@ -53,7 +53,6 @@ class OrderRepositoryImpl extends OrderRepository {
         );
       }
     });
-    
   }
 
   @override
@@ -288,7 +287,9 @@ class OrderRepositoryImpl extends OrderRepository {
   @override
   Stream<List<order_model.Order>> watchAllOrder() {
     return _orderCol.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => order_model.Order.fromJson(doc.data())).toList();
+      return snapshot.docs
+          .map((doc) => order_model.Order.fromJson(doc.data()))
+          .toList();
     });
   }
 
@@ -318,13 +319,14 @@ class OrderRepositoryImpl extends OrderRepository {
       }
     });
   }
-  
+
   @override
-  Future<(List<order_model.Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(int limit, DocumentSnapshot<Map<String, dynamic>>? lastDoc) {
+  Future<(List<order_model.Order>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getAll(int limit, DocumentSnapshot<Map<String, dynamic>>? lastDoc) {
     // TODO: implement getAll
     throw UnimplementedError();
   }
-  
+
   @override
   Future<order_model.Order?> getOrderById(String orderId) async {
     try {
@@ -336,26 +338,31 @@ class OrderRepositoryImpl extends OrderRepository {
       rethrow;
     }
   }
-  
+
   @override
-  Future<(List<order_model.Order>, DocumentSnapshot<Map<String, dynamic>>?)> getSearchOrders(String query, int limit, DocumentSnapshot<Map<String, dynamic>>? lastDoc) {
+  Future<(List<order_model.Order>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getSearchOrders(
+    String query,
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  ) {
     // TODO: implement getSearchOrders
     throw UnimplementedError();
   }
-  
+
   @override
   Future<void> removeOrderedItem(String orderId, String menuItemId) {
     // TODO: implement removeOrderedItem
     throw UnimplementedError();
   }
-  
+
   @override
   Future<order_model.Order> update(order_model.Order order) {
     // TODO: implement update
     throw UnimplementedError();
   }
-  
-   @override
+
+  @override
   Stream<order_model.Order?> watchCurrentOrder(String orderId) {
     return _orderCol.doc(orderId).snapshots().map((snapshot) {
       if (!snapshot.exists) return null;
@@ -364,5 +371,26 @@ class OrderRepositoryImpl extends OrderRepository {
       return order;
     });
   }
-    
+  @override
+  Stream<List<Order>> watchTodayOrders(String restId) {
+    final startOfToday = DateTime.now().copyWith(
+      hour: 0,
+      minute: 0,
+      microsecond: 0,
+      millisecond: 0,
+    );
+    final result = fireStore
+        .collection('orders')
+        .where('restId', isEqualTo: restId)
+        .where('timestamp', isGreaterThan: startOfToday)
+        .snapshots()
+        .handleError((err) => debugPrint("Stream Error: $err"))
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            var result = Order.fromJson(doc.data());
+            return result;
+          }).toList();
+        });
+    return result;
+  }
 }

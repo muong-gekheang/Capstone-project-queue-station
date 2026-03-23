@@ -1,8 +1,8 @@
-import 'package:queue_station_app/data/repositories/authentication/auth_repository.dart';
-import 'package:queue_station_app/data/repositories/authentication/auth_repository_impl.dart';
-import 'package:queue_station_app/data/repositories/user/customer_repository_impl.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
+import '../data/repositories/auth/auth_repository.dart';
+import '../data/repositories/auth/auth_repository_impl.dart';
+import '../data/repositories/user/production/customer_repository_impl.dart';
 
 class AuthService {
   final AuthRepository _authRepository = AuthRepositoryImpl();
@@ -65,23 +65,5 @@ class AuthService {
   Future<void> signOut() async {
     await _authRepository.signOut();
     currentUser = null;
-  }
-
-  // Get current user
-  Future<User?> getCurrentUser() async {
-    final firebaseUser = _authRepository.getCurrentUser();
-
-    if (firebaseUser != null && currentUser == null) {
-      final customer = await _customerRepository.getUserById(firebaseUser.uid);
-      currentUser = customer;
-      return customer;
-    }
-
-    return currentUser;
-  }
-
-  // Check if user is logged in
-  bool isLoggedIn() {
-    return _authRepository.getCurrentUser() != null;
   }
 }

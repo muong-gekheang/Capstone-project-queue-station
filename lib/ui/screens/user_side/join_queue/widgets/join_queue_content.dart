@@ -167,7 +167,7 @@ class JoinQueueContent extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  rest.curWait.toString(),
+                  'mock',
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,

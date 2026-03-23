@@ -81,7 +81,7 @@ class _RestaurantCardState extends State<RestaurantTile> {
                         children: [
                           Icon(Icons.hourglass_empty, color: Color(0xFFFF6835)),
                           Text(
-                            "${widget.rest.curWait} people waiting",
+                            "${10} people waiting",
                             style: TextStyle(color: Color(0xFFFF6835)),
                           ),
                         ],

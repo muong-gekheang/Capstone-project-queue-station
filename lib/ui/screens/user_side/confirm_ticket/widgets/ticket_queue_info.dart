@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+<<<<<<< HEAD
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+=======
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+>>>>>>> origin/store-side_mvvm
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
@@ -131,9 +135,13 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
+<<<<<<< HEAD
                         queueEntry
                             .currentSpot(restaurant)
                             .toString(),
+=======
+                        "", // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+>>>>>>> origin/store-side_mvvm
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,

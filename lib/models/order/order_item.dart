@@ -11,6 +11,7 @@ enum OrderItemStatus { pending, accepted, rejected, cancelled }
 @JsonSerializable(explicitToJson: true)
 class OrderItem {
   final String menuItemId;
+  final String id;
 
   @JsonKey(fromJson: _addOnsFromJson, toJson: _addOnsToJson)
   final Map<String, double> addOns;
@@ -20,6 +21,7 @@ class OrderItem {
   final int quantity;
   final String? note;
   final OrderItemStatus orderItemStatus;
+  String orderId;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   final MenuItem item;
@@ -32,22 +34,27 @@ class OrderItem {
     required this.quantity,
     this.note,
     required this.orderItemStatus,
+    required this.orderId,
     Map<String, double>? addOns,
     String? sizeName,
     MenuItem? item,
     SizeOption? size,
+    required this.id,
   }) : addOns = addOns ?? {},
        sizeName = sizeName ?? size?.name ?? 'Regular',
        item = item ?? _placeholderMenuItem(menuItemId),
-       size = size ?? SizeOption(name: sizeName ?? 'Regular');
+       size =
+           size ??
+           SizeOption(name: sizeName ?? 'Regular', id: '', restaurantId: '');
 
   OrderItem copyWith({
     String? menuItemId,
+    String? orderId,
     Map<String, double>? addOns,
     double? menuItemPrice,
     String? sizeName,
     SizeOption? size,
-    MenuItem? item,
+    MenuItem? menuItem,
     int? quantity,
     String? note,
     OrderItemStatus? orderItemStatus,
@@ -61,7 +68,9 @@ class OrderItem {
       addOns: addOns != null ? Map.from(addOns) : Map.from(this.addOns),
       sizeName: sizeName ?? this.sizeName,
       size: size ?? this.size,
-      item: item ?? this.item,
+      item: item ,
+      orderId: orderId ?? this.orderId,
+      id: id,
     );
   }
 
@@ -92,5 +101,7 @@ MenuItem _placeholderMenuItem(String menuItemId) {
     name: 'Unknown item',
     description: '',
     category: MenuItemCategory(id: 'unknown_category', name: 'Unknown'),
+    restaurantId: '',
+    minPrice: 0,
   );
 }

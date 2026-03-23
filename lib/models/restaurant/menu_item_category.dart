@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 part 'menu_item_category.g.dart';
 
@@ -7,6 +6,7 @@ part 'menu_item_category.g.dart';
 class MenuItemCategory {
   final String id;
   final String name;
+  String? restaurantId;
   String? imageLink;
 
   MenuItemCategory({required this.id, required this.name, this.imageLink});
@@ -16,10 +16,3 @@ class MenuItemCategory {
 
   Map<String, dynamic> toJson() => _$MenuItemCategoryToJson(this);
 }
-
-final categories = [
-  MenuItemCategory(name: 'Burgers', id: Uuid().v4()),
-  MenuItemCategory(name: 'Pizza', id: Uuid().v4()),
-  MenuItemCategory(name: 'Drinks', id: Uuid().v4()),
-  MenuItemCategory(name: 'Desserts', id: Uuid().v4()),
-];

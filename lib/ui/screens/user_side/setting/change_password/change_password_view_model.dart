@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/repositories/authentication/auth_repository.dart';
+import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 
 class ChangePasswordViewModel extends ChangeNotifier {

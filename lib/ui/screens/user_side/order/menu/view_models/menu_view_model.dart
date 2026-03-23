@@ -4,11 +4,11 @@ import 'package:queue_station_app/data/repositories/order/order_repository.dart'
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurants/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurants/menu_item/menu_item_repository.dart';
-import 'package:queue_station_app/models/order/order.dart' as order_model;
-import 'package:queue_station_app/models/order/order_item.dart';
-import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/models01/order/order.dart' as order_model;
+import 'package:queue_station_app/models01/order/order_item.dart';
+import 'package:queue_station_app/models01/restaurant/menu_item.dart';
+import 'package:queue_station_app/models01/restaurant/menu_item_category.dart';
+import 'package:queue_station_app/models01/user/queue_entry.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 
 class MenuViewModel extends ChangeNotifier {

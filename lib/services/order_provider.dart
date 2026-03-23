@@ -47,6 +47,7 @@ class OrderProvider extends ChangeNotifier {
     });
   }
 
+<<<<<<< HEAD
   // ---------------------------
   // Firestore Listener
   // ---------------------------
@@ -71,6 +72,13 @@ class OrderProvider extends ChangeNotifier {
     _currentOrder = firestoreOrder.copyWith(
       inCart: _currentOrder.inCart,
       ordered: _currentOrder.ordered,
+=======
+  Order _createNewOrder() {
+    return Order(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      timestamp: DateTime.now(),
+      restaurantId: '',
+>>>>>>> origin/store-side_mvvm
     );
 
     notifyListeners();

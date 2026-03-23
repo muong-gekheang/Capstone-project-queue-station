@@ -23,14 +23,14 @@ Map<String, dynamic> _$QueueLengthDataPointToJson(
 TableOccupancyDataPoint _$TableOccupancyDataPointFromJson(
   Map<String, dynamic> json,
 ) => TableOccupancyDataPoint(
-  day: json['day'] as String,
+  day: DateTime.parse(json['day'] as String),
   occupancyPercentage: (json['occupancyPercentage'] as num).toDouble(),
 );
 
 Map<String, dynamic> _$TableOccupancyDataPointToJson(
   TableOccupancyDataPoint instance,
 ) => <String, dynamic>{
-  'day': instance.day,
+  'day': instance.day.toIso8601String(),
   'occupancyPercentage': instance.occupancyPercentage,
 };
 

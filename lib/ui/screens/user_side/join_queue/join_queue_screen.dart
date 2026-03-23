@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/restaurants/restaurant/restaurant_repository.dart';
@@ -7,9 +8,24 @@ import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/view_models/join_queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/join_queue_content.dart';
+=======
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/customer.dart';
+import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
+import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
+import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
+import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
+
+class JoinQueueScreen extends StatefulWidget {
+  const JoinQueueScreen({super.key, required this.rest});
+>>>>>>> origin/store-side_mvvm
 
 class JoinQueueScreen extends StatelessWidget {
   final Restaurant rest;
+<<<<<<< HEAD
   const JoinQueueScreen({super.key, required this.rest});
 
   @override
@@ -20,6 +36,270 @@ class JoinQueueScreen extends StatelessWidget {
         userProvider: context.read<UserProvider>(),
         restaurantRepository: context.read<RestaurantRepository>(),
         customerRepository: context.read<CustomerRepositoryImpl>(),
+=======
+
+  @override
+  State<JoinQueueScreen> createState() => _JoinQueueScreenState();
+}
+
+class _JoinQueueScreenState extends State<JoinQueueScreen> {
+  int numPeople = 0;
+
+  void onTableTap(int value) {
+    setState(() {
+      numPeople = value;
+    });
+  }
+
+  Future<void> onJoinQueue() async {
+    UserProvider userProvider = context.read<UserProvider>();
+    Customer? user = userProvider.asCustomer;
+    if (user != null) {
+      // TODO: Use Repos in VM to fetch and create Rest obj
+      userProvider.updateUser(user.copyWith(currentHistoryId: ""));
+      // TODO: Use Repos in VM to fetch and create Rest obj
+      userProvider.updateUser(user.copyWith(currentHistoryId: ""));
+      Navigator.pop(context);
+      context.go("/ticket");
+    } else {
+      const snackBar = SnackBar(
+        content: Text('You must have an account to join queue!'),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  void incrPeople() {
+    setState(() {
+      numPeople = min(numPeople + 1, widget.rest.biggestTableSize);
+    });
+  }
+
+  void decrPeople() {
+    setState(() {
+      numPeople = max(numPeople - 1, 0);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String formattedPhone = widget.rest.phone.length >= 6
+        ? widget.rest.phone.replaceAllMapped(RegExp(r"(\d{3})(\d{3})(\d+)"), (
+            match,
+          ) {
+            return "${match[1]} ${match[2]} ${match[3]}";
+          })
+        : "";
+
+    UserProvider userProvider = context.read<UserProvider>();
+    Customer? user = userProvider.asCustomer;
+
+    return CustomScreenView(
+      title: "Get Queue",
+      isTitleCenter: true,
+      content: ListView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(3),
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha((255 * 0.25).toInt()),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            child: Column(
+              spacing: 10,
+              children: [
+                Row(
+                  spacing: 16,
+                  children: [
+                    SizedBox.square(
+                      dimension: 160,
+                      child: Image.asset(
+                        "assets/home_screen/kungfu.png",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            widget.rest.name,
+                            softWrap: true,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color(0xFFFF6835),
+                            ),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 5,
+                            children: [
+                              const Icon(Icons.location_pin),
+                              Expanded(
+                                child: Text(
+                                  widget.rest.address,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                    color: Color(0xFF0D47A1),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                if (widget.rest.policy.isNotEmpty)
+                  const Text(
+                    "Restaurant Policy",
+                    style: TextStyle(
+                      color: Color(0xFF0D47A1),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                if (widget.rest.policy.isNotEmpty)
+                  Text(
+                    widget.rest.policy,
+                    style: TextStyle(fontSize: 16, color: Color(0xFFFF6835)),
+                  ),
+                const Text(
+                  "Our Biggest Table Size",
+                  style: TextStyle(
+                    color: Color(0xFF0D47A1),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  "${widget.rest.biggestTableSize.toString()} people per table",
+                  style: TextStyle(fontSize: 16, color: Color(0xFFFF6835)),
+                ),
+                const Text(
+                  "Contact Us",
+                  style: TextStyle(
+                    color: Color(0xFF0D47A1),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  formattedPhone,
+                  style: TextStyle(fontSize: 16, color: Color(0xFFFF6835)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            tileColor: Color(0xFFFF6835),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(10),
+            ),
+            title: const Text(
+              "Wait",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            subtitle: Text(
+              "Estimated waiting time: ${widget.rest.averageWaitingTime.inMinutes} min",
+              style: TextStyle(color: Colors.white, fontSize: 11),
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "10",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    height: 1.0,
+                    color: Colors.white,
+                  ),
+                ),
+                const Text(
+                  "Entries",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "Queue Type",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: (widget.rest.biggestTableSize >= 4)
+                ? [
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 1,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 2,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 3,
+                      onTap: onTableTap,
+                    ),
+                    TableTypeWidget(
+                      selectedType: numPeople,
+                      value: 4,
+                      onTap: onTableTap,
+                    ),
+                  ]
+                : [
+                    for (int i = 1; i < widget.rest.biggestTableSize; i++)
+                      TableTypeWidget(
+                        value: i,
+                        selectedType: numPeople,
+                        onTap: onTableTap,
+                      ),
+                  ],
+          ),
+          const SizedBox(height: 16),
+          const Text("Number of Guest(s)", style: TextStyle(fontSize: 16)),
+          const SizedBox(height: 16),
+          GuestsCounterWidget(
+            maxPeople: widget.rest.biggestTableSize,
+            numPeople: numPeople,
+            incrPeople: incrPeople,
+            decrPeople: decrPeople,
+          ),
+        ],
+      ),
+      bottomNavigationBar: FullWidthFilledButton(
+        onPress: user != null && user.currentHistoryId == null && numPeople > 0
+            ? onJoinQueue
+            : null,
+        label: "Join Queue",
+>>>>>>> origin/store-side_mvvm
       ),
       child: JoinQueueContent(rest: rest),
     );
