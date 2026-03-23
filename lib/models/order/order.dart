@@ -57,6 +57,9 @@ class Order {
     );
   }
 
+  static String orderItemRef(OrderItem item) =>
+      '${item.menuItemId}_${item.sizeName}_${item.quantity}';
+      
   double calculateTotalPrice() {
     double totalPrice = 0;
     for (final orderItem in ordered) {
@@ -72,5 +75,4 @@ class Order {
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 }
 
-String orderItemRef(OrderItem item) =>
-    '${item.menuItemId}_${item.sizeName}_${item.quantity}';
+

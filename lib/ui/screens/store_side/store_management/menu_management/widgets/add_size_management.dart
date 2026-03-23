@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class AddSizeScreen extends StatefulWidget {
   final List<MenuSize> selectedMenuSizes;
@@ -53,7 +53,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       if (sizeOption.name == sizeName) return;
     }
     vm.addNewSizeOption(
-      SizeOption(name: sizeName, id: uuid.v4(), restaurantId: ''),
+      SizeOption(name: sizeName, id: Uuid().v4(), restaurantId: ''),
     );
     _sizeController.clear();
   }
@@ -107,7 +107,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
             (e) => MenuSize(
               price: 0,
               sizeOption: e,
-              id: uuid.v4(),
+              id: Uuid().v4(),
               sizeOptionId: e.id,
             ),
           )

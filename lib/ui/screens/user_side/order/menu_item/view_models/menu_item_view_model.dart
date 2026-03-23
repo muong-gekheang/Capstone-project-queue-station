@@ -110,7 +110,7 @@ class MenuItemViewModel extends ChangeNotifier {
 
     final orderItem = OrderItem(
       id: Uuid().v4(),
-      orderId: ,
+      orderId: orderProvider.currentOrder.id,
       menuItemId: menuItem.id,
       item: menuItem,
       size: _selectedSize!.sizeOption,

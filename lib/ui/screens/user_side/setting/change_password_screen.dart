@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/forget_password_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/change_password/forget_password_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
