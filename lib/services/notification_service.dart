@@ -19,6 +19,8 @@ class NotificationService {
       ? null
       : FlutterLocalNotificationsPlugin();
 
+  static const String _vapidKey = String.fromEnvironment('VAPID_KEY');
+
   static const String _orderChannelId = 'order_channel';
   static const String _orderChannelName = 'Order Notifications';
   static const String _queueChannelId = 'queue_channel';
@@ -32,15 +34,14 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-      print('User declined or has not granted permission');
+      debugPrint('User declined or has not granted permission');
       return;
     }
 
     String? token = await _fcm.getToken(
-      vapidKey:
-          'BKqmUCC4cke68rUfsLdszYytkrGY1O3KSd4HJB3csTq8q-d14xtZ9PJW2WYvz7vT6wJ0V0tcT0g8rSVt3E4JkmU',
+      vapidKey: _vapidKey,
     );
-    print('FCM Token: $token');
+    debugPrint('FCM Token: $token');
 
     if (!kIsWeb) {
       const AndroidInitializationSettings androidSettings =
@@ -71,7 +72,9 @@ class NotificationService {
 
     // App brought to foreground from background via notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      _handleRemoteNotificationTap(message);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleRemoteNotificationTap(message);
+      });
     });
   }
 
@@ -85,7 +88,7 @@ class NotificationService {
     if (!kIsWeb && notification != null) {
       final isOrderType = type == 'new_order' || type == 'order_update';
       _localNotifications!.show(
-        notification.hashCode,
+        notification.title.hashCode ^ notification.body.hashCode,
         notification.title,
         notification.body,
         NotificationDetails(
@@ -100,7 +103,7 @@ class NotificationService {
         payload: type,
       );
     } else if (kIsWeb && notification != null) {
-      print(
+      debugPrint(
         'Web foreground notification: ${notification.title} - ${notification.body}',
       );
     }
@@ -133,7 +136,7 @@ class NotificationService {
     if (payload == 'queue_joined') {
       // Customer tapped their queue confirmation notification — just bring
       // the app to foreground; the ticket screen is already showing.
-      print('Queue joined notification tapped');
+      debugPrint('Queue joined notification tapped');
     } else {
       // new_order or order_update → show the store's notification list
       _navigateToNotificationScreen();
@@ -147,7 +150,7 @@ class NotificationService {
     if (type == 'new_order' || type == 'order_update') {
       _navigateToNotificationScreen();
     } else if (type == 'queue_joined') {
-      print('Queue joined remote notification tapped');
+      debugPrint('Queue joined remote notification tapped');
     }
   }
 
@@ -156,8 +159,12 @@ class NotificationService {
   void _navigateToNotificationScreen() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (NavigationService.isReady) {
-        // Pop any existing notification screen on the stack to avoid stacking
         final navigator = NavigationService.navigatorKey.currentState!;
+        // Pop any existing notification screen to avoid stacking duplicates
+        if (navigator.canPop()) {
+          navigator.popUntil((route) =>
+              route.settings.name != '/notifications');
+        }
         navigator.push(
           MaterialPageRoute(
             builder: (_) => const NotificationScreen(),
@@ -176,6 +183,8 @@ class NotificationService {
     required String tableNumber,
     required String queueNumber,
     required int itemCount,
+    required String restId,
+    required String customerId,
   }) async {
     final ctx = NavigationService.navigatorKey.currentContext;
     if (ctx == null) return;
@@ -183,8 +192,8 @@ class NotificationService {
     final entry = QueueEntry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       queueNumber: queueNumber,
-      restId: 'mock-store-1',
-      customerId: 'customer-1',
+      restId: restId,
+      customerId: customerId,
       partySize: 1,
       joinTime: DateTime.now(),
       status: QueueStatus.waiting,
@@ -200,7 +209,7 @@ class NotificationService {
     // app is in the background or the screen is locked.
     if (!kIsWeb) {
       await _localNotifications?.show(
-        entry.hashCode,
+        int.tryParse(entry.id) ?? entry.id.hashCode,
         'New Order — Table $tableNumber',
         '$itemCount item${itemCount == 1 ? '' : 's'} ordered  •  Queue $queueNumber',
         const NotificationDetails(
@@ -222,6 +231,8 @@ class NotificationService {
     required String tableNumber,
     required String queueNumber,
     required int itemCount,
+    required String restId,
+    required String customerId,
   }) async {
     final ctx = NavigationService.navigatorKey.currentContext;
     if (ctx == null) return;
@@ -229,8 +240,8 @@ class NotificationService {
     final entry = QueueEntry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       queueNumber: queueNumber,
-      restId: 'mock-store-1',
-      customerId: 'customer-1',
+      restId: restId,
+      customerId: customerId,
       partySize: 1,
       joinTime: DateTime.now(),
       status: QueueStatus.waiting,
@@ -243,7 +254,7 @@ class NotificationService {
 
     if (!kIsWeb) {
       await _localNotifications?.show(
-        entry.hashCode,
+        int.tryParse(entry.id) ?? entry.id.hashCode,
         'Order Updated — Table $tableNumber',
         '$itemCount item${itemCount == 1 ? '' : 's'} in updated order  •  Queue $queueNumber',
         const NotificationDetails(
@@ -269,7 +280,7 @@ class NotificationService {
 
     await _localNotifications?.show(
       // Use a distinct id so it doesn't overwrite the queue-joined banner
-      entry.hashCode ^ 0x1,
+      (int.tryParse(entry.id) ?? entry.id.hashCode) ^ 0x1,
       'Order Accepted!',
       'Your order for Table ${entry.tableNumber} (Queue #${entry.queueNumber}) has been accepted.',
       const NotificationDetails(
@@ -291,7 +302,7 @@ class NotificationService {
     if (kIsWeb) return;
 
     await _localNotifications?.show(
-      entry.hashCode,
+      int.tryParse(entry.id) ?? entry.id.hashCode,
       'You\'ve Joined the Queue!',
       'Queue #${entry.queueNumber}  •  Party of ${entry.partySize}',
       const NotificationDetails(

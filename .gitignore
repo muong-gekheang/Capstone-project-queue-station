@@ -53,3 +53,6 @@ android/app/google-services.json
 # iOS/macOS Secrets
 ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
+
+# Environment secrets
+.env
