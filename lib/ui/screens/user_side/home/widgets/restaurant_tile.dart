@@ -3,9 +3,14 @@ import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/join_queue_screen.dart';
 
 class RestaurantTile extends StatefulWidget {
-  const RestaurantTile({super.key, required this.rest});
-
   final Restaurant rest;
+  final int peopleWaiting;
+
+  const RestaurantTile({
+    super.key,
+    required this.rest,
+    required this.peopleWaiting,
+  });
 
   @override
   State<RestaurantTile> createState() => _RestaurantCardState();
@@ -55,10 +60,19 @@ class _RestaurantCardState extends State<RestaurantTile> {
               children: [
                 SizedBox.square(
                   dimension: 75,
-                  child: Image.asset(
-                    "assets/home_screen/burger-logo.jpg",
-                    fit: BoxFit.cover
-                  )
+                  child:
+                      Image.network(
+                          widget.rest.logoLink,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // fallback if image fails to load
+                            return Icon(
+                              Icons.restaurant,
+                              size: 50,
+                              color: Colors.grey,
+                            );
+                          },
+                        )
                 ),
                 Expanded(
                   child: Column(
@@ -81,7 +95,7 @@ class _RestaurantCardState extends State<RestaurantTile> {
                         children: [
                           Icon(Icons.hourglass_empty, color: Color(0xFFFF6835)),
                           Text(
-                            "${10} people waiting",
+                            "${widget.peopleWaiting} people waiting",
                             style: TextStyle(color: Color(0xFFFF6835)),
                           ),
                         ],

@@ -167,7 +167,7 @@ class JoinQueueContent extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'mock',
+                  joinQueueVM.queueCount.toString(),
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -276,7 +276,10 @@ class JoinQueueContent extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: FullWidthFilledButton(
-        onPress: (joinQueueVM.numPeople > 0 && !joinQueueVM.isLoading)
+        onPress:
+            (joinQueueVM.numPeople > 0 &&
+                !joinQueueVM.isLoading &&
+                joinQueueVM.userProvider.asCustomer?.currentHistoryId == null)
             ? () async {
                 // Call joinQueue and wait for the result
                 final createdEntry = await joinQueueVM.joinQueue(rest.id);
@@ -292,8 +295,9 @@ class JoinQueueContent extends StatelessWidget {
                 // If createdEntry is null, error message will be shown in UI
               }
             : null,
-        // Show a progress indicator if loading
-        label: joinQueueVM.isLoading ? "Processing..." : "Join Queue",
+        label: joinQueueVM.userProvider.asCustomer?.currentHistoryId != null
+            ? "Already in Queue"
+            : (joinQueueVM.isLoading ? "Processing..." : "Join Queue"),
       ),
     );
   }

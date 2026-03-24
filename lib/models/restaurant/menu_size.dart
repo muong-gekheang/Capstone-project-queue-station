@@ -16,6 +16,8 @@ class MenuSize {
     required this.sizeOptionId,
   });
 
+  String get name => sizeOption?.name ?? "Size";
+
   factory MenuSize.fromJson(Map<String, dynamic> json) =>
       _$MenuSizeFromJson(json);
 

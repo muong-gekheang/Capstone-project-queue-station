@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import '../../../../../data/repositories/restaurant/restaurant_repository.dart';
 import '../../../../../data/repositories/user/production/customer_repository_impl.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
@@ -11,13 +13,63 @@ class ConfirmTicketViewModel extends ChangeNotifier {
   final RestaurantRepository restaurantRepository;
   final UserProvider userProvider;
   final CustomerRepositoryImpl customerRepository;
+  final QueueService queueService;
 
   ConfirmTicketViewModel({
     required this.queueRepository,
     required this.restaurantRepository,
     required this.userProvider,
     required this.customerRepository,
+    required this.queueService,
   });
+
+  List<QueueEntry> currentRestaurantQueue = [];
+  StreamSubscription<List<QueueEntry>>? _queueSubscription;
+
+  void listenCurrentRestaurantQueue(String restId) {
+    print('listenCurrentRestaurantQueue called for restId: $restId');
+    _queueSubscription?.cancel();
+
+    // Use the new method that gets stream for specific restaurant
+    _queueSubscription = queueService
+        .getQueueStreamForRestaurant(restId)
+        .listen(
+          (queueList) {
+            print(
+              'ConfirmTicketViewModel: Received ${queueList.length} queue entries for restaurant $restId',
+            );
+            currentRestaurantQueue = queueList;
+
+            // Print queue details for debugging
+            for (var i = 0; i < queueList.length; i++) {
+              print(
+                'Queue #${i + 1}: ${queueList[i].id} - ${queueList[i].customerName}',
+              );
+            }
+
+            notifyListeners();
+          },
+          onError: (error) {
+            print('Queue stream error in ConfirmTicketViewModel: $error');
+          },
+        );
+  }
+
+  int get currentQueueEntriesCount {
+    print('currentQueueEntriesCount: ${currentRestaurantQueue.length}');
+    return currentRestaurantQueue.length;
+  }
+
+  int get customerPosition {
+    if (ticket == null) {
+      print('No ticket found for position');
+      return 0;
+    }
+    final index = currentRestaurantQueue.indexWhere((q) => q.id == ticket!.id);
+    final position = index != -1 ? index + 1 : 0;
+    print('Customer position: $position (ticket ID: ${ticket!.id})');
+    return position;
+  }
 
   QueueEntry? _ticket;
   QueueEntry? get ticket => _ticket;
@@ -34,13 +86,15 @@ class ConfirmTicketViewModel extends ChangeNotifier {
   CancelReasonType? cancelReason;
   String? otherReasonText;
 
-  /// Fetch ticket and restaurant by queue entry id
   Future<void> loadTicket(String queueEntryId) async {
+    print('loadTicket called for ID: $queueEntryId');
     _loading = true;
     notifyListeners();
 
     try {
       final entry = await queueRepository.getQueueEntryById(queueEntryId);
+      print('Queue entry fetched: ${entry?.id}, restId: ${entry?.restId}');
+
       if (entry == null) {
         _error = "Ticket not found";
         _loading = false;
@@ -49,26 +103,50 @@ class ConfirmTicketViewModel extends ChangeNotifier {
       }
 
       _ticket = entry;
-      print('Ticket loaded: ${entry.id}, status: ${entry.status}');
+      print(
+        'Ticket loaded: ${entry.id}, status: ${entry.status}, restId: ${entry.restId}',
+      );
 
-      // Fetch restaurant
       final rest = await restaurantRepository.getById(entry.restId);
+      print('Restaurant fetched: ${rest?.name}');
+
       if (rest == null) {
         _error = "Restaurant not found";
       } else {
         _restaurant = rest;
         print('Restaurant loaded: ${rest.name}');
+
+        // Start listening to queue updates for this restaurant
+        listenCurrentRestaurantQueue(entry.restId);
       }
     } catch (e) {
       _error = e.toString();
       print('Error loading ticket: $e');
+    } finally {
+      _loading = false;
+      notifyListeners();
     }
-
-    _loading = false;
-    notifyListeners();
   }
 
-  /// Cancel the queue
+  Future<Duration> getEstimatedWaitTime() async {
+    if (ticket == null) return Duration.zero;
+
+    final avgWaitTime = await queueService.avgWaitingTime;
+    print('Average wait time: ${avgWaitTime.inMinutes} minutes');
+
+    if (avgWaitTime.inMinutes == 0) {
+      return Duration(minutes: 15);
+    }
+
+    final position = customerPosition;
+    final waitTimeInMinutes = position * avgWaitTime.inMinutes;
+    print(
+      'Estimated wait time: $waitTimeInMinutes minutes (position: $position)',
+    );
+
+    return Duration(minutes: waitTimeInMinutes);
+  }
+
   Future<bool> cancelQueue() async {
     final customer = userProvider.asCustomer;
     if (customer == null || _ticket == null) {
@@ -77,51 +155,27 @@ class ConfirmTicketViewModel extends ChangeNotifier {
     }
 
     print('Starting cancellation for customer: ${customer.id}');
-    print(
-      'Current customer data - currentHistoryId: ${customer.currentHistoryId}',
-    );
 
     try {
-      // 1. Update queue entry status to cancelled
       final updatedTicket = _ticket!.copyWith(status: QueueStatus.cancelled);
       await queueRepository.update(updatedTicket);
       print('Queue entry status updated to cancelled');
 
-      // 2. Remove from restaurant's current queue
       await restaurantRepository.removeQueueEntryFromRestaurant(
         _ticket!.restId,
         _ticket!.id,
       );
       print('Queue entry removed from restaurant');
 
-      // 3. Update customer in Firestore - set currentHistoryId to null
-      final updatedCustomer = customer.copyWith(
-        currentHistoryId: null,
-        // noQueue: true, // Keep or remove as needed
-      );
-
-      print('Updating customer in Firestore:');
-      print('- Old currentHistoryId: ${customer.currentHistoryId}');
-      print('- New currentHistoryId: ${updatedCustomer.currentHistoryId}');
-
-      // Save to Firestore using repository
+      final updatedCustomer = customer.copyWith(currentHistoryId: null);
       await customerRepository.update(updatedCustomer);
       print('Customer updated in Firestore');
 
-      // 4. Update local provider state
       userProvider.updateUser(updatedCustomer);
       print('UserProvider updated');
 
-      // 5. Update local ticket state
       _ticket = updatedTicket;
-
       notifyListeners();
-
-      // Verify the update by fetching fresh data
-      final verifyCustomer = await customerRepository.getUserById(customer.id);
-      print(
-        'Verification - Firestore currentHistoryId: ${verifyCustomer?.currentHistoryId}',
-      );
 
       return true;
     } catch (e) {
@@ -141,6 +195,12 @@ class ConfirmTicketViewModel extends ChangeNotifier {
     otherReasonText = text;
     cancelReason = CancelReasonType.other;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _queueSubscription?.cancel();
+    super.dispose();
   }
 }
 

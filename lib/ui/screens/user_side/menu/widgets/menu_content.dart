@@ -53,17 +53,32 @@ class _MenuContentState extends State<MenuContent> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF6835).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: menuVM.restaurant?.logoLink != null &&
+                        menuVM.restaurant!.logoLink.isNotEmpty
+                    ? Image.network(
+                        menuVM.restaurant!.logoLink,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.store,
+                            color: Color(0xFFFF6835),
+                          );
+                        },
+                      )
+                    : const Icon(
+                        Icons.store,
+                        color: Color(0xFFFF6835),
+                      ),
               ),
-              child: const Icon(Icons.store, color: Color(0xFFFF6835)),
-            ),
             const SizedBox(width: 12),
-            const Text(
-              "Restaurant Menu",
+            Text(
+              menuVM.restaurantName.isEmpty
+                  ? "Restaurant"
+                  : menuVM.restaurantName,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -126,7 +141,11 @@ class _MenuContentState extends State<MenuContent> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text("View Order"),
+                    child: const Text(
+                      "View Order",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    )
+                    
                   ),
                 ),
               ],

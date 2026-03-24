@@ -93,8 +93,9 @@ class MenuItemViewModel extends ChangeNotifier {
   }
 
   double get startingPrice {
-    if (menuItem.sizes.isEmpty) return 0;
-    return menuItem.sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);
+    return menuItem.sizes.isNotEmpty
+        ? menuItem.sizes.first.price
+        : (menuItem.minPrice > 0 ? menuItem.minPrice : 0.0);
   }
 
   void saveItem() {

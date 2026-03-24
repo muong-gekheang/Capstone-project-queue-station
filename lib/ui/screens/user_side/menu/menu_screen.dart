@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
+import 'package:queue_station_app/data/repositories/menu/menu_size/menu_size_repository.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
+import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu/view_models/menu_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/menu/widgets/menu_content.dart';
@@ -21,6 +24,9 @@ class MenuScreen extends StatelessWidget {
           queueEntryRepository: context.read<QueueEntryRepository>(),
           menuCategoryRepository: context.read<MenuCategoryRepository>(),
           userProvider: context.read<UserProvider>(),
+          addOnRepository: context.read<AddOnRepository>(),
+          menuSizeRepository: context.read<MenuSizeRepository>(),
+          restaurantRepository: context.read<RestaurantRepository>()
         );
         // Initialize after creation
         viewModel.initialize();

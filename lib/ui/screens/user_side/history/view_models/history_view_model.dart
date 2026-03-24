@@ -71,109 +71,20 @@ class HistoryViewModel extends ChangeNotifier {
     return total;
   }
 
-  // Future<void> loadHistory() async {
-  //   _isLoading = true;
-  //   notifyListeners();
-
-  //   _customer = userProvider.asCustomer;
-  //   if (_customer == null) {
-  //     print('❌ No customer found');
-  //     _isLoading = false;
-  //     notifyListeners();
-  //     return;
-  //   }
-
-  //   print('✅ Customer found: ${_customer!.id}');
-  //   print('Loading queue history...');
-
-  //   // 2️⃣ Load queue history for the user
-  //   final (queueList, _) = await queueRepo.getByCustomerId(
-  //     _customer!.id,
-  //     50,
-  //     null,
-  //   );
-
-  //   print('📊 Queue entries found: ${queueList.length}');
-  //   for (var entry in queueList) {
-  //     print(
-  //       '  - Entry ID: ${entry.id}, Restaurant: ${entry.restId}, Status: ${entry.status}',
-  //     );
-  //   }
-
-  //   _history = queueList;
-
-  //   // 3️⃣ Load restaurant and order for each queue entry
-  //   for (final entry in _history) {
-  //     print('Loading details for entry: ${entry.id}');
-
-  //     if (!_restaurants.containsKey(entry.restId)) {
-  //       print('  Loading restaurant: ${entry.restId}');
-  //       final rest = await restaurantRepo.getById(entry.restId);
-  //       if (rest != null) {
-  //         _restaurants[entry.restId] = rest;
-  //         print('  ✅ Restaurant loaded: ${rest.name}');
-  //       } else {
-  //         print('  ❌ Restaurant not found: ${entry.restId}');
-  //       }
-  //     }
-
-  //     if (entry.orderId != null && !_orders.containsKey(entry.orderId)) {
-  //       print('  Loading order: ${entry.orderId}');
-  //       final order = await orderRepo.getOrderById(entry.orderId!);
-  //       if (order != null) {
-  //         print('  ✅ Order loaded: ${order.id}');
-  //         List<OrderItem> orderedItems = [];
-
-  //         for (final orderItemId in order.orderedIds) {
-  //           print('    Loading order item: $orderItemId');
-  //           final orderItem = await orderRepo.getOrderItemById(
-  //             order.id,
-  //             orderItemId,
-  //           );
-  //           if (orderItem != null) {
-  //             orderedItems.add(orderItem);
-  //             print('    ✅ Order item loaded: ${orderItem.menuItemId}');
-
-  //             if (!_menuItems.containsKey(orderItem.menuItemId)) {
-  //               print('      Loading menu item: ${orderItem.menuItemId}');
-  //               final menuItem = await menuItemRepository.getMenuItemById(
-  //                 orderItem.menuItemId,
-  //               );
-  //               if (menuItem != null) {
-  //                 _menuItems[orderItem.menuItemId] = menuItem;
-  //                 print('      ✅ Menu item loaded: ${menuItem.name}');
-  //               }
-  //             }
-  //           }
-  //         }
-
-  //         final fullOrder = order.copyWith(ordered: orderedItems);
-  //         _orders[entry.orderId!] = fullOrder;
-  //       } else {
-  //         print('  ❌ Order not found: ${entry.orderId}');
-  //       }
-  //     }
-  //   }
-
-  //   print('✅ History loading complete');
-  //   print('Restaurants loaded: ${_restaurants.length}');
-  //   print('Orders loaded: ${_orders.length}');
-  //   print('Menu items loaded: ${_menuItems.length}');
-
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
-
   Future<void> loadHistory() async {
     _isLoading = true;
     notifyListeners();
 
     _customer = userProvider.asCustomer;
     if (_customer == null) {
+      print('❌ No customer found');
       _isLoading = false;
       notifyListeners();
       return;
     }
+
+    print('✅ Customer found: ${_customer!.id}');
+    print('Loading queue history...');
 
     // 2️⃣ Load queue history for the user
     final (queueList, _) = await queueRepo.getByCustomerId(
@@ -181,49 +92,138 @@ class HistoryViewModel extends ChangeNotifier {
       50,
       null,
     );
+
+    print('📊 Queue entries found: ${queueList.length}');
+    for (var entry in queueList) {
+      print(
+        '  - Entry ID: ${entry.id}, Restaurant: ${entry.restId}, Status: ${entry.status}',
+      );
+    }
+
     _history = queueList;
 
     // 3️⃣ Load restaurant and order for each queue entry
     for (final entry in _history) {
+      print('Loading details for entry: ${entry.id}');
+
       if (!_restaurants.containsKey(entry.restId)) {
+        print('  Loading restaurant: ${entry.restId}');
         final rest = await restaurantRepo.getById(entry.restId);
-        if (rest != null) _restaurants[entry.restId] = rest;
+        if (rest != null) {
+          _restaurants[entry.restId] = rest;
+          print('  ✅ Restaurant loaded: ${rest.name}');
+        } else {
+          print('  ❌ Restaurant not found: ${entry.restId}');
+        }
       }
 
       if (entry.orderId != null && !_orders.containsKey(entry.orderId)) {
+        print('  Loading order: ${entry.orderId}');
         final order = await orderRepo.getOrderById(entry.orderId!);
         if (order != null) {
+          print('  ✅ Order loaded: ${order.id}');
           List<OrderItem> orderedItems = [];
 
           for (final orderItemId in order.orderedIds) {
+            print('    Loading order item: $orderItemId');
             final orderItem = await orderRepo.getOrderItemById(
               order.id,
               orderItemId,
             );
             if (orderItem != null) {
               orderedItems.add(orderItem);
+              print('    ✅ Order item loaded: ${orderItem.menuItemId}');
 
               if (!_menuItems.containsKey(orderItem.menuItemId)) {
+                print('      Loading menu item: ${orderItem.menuItemId}');
                 final menuItem = await menuItemRepository.getMenuItemById(
                   orderItem.menuItemId,
                 );
                 if (menuItem != null) {
                   _menuItems[orderItem.menuItemId] = menuItem;
+                  print('      ✅ Menu item loaded: ${menuItem.name}');
                 }
               }
             }
           }
 
           final fullOrder = order.copyWith(ordered: orderedItems);
-
           _orders[entry.orderId!] = fullOrder;
+        } else {
+          print('  ❌ Order not found: ${entry.orderId}');
         }
       }
     }
 
+    print('✅ History loading complete');
+    print('Restaurants loaded: ${_restaurants.length}');
+    print('Orders loaded: ${_orders.length}');
+    print('Menu items loaded: ${_menuItems.length}');
+
     _isLoading = false;
     notifyListeners();
   }
+
+  // Future<void> loadHistory() async {
+  //   _isLoading = true;
+  //   notifyListeners();
+
+  //   _customer = userProvider.asCustomer;
+  //   if (_customer == null) {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //     return;
+  //   }
+
+  //   // 2️⃣ Load queue history for the user
+  //   final (queueList, _) = await queueRepo.getByCustomerId(
+  //     _customer!.id,
+  //     50,
+  //     null,
+  //   );
+  //   _history = queueList;
+
+  //   // 3️⃣ Load restaurant and order for each queue entry
+  //   for (final entry in _history) {
+  //     if (!_restaurants.containsKey(entry.restId)) {
+  //       final rest = await restaurantRepo.getById(entry.restId);
+  //       if (rest != null) _restaurants[entry.restId] = rest;
+  //     }
+
+  //     if (entry.orderId != null && !_orders.containsKey(entry.orderId)) {
+  //       final order = await orderRepo.getOrderById(entry.orderId!);
+  //       if (order != null) {
+  //         List<OrderItem> orderedItems = [];
+
+  //         for (final orderItemId in order.orderedIds) {
+  //           final orderItem = await orderRepo.getOrderItemById(
+  //             order.id,
+  //             orderItemId,
+  //           );
+  //           if (orderItem != null) {
+  //             orderedItems.add(orderItem);
+
+  //             if (!_menuItems.containsKey(orderItem.menuItemId)) {
+  //               final menuItem = await menuItemRepository.getMenuItemById(
+  //                 orderItem.menuItemId,
+  //               );
+  //               if (menuItem != null) {
+  //                 _menuItems[orderItem.menuItemId] = menuItem;
+  //               }
+  //             }
+  //           }
+  //         }
+
+  //         final fullOrder = order.copyWith(ordered: orderedItems);
+
+  //         _orders[entry.orderId!] = fullOrder;
+  //       }
+  //     }
+  //   }
+
+  //   _isLoading = false;
+  //   notifyListeners();
+  // }
 
   Restaurant? getRestaurant(String restId) => _restaurants[restId];
   Order? getOrder(String orderId) => _orders[orderId];

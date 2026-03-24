@@ -15,8 +15,6 @@ abstract class RestaurantRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
-<<<<<<<< HEAD:lib/data/repositories/restaurants/restaurant/restaurant_repository.dart
-
   Future<void> addQueueEntryToRestaurant(
     String restaurantId,
     String queueEntryId,
@@ -26,10 +24,6 @@ abstract class RestaurantRepository {
     String restaurantId,
     String queueEntryId,
   );
-
-  Stream<Restaurant> watchCurrent(String id);
-========
   Stream<Restaurant?> watchCurrent(String id);
->>>>>>>> origin/store-side_mvvm:lib/data/repositories/restaurant/restaurant_repository.dart
   Stream<List<Restaurant>> watchAll();
 }

@@ -55,6 +55,7 @@ dependencies:
   rxdart: ^0.28.0
   firebase_auth: ^6.2.0
   auto_size_text: ^3.0.0
+  collection: ^1.19.1
    
 
 dev_dependencies:

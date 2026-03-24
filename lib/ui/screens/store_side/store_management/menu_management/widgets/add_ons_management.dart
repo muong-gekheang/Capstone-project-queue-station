@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
-import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_add_on_menu.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';

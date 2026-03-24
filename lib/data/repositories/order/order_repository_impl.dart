@@ -19,6 +19,55 @@ class OrderRepositoryImpl extends OrderRepository {
 
   Order get currentOrder => _currentOrder ??= Order.empty();
 
+  // Helper method to safely convert document to Order
+  // Helper method to safely convert document to Order
+  Order? _orderFromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
+    try {
+      final data = doc.data();
+      if (data == null) {
+        print('❌ Document ${doc.id} has null data');
+        return null;
+      }
+
+      // Log ALL fields to see what's actually in the document
+      print('📄 Document ID: ${doc.id}');
+      print('📄 Fields in document:');
+      data.forEach((key, value) {
+        print('   - $key: $value (${value.runtimeType})');
+      });
+
+      // Create a safe copy with the document ID
+      final safeData = Map<String, dynamic>.from(data);
+
+      // CRITICAL: Ensure id field exists
+      if (safeData['id'] == null || safeData['id'].toString().isEmpty) {
+        print('⚠️ Order ${doc.id} is missing id field, using document ID');
+        safeData['id'] = doc.id;
+        print('   Added id: ${safeData['id']}');
+      } else {
+        print('✅ id field exists: ${safeData['id']}');
+      }
+
+      // Check timestamp
+      if (safeData['timestamp'] == null) {
+        print('⚠️ Timestamp is missing, adding current time');
+        safeData['timestamp'] = DateTime.now().toIso8601String();
+      } else {
+        print('✅ timestamp exists: ${safeData['timestamp']}');
+      }
+
+      print('🔄 Attempting to parse Order with safeData: $safeData');
+      final order = Order.fromJson(safeData);
+      print('✅ Order parsed successfully: ${order.id}');
+
+      return order;
+    } catch (e, stackTrace) {
+      print('❌ Error converting order ${doc.id}: $e');
+      print('Stack trace: $stackTrace');
+      return null;
+    }
+  }
+
   // CREATE ORDER
   @override
   Future<void> create(Order order) async {
@@ -28,6 +77,7 @@ class OrderRepositoryImpl extends OrderRepository {
       txn.set(orderRef, {
         'id': order.id,
         'timestamp': order.timestamp.toIso8601String(),
+        'restaurantId': order.restaurantId,
         'inCartIds': order.inCart.map(Order.orderItemRef).toList(),
         'orderedIds': order.ordered.map(Order.orderItemRef).toList(),
       });
@@ -71,16 +121,20 @@ class OrderRepositoryImpl extends OrderRepository {
 
         transaction.update(queueRef, {'orderId': targetOrderId});
 
+        // ✅ Include id field when creating
         transaction.set(newOrderRef, {
-          'id': targetOrderId,
+          'id': targetOrderId, // CRITICAL: Include the id field
           'timestamp': DateTime.now().toIso8601String(),
+          'restaurantId': order.restaurantId,
           'inCartIds': order.inCart.map(Order.orderItemRef).toList(),
           'orderedIds': [],
         });
       } else {
         final orderRef = _orderCol.doc(targetOrderId);
 
+        // ✅ Ensure id is preserved when updating
         transaction.update(orderRef, {
+          'id': targetOrderId, // CRITICAL: Keep the id field
           'inCartIds': order.inCart.map(Order.orderItemRef).toList(),
         });
       }
@@ -112,6 +166,7 @@ class OrderRepositoryImpl extends OrderRepository {
       final List<dynamic> currentOrdered = data['orderedIds'] ?? [];
 
       transaction.update(orderRef, {
+        'id': orderId, // ✅ Preserve id field
         'inCartIds': [],
         'orderedIds': [...currentOrdered, ...currentInCart],
         'lastConfirmedAt': DateTime.now().toIso8601String(),
@@ -151,7 +206,10 @@ class OrderRepositoryImpl extends OrderRepository {
       final itemRef = Order.orderItemRef(item);
       inCartIds.add(itemRef);
 
-      txn.update(orderDoc, {'inCartIds': inCartIds});
+      txn.update(orderDoc, {
+        'id': orderId, // ✅ Preserve id field
+        'inCartIds': inCartIds,
+      });
 
       final itemDocId = '${orderId}_$itemRef';
       txn.set(
@@ -164,7 +222,14 @@ class OrderRepositoryImpl extends OrderRepository {
   @override
   Stream<List<Order>> watchAllOrder() {
     return _orderCol.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => Order.fromJson(doc.data())).toList();
+      final orders = <Order>[];
+      for (final doc in snapshot.docs) {
+        final order = _orderFromDoc(doc);
+        if (order != null) {
+          orders.add(order);
+        }
+      }
+      return orders;
     });
   }
 
@@ -172,23 +237,33 @@ class OrderRepositoryImpl extends OrderRepository {
   Stream<Order?> watchOrderById(String orderId) {
     return _orderCol.doc(orderId).snapshots().map((snapshot) {
       if (!snapshot.exists) return null;
-      return Order.fromJson(snapshot.data()!);
+      return _orderFromDoc(snapshot);
     });
   }
 
   @override
   Future<Order?> getOrderById(String orderId) async {
-    final doc = await fireStore.collection('orders').doc(orderId).get();
-    if (!doc.exists) return null;
-    return Order.fromJson(doc.data()!);
+    try {
+      final doc = await _orderCol.doc(orderId).get();
+      if (!doc.exists) {
+        print('Order not found: $orderId');
+        return null;
+      }
+      return _orderFromDoc(doc);
+    } catch (e) {
+      print('Error getting order $orderId: $e');
+      return null;
+    }
   }
 
   @override
   Stream<Order?> watchCurrentOrder(String orderId) {
     return _orderCol.doc(orderId).snapshots().map((snapshot) {
       if (!snapshot.exists) return null;
-      final order = Order.fromJson(snapshot.data()!);
-      _currentOrder = order;
+      final order = _orderFromDoc(snapshot);
+      if (order != null) {
+        _currentOrder = order;
+      }
       return order;
     });
   }
@@ -205,66 +280,89 @@ class OrderRepositoryImpl extends OrderRepository {
 
     return fireStore
         .collection('orders')
-        .where('restId', isEqualTo: restId)
-        .where('timestamp', isGreaterThan: startOfToday)
+        .where(
+          'restaurantId',
+          isEqualTo: restId,
+        ) // Fixed: was 'restId', should be 'restaurantId'
+        .where(
+          'timestamp',
+          isGreaterThanOrEqualTo: startOfToday.toIso8601String(),
+        ) // Fixed: use string for query
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return Order.fromJson(doc.data());
-          }).toList();
+          final orders = <Order>[];
+          for (final doc in snapshot.docs) {
+            final order = _orderFromDoc(doc);
+            if (order != null) {
+              orders.add(order);
+            }
+          }
+          return orders;
         });
   }
-  
+
   @override
   Future<void> delete(String orderId) {
     // TODO: implement delete
     throw UnimplementedError();
   }
-  
+
   @override
-  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(int limit, DocumentSnapshot<Map<String, dynamic>>? lastDoc) {
+  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  ) {
     // TODO: implement getAll
     throw UnimplementedError();
   }
-  
+
   @override
-  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getSearchOrders(String query, int limit, DocumentSnapshot<Map<String, dynamic>>? lastDoc) {
+  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)>
+  getSearchOrders(
+    String query,
+    int limit,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+  ) {
     // TODO: implement getSearchOrders
     throw UnimplementedError();
   }
-  
+
   @override
   Future<void> moveItemToOrdered(String orderId, OrderItem item) {
     // TODO: implement moveItemToOrdered
     throw UnimplementedError();
   }
-  
+
   @override
   Future<void> removeItemFromCart(String orderId, OrderItem item) {
     // TODO: implement removeItemFromCart
     throw UnimplementedError();
   }
-  
+
   @override
   Future<void> removeOrderedItem(String orderId, String menuItemId) {
     // TODO: implement removeOrderedItem
     throw UnimplementedError();
   }
-  
+
   @override
   Future<Order> update(Order order) {
     // TODO: implement update
     throw UnimplementedError();
   }
-  
+
   @override
   Future<void> updateCartItem(String orderId, OrderItem item) {
     // TODO: implement updateCartItem
     throw UnimplementedError();
   }
-  
+
   @override
-  Future<void> updateOrderedItemStatus(String orderId, String menuItemId, OrderItemStatus status) {
+  Future<void> updateOrderedItemStatus(
+    String orderId,
+    String menuItemId,
+    OrderItemStatus status,
+  ) {
     // TODO: implement updateOrderedItemStatus
     throw UnimplementedError();
   }

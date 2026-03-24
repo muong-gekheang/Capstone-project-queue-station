@@ -8,10 +8,46 @@ import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/widgets/ti
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
 import 'package:queue_station_app/ui/widgets/full_width_filled_button.dart';
 
-class ConfirmTicketContent extends StatelessWidget {
+class ConfirmTicketContent extends StatefulWidget {
   final String queueEntryId;
 
   const ConfirmTicketContent({super.key, required this.queueEntryId});
+
+  @override
+  State<ConfirmTicketContent> createState() => _ConfirmTicketContentState();
+}
+
+class _ConfirmTicketContentState extends State<ConfirmTicketContent> {
+  Duration _estimatedWaitTime = Duration.zero;
+  bool _isLoadingWaitTime = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEstimatedWaitTime();
+  }
+
+  Future<void> _loadEstimatedWaitTime() async {
+    final vm = context.read<ConfirmTicketViewModel>();
+
+    // Wait for ticket to load first
+    if (vm.ticket != null) {
+      final waitTime = await vm.getEstimatedWaitTime();
+      if (mounted) {
+        setState(() {
+          _estimatedWaitTime = waitTime;
+          _isLoadingWaitTime = false;
+        });
+      }
+    } else {
+      // If ticket not loaded yet, wait a bit and try again
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _loadEstimatedWaitTime();
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +56,7 @@ class ConfirmTicketContent extends StatelessWidget {
     // Load ticket if not loaded yet
     if (!vm.loading && vm.ticket == null && vm.error == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        vm.loadTicket(queueEntryId);
+        vm.loadTicket(widget.queueEntryId);
       });
     }
 
@@ -36,7 +72,6 @@ class ConfirmTicketContent extends StatelessWidget {
       return const Scaffold(body: Center(child: Text("Ticket not found.")));
     }
 
-    // Check if queue status is waiting
     final bool isWaiting = vm.ticket!.status == QueueStatus.waiting;
 
     return CustomScreenView(
@@ -46,7 +81,15 @@ class ConfirmTicketContent extends StatelessWidget {
       content: Column(
         spacing: 20,
         children: [
-          TicketQueueInfo(queueEntry: vm.ticket!, restaurant: vm.restaurant!),
+          TicketQueueInfo(
+            queueEntry: vm.ticket!,
+            restaurant: vm.restaurant!,
+            queueEntriesCount: vm.currentQueueEntriesCount,
+            customerPosition: vm.customerPosition,
+            estimatedWaitTime: _isLoadingWaitTime
+                ? Duration.zero
+                : _estimatedWaitTime,
+          ),
           if (isWaiting)
             FilledButton(
               style: FilledButton.styleFrom(

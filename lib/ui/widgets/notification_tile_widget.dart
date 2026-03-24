@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/order_screen/store_order_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 

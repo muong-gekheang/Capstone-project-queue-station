@@ -78,10 +78,13 @@ class MenuItemCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
+            // In MenuItemCard
             Text(
               item.sizes.isNotEmpty
                   ? '\$${item.sizes.first.price.toStringAsFixed(2)}'
-                  : '\$0.00',
+                  : item.minPrice > 0
+                  ? '\$${item.minPrice.toStringAsFixed(2)}'
+                  : '\$0.00', 
               style: TextStyle(fontSize: 18),
             ),
           ],

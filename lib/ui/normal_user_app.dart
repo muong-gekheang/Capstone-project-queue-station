@@ -62,19 +62,64 @@ class _NormalUserAppState extends State<NormalUserApp> {
     } else {
       await showDialog(
         context: context,
-        builder: (context) {
-          return CustomDialog(
-            title: "No Queue Found",
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  "Please make sure to join a queue first, so you can see your ticket.",
-                  textAlign: TextAlign.center,
-                ),
-              ],
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            actions: [],
+            insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'No queue found',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFFB22222),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Message
+                  Text(
+                    'We could not find your joined queue at the moment. Please make sure to join a queue first so you can see your ticket.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      height: 1.6,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Return button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF6835),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Return',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         },
       );
@@ -88,8 +133,9 @@ class _NormalUserAppState extends State<NormalUserApp> {
       // Case 1: No user logged in
       if (user == null) {
         await _showQueueErrorDialog(
-          'No Queue!',
-          'We could not find your joined queue at the moment. Please make sure you have joined a queue and checked in.',
+          title: 'No queue found',
+          message:
+              'We could not find your joined queue at the moment. Please make sure you have joined a queue and checked in.',
         );
         return;
       }
@@ -97,8 +143,9 @@ class _NormalUserAppState extends State<NormalUserApp> {
       // Case 2: customer.currentHistoryId is null (not yet joined queue)
       if (user.currentHistoryId == null) {
         await _showQueueErrorDialog(
-          'No Queue!',
-          'We could not find your joined queue at the moment. Please make sure you have joined a queue and checked in.',
+          title: 'No queue found',
+          message:
+              'We could not find your joined queue at the moment. Please make sure you have joined a queue and checked in.',
         );
         return;
       }
@@ -124,15 +171,15 @@ class _NormalUserAppState extends State<NormalUserApp> {
 
       // Close loading dialog
       if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
+        Navigator.of(context).pop();
       }
 
       // Case 3: Queue entry not found
       if (queueEntry == null) {
         if (context.mounted) {
           await _showQueueErrorDialog(
-            'Queue Error',
-            'We could not find your queue entry. Please try again.',
+            title: 'Queue error',
+            message: 'We could not find your queue entry. Please try again.',
           );
         }
         return;
@@ -145,8 +192,10 @@ class _NormalUserAppState extends State<NormalUserApp> {
         final queueNumber = queueEntry.queueNumber?.toString() ?? 'N/A';
         if (context.mounted) {
           await _showQueueErrorDialog(
-            'Still in Queue!',
-            'You have not checked in yet. Please make sure to check in when it is your turn.\n\nYour current queue: $queueNumber',
+            title: 'Still in queue',
+            message:
+                'You have not checked in yet. Please make sure to check in when it is your turn.',
+            queueNumber: queueNumber,
           );
         }
         return;
@@ -155,13 +204,11 @@ class _NormalUserAppState extends State<NormalUserApp> {
       // Case 5: Success - user can access menu
       if (status == QUEUE_STATUS_SERVING) {
         if (!_hasSeenFoodInstruction) {
-          // First time: show instruction and switch to food ordering tab
           setState(() {
             selectedTab = NormalUserNavTab.foodOrdering;
             _hasSeenFoodInstruction = true;
           });
         } else {
-          // Already seen instruction, go directly to menu screen
           if (context.mounted) {
             context.go("/menu");
           }
@@ -170,23 +217,23 @@ class _NormalUserAppState extends State<NormalUserApp> {
         // Case 6: Other statuses (completed, cancelled, etc.)
         if (context.mounted) {
           await _showQueueErrorDialog(
-            'Queue Status',
-            'You cannot access the menu at this time. Queue status: ${queueEntry.status.name}',
+            title: 'Cannot access menu',
+            message:
+                'You cannot access the menu at this time. Queue status: ${queueEntry.status.name}',
           );
         }
       }
     } catch (e) {
-      // Handle any errors
       debugPrint("Error checking queue: $e");
       if (context.mounted) {
-        // Close loading dialog if it's still showing
         try {
           Navigator.of(context).pop();
         } catch (_) {}
 
         await _showQueueErrorDialog(
-          'Error',
-          'An error occurred while checking your queue status. Please try again.',
+          title: 'Something went wrong',
+          message:
+              'An error occurred while checking your queue status. Please try again.',
         );
       }
     } finally {
@@ -194,29 +241,114 @@ class _NormalUserAppState extends State<NormalUserApp> {
     }
   }
 
-  Future<void> _showQueueErrorDialog(String title, String message) async {
+  Future<void> _showQueueErrorDialog({
+    required String title,
+    required String message,
+    String? queueNumber,
+  }) async {
     await showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                // Stay on current tab (don't switch to menu)
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF6835),
-              ),
-              child: const Text('RETURN'),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFFB22222),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Message
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    height: 1.6,
+                  ),
+                ),
+
+                // Queue number badge (only for "still waiting" case)
+                if (queueNumber != null) ...[
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF0EA),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text( 
+                          'Your queue number is:',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFFF6835),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          queueNumber,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFF6835),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 24),
+
+                // Return button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6835),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Return',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );

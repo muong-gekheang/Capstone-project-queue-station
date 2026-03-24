@@ -28,7 +28,19 @@ class OrderContent extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  _buildOrderHeader(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Table No. ${vm.tableNumber}",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        "Start Time: ${vm.startTime}",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
 
                   Expanded(
@@ -66,26 +78,6 @@ class OrderContent extends StatelessWidget {
       bottomSheet: vm.confirmedItems.isEmpty
           ? null
           : _buildCheckoutButton(context),
-    );
-  }
-
-  Widget _buildOrderHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      color: Colors.grey[50],
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Table No. B202",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            "Start Time: 8:40 PM",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
     );
   }
 

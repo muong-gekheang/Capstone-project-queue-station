@@ -110,7 +110,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     final snap = await fireStore
         .collection('queue_entries')
         .where('customerId', isEqualTo: customerId)
-        .where('status', whereIn: ['waiting', 'serving']) 
+        .where('status', isEqualTo: 'waiting')
         .orderBy('joinTime', descending: true)
         .limit(1)
         .get();
@@ -149,24 +149,6 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     throw UnimplementedError();
   }
 
-  @override
-  Stream<QueueEntry?> watchCurrentHistory(String customerId) {
-    return fireStore
-        .collection('queue_entries')
-        .where('customerId', isEqualTo: customerId)
-        .where('status', whereIn: ['waiting', 'serving'])
-        .orderBy('joinTime', descending: true)
-        .limit(1)
-        .snapshots()
-        .map((snapshot) {
-          if (snapshot.docs.isEmpty) return null;
-
-          final json = Map<String, dynamic>.from(snapshot.docs.first.data());
-          json['id'] ??= snapshot.docs.first.id;
-
-          return QueueEntry.fromJson(json);
-        });
-  }
 
   @override
   Future<List<QueueEntry>> getTodayFinishedQueue(String restaurantId) async {
@@ -267,6 +249,21 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   }
 
   @override
+  Stream<List<QueueEntry>> watchAllActiveQueues() {
+    return fireStore
+        .collection('queue_entries')
+        .where('status', isEqualTo: 'waiting') 
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return QueueEntry.fromJson(json);
+          }).toList();
+        });
+  }
+
+  @override
   Future<void> updateStatus(String id, QueueStatus newStatus) async {
     String? fieldToUpdate;
     switch (newStatus) {
@@ -291,5 +288,11 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
       if (fieldToUpdate != null)
         fieldToUpdate: DateTime.now().toIso8601String(),
     });
+  }
+  
+  @override
+  watchCurrentHistory() {
+    // TODO: implement watchCurrentHistory
+    throw UnimplementedError();
   }
 }
