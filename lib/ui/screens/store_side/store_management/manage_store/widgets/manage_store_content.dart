@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
 import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/store/analytics_service.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
-import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/analytics_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/view_model/manage_store_view_model.dart';

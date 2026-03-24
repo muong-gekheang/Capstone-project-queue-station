@@ -35,6 +35,15 @@ class AuthService {
     return doc['userType'] as String;
   }
 
+  Future<bool> checkSubscriptionStatus(User authUser) async {
+    final userData = await _authRepository.getUserData(authUser.uid);
+    final status = await _authRepository.getSubscriptionStatus(
+      userData['restaurantId'] as String,
+    );
+    print('Auth Service: The subscription status is ${status}');
+    return status!.toLowerCase() == 'active';
+  }
+
   Future<User?> register(Customer customer, String password) async {
     User? user = await _authRepository.register(customer, password);
     if (user == null) return null;
@@ -48,6 +57,8 @@ class AuthService {
 
     String? role = await getUserRole(user);
     if (role == null || role.isEmpty) return null;
+
+    final bool status = await checkSubscriptionStatus(user);
 
     switch (role) {
       case "customer":
@@ -63,6 +74,10 @@ class AuthService {
             user.uid,
           );
           if (storeUser == null) return null;
+          if (!status) {
+            print("Subscription expired");
+            return null; // login fails gracefully
+          }
           _userProvider.updateUser(storeUser);
         }
         break;
@@ -141,7 +156,15 @@ class AuthService {
         StoreUser? storeUser = await _storeUserRepository.getUserById(
           firebaseUser.uid,
         );
-        if (storeUser != null) _userProvider.updateUser(storeUser);
+        if (storeUser == null) return;
+
+        final bool isActive = await checkSubscriptionStatus(firebaseUser);
+        if(!isActive){
+          print("Subscription expired on restore, signing out...");
+          signOut();
+          return;
+        }
+        _userProvider.updateUser(storeUser);
         break;
     }
   }

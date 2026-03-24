@@ -33,7 +33,7 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
     isOpen: true,
     email: "queuecafe@gmail.com",
     subscriptionDate: now,
-    subscriptionStatus: SubscriptionStatus.paid,
+    subscriptionStatus: SubscriptionStatus.active,
     openingTime: 8,
     closingTime: 11,
   );

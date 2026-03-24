@@ -33,6 +33,7 @@ class RestaurantService {
               print("Data:${data?.name}");
               _controller.add(data);
               _currentRest = data;
+
             },
             onError: (error) {
               print("ERROR:$error");

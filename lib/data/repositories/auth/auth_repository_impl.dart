@@ -150,4 +150,25 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     }
   }
+
+  @override
+  Future<String?> getSubscriptionStatus(String restaurantId) async {
+    final restaurantDoc = await _firestore
+        .collection('restaurants')
+        .doc(restaurantId)
+        .get();
+    if (!restaurantDoc.exists) return null;
+    final data = restaurantDoc.data() as Map<String, dynamic>;
+    print('subscription status is:${data['subscriptionStatus']}');
+    return data['subscriptionStatus'] as String?;
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserData(String uid) async {
+    final userDoc = await _firestore.collection('users').doc(uid).get();
+
+    if (!userDoc.exists) throw Exception("User not found");
+
+    return userDoc.data() as Map<String, dynamic>;
+  }
 }

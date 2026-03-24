@@ -6,7 +6,7 @@ import 'queue_table.dart';
 
 part 'restaurant.g.dart';
 
-enum SubscriptionStatus { paid, expired }
+enum SubscriptionStatus { active, expired }
 
 @JsonSerializable(explicitToJson: true)
 class Restaurant {
@@ -53,7 +53,7 @@ class Restaurant {
     this.isOpen = true,
     this.email = '',
     required this.subscriptionDate,
-    this.subscriptionStatus = SubscriptionStatus.paid,
+    this.subscriptionStatus = SubscriptionStatus.active,
     required this.openingTime,
     required this.closingTime,
   }) : itemIds = itemIds ?? [],
