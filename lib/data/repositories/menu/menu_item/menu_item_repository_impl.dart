@@ -50,12 +50,20 @@ class MenuItemRepositoryImpl implements MenuItemRepository {
 
   @override
   Future<MenuItem?> getMenuItemById(String menuItemId) async {
-    final doc = await fireStore.collection('menu_items').doc(menuItemId).get();
-    if (!doc.exists) return null;
+    try {
+      final doc = await fireStore
+          .collection('menu_items')
+          .doc(menuItemId)
+          .get();
+      if (!doc.exists) return null;
 
-    final json = Map<String, dynamic>.from(doc.data()!);
-    json['id'] ??= doc.id;
-    return MenuItem.fromJson(json);
+      final json = Map<String, dynamic>.from(doc.data()!);
+      json['id'] ??= doc.id;
+      return MenuItem.fromJson(json);
+    } catch (err) {
+      debugPrint("ERROR: $err");
+      rethrow;
+    }
   }
 
   @override

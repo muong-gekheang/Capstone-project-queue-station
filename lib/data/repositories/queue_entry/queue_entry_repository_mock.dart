@@ -117,6 +117,12 @@ class QueueEntryRepositoryMock implements QueueEntryRepository {
     // TODO: implement getTodayFinishedQueue
     throw UnimplementedError();
   }
+
+  @override
+  Stream<List<QueueEntry>> watchCurrentInStore(String restId) {
+    // TODO: implement watchCurrentInStore
+    throw UnimplementedError();
+  }
 }
 
 List<QueueEntry> mockQueueEntries = [

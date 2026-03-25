@@ -69,19 +69,27 @@ class OrderService {
   Future<Order?> getOrderDetailsById(String orderId) async {
     Order? initOrder = await _orderRepository.getOrderById(orderId);
     if (initOrder == null) return null;
+    try {
+      debugPrint("Order:  ${initOrder.id}");
 
-    List<OrderItem> orderItems = await _orderItemRepository
-        .getOrderItemByOrderId(orderId);
+      List<OrderItem> orderItems = await _orderItemRepository
+          .getOrderItemByOrderId(orderId);
 
-    List<OrderItem> filledOrderItems = [];
-    for (var item in orderItems) {
-      MenuItem? menuItem = _menuService.menuItemsMap[item.menuItemId];
+      List<OrderItem> filledOrderItems = [];
+      for (var item in orderItems) {
+        MenuItem? menuItem = _menuService.menuItemsMap[item.menuItemId];
 
-      menuItem ??= await _menuService.getMenuItemById(item.menuItemId);
-      filledOrderItems.add(item.copyWith(menuItem: menuItem));
+        menuItem ??= await _menuService.getMenuItemById(item.menuItemId);
+        filledOrderItems.add(item.copyWith(menuItem: menuItem));
+      }
+      debugPrint(
+        "Order: Copy ${initOrder.copyWith(ordered: filledOrderItems).id}",
+      );
+      return initOrder.copyWith(ordered: filledOrderItems);
+    } catch (err) {
+      debugPrint("Order: Err $err");
+      rethrow;
     }
-
-    return initOrder.copyWith(ordered: filledOrderItems);
   }
 
   List<Order> todayOrder = [];

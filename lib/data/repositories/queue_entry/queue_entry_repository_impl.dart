@@ -254,6 +254,28 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   }
 
   @override
+  Stream<List<QueueEntry>> watchCurrentInStore(String restId) {
+    final result = fireStore
+        .collection('queue_entries')
+        .where('restId', isEqualTo: restId)
+        .where('status', isEqualTo: 'serving')
+        .snapshots()
+        .handleError((err) => print("Stream Error: $err"))
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            debugPrint(json.toString());
+
+            json['id'] ??= doc.id;
+            var result = QueueEntry.fromJson(json);
+            return result;
+          }).toList();
+        });
+
+    return result;
+  }
+
+  @override
   Future<void> updateStatus(String id, QueueStatus newStatus) async {
     String? fieldToUpdate;
     switch (newStatus) {

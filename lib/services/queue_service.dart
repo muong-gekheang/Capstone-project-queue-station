@@ -26,6 +26,11 @@ class QueueService {
     [],
   );
 
+  StreamSubscription<List<QueueEntry>>? _checkedInQueueSubscription;
+  final _checkedInQueueController = BehaviorSubject<List<QueueEntry>>.seeded(
+    [],
+  );
+
   QueueService({
     required UserProvider userProvider,
     required QueueEntryRepository queueEntryRepository,
@@ -52,12 +57,21 @@ class QueueService {
               _queueEntryStreamController.addError(error);
             },
           );
+
+      _checkedInQueueSubscription = _queueEntryRepository
+          .watchCurrentInStore(_restId)
+          .listen((data) {
+            _checkedInQueueController.add(data);
+          });
     }
   }
 
   void dispose() {
     _queueEntrySubscription?.cancel();
     _queueEntryStreamController.close();
+
+    _checkedInQueueController.close();
+    _checkedInQueueSubscription?.cancel();
   }
 
   void updateDependencies(UserProvider newUserProvider) {
@@ -65,6 +79,7 @@ class QueueService {
     final newId = newUserProvider.asStoreUser?.restaurantId ?? "";
     if (newId != _restId && newId.isNotEmpty) {
       _queueEntrySubscription?.cancel();
+      _checkedInQueueSubscription?.cancel();
       _initStream();
     }
   }
@@ -72,6 +87,9 @@ class QueueService {
   // Queue Entry Operations
   Stream<List<QueueEntry>> get streamQueueEntries =>
       _queueEntryStreamController.stream;
+
+  Stream<List<QueueEntry>> get streamCheckedInQueue =>
+      _checkedInQueueController.stream;
 
   void addCustomerToQueue({required QueueEntry newQueue}) async {
     try {
