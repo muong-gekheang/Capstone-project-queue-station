@@ -1,7 +1,7 @@
+import 'package:queue_station_app/data/repositories/auth/auth_repository_impl.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import '../data/repositories/auth/auth_repository.dart';
-import '../data/repositories/auth/auth_repository_impl.dart';
 import '../data/repositories/user/production/customer_repository_impl.dart';
 
 class AuthService {
