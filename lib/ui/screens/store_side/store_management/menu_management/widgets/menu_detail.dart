@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
-import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_menu/edit_menu_screen.dart';
@@ -138,7 +137,10 @@ class _MenuDetailState extends State<MenuDetail> {
 
   // --- Helper Widgets (Piping only) ---
   Widget _buildImageHeader(String? image) {
-    return CircleAvatar(radius: 120, backgroundImage: _getImageProvider(image));
+    return CircleAvatar(
+      radius: 120, 
+      backgroundColor: Colors.transparent,
+      backgroundImage: _getImageProvider(image));
   }
 
   Widget _buildMenuInfo(MenuItem menu, MenuManagementViewModel vm) {
@@ -158,7 +160,7 @@ class _MenuDetailState extends State<MenuDetail> {
         Text(
           '\$${menu.minPrice}',
           style: const TextStyle(
-            color: Color.fromRGBO(255, 104, 53, 1),
+            color: AppTheme.primaryColor,
             fontSize: 25,
           ),
         ),

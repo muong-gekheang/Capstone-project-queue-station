@@ -6,9 +6,9 @@ import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/subscreens/store_subscription_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/edit_store_screen.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/change_password_screen.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/contact_us_screen.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/terms_of_service_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/widgets/change_password/change_password_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/widgets/contact_us/contact_us_screen.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/widgets/terms_of_service/terms_of_service_screen.dart';
 import 'package:queue_station_app/ui/widgets/custom_success_snackbar.dart';
 import 'package:queue_station_app/ui/widgets/setting_card.dart';
 

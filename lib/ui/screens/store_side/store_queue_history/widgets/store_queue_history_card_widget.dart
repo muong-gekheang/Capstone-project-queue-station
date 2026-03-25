@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,6 @@ class StoreQueueHistoryCard extends StatelessWidget {
                     Text(queueEntry.status.name),
                   ],
                 ),
-
                 Icon(Icons.arrow_forward_ios),
               ],
             ),

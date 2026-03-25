@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:queue_station_app/models/user/abstracts/user.dart';
-
+import 'abstracts/user.dart';
 part 'customer.g.dart';
 
 @JsonSerializable(explicitToJson: true)

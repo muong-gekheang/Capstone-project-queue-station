@@ -26,7 +26,7 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
       (e) => e.id == widget.queueEntry.id,
     );
 
-    final allItems = [];
+    final allItems = queueEntry.order?.ordered ?? [];
 
     final pendingItems = allItems
         .where((item) => item.orderItemStatus == OrderItemStatus.pending)
@@ -114,7 +114,8 @@ class _StoreOrderScreenState extends State<StoreOrderScreen> {
             ),
             ButtonWidget(
               title: 'Total',
-              trailingText: '\$${10}',
+              trailingText:
+                  '\$${queueEntry.order?.calculateTotalPrice().toStringAsFixed(2)}',
               onPressed: () {},
               backgroundColor: AppTheme.primaryColor,
               textColor: AppTheme.naturalWhite,

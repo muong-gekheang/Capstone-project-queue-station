@@ -17,8 +17,11 @@ class EditStoreContent extends StatefulWidget {
 
 class _EditStoreContentState extends State<EditStoreContent> {
   final TextEditingController _storeNameController = TextEditingController();
-  final TextEditingController _storeDescriptionController =
-      TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _policyController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _openingTimeController = TextEditingController();
+  final TextEditingController _closingTimeController = TextEditingController();
 
   final TextEditingController _storePasswordController =
       TextEditingController();
@@ -26,7 +29,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
   final TextEditingController _storeEmailcontroller = TextEditingController();
 
   final TextEditingController _userEmailController = TextEditingController();
-  String _selectedBranch = "IFL";
+
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
@@ -38,10 +41,14 @@ class _EditStoreContentState extends State<EditStoreContent> {
       await editStoreViewModel.onSave(
         selectedImage: _selectedImage,
         newStoreName: _storeNameController.text,
-        newDescription: _storeDescriptionController.text,
+        newAddress: _addressController.text,
         userEmail: _userEmailController.text,
         storeEmail: _storeEmailcontroller.text,
         password: _storePasswordController.text,
+        newPolicy: _policyController.text,
+        newPhone: _phoneController.text,
+        newOpeningTime: int.tryParse(_openingTimeController.text) ?? 0,
+        newClosingTime: int.tryParse(_closingTimeController.text) ?? 0,
       );
       if (mounted) {
         CustomSuccessSnackbar.show(context, "Added Successfully");
@@ -98,7 +105,11 @@ class _EditStoreContentState extends State<EditStoreContent> {
   @override
   void dispose() {
     _storeNameController.dispose();
-    _storeDescriptionController.dispose();
+    _addressController.dispose();
+    _openingTimeController.dispose();
+    _policyController.dispose();
+    _phoneController.dispose();
+    _closingTimeController.dispose();
     _userEmailController.dispose();
     _storeEmailcontroller.dispose();
     _storePasswordController.dispose();
@@ -109,7 +120,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
   Widget build(BuildContext context) {
     EditStoreViewModel editStoreViewModel = context.watch<EditStoreViewModel>();
     _storeNameController.text = editStoreViewModel.storeName;
-    _storeDescriptionController.text = editStoreViewModel.storeDescription;
+    _addressController.text = editStoreViewModel.storeDescription;
     _userEmailController.text = editStoreViewModel.adminEmail;
     _storeEmailcontroller.text = editStoreViewModel.storeEmail;
     return Scaffold(
@@ -256,20 +267,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),
-                  const SizedBox(height: 20),
 
-                  _buildFormField(
-                    label: "Description:",
-                    child: TextField(
-                      controller: _storeDescriptionController,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ),
                   const SizedBox(height: 20),
 
                   _buildFormField(
@@ -288,8 +286,87 @@ class _EditStoreContentState extends State<EditStoreContent> {
 
                   const SizedBox(height: 20),
 
+                  ExpansionTile(
+                    tilePadding: EdgeInsets.all(0),
+                    leading: Icon(Icons.mode_rounded),
+                    textColor: AppTheme.primaryColor,
+                    title: Text("More store edit"),
+                    children: [
+                      _buildFormField(
+                        label: "Address:",
+                        child: TextField(
+                          controller: _addressController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildFormField(
+                        label: "Policy:",
+                        child: TextField(
+                          controller: _policyController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildFormField(
+                        label: "Phone:",
+                        child: TextField(
+                          controller: _phoneController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildFormField(
+                        label: "Opening Time:",
+                        child: TextField(
+                          controller: _openingTimeController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildFormField(
+                        label: "Closing Time:",
+                        child: TextField(
+                          controller: _closingTimeController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
                   _buildFormField(
-                    label: "Email:",
+                    label: "User Email:",
                     isError: !editStoreViewModel.isEmailVerified,
                     child: TextField(
                       controller: _userEmailController,

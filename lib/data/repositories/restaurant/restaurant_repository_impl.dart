@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'restaurant_repository.dart';
 
 class RestaurantRepositoryImpl implements RestaurantRepository {
   final FirebaseFirestore fireStore;
@@ -131,26 +131,42 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
   }
 
   @override
-  Stream<List<Restaurant>> watchAll() {
-    // TODO: implement watchAll
-    throw UnimplementedError();
+  Future<void> addQueueEntryToRestaurant(
+    String restaurantId,
+    String queueEntryId,
+  ) async {
+    await fireStore.collection('restaurants').doc(restaurantId).update({
+      'currentInQueueIds': FieldValue.arrayUnion([queueEntryId]),
+    });
   }
 
   @override
-  Stream<Restaurant?> watchCurrent(String id) {
-    return fireStore
-        .collection('restaurants')
-        .where('id', isEqualTo: id)
-        .snapshots()
-        .handleError((err) => debugPrint("$err"))
-        .map((snap) {
-          if (snap.docs.isEmpty) return null; // Handle not found
+  Future<void> removeQueueEntryFromRestaurant(
+    String restaurantId,
+    String queueEntryId,
+  ) async {
+    await fireStore.collection('restaurants').doc(restaurantId).update({
+      'currentInQueueIds': FieldValue.arrayRemove([queueEntryId]),
+    });
+  }
 
-          final doc = snap.docs.first; // Get the first match
-          final json = Map<String, dynamic>.from(doc.data());
-          json['id'] ??= doc.id;
+  @override
+  Stream<List<Restaurant>> watchAll() {
+    return fireStore.collection('restaurants').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final json = Map<String, dynamic>.from(doc.data());
+        json['id'] ??= doc.id;
+        return Restaurant.fromJson(json);
+      }).toList();
+    });
+  }
 
-          return Restaurant.fromJson(json);
-        });
+  @override
+  Stream<Restaurant> watchCurrent(String id) {
+    return fireStore.collection('restaurants').doc(id).snapshots().map((doc) {
+      final json = Map<String, dynamic>.from(doc.data()!);
+      json['id'] ??= doc.id;
+      return Restaurant.fromJson(json);
+    });
   }
 }

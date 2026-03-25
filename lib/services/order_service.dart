@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/data/repositories/order_item/order_item_repository.dart';
 import 'package:queue_station_app/models/order/order.dart';
@@ -15,7 +16,7 @@ class OrderService {
   final OrderItemRepository _orderItemRepository;
   MenuService _menuService;
 
-  StreamController<List<Order>> _orderController =
+  final StreamController<List<Order>> _orderController =
       BehaviorSubject<List<Order>>.seeded([]);
 
   StreamSubscription<List<Order>>? _orderSubscription;
@@ -32,20 +33,29 @@ class OrderService {
 
   String? get restId => _userProvider.asStoreUser?.restaurantId;
 
+  Stream<List<Order>> get streamTodayOrders => _orderController.stream;
+
   void initStream() {
     if (restId != null) {
-      _orderSubscription = _orderRepository.watchTodayOrders(restId!).listen((
-        data,
-      ) {
-        _orderController.add(data);
-        todayOrder = data;
-      }, onError: (err) => _orderController.addError(err));
+      _orderSubscription = _orderRepository
+          .watchTodayOrders(restId!)
+          .listen(
+            (data) {
+              debugPrint("Order: ${data.length}");
+              _orderController.add(data);
+              todayOrder = data;
+            },
+            onError: (err) {
+              _orderController.addError(err);
+              debugPrint("Order ERR: $err");
+            },
+          );
     }
   }
 
   void updateDependencies(UserProvider userProvider, MenuService menuService) {
-    userProvider = userProvider;
-    menuService = menuService;
+    _userProvider = userProvider;
+    _menuService = menuService;
     if (restId != null) {
       initStream();
     }

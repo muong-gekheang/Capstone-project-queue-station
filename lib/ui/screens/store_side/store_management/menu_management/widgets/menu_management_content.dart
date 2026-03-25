@@ -4,7 +4,6 @@ import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_menu.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import '../view_model/menu_management_view_model.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/ui/widgets/category_card_widget.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/menu_card_widget.dart';
 import 'package:queue_station_app/ui/widgets/searchbar_widget.dart';

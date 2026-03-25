@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/repositories/order/order_repository_mock.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_queue_history/view_model/store_queue_history_view_model.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';

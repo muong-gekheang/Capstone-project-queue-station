@@ -5,8 +5,8 @@ import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
 import 'package:queue_station_app/ui/screens/auth/view_model/auth_view_model.dart';
 import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
-import 'package:queue_station_app/ui/screens/user_side/setting/forget_password_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
+import 'package:queue_station_app/ui/screens/user_side/setting/widgets/change_password/forget_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onSwitchTap});
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       MaterialPageRoute(
                                         builder: (_) => Provider.value(
                                           value: context.read<AuthService>(),
-                                          child: ForgetPasswordScreen(),
+                                          child: ForgetPasswordScreen(),  
                                         ),
                                       ),
                                     );

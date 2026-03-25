@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/ui/screens/notification/store_order_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/order_screen/store_order_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 
 class NotificationTileWidget extends StatelessWidget {
-  final QueueEntry queueEntry;
+  final String queueEntryId;
   final isNew = true;
-  const NotificationTileWidget({super.key, required this.queueEntry});
+  const NotificationTileWidget({super.key, required this.queueEntryId});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class NotificationTileWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => StoreOrderScreen(queueEntry: queueEntry),
+            builder: (context) => StoreOrderScreen(queueEntryId: queueEntryId),
           ),
         );
       },
@@ -32,7 +31,7 @@ class NotificationTileWidget extends StatelessWidget {
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Text("New order from table ${queueEntry.tableNumber}"),
+              child: Text("New order from table tableNumber"),
             ),
           ),
           if (isNew)

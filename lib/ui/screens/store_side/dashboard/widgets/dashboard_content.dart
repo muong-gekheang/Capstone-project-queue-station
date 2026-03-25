@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/order_service.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/dashboard_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
@@ -50,7 +52,15 @@ class _DashboardContentState extends State<DashboardContent> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotificationScreen()),
+                MaterialPageRoute(
+                  builder: (_) => MultiProvider(
+                    providers: [
+                      Provider.value(value: context.read<QueueService>()),
+                      Provider.value(value: context.read<OrderService>()),
+                    ],
+                    child: NotificationScreen(),
+                  ),
+                ),
               );
             },
           ),

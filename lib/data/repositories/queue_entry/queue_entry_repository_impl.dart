@@ -149,11 +149,6 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     throw UnimplementedError();
   }
 
-  @override
-  Stream<QueueEntry?> watchCurrentHistory() {
-    // TODO: implement watchCurrentHistory
-    throw UnimplementedError();
-  }
 
   @override
   Future<List<QueueEntry>> getTodayFinishedQueue(String restaurantId) async {
@@ -254,6 +249,21 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   }
 
   @override
+  Stream<List<QueueEntry>> watchAllActiveQueues() {
+    return fireStore
+        .collection('queue_entries')
+        .where('status', isEqualTo: 'waiting') 
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            json['id'] ??= doc.id;
+            return QueueEntry.fromJson(json);
+          }).toList();
+        });
+  }
+
+  @override
   Future<void> updateStatus(String id, QueueStatus newStatus) async {
     String? fieldToUpdate;
     switch (newStatus) {
@@ -278,5 +288,11 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
       if (fieldToUpdate != null)
         fieldToUpdate: DateTime.now().toIso8601String(),
     });
+  }
+  
+  @override
+  watchCurrentHistory() {
+    // TODO: implement watchCurrentHistory
+    throw UnimplementedError();
   }
 }

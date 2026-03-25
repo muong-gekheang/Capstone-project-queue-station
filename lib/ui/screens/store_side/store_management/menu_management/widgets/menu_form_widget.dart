@@ -3,12 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_mock_data.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
-import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
@@ -20,6 +18,7 @@ import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/menu_size_tile_widget.dart';
 import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class MenuForm extends StatefulWidget {
   final MenuItem? initialMenu; // null = Add, not null = Edit
@@ -484,7 +483,7 @@ class _MenuFormState extends State<MenuForm> {
                                 availableMenuSizes.isNotEmpty)
                             ? () => widget.onSubmit(
                                 MenuItem(
-                                  id: widget.initialMenu?.id ?? uuid.v4(),
+                                  id: widget.initialMenu?.id ?? Uuid().v4(),
                                   addOnIds: selectedAddOns
                                       .map((e) => e.id)
                                       .toList(),

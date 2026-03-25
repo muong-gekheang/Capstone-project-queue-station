@@ -15,6 +15,15 @@ abstract class RestaurantRepository {
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
   );
+  Future<void> addQueueEntryToRestaurant(
+    String restaurantId,
+    String queueEntryId,
+  );
+
+  Future<void> removeQueueEntryFromRestaurant(
+    String restaurantId,
+    String queueEntryId,
+  );
   Stream<Restaurant?> watchCurrent(String id);
   Stream<List<Restaurant>> watchAll();
 }
