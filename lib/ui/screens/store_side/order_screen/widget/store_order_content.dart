@@ -23,7 +23,7 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
     final vm = context.watch<StoreOrderViewModel>();
     QueueEntry? queueEntry = vm.getQueueEntryById(widget.queueEntryId);
     return Scaffold(
-      appBar: AppBarWidget(title: '${queueEntry?.tableNumber} Order'),
+      appBar: AppBarWidget(title: '${queueEntry?.tableNumber ?? ""} Order'),
       body: queueEntry != null
           ? Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
@@ -31,18 +31,16 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: queueEntry.orderId != null
+                    child: queueEntry.orderId == null
                         ? Text("No Order")
                         : FutureBuilder(
                             future: vm.getOrderDetailsById(queueEntry.orderId!),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              }
-
-                              if (snapshot.data == null) {
-                                return Text("No data");
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
                               }
 
                               List<OrderItem> pendingItems =
@@ -64,6 +62,8 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                                       )
                                       .toList() ??
                                   [];
+
+                              debugPrint("Order: ${snapshot.data}");
 
                               return ListView(
                                 children: [
@@ -152,7 +152,7 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                 ],
               ),
             )
-          : CircularProgressIndicator(),
+          : Center(child: Text("No Customer is in the table.")),
     );
   }
 }

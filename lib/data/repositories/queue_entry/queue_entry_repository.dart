@@ -45,4 +45,5 @@ abstract class QueueEntryRepository {
   Stream<List<QueueEntry>> watchAllActiveQueues();
   Stream<QueueEntry?> watchCurrentHistory();
   Stream<List<QueueEntry>> watchAllHistory();
+  Stream<List<QueueEntry>> watchCurrentInStore(String restId);
 }

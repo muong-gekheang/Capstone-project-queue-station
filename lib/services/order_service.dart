@@ -70,6 +70,8 @@ class OrderService {
     Order? initOrder = await _orderRepository.getOrderById(orderId);
     if (initOrder == null) return null;
 
+    debugPrint("Order:  ${initOrder.id}");
+
     List<OrderItem> orderItems = await _orderItemRepository
         .getOrderItemByOrderId(orderId);
 
@@ -80,7 +82,9 @@ class OrderService {
       menuItem ??= await _menuService.getMenuItemById(item.menuItemId);
       filledOrderItems.add(item.copyWith(menuItem: menuItem));
     }
-
+    debugPrint(
+      "Order: Copy ${initOrder.copyWith(ordered: filledOrderItems).id}",
+    );
     return initOrder.copyWith(ordered: filledOrderItems);
   }
 

@@ -12,7 +12,7 @@ class StoreOrderViewModel extends ChangeNotifier {
 
   bool _isDisposed = false;
 
-  List<QueueEntry> _currentQueue = [];
+  List<QueueEntry> _currentInStore = [];
   bool _isLoading = true;
 
   StreamSubscription<List<QueueEntry>>? _queueEntriesSubscription;
@@ -26,13 +26,15 @@ class StoreOrderViewModel extends ChangeNotifier {
   }
 
   void _subscribeToQueueEntries() {
-    _queueEntriesSubscription = _queueService.streamQueueEntries.listen(
+    _queueEntriesSubscription = _queueService.streamCheckedInQueue.listen(
       (queueEntries) {
         if (_isDisposed) return;
         queueEntries.sort(
           (a, b) => a.expectedTableReadyAt.compareTo(b.expectedTableReadyAt),
         );
-        _currentQueue = queueEntries;
+        _currentInStore = queueEntries;
+        debugPrint(queueEntries.length.toString());
+
         _isLoading = false;
         notifyListeners(); // Updates the UI
       },
@@ -55,11 +57,11 @@ class StoreOrderViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  List<QueueEntry> get currentQueue => _currentQueue;
+  List<QueueEntry> get currentInStore => _currentInStore;
 
   QueueEntry? getQueueEntryById(String id) {
     try {
-      return _currentQueue.firstWhere((e) => e.id == id);
+      return _currentInStore.firstWhere((e) => e.id == id);
     } catch (e) {
       return null;
     }

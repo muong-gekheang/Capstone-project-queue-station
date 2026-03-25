@@ -26,6 +26,11 @@ class QueueService {
     [],
   );
 
+  StreamSubscription<List<QueueEntry>>? _checkedInQueueSubscription;
+  final _checkedInQueueController = BehaviorSubject<List<QueueEntry>>.seeded(
+    [],
+  );
+
   // For customer view - all active queues
   StreamSubscription<List<QueueEntry>>? _allQueuesSubscription;
   final _allQueuesStreamController = BehaviorSubject<List<QueueEntry>>.seeded(
@@ -66,6 +71,12 @@ class QueueService {
               _queueEntryStreamController.addError(error);
             },
           );
+
+      _checkedInQueueSubscription = _queueEntryRepository
+          .watchCurrentInStore(_restId)
+          .listen((data) {
+            _checkedInQueueController.add(data);
+          });
     }
   }
 
@@ -85,7 +96,7 @@ class QueueService {
         );
   }
 
-   // NEW: Get stream for a specific restaurant
+  // NEW: Get stream for a specific restaurant
   Stream<List<QueueEntry>> getQueueStreamForRestaurant(String restaurantId) {
     print('QueueService: Getting queue stream for restaurant: $restaurantId');
 
@@ -122,6 +133,9 @@ class QueueService {
     _queueEntryStreamController.close();
     _allQueuesSubscription?.cancel();
     _allQueuesStreamController.close();
+
+    _checkedInQueueController.close();
+    _checkedInQueueSubscription?.cancel();
   }
 
   void updateDependencies(UserProvider newUserProvider) {
@@ -141,6 +155,9 @@ class QueueService {
   Stream<List<QueueEntry>> get streamAllActiveQueues =>
       _allQueuesStreamController.stream;
 
+  Stream<List<QueueEntry>> get streamCheckedInQueue =>
+      _checkedInQueueController.stream;
+
   void addCustomerToQueue({required QueueEntry newQueue}) async {
     try {
       HttpsCallable callable = functions.httpsCallable('createQueue');
@@ -154,7 +171,6 @@ class QueueService {
         "partySize": newQueue.partySize,
         "customerName": newQueue.customerName,
         "phoneNumber": newQueue.phoneNumber,
-        "joinTime": newQueue.joinTime.toIso8601String(),
         "queueNumber": newQueue.id.substring(0, 4),
       });
 

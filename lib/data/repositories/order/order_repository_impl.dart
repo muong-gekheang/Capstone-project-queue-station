@@ -188,6 +188,7 @@ class OrderRepositoryImpl extends OrderRepository {
     final doc = await _orderItemCol.doc(docId).get();
 
     if (!doc.exists) return null;
+    doc.data()!['id'] = docId;
 
     return OrderItem.fromJson(doc.data()!);
   }

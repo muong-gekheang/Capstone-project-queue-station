@@ -68,7 +68,7 @@ class OrderItem {
       addOns: addOns != null ? Map.from(addOns) : Map.from(this.addOns),
       sizeName: sizeName ?? this.sizeName,
       size: size ?? this.size,
-      item: item ,
+      item: item ?? this.item,
       orderId: orderId ?? this.orderId,
       id: id,
     );

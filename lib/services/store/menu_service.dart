@@ -138,7 +138,12 @@ class MenuService {
   }
 
   Future<MenuItem?> getMenuItemById(String menuItemId) async {
-    return await _menuItemRepository.getMenuItemById(menuItemId);
+    try {
+      return await _menuItemRepository.getMenuItemById(menuItemId);
+    } catch (err) {
+      debugPrint("Menu: Err $err");
+      rethrow;
+    }
   }
 
   Future<MenuItem> getMenuItemDetails(MenuItem menuItem) async {
@@ -304,7 +309,7 @@ class MenuService {
             AddOn newAddOnWithLogo = newAddOn.copyWith(image: imageUrl);
             _addOnRepository.create(newAddOnWithLogo);
           });
-    }else{
+    } else {
       _addOnRepository.create(newAddOn);
     }
   }

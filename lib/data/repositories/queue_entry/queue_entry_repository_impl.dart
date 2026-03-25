@@ -149,7 +149,6 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     throw UnimplementedError();
   }
 
-
   @override
   Future<List<QueueEntry>> getTodayFinishedQueue(String restaurantId) async {
     try {
@@ -252,7 +251,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   Stream<List<QueueEntry>> watchAllActiveQueues() {
     return fireStore
         .collection('queue_entries')
-        .where('status', isEqualTo: 'waiting') 
+        .where('status', isEqualTo: 'waiting')
         .snapshots()
         .map((snapshot) {
           return snapshot.docs.map((doc) {
@@ -289,10 +288,32 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
         fieldToUpdate: DateTime.now().toIso8601String(),
     });
   }
-  
+
   @override
   watchCurrentHistory() {
     // TODO: implement watchCurrentHistory
     throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<QueueEntry>> watchCurrentInStore(String restId) {
+    final result = fireStore
+        .collection('queue_entries')
+        .where('restId', isEqualTo: restId)
+        .where('status', isEqualTo: 'serving')
+        .snapshots()
+        .handleError((err) => print("Stream Error: $err"))
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final json = Map<String, dynamic>.from(doc.data());
+            debugPrint(json.toString());
+
+            json['id'] ??= doc.id;
+            var result = QueueEntry.fromJson(json);
+            return result;
+          }).toList();
+        });
+
+    return result;
   }
 }
