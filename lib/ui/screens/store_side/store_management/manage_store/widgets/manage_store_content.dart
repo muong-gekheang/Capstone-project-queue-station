@@ -339,12 +339,18 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
 
   // Placeholder for store profile image widget
   Widget _buildStoreProfileImage() {
+    final imageUrl = context.watch<ManageStoreViewModel>().restaurantLogoLink;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: CircleAvatar(
         radius: 18,
         backgroundColor: Colors.grey[300],
-        child: const Icon(Icons.person, color: Colors.white),
+        backgroundImage: imageUrl != null && imageUrl.isNotEmpty
+            ? NetworkImage(imageUrl)
+            : null,
+        child: imageUrl == null || imageUrl.isEmpty
+            ? const Icon(Icons.person, color: Colors.white)
+            : null,
       ),
     );
   }

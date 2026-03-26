@@ -38,26 +38,7 @@ class _QueueContentState extends State<QueueContent> {
           ),
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 18),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Center(
-              child: Text(
-                "DORI\nDORI",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  height: 1.0,
-                ),
-              ),
-            ),
-          ),
+          _buildStoreProfileImage(),
           const SizedBox(width: 8),
           const Icon(Icons.notifications_none, color: Colors.black, size: 30),
           const SizedBox(width: 16),
@@ -199,4 +180,22 @@ class _QueueContentState extends State<QueueContent> {
       Text(r, style: const TextStyle(fontSize: 10, color: Colors.black87)),
     ],
   );
+
+    // Placeholder for store profile image widget
+  Widget _buildStoreProfileImage() {
+    final imageUrl = context.watch<QueueViewModel>().restaurantLogoLink;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: CircleAvatar(
+        radius: 18,
+        backgroundColor: Colors.grey[300],
+        backgroundImage: imageUrl != null && imageUrl.isNotEmpty
+            ? NetworkImage(imageUrl)
+            : null,
+        child: imageUrl == null || imageUrl.isEmpty
+            ? const Icon(Icons.person, color: Colors.white)
+            : null,
+      ),
+    );
+  }
 }

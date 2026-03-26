@@ -23,6 +23,8 @@ class QueueViewModel extends ChangeNotifier {
   String _searchKeyword = "";
 
   String get restId => _restaurantService.restId;
+  String? get restaurantLogoLink => _currentRestaurant?.logoLink;
+
 
   QueueViewModel({
     required RestaurantService restaurantService,
