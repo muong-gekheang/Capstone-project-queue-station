@@ -1,9 +1,19 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/widgets/edit_account/edit_account_view_model.dart';
+import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
 
-class EditAccountScreen extends StatelessWidget {
+class EditAccountScreen extends StatefulWidget {
   const EditAccountScreen({super.key});
+
+  @override
+  State<EditAccountScreen> createState() => _EditAccountScreenState();
+}
+
+class _EditAccountScreenState extends State<EditAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -25,47 +35,14 @@ class EditAccountScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 16),
-
-              /// Avatar
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 90,
-                    backgroundColor: Colors.grey.shade100,
-                    backgroundImage: vm.selectedImage != null
-                        ? FileImage(vm.selectedImage!)
-                        : null,
-                    child: vm.selectedImage == null
-                        ? const Icon(
-                            Icons.person,
-                            size: 120,
-                            color: Colors.grey,
-                          )
-                        : null,
-                  ),
-
-                  Positioned(
-                    bottom: 10,
-                    right: 14,
-                    child: InkWell(
-                      onTap: vm.pickAvatar,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF0D47A1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.edit_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              ProfileEditorWidget(
+                image: vm.pickedImageBytes != null
+                 ? MemoryImage(vm.pickedImageBytes!)
+                 : (vm.profileLink != null && vm.profileLink!.isNotEmpty)
+                  ? NetworkImage(vm.profileLink!)
+                  : null,
+                onPickImage: vm.pickAvatar,
               ),
-
               const SizedBox(height: 32),
 
               /// Name

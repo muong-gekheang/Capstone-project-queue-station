@@ -16,7 +16,9 @@ class AccountContent extends StatelessWidget {
     }
 
     final customer = vm.currentCustomer;
-
+    final profileLink = customer?.profileLink;
+    print('customer name is: ${customer!.name}');
+    print('profile link is: ${customer.profileLink}');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -41,10 +43,21 @@ class AccountContent extends StatelessWidget {
                 border: Border.all(color: const Color(0xFFFF6835), width: 4),
               ),
               child: ClipOval(
-                child: Container(
-                  color: Colors.grey[300],
-                  child: Icon(Icons.person, size: 60, color: Colors.grey[700]),
-                ),
+                child: profileLink != null && profileLink.isNotEmpty
+                    ? Image.network(
+                        profileLink,
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Colors.grey[700],
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 14),
@@ -61,9 +74,7 @@ class AccountContent extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => HistoryScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => HistoryScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -96,9 +107,7 @@ class AccountContent extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => SettingsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => SettingsScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(

@@ -37,6 +37,9 @@ class AuthService {
 
   Future<bool> checkSubscriptionStatus(User authUser) async {
     final userData = await _authRepository.getUserData(authUser.uid);
+    if (userData['userType'] != 'store') {
+      return true; // Skip subscription check for customers
+    }
     final status = await _authRepository.getSubscriptionStatus(
       userData['restaurantId'] as String,
     );

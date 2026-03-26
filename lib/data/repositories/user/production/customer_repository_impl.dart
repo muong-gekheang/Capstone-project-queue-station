@@ -51,6 +51,7 @@ class CustomerRepositoryImpl implements UserRepository<Customer> {
           ? <String>[]
           : List<String>.from(data['historyIds']),
       'currentHistoryId': data['currentHistoryId'],
+      'profileLink': data['profileLink'], 
     };
 
     print('customerJson: $customerJson'); // DEBUG

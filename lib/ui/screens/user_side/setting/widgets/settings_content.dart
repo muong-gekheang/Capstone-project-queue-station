@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
+import 'package:queue_station_app/data/repositories/image/image_repository.dart';
 import 'package:queue_station_app/data/repositories/user/production/customer_repository_impl.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/view_models/settings_view_model.dart';
@@ -60,7 +61,6 @@ class SettingsContent extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context); // Close dialog
-
               // Show loading indicator
               showDialog(
                 context: context,
@@ -276,7 +276,8 @@ class SettingsContent extends StatelessWidget {
                             create: (_) => EditAccountViewModel(
                               userRepository: context
                                   .read<CustomerRepositoryImpl>(),
-                              userProvider: context.read<UserProvider>(),
+                              userProvider: context.read<UserProvider>(), 
+                              imageRepository: context.read<ImageRepository>(),
                             ),
                             child: EditAccountScreen(),
                           ),
