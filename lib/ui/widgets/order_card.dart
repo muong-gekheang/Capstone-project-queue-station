@@ -51,9 +51,30 @@ class OrderCard extends StatelessWidget {
                   child: image != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(image!, fit: BoxFit.cover),
+                          child: Image.network(
+                            image!,
+                            fit: BoxFit.cover,
+                            width: 100,
+                            height: 100,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey[200],
+                                child: Icon(
+                                  Icons.restaurant,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
+                              );
+                            },
+                          ),
                         )
-                      : Icon(Icons.restaurant, color: Colors.grey[400]),
+                      : Icon(
+                          Icons.restaurant,
+                          size: 48,
+                          color: Colors.grey[400],
+                        ),
                 ),
 
                 const SizedBox(width: 10),

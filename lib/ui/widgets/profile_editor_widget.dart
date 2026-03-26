@@ -1,56 +1,37 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:queue_station_app/ui/theme/app_theme.dart';
 
 class ProfileEditorWidget extends StatelessWidget {
-  final VoidCallback onEdit;
-  final String? imagePath;
+  final ImageProvider? image; // current image to display (from VM)
+  final VoidCallback onPickImage; // callback when user taps edit
+
   const ProfileEditorWidget({
     super.key,
-    required this.onEdit,
-    required this.imagePath, required imageBytes,
+    required this.image,
+    required this.onPickImage,
   });
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider? imageProvider;
-    if (imagePath != null && imagePath!.isNotEmpty) {
-      if (imagePath!.startsWith('http')) {
-        imageProvider = NetworkImage(imagePath!);
-      } else if (imagePath!.startsWith('assets/')) {
-        imageProvider = AssetImage(imagePath!);
-      } else {
-        final imageFile = File(imagePath!);
-        if (imageFile.existsSync()) {
-          imageProvider = FileImage(imageFile);
-        }
-      }
-    }
     return Stack(
       children: [
         CircleAvatar(
-          radius: 90,
-          backgroundColor: Colors.grey.shade100,
-          backgroundImage: imageProvider,
-          child: imageProvider == null
-              ? const Icon(Icons.person, size: 120)
+          radius: 80, 
+          backgroundColor: Colors.grey[200],
+          backgroundImage: image,
+          child: image == null
+              ? const Icon(Icons.image, size: 50, color: AppTheme.naturalTextGrey)
               : null,
         ),
         Positioned(
-          bottom: 10,
-          right: 14,
-          child: InkWell(
-            onTap: onEdit,
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: Color(0xFF0D47A1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.edit_outlined,
-                size: 16,
-                color: Colors.white,
-              ),
+          bottom: 0,
+          right: 0,
+          child: GestureDetector(
+            onTap: onPickImage,
+            child: const CircleAvatar(
+              radius: 15,
+              backgroundColor: Colors.white,
+              child: Icon(Icons.edit, size: 15, color: AppTheme.secondaryColor),
             ),
           ),
         ),

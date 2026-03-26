@@ -1,3 +1,59 @@
+// import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+// import 'package:queue_station_app/models/order/order.dart';
+// import 'package:queue_station_app/models/order/order_item.dart';
+
+// abstract class OrderRepository {
+//   // CRUD for Orders
+//   Future<void> create(Order order);
+//   Future<Order?> getOrderById(String orderId);
+//   Future<Order> update(Order order);
+//   Future<void> delete(String orderId);
+
+//   // Current Order getter
+//   Order get currentOrder;
+
+//   // Confirm order
+//   Future<void> confirmOrder(String orderId);
+
+//   // OrderItems
+//   Future<OrderItem?> getOrderItemById(String orderId, String orderedId);
+//   Future<void> addItemToCart(String orderId, OrderItem item);
+//   Future<void> updateCartItem(String orderId, OrderItem item);
+//   Future<void> removeItemFromCart(String orderId, OrderItem item);
+//   Future<void> moveItemToOrdered(String orderId, OrderItem item);
+//   Future<void> updateOrderedItemStatus(
+//     String orderId,
+//     String menuItemId,
+//     OrderItemStatus status,
+//   );
+//   Future<void> removeOrderedItem(String orderId, String menuItemId);
+
+//   // Sync cart with queue
+//   Future<String?> syncCart({
+//     required String queueEntryId,
+//     required Order order,
+//   });
+
+//   // Pagination / search
+//   Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
+//     int limit,
+//     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+//   );
+
+//   Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)>
+//   getSearchOrders(
+//     String query,
+//     int limit,
+//     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+//   );
+
+//   // Streams / watchers
+//   Stream<Order?> watchOrderById(String orderId);
+//   Stream<List<Order>> watchAllOrder();
+//   Stream<Order?> watchCurrentOrder(String orderId);
+//   Stream<List<Order>> watchTodayOrders(String restId);
+// }
+
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
@@ -7,17 +63,26 @@ abstract class OrderRepository {
   Future<Order?> getOrderById(String orderId);
   Future<Order> update(Order order);
   Future<void> delete(String orderId);
+  Order get currentOrder;
+  Future<void> confirmOrder(String orderId);
 
+  Future<OrderItem?> getOrderItemById(String orderId, String orderedId);
   Future<void> addItemToCart(String orderId, OrderItem item);
   Future<void> updateCartItem(String orderId, OrderItem item);
-  Future<void> removeItemFromCart(String orderId, String menuItemId);
+  Future<void> removeItemFromCart(String orderId, OrderItem item);
 
-  Future<void> moveItemToOrdered(String orderId, String menuItemId);
+  Future<void> moveItemToOrdered(String orderId, OrderItem item);
   Future<void> updateOrderedItemStatus(
     String orderId,
     String menuItemId,
     OrderItemStatus status,
   );
+
+  Future<String?> syncCart({
+    required String queueEntryId,
+    required Order order,
+  });
+
   Future<void> removeOrderedItem(String orderId, String menuItemId);
 
   Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
@@ -33,4 +98,6 @@ abstract class OrderRepository {
 
   Stream<Order?> watchOrderById(String orderId);
   Stream<List<Order>> watchAllOrder();
+  Stream<Order?> watchCurrentOrder(String orderId);
+  Stream<List<Order>> watchTodayOrders(String restId);
 }

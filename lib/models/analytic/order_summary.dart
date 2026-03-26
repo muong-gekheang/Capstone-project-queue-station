@@ -4,7 +4,7 @@ part 'order_summary.g.dart';
 
 @JsonSerializable()
 class OrderSummary {
-  final String time;
+  final DateTime time;
   final String tableNumber;
   final double amount;
 

@@ -4,15 +4,15 @@ import 'package:queue_station_app/ui/theme/app_theme.dart';
 
 class CategoryChips extends StatelessWidget {
   final List<TableCategory> tableData;
-  final int selectedChipIndex;
-  final Function(int) onSelectedChip;
+  final TableCategory selectedCat;
+  final ValueChanged<TableCategory> onSelectedChip;
   final bool isEditMode;
-  final Function(String?) onAddChip;
+  final Function(TableCategory?) onAddChip;
 
   const CategoryChips({
     super.key,
     required this.tableData,
-    required this.selectedChipIndex,
+    required this.selectedCat,
     required this.onSelectedChip,
     required this.isEditMode,
     required this.onAddChip,
@@ -35,7 +35,7 @@ class CategoryChips extends StatelessWidget {
         itemBuilder: (context, index) {
           // ADD BOX
           if (isEditMode && index == 0) {
-            bool isPicked = selectedChipIndex == index;
+            bool isPicked = selectedCat == tableData[index];
 
             return Row(
               children: [
@@ -69,7 +69,7 @@ class CategoryChips extends StatelessWidget {
                       ),
                     ),
                     selected: isPicked,
-                    onSelected: (_) => onSelectedChip(index),
+                    onSelected: (_) => onSelectedChip(tableData[index]),
                     chipAnimationStyle: ChipAnimationStyle(
                       enableAnimation: AnimationStyle(
                         duration: const Duration(milliseconds: 300),
@@ -81,7 +81,7 @@ class CategoryChips extends StatelessWidget {
               ],
             );
           } else {
-            bool isPicked = selectedChipIndex == index;
+            bool isPicked = selectedCat == tableData[index];
             return Padding(
               padding: const EdgeInsets.only(right: AppTheme.spacingS),
               child: ChoiceChip(
@@ -102,7 +102,7 @@ class CategoryChips extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTheme.borderRadiusL),
                 ),
                 selected: isPicked,
-                onSelected: (_) => onSelectedChip(index),
+                onSelected: (_) => onSelectedChip(tableData[index]),
                 chipAnimationStyle: ChipAnimationStyle(
                   enableAnimation: AnimationStyle(
                     duration: const Duration(milliseconds: 300),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 
@@ -195,9 +196,10 @@ class AddOnRepositoryImpl implements AddOnRepository {
   }
 
   @override
-  Stream<List<AddOn>> watchAllAddOn() {
+  Stream<List<AddOn>> watchAllAddOn(String restId) {
     return fireStore
         .collection('add_ons')
+        .where('restaurantId', isEqualTo: restId)
         .orderBy('name')
         .snapshots()
         .map(

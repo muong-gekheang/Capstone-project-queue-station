@@ -3,22 +3,28 @@ import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/join_queue_screen.dart';
 
 class RestaurantTile extends StatefulWidget {
-  const RestaurantTile({super.key, required this.rest});
-
   final Restaurant rest;
+  final int peopleWaiting;
+
+  const RestaurantTile({
+    super.key,
+    required this.rest,
+    required this.peopleWaiting,
+  });
 
   @override
-  State<RestaurantTile> createState() => _RestaurantTileState();
+  State<RestaurantTile> createState() => _RestaurantCardState();
 }
 
-class _RestaurantTileState extends State<RestaurantTile> {
+class _RestaurantCardState extends State<RestaurantTile> {
   bool _isPressed = false;
-
-  Future<void> onRestTap() async {
+  Future<void> onRestTap(Restaurant rest) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => JoinQueueScreen(rest: widget.rest),
+        builder: (context) {
+          return JoinQueueScreen(rest: widget.rest);
+        },
       ),
     );
   }
@@ -32,7 +38,7 @@ class _RestaurantTileState extends State<RestaurantTile> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.25),
-            offset: const Offset(0, 0),
+            offset: Offset(0, 0),
             blurRadius: 4,
             spreadRadius: 0,
           ),
@@ -43,7 +49,7 @@ class _RestaurantTileState extends State<RestaurantTile> {
         onTapUp: (_) => setState(() => _isPressed = false),
         onTapCancel: () => setState(() => _isPressed = false),
         behavior: HitTestBehavior.opaque,
-        onTap: onRestTap,
+        onTap: () => onRestTap(widget.rest),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 10),
           opacity: _isPressed ? 0.6 : 1.0,
@@ -54,10 +60,19 @@ class _RestaurantTileState extends State<RestaurantTile> {
               children: [
                 SizedBox.square(
                   dimension: 75,
-                  child: Image.asset(
-                    "assets/home_screen/kungfu.png",
-                    fit: BoxFit.fitHeight,
-                  ),
+                  child:
+                      Image.network(
+                          widget.rest.logoLink,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // fallback if image fails to load
+                            return Icon(
+                              Icons.restaurant,
+                              size: 50,
+                              color: Colors.grey,
+                            );
+                          },
+                        )
                 ),
                 Expanded(
                   child: Column(
@@ -65,27 +80,23 @@ class _RestaurantTileState extends State<RestaurantTile> {
                     children: [
                       Text(
                         widget.rest.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
                       ),
                       Row(
                         children: [
-                          const Icon(Icons.location_pin),
+                          Icon(Icons.location_pin),
                           Text(widget.rest.address),
                         ],
                       ),
                       Row(
                         children: [
-                          const Icon(
-                            Icons.hourglass_empty,
-                            color: Color(0xFFFF6835),
-                          ),
+                          Icon(Icons.hourglass_empty, color: Color(0xFFFF6835)),
                           Text(
-                            // Replace curWait with a proper field; here using a placeholder
-                            "? people waiting",
-                            style: const TextStyle(color: Color(0xFFFF6835)),
+                            "${widget.peopleWaiting} people waiting",
+                            style: TextStyle(color: Color(0xFFFF6835)),
                           ),
                         ],
                       ),

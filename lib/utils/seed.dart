@@ -1,8 +1,14 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
 
 Future<void> seedDatabase({bool clearExisting = false}) async {
   final firestore = FirebaseFirestore.instance;
   final now = DateTime.now();
+  final restId = 'rest_kh_1';
+  final storeUserId = 'vDDDAYtdcvTn9Dg2YNkkSqvbLVI3';
 
   if (clearExisting) {
     await _deleteCollection(firestore, 'users');
@@ -12,13 +18,28 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
     await _deleteCollection(firestore, 'queue_entries');
     await _deleteCollection(firestore, 'menu_item_categories');
     await _deleteCollection(firestore, 'size_options');
+    await _deleteCollection(firestore, 'sizes'); // Add sizes collection
     await _deleteCollection(firestore, 'add_ons');
     await _deleteCollection(firestore, 'menu_items');
     await _deleteCollection(firestore, 'order_items');
     await _deleteCollection(firestore, 'orders');
   }
 
-  final restId = 'rest_kh_1';
+  final restaurant = Restaurant(
+    id: restId,
+    name: 'Queue Cafe',
+    address: 'Phnom Penh',
+    logoLink: '',
+    policy: 'Please arrive within 10 minutes of your call.',
+    biggestTableSize: 8,
+    phone: '023900001',
+    isOpen: true,
+    email: "queuecafe@gmail.com",
+    subscriptionDate: now,
+    subscriptionStatus: SubscriptionStatus.active,
+    openingTime: 8,
+    closingTime: 11,
+  );
 
   final tableCategorySmallId = 'tbl_cat_small_1';
   final tableCategoryFamilyId = 'tbl_cat_family_1';
@@ -28,8 +49,15 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
   final categoryBurgerId = 'cat_burger_1';
   final categoryDrinkId = 'cat_drink_1';
 
-  final sizeRegularId = 'size_regular';
-  final sizeLargeId = 'size_large';
+  // Size Options (global sizes)
+  final sizeRegularOptionId = 'size_option_regular';
+  final sizeLargeOptionId = 'size_option_large';
+
+  // Actual sizes with prices (these go in 'sizes' collection)
+  final sizeBurgerRegularId = 'size_burger_regular';
+  final sizeBurgerLargeId = 'size_burger_large';
+  final sizeColaRegularId = 'size_cola_regular';
+  final sizeColaLargeId = 'size_cola_large';
 
   final addOnCheeseId = 'addon_cheese';
   final addOnBaconId = 'addon_bacon';
@@ -85,7 +113,10 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       'itemIds': [menuBurgerId, menuColaId],
       'tableIds': [tableA1Id, tableB1Id],
       'globalAddOnIds': [addOnCheeseId, addOnBaconId],
-      'globalSizeOptionIds': [sizeRegularId, sizeLargeId],
+      'globalSizeOptionIds': [
+        sizeRegularOptionId,
+        sizeLargeOptionId,
+      ], // Size options (global)
       'currentInQueueIds': [queueEntry1Id],
     },
   };
@@ -141,9 +172,38 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
     },
   };
 
+  // Size Options (global sizes available at restaurant)
   final sizeOptions = <String, Map<String, dynamic>>{
-    sizeRegularId: {'name': 'Regular', 'restaurantId': restId},
-    sizeLargeId: {'name': 'Large', 'restaurantId': restId},
+    sizeRegularOptionId: {'name': 'Regular', 'restaurantId': restId},
+    sizeLargeOptionId: {'name': 'Large', 'restaurantId': restId},
+  };
+
+  // Actual sizes with prices (these are linked to menu items)
+  final sizes = <String, Map<String, dynamic>>{
+    sizeBurgerRegularId: {
+      'id': sizeBurgerRegularId,
+      'price': 5.5,
+      'sizeOptionId': sizeRegularOptionId,
+      'restaurantId': restId,
+    },
+    sizeBurgerLargeId: {
+      'id': sizeBurgerLargeId,
+      'price': 7.5,
+      'sizeOptionId': sizeLargeOptionId,
+      'restaurantId': restId,
+    },
+    sizeColaRegularId: {
+      'id': sizeColaRegularId,
+      'price': 1.5,
+      'sizeOptionId': sizeRegularOptionId,
+      'restaurantId': restId,
+    },
+    sizeColaLargeId: {
+      'id': sizeColaLargeId,
+      'price': 2.5,
+      'sizeOptionId': sizeLargeOptionId,
+      'restaurantId': restId,
+    },
   };
 
   final addOns = <String, Map<String, dynamic>>{
@@ -172,7 +232,10 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       'minPrepTimeMinutes': 8,
       'maxPrepTimeMinutes': 15,
       'categoryId': categoryBurgerId,
-      'sizeOptionIds': [sizeRegularId, sizeLargeId],
+      'sizeOptionIds': [
+        sizeBurgerRegularId,
+        sizeBurgerLargeId,
+      ], // References to sizes collection
       'addOnIds': [addOnCheeseId, addOnBaconId],
       'isAvailable': true,
       'restaurantId': restId,
@@ -185,7 +248,10 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       'minPrepTimeMinutes': 1,
       'maxPrepTimeMinutes': 3,
       'categoryId': categoryDrinkId,
-      'sizeOptionIds': [sizeRegularId],
+      'sizeOptionIds': [
+        sizeColaRegularId,
+        sizeColaLargeId,
+      ], // References to sizes collection
       'addOnIds': <String>[],
       'isAvailable': true,
       'restaurantId': restId,
@@ -287,6 +353,10 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
   for (final entry in sizeOptions.entries) {
     batch.set(firestore.collection('size_options').doc(entry.key), entry.value);
   }
+  // Add sizes collection
+  for (final entry in sizes.entries) {
+    batch.set(firestore.collection('sizes').doc(entry.key), entry.value);
+  }
   for (final entry in addOns.entries) {
     batch.set(firestore.collection('add_ons').doc(entry.key), entry.value);
   }
@@ -305,8 +375,29 @@ Future<void> seedDatabase({bool clearExisting = false}) async {
       entry.value,
     );
   }
+  // 2. Create the Store User (linked to the restaurant)
+  final storeUser = StoreUser(
+    id: storeUserId,
+    name: 'Alex ',
+    email: 'sophanithmeas91@gmail.com',
+    phone: '077000111',
+    restaurantId: restId,
+  );
 
+  //final batch = firestore.batch();
+
+  // 3. Add to batch using .toJson()
+
+  batch.set(
+    firestore.collection('restaurants').doc(restId),
+    restaurant.toJson(),
+  );
+
+  batch.set(firestore.collection('users').doc(storeUserId), storeUser.toJson());
+
+  // 4. Commit the changes
   await batch.commit();
+  print('Seed successful: Restaurant and User created.');
 }
 
 Future<void> _deleteCollection(
@@ -315,7 +406,10 @@ Future<void> _deleteCollection(
 ) async {
   const pageSize = 200;
   while (true) {
-    final snapshot = await firestore.collection(collectionPath).limit(pageSize).get();
+    final snapshot = await firestore
+        .collection(collectionPath)
+        .limit(pageSize)
+        .get();
     if (snapshot.docs.isEmpty) break;
 
     final batch = firestore.batch();

@@ -70,6 +70,7 @@ class MenuSizeTileWidget<T> extends StatelessWidget {
                   flex: 1,
                   child: TextFieldWidget(
                     title: '',
+                    prefixText: '\$',
                     textController: controller,
                     hintText: 'Price',
                     validator: (value) {

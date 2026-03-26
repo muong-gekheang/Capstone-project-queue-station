@@ -1,28 +1,41 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:queue_station_app/utils/nullable_timestamp_converter.dart';
 import 'package:uuid/uuid.dart';
 
 part 'queue_table.g.dart';
 
-final _uuid = Uuid();
+const _uuid = Uuid();
 
-enum TableStatus { available, occupied }
+enum TableStatus {
+  @JsonValue('available')
+  available,
+  @JsonValue('occupied')
+  occupied,
+}
 
 @JsonSerializable(explicitToJson: true)
 class QueueTable {
   final String id;
   final String tableNum;
-  TableStatus tableStatus;
+  final String restaurantId; // Added
   final String tableCategoryId;
+  final TableStatus tableStatus;
 
-  @JsonKey(defaultValue: <String>[])
+  @JsonKey(defaultValue: [])
   final List<String> queueEntryIds;
+
+  // Handles the ISO8601 string from your data
+  @NullableTimestampConverter()
+  final DateTime? latestEstimatedReadyAt; // Added
 
   QueueTable({
     String? id,
     required this.tableNum,
+    required this.restaurantId,
     required this.tableStatus,
     required this.tableCategoryId,
     required this.queueEntryIds,
+    this.latestEstimatedReadyAt,
   }) : id = id ?? _uuid.v4();
 
   QueueTable copyWith({
@@ -30,13 +43,18 @@ class QueueTable {
     TableStatus? tableStatus,
     String? tableCategoryId,
     List<String>? queueEntryIds,
+    String? restaurantId,
+    DateTime? latestEstimatedReadyAt,
   }) {
     return QueueTable(
       id: id,
       tableNum: tableNum ?? this.tableNum,
+      restaurantId: restaurantId ?? this.restaurantId,
       tableStatus: tableStatus ?? this.tableStatus,
       tableCategoryId: tableCategoryId ?? this.tableCategoryId,
       queueEntryIds: queueEntryIds ?? this.queueEntryIds,
+      latestEstimatedReadyAt:
+          latestEstimatedReadyAt ?? this.latestEstimatedReadyAt,
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
+import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 
 class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
@@ -10,6 +11,7 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
 
   @override
   Future<void> create(MenuItemCategory category) async {
+    debugPrint("Add Cat: $category");
     final categoryRef = fireStore
         .collection('menu_item_categories')
         .doc(category.id);
@@ -19,9 +21,7 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
 
   @override
   Future<void> delete(String categoryId) async {
-    // How should we handle it?
-    // cuz each category connects to many menuItem
-    // await fireStore.collection('menu_item_categories').doc(categoryId).delete();
+    await fireStore.collection('menu_item_categories').doc(categoryId).delete();
   }
 
   @override
@@ -121,9 +121,10 @@ class MenuCategoryRepositoryImpl implements MenuCategoryRepository {
   }
 
   @override
-  Stream<List<MenuItemCategory>> watchAllMenuCategory() {
+  Stream<List<MenuItemCategory>> watchAllMenuCategory(String restId) {
     return fireStore
         .collection('menu_item_categories')
+        .where("restaurantId", isEqualTo: restId)
         .orderBy('name')
         .snapshots()
         .map(

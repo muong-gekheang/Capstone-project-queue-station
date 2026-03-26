@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 
@@ -132,8 +133,10 @@ class MenuItemRepositoryImpl implements MenuItemRepository {
         .where('restaurantId', isEqualTo: restaurantId)
         .orderBy('name')
         .snapshots()
+        .handleError((err) => debugPrint("Retrieval Error: $err"))
         .map(
           (snap) => snap.docs.map((doc) {
+            debugPrint("Retrieval: ${doc.data()}");
             final json = Map<String, dynamic>.from(doc.data());
             json['id'] ??= doc.id;
             return MenuItem.fromJson(json);

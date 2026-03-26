@@ -129,6 +129,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
               numPeople: _guestCount,
               incrPeople: incrPeople,
               decrPeople: decrPeople,
+              maxPeople: 10, //mock
             ),
             const SizedBox(height: 30),
             Row(

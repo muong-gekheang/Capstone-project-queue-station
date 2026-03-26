@@ -24,5 +24,5 @@ abstract class AddOnRepository {
   );
   Future<void> deleteMany(List<String> ids);
   Stream<AddOn> watchCurrentAddOn(String addOnId);
-  Stream<List<AddOn>> watchAllAddOn();
+  Stream<List<AddOn>> watchAllAddOn(String restId);
 }

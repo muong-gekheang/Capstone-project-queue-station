@@ -3,30 +3,30 @@ import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:uuid/uuid.dart';
 
-const uuid = Uuid();
+final uuid = const Uuid();
 
-// --- 5 CUSTOMERS (with hardcoded IDs matching those in queue entries) ---
+// --- 5 CUSTOMERS ---
 List<Customer> mockCustomers = [
   Customer(
-    id: 'cust-1', // matches queueEntry above
+    id: uuid.v4(),
     name: "Sok Dara",
     email: "dara.sok@gmail.com",
     phone: "012888777",
-    historyIds: ['hist-1'], // hardcoded history ID
+    historyIds: [],
   ),
   Customer(
-    id: 'cust-2',
+    id: uuid.v4(),
     name: "Chan Bopha",
     email: "bopha.chan@outlook.com",
     phone: "015222333",
     historyIds: [], // New user, no history yet
   ),
   Customer(
-    id: 'cust-3',
+    id: uuid.v4(),
     name: "Keo Pich",
     email: "pich.keo@yahoo.com",
     phone: "099444555",
-    historyIds: ['hist-2'],
+    historyIds: [],
   ),
   Customer(
     id: uuid.v4(),
@@ -44,13 +44,14 @@ List<Customer> mockCustomers = [
   ),
 ];
 
-// --- 5 STORE USERS (without storeName/storeAddress) ---
+// --- 5 STORE USERS ---
 List<StoreUser> mockStoreUsers = [
   StoreUser(
-    id: uuid.v4(),
-    name: "Manager Rath",
-    email: "rath.manager@queuestation.com",
-    phone: "012333444",
+    id: "user_s_1",
+    name: "alex@store.com",
+    email: "JackieStore@queuestation.com",
+    phone: "012589745",
+    restaurantId: "rest_kh_1",
   ),
   StoreUser(
     id: uuid.v4(),
@@ -78,5 +79,5 @@ List<StoreUser> mockStoreUsers = [
   ),
 ];
 
-// Combined list
+// Combine them into your global mockUsers list if needed
 List<User> mockUsers = [...mockCustomers, ...mockStoreUsers];

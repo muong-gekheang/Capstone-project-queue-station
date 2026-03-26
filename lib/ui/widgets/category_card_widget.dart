@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 class CategoryCardWidget extends StatelessWidget {
-  final Uint8List? profile;
+  final ImageProvider? profile;
   final String name;
   final bool isSelected;
   final VoidCallback onTap;
@@ -31,7 +31,7 @@ class CategoryCardWidget extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: MemoryImage(profile!)),
+                  image: DecorationImage(image: profile!),
                 ),
               ),
             Text(name, style: TextStyle(fontSize: 12, color: color),)

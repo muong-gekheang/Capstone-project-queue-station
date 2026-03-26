@@ -5,175 +5,318 @@ import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/models/restaurant/size_option.dart';
 import 'package:uuid/uuid.dart';
 
-final _uuid = Uuid();
-
 /// ----------------------------
-/// GLOBAL SIZE OPTIONS
+/// GLOBAL SIZES
 /// ----------------------------
-final List<SizeOption> globalSizeOptions = [
-  SizeOption(id: _uuid.v4(), name: 'Small'),
-  SizeOption(id: _uuid.v4(), name: 'Medium'),
-  SizeOption(id: _uuid.v4(), name: 'Large'),
+final List<SizeOption> globalSizes = [
+  SizeOption(name: 'Small', id: '', restaurantId: ''),
+  SizeOption(name: 'Medium', id: '', restaurantId: ''),
+  SizeOption(name: 'Large', id: '', restaurantId: ''),
 ];
 
 /// ----------------------------
-/// GLOBAL ADD-ONS
+/// GLOBAL SIZES
 /// ----------------------------
 final List<AddOn> globalAddOns = [
-  AddOn(id: _uuid.v4(), name: 'Extra Cheese', price: 1.50, image: null),
-  AddOn(id: _uuid.v4(), name: 'Bacon', price: 2.00, image: null),
-  AddOn(id: _uuid.v4(), name: 'Avocado', price: 2.50, image: null),
-  AddOn(id: _uuid.v4(), name: 'Extra Sauce', price: 0.75, image: null),
-  AddOn(id: _uuid.v4(), name: 'Fried Egg', price: 1.25, image: null),
-];
-
-/// ----------------------------
-/// CATEGORIES
-/// ----------------------------
-final List<MenuItemCategory> mockMenuCategories = [
-  MenuItemCategory(id: _uuid.v4(), name: 'Burger'),
-  MenuItemCategory(id: _uuid.v4(), name: 'Pizza'),
-  MenuItemCategory(id: _uuid.v4(), name: 'Drinks'),
-  MenuItemCategory(id: _uuid.v4(), name: 'Desserts'),
+  AddOn(
+    name: 'Extra Cheese',
+    price: 1.50,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Bacon',
+    price: 2.00,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Avocado',
+    price: 2.50,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Extra Sauce',
+    price: 0.75,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Fried Egg',
+    price: 1.25,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
 ];
 
 /// ----------------------------
 /// MENU-SIZE RELATIONS (PRICE PER MENU)
 /// ----------------------------
 final List<MenuSize> burgerSizes = [
-  MenuSize(price: 3.0, sizeOption: globalSizeOptions[0]),
-  MenuSize(price: 4.0, sizeOption: globalSizeOptions[1]),
-  MenuSize(price: 4.75, sizeOption: globalSizeOptions[2]),
+  MenuSize(
+    sizeOption: globalSizes[0],
+    price: 3.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Small
+  MenuSize(
+    sizeOption: globalSizes[1],
+    price: 4.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Medium
+  MenuSize(
+    sizeOption: globalSizes[2],
+    price: 4.75,
+    id: '',
+    sizeOptionId: '',
+  ), // Large
 ];
 
 final List<MenuSize> burgerMediumLarge = [
-  MenuSize(price: 1.0, sizeOption: globalSizeOptions[1]),
-  MenuSize(price: 1.25, sizeOption: globalSizeOptions[2]),
+  MenuSize(
+    sizeOption: globalSizes[1],
+    price: 1.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Medium
+  MenuSize(
+    sizeOption: globalSizes[2],
+    price: 1.25,
+    id: '',
+    sizeOptionId: '',
+  ), // Large
 ];
 
 final List<MenuSize> pizzaSizes = [
-  MenuSize(price: 0.0, sizeOption: globalSizeOptions[0]),
-  MenuSize(price: 2.0, sizeOption: globalSizeOptions[1]),
+  MenuSize(
+    sizeOption: globalSizes[0],
+    price: 0.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Small
+  MenuSize(
+    sizeOption: globalSizes[1],
+    price: 2.0,
+    id: '',
+    sizeOptionId: '',
+  ), // Medium
 ];
 
 /// ----------------------------
-/// MENU ITEMS
+/// CATEGORIES
 /// ----------------------------
-final List<MenuItem> mockMenuItems = [
-  MenuItem(
-      id: _uuid.v4(),
-      name: 'Classic Burger',
-      description: 'Classic burger with fresh lettuce, tomato, and beef patty.',
-      image: 'assets/images/burger.png',
-      categoryId: mockMenuCategories[0].id,
-      sizeOptionIds: [
-        globalSizeOptions[0].id,
-        globalSizeOptions[1].id,
-        globalSizeOptions[2].id,
-      ],
-      addOnIds: [globalAddOns[0].id, globalAddOns[1].id, globalAddOns[4].id],
-      minPrepTimeMinutes: 10,
-      maxPrepTimeMinutes: 15,
-      isAvailable: true,
-    )
-    ..sizes = burgerSizes
-    ..addOns = [globalAddOns[0], globalAddOns[1], globalAddOns[4]],
-  MenuItem(
-      id: _uuid.v4(),
-      name: 'Cheese Burger',
-      description:
-          'Beef patty with melted cheddar cheese, pickles, and special sauce.',
-      image: 'assets/images/cheeseburger.png',
-      categoryId: mockMenuCategories[0].id,
-      sizeOptionIds: [globalSizeOptions[1].id, globalSizeOptions[2].id],
-      addOnIds: [
-        globalAddOns[0].id,
-        globalAddOns[1].id,
-        globalAddOns[2].id,
-        globalAddOns[4].id,
-      ],
-      minPrepTimeMinutes: 8,
-      maxPrepTimeMinutes: 12,
-      isAvailable: true,
-    )
-    ..sizes = burgerMediumLarge
-    ..addOns = [
-      globalAddOns[0],
-      globalAddOns[1],
-      globalAddOns[2],
-      globalAddOns[4],
-    ],
-  MenuItem(
-      id: _uuid.v4(),
-      name: 'Pepperoni Pizza',
-      description:
-          'Classic pepperoni with mozzarella cheese on tomato sauce base.',
-      image: 'assets/images/pizza.png',
-      categoryId: mockMenuCategories[1].id,
-      sizeOptionIds: [globalSizeOptions[0].id, globalSizeOptions[1].id],
-      addOnIds: [
-        globalAddOns[0].id,
-        globalAddOns[1].id,
-        globalAddOns[2].id,
-        globalAddOns[3].id,
-      ],
-      minPrepTimeMinutes: 15,
-      maxPrepTimeMinutes: 20,
-      isAvailable: true,
-    )
-    ..sizes = pizzaSizes
-    ..addOns = [
-      globalAddOns[0],
-      globalAddOns[1],
-      globalAddOns[2],
-      globalAddOns[3],
-    ],
-  MenuItem(
-      id: _uuid.v4(),
-      name: 'Margherita Pizza',
-      description:
-          'Simple yet delicious with fresh mozzarella, tomatoes, and basil.',
-      image: 'assets/images/pizza(1).png',
-      categoryId: mockMenuCategories[1].id,
-      sizeOptionIds: [globalSizeOptions[1].id, globalSizeOptions[2].id],
-      addOnIds: [globalAddOns[0].id, globalAddOns[3].id],
-      minPrepTimeMinutes: 12,
-      maxPrepTimeMinutes: 18,
-      isAvailable: true,
-    )
-    ..sizes = [
-      MenuSize(price: 2.0, sizeOption: globalSizeOptions[1]),
-      MenuSize(price: 3.5, sizeOption: globalSizeOptions[2]),
-    ]
-    ..addOns = [globalAddOns[0], globalAddOns[3]],
-  MenuItem(
-    id: _uuid.v4(),
-    name: 'Cola',
-    description: 'Chilled soft drink, perfect with any meal.',
-    image: 'assets/images/energy-drink.png',
-    categoryId: mockMenuCategories[2].id,
-    sizeOptionIds: [],
-    addOnIds: [],
-    minPrepTimeMinutes: 2,
-    maxPrepTimeMinutes: 5,
-    isAvailable: true,
+final List<MenuItemCategory> mockMenuCategories = [
+  MenuItemCategory(name: "Burger", id: Uuid().v4()),
+  MenuItemCategory(name: "Pizza", id: Uuid().v4()),
+  MenuItemCategory(name: "Drinks", id: Uuid().v4()),
+];
+
+/// ----------------------------
+/// ADD-ONS
+/// ----------------------------
+final List<AddOn> mockMenuAddOns = [
+  AddOn(
+    name: 'Extra Cheese',
+    price: 0.99,
+    image: "assets/images/cheese.png",
+    id: Uuid().v4(),
+    restaurantId: '',
   ),
-  MenuItem(
-      id: _uuid.v4(),
-      name: 'Veggie Wrap',
-      description:
-          'A healthy wrap with fresh vegetables, hummus, and whole wheat tortilla.',
-      image: 'assets/images/burger.png',
-      categoryId: mockMenuCategories[0].id,
-      sizeOptionIds: [globalSizeOptions[1].id, globalSizeOptions[2].id],
-      addOnIds: [globalAddOns[0].id, globalAddOns[2].id, globalAddOns[3].id],
-      minPrepTimeMinutes: 8,
-      maxPrepTimeMinutes: 10,
-      isAvailable: true,
-    )
-    ..sizes = burgerMediumLarge
-    ..addOns = [globalAddOns[0], globalAddOns[2], globalAddOns[3]],
+  AddOn(
+    name: 'Bacon Strips',
+    price: 1.49,
+    image: "assets/images/bacon.png",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Avocado',
+    price: 1.29,
+    image: "assets/images/avocado.png",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Extra Sauce',
+    price: 0.59,
+    image: "assets/images/sauces.png",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
+  AddOn(
+    name: 'Onion Rings',
+    price: 1.99,
+    image: "",
+    id: Uuid().v4(),
+    restaurantId: '',
+  ),
 ];
 
-/// Legacy alias used by various UI screens.
-final List<MenuItem> allMenuItems = mockMenuItems;
+/// ----------------------------
+/// MENUS
+/// ----------------------------
+
+// 1. Classic Burger
+final MenuItem classicBurger =
+    MenuItem(
+        name: "Classic Burger",
+        description:
+            "Classic burger with fresh lettuce, tomato, and beef patty.",
+        maxPrepTimeMinutes: 15,
+        category: mockMenuCategories[0], // Burger category
+        image: "assets/images/burger.png",
+        isAvailable: true,
+        id: Uuid().v4(),
+        restaurantId: '',
+        minPrice: 0,
+      )
+      ..sizes.addAll(burgerSizes)
+      ..addOns.addAll([
+        globalAddOns[0], // Extra Cheese
+        globalAddOns[1], // Bacon
+        globalAddOns[4], // Fried Egg
+      ]);
+
+// 2. Cheese Burger
+final MenuItem cheeseBurger =
+    MenuItem(
+        id: Uuid().v4(),
+        name: "Cheese Burger",
+        description:
+            "Beef patty with melted cheddar cheese, pickles, and special sauce.",
+        maxPrepTimeMinutes: 12,
+        category: mockMenuCategories[0], // Burger category
+        image: "assets/images/cheeseburger.png",
+        isAvailable: true,
+        restaurantId: '',
+        minPrice: 0,
+      )
+      ..sizes.addAll(burgerMediumLarge)
+      ..addOns.addAll([
+        globalAddOns[0], // Extra Cheese
+        globalAddOns[1], // Bacon
+        globalAddOns[2], // Avocado
+        globalAddOns[4], // Fried Egg
+      ]);
+
+// 3. Pepperoni Pizza
+final MenuItem pepperoniPizza =
+    MenuItem(
+        id: Uuid().v4(),
+        name: "Pepperoni Pizza",
+        description:
+            "Classic pepperoni with mozzarella cheese on tomato sauce base.",
+        maxPrepTimeMinutes: 20,
+        category: mockMenuCategories[1], // Pizza category
+        image: "assets/images/pizza.png",
+        isAvailable: true,
+        restaurantId: '',
+        minPrice: 0,
+      )
+      ..sizes.addAll(pizzaSizes)
+      ..addOns.addAll([
+        globalAddOns[0], // Extra Cheese
+        globalAddOns[1], // Bacon
+        globalAddOns[2], // Avocado
+        globalAddOns[3], // Extra Sauce
+      ]);
+
+// 4. Margherita Pizza
+final MenuItem margheritaPizza =
+    MenuItem(
+        id: Uuid().v4(),
+        name: "Margherita Pizza",
+        description:
+            "Simple yet delicious with fresh mozzarella, tomatoes, and basil.",
+        maxPrepTimeMinutes: 18,
+        category: mockMenuCategories[1], // Pizza category
+        image: "assets/images/pizza(1).png",
+        isAvailable: true,
+        restaurantId: '',
+        minPrice: 0,
+      )
+      ..sizes.addAll([
+        MenuSize(
+          sizeOption: globalSizes[1],
+          price: 1.0,
+          id: '',
+          sizeOptionId: '',
+        ), // Medium
+        MenuSize(
+          sizeOption: globalSizes[2],
+          price: 2.0,
+          id: '',
+          sizeOptionId: '',
+        ), // Large
+      ])
+      ..addOns.addAll([
+        globalAddOns[0], // Extra Cheese
+        globalAddOns[3], // Extra Sauce
+      ]);
+
+// 5. Cola
+final MenuItem cola =
+    MenuItem(
+        id: Uuid().v4(),
+        name: "Cola",
+        description: "Chilled soft drink, perfect with any meal.",
+        maxPrepTimeMinutes: 2,
+        category: mockMenuCategories[2], // Drinks category
+        image: "assets/images/energy-drink.png",
+        isAvailable: true,
+        restaurantId: '',
+        minPrice: 0,
+      )
+      ..addOns.addAll([
+        AddOn(
+          name: 'Extra Ice',
+          price: 0.25,
+          image: "",
+          id: Uuid().v4(),
+          restaurantId: '',
+        ),
+        AddOn(
+          name: 'Lemon Slice',
+          price: 0.10,
+          image: "",
+          id: Uuid().v4(),
+          restaurantId: '',
+        ),
+      ]);
+final MenuItem veggieWrap =
+    MenuItem(
+        id: Uuid().v4(),
+        name: "Veggie Wrap",
+        description:
+            "A healthy wrap with fresh vegetables, hummus, and whole wheat tortilla.",
+        maxPrepTimeMinutes: 10,
+        category:
+            mockMenuCategories[0], // Burger category (or you can create a new category 'Wraps')
+        image: "assets/images/burger.png",
+        isAvailable: true,
+        restaurantId: '',
+        minPrice: 0,
+      )
+      ..sizes.addAll(burgerMediumLarge)
+      ..addOns.addAll([
+        globalAddOns[0], // Extra Cheese
+        globalAddOns[2], // Avocado
+        globalAddOns[3], // Extra Sauce
+      ]);
+
+// List of all menu items
+final List<MenuItem> mockMenuItems = [
+  classicBurger,
+  cheeseBurger,
+  pepperoniPizza,
+  margheritaPizza,
+  cola,
+  veggieWrap,
+];

@@ -11,7 +11,7 @@ class TableTypeWidget extends StatelessWidget {
 
   final int value;
   final int selectedType;
-  final ValueChanged<int> onTap;
+  final ValueChanged<int>? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class TableTypeWidget extends StatelessWidget {
     Color boxColor = isSelected ? Color(0xFFFF6835) : Color(0xFF0D47A1);
     String tableText = value > 1 ? "$value People" : "$value Person";
     return GestureDetector(
-      onTap: () => onTap(value),
+      onTap: onTap != null ? () => onTap!(value) : null,
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(

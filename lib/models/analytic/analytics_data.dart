@@ -7,10 +7,7 @@ class QueueLengthDataPoint {
   final DateTime time;
   final int queueLength;
 
-  QueueLengthDataPoint({
-    required this.time,
-    required this.queueLength,
-  });
+  QueueLengthDataPoint({required this.time, required this.queueLength});
 
   factory QueueLengthDataPoint.fromJson(Map<String, dynamic> json) =>
       _$QueueLengthDataPointFromJson(json);
@@ -20,7 +17,7 @@ class QueueLengthDataPoint {
 
 @JsonSerializable()
 class TableOccupancyDataPoint {
-  final String day;
+  final DateTime day;
   final double occupancyPercentage;
 
   TableOccupancyDataPoint({
@@ -39,10 +36,7 @@ class OrderValueDataPoint {
   final String day;
   final double averageOrderValue;
 
-  OrderValueDataPoint({
-    required this.day,
-    required this.averageOrderValue,
-  });
+  OrderValueDataPoint({required this.day, required this.averageOrderValue});
 
   factory OrderValueDataPoint.fromJson(Map<String, dynamic> json) =>
       _$OrderValueDataPointFromJson(json);
@@ -55,10 +49,7 @@ class OrdersDataPoint {
   final DateTime time;
   final int orderCount;
 
-  OrdersDataPoint({
-    required this.time,
-    required this.orderCount,
-  });
+  OrdersDataPoint({required this.time, required this.orderCount});
 
   factory OrdersDataPoint.fromJson(Map<String, dynamic> json) =>
       _$OrdersDataPointFromJson(json);

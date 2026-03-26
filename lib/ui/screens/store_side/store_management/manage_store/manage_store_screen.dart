@@ -1,0 +1,19 @@
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/view_model/manage_store_view_model.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/widgets/manage_store_content.dart';
+
+class ManageStoreScreen extends StatelessWidget {
+  const ManageStoreScreen({super.key, required this.onManageQueue});
+  final VoidCallback onManageQueue;
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ManageStoreViewModel(
+        restaurantService: context.read<RestaurantService>(),
+      ),
+      child: ManageStoreContent(onManageQueue: onManageQueue),
+    );
+  }
+}

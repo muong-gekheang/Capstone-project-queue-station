@@ -54,7 +54,7 @@ class MenuCategoryRepositoryMock implements MenuCategoryRepository {
   }
 
   @override
-  Stream<List<MenuItemCategory>> watchAllMenuCategory() {
+  Stream<List<MenuItemCategory>> watchAllMenuCategory(String restId) {
     // TODO: implement watchAllMenuCategory
     throw UnimplementedError();
   }

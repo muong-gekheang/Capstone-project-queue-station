@@ -42,6 +42,19 @@ class AddOnTileWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: addOn.image != null
+                        ? NetworkImage(addOn.image!)
+                        : AssetImage('assets/images/default_menu_profile.jpg'),
+                      fit: BoxFit.cover
+                    )
+                  ),
+                ),
+                SizedBox(width: 10),
                 Expanded(
                   flex: 2,
                   child: Text(addOn.name, style: const TextStyle(fontSize: 16)),
