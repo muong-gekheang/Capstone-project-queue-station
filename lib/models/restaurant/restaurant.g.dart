@@ -30,11 +30,16 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
           ?.map((e) => e as String)
           .toList() ??
       [],
+  currentInQueueIds:
+      (json['currentInQueueIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [],
   isOpen: json['isOpen'] as bool? ?? true,
   email: json['email'] as String? ?? '',
-  subscriptionDate: json['subscriptionDate'] == null
-      ? DateTime.now()
-      : const TimestampConverter().fromJson(json['subscriptionDate']),
+  subscriptionDate: const TimestampConverter().fromJson(
+    json['subscriptionDate'],
+  ),
   subscriptionStatus:
       $enumDecodeNullable(
         _$SubscriptionStatusEnumMap,
@@ -43,6 +48,19 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
       SubscriptionStatus.paid,
   openingTime: (json['openingTime'] as num?)?.toInt() ?? 0,
   closingTime: (json['closingTime'] as num?)?.toInt() ?? 0,
+  location: const LatLngConverter().fromJson(
+    json['location'] as Map<String, dynamic>?,
+  ),
+  contactDetailIds:
+      (json['contactDetailIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [],
+  menuImageLinks:
+      (json['menuImageLinks'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [],
 );
 
 Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
@@ -58,6 +76,7 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
       'tableIds': instance.tableIds,
       'globalAddOnIds': instance.globalAddOnIds,
       'globalSizeOptionIds': instance.globalSizeOptionIds,
+      'currentInQueueIds': instance.currentInQueueIds,
       'isOpen': instance.isOpen,
       'email': instance.email,
       'openingTime': instance.openingTime,
@@ -67,9 +86,13 @@ Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>
       ),
       'subscriptionStatus':
           _$SubscriptionStatusEnumMap[instance.subscriptionStatus]!,
+      'location': const LatLngConverter().toJson(instance.location),
+      'menuImageLinks': instance.menuImageLinks,
+      'contactDetailIds': instance.contactDetailIds,
     };
 
 const _$SubscriptionStatusEnumMap = {
   SubscriptionStatus.paid: 'paid',
   SubscriptionStatus.expired: 'expired',
+  SubscriptionStatus.active: 'active',
 };

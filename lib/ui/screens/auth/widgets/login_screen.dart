@@ -21,22 +21,48 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _loginFalse = false;
 
+  // Future<void> _handleLogin() async {
+  //   final vm = context.read<AuthViewModel>();
+
+  //   final result = await vm.login(
+  //     email: _emailController.text,
+  //     password: _passwordController.text,
+  //   );
+
+  //   debugPrint("Loading: ${vm.isLoading}");
+  //   if (context.mounted) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(result ? "Login successful" : "Login failed")),
+  //     );
+  //     if (result) {
+  //       context.go("/");
+  //     } else {
+  //       setState(() {
+  //         _loginFalse = true;
+  //       });
+  //     }
+  //   }
+  // }
+
   Future<void> _handleLogin() async {
     final vm = context.read<AuthViewModel>();
 
+    // This method logs the user in and updates the UserProvider
     final result = await vm.login(
       email: _emailController.text,
       password: _passwordController.text,
     );
 
     debugPrint("Loading: ${vm.isLoading}");
+
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result ? "Login successful" : "Login failed")),
       );
-      if (result) {
-        context.go("/");
-      } else {
+
+      if (!result) {
+        // Only update UI if login failed.
+        // If it succeeded, GoRouter is already redirecting the screen!
         setState(() {
           _loginFalse = true;
         });

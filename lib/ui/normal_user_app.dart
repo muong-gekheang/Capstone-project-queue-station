@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+import 'package:queue_station_app/ui/screens/map/map_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/instruction_screen.dart';
@@ -111,7 +112,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       HomeScreen(),
-      Placeholder(), // MAP
+      MapScreen(), // MAP
       _hasSeenFoodInstruction
           ? MenuScreen() // Already seen instruction, show menu
           : Instruction(

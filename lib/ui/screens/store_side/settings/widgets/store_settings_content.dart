@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
@@ -117,7 +118,7 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
                   ListTile(
                     leading: const Icon(Icons.storefront, color: Colors.black),
                     title: const Text(
-                      "Edit store",
+                      "Edit Store",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -158,6 +159,21 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: onChangePassword,
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.location_on_outlined,
+                      color: Colors.black,
+                    ),
+                    title: const Text(
+                      "Manage Store Location",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => context.go('/map'),
                   ),
                 ],
               ),

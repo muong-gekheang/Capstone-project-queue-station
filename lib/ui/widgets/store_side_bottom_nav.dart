@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
@@ -47,11 +46,12 @@ class BottomNavBar extends StatelessWidget {
                 'Manage',
               ),
               _buildNavItem(
-                NavTab.queue, 
-                'assets/icons/queue_blue.svg', 
+                NavTab.queue,
+                'assets/icons/queue_blue.svg',
                 'assets/icons/queue_orange.svg',
-                null, 
-                'Queue'),
+                null,
+                'Queue',
+              ),
               _buildNavItem(
                 NavTab.settings,
                 'assets/icons/Setting.svg',
@@ -107,7 +107,8 @@ class BottomNavBar extends StatelessWidget {
       width: 26,
       height: 26,
       color: color,
-      placeholderBuilder: (context) => Icon(Icons.circle, size: 26, color: Colors.grey),
+      placeholderBuilder: (context) =>
+          Icon(Icons.circle, size: 26, color: Colors.grey),
     );
   }
 }

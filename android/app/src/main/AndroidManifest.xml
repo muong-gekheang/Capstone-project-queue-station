@@ -1,8 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:label="queue_station_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <uses-library
+        android:name="org.apache.http.legacy"
+        android:required="false" /> 
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -23,8 +28,21 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts links like: queuestation://map?id=123 -->
+                <!-- This tells Android to open your app for links starting with queuestation:// -->
+                <!-- <data android:scheme="queuestation" /> -->
+                <data
+                android:scheme="queuestation"
+                android:host="map" />
             </intent-filter>
         </activity>
+        <!-- Replace your hardcoded key with the placeholder -->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+                   android:value="${MAPS_API_KEY}"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

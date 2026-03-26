@@ -1,12 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:queue_station_app/models/restaurant/restaurant_social.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:queue_station_app/utils/latlng_converter.dart';
 import 'package:queue_station_app/utils/timestamp_converter.dart';
-import 'menu_item.dart';
-import 'queue_table.dart';
+
+import 'package:uuid/uuid.dart';
 
 part 'restaurant.g.dart';
 
-enum SubscriptionStatus { paid, expired }
+final uuid = Uuid();
+
+enum SubscriptionStatus {
+  @JsonValue('paid')
+  paid,
+  @JsonValue('expired')
+  expired,
+  @JsonValue('active')
+  active,
+}
 
 @JsonSerializable(explicitToJson: true)
 class Restaurant {
@@ -26,6 +39,12 @@ class Restaurant {
   final List<String> globalAddOnIds;
   @JsonKey(defaultValue: <String>[])
   final List<String> globalSizeOptionIds;
+  @JsonKey(defaultValue: <String>[])
+  @JsonKey(
+    defaultValue: SubscriptionStatus.paid,
+    unknownEnumValue: SubscriptionStatus.expired,
+  )
+  final List<String> currentInQueueIds;
 
   final bool isOpen;
   final String email;
@@ -33,10 +52,16 @@ class Restaurant {
   final int openingTime; // this need to be store in minute to handle the time like 8:30 which is equal to 510
   @JsonKey(defaultValue: 0)
   final int closingTime;
-  @JsonKey(defaultValue: DateTime.now)
   @TimestampConverter()
   final DateTime subscriptionDate;
   final SubscriptionStatus subscriptionStatus;
+
+  @LatLngConverter()
+  LatLng? location;
+  @JsonKey(defaultValue: <String>[])
+  List<String> menuImageLinks;
+  @JsonKey(defaultValue: <String>[])
+  List<String>? contactDetailIds;
 
   Restaurant({
     required this.id,
@@ -50,22 +75,30 @@ class Restaurant {
     List<String>? tableIds,
     List<String>? globalAddOnIds,
     List<String>? globalSizeOptionIds,
+    List<String>? currentInQueueIds,
     this.isOpen = true,
     this.email = '',
     required this.subscriptionDate,
     this.subscriptionStatus = SubscriptionStatus.paid,
     required this.openingTime,
     required this.closingTime,
+    this.location,
+    List<String>? contactDetailIds,
+    List<String>? menuImageLinks,
   }) : itemIds = itemIds ?? [],
        tableIds = tableIds ?? [],
        globalAddOnIds = globalAddOnIds ?? [],
-       globalSizeOptionIds = globalSizeOptionIds ?? [];
+       globalSizeOptionIds = globalSizeOptionIds ?? [],
+       currentInQueueIds = currentInQueueIds ?? [],
+       contactDetailIds = contactDetailIds ?? [],
+       menuImageLinks = menuImageLinks ?? [];
 
   Duration get averageWaitingTime => const Duration(hours: 1);
 
+  int get curWait => currentInQueueIds.length;
+
   bool get isCurrentlyOpen {
     if (!isOpen) return false;
-
     final now = DateTime.now();
     // convert hour to minute
     final currentTimeInMinute = now.hour * 60 + now.minute;
@@ -92,12 +125,16 @@ class Restaurant {
     List<String>? tableIds,
     List<String>? globalAddOnIds,
     List<String>? globalSizeOptionIds,
+    List<String>? currentInQueueIds,
     bool? isOpen,
     String? email,
     DateTime? subscriptionDate,
     SubscriptionStatus? subscriptionStatus,
     int? openingTime,
     int? closingTime,
+    LatLng? location,
+    List<String>? menuImageLinks,
+    List<String>? contactDetailIds,
   }) {
     return Restaurant(
       id: id ?? this.id,
@@ -111,12 +148,16 @@ class Restaurant {
       tableIds: tableIds ?? this.tableIds,
       globalAddOnIds: globalAddOnIds ?? this.globalAddOnIds,
       globalSizeOptionIds: globalSizeOptionIds ?? this.globalSizeOptionIds,
+      currentInQueueIds: currentInQueueIds ?? this.currentInQueueIds,
       isOpen: isOpen ?? this.isOpen,
       email: email ?? this.email,
       subscriptionDate: subscriptionDate ?? this.subscriptionDate,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       openingTime: openingTime ?? this.openingTime,
       closingTime: closingTime ?? this.closingTime,
+      location: location ?? this.location,
+      menuImageLinks: menuImageLinks ?? this.menuImageLinks,
+      contactDetailIds: contactDetailIds ?? this.contactDetailIds,
     );
   }
 
