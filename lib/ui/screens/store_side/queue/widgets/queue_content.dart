@@ -2,19 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/widgets/add_queue_dialog.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/widgets/edit_queue_dialog.dart';
 import 'package:queue_station_app/ui/widgets/search_box.dart';
+import 'package:queue_station_app/ui/widgets/store_profile_avatar.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 
 class QueueContent extends StatefulWidget {
   final VoidCallback? onClose; // This is used to back to the parent screen
-  const QueueContent({super.key, this.onClose});
+  final bool showBackButton; // Whether to show a back button
+  
+  const QueueContent({
+    super.key,
+    this.onClose,
+    this.showBackButton = false,
+  });
   @override
   State<QueueContent> createState() => _QueueContentState();
 }
 
 class _QueueContentState extends State<QueueContent> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _onProfileChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     QueueViewModel queueViewModel = context.watch<QueueViewModel>();
@@ -24,11 +47,22 @@ class _QueueContentState extends State<QueueContent> {
         backgroundColor: Colors.white,
         elevation: 0,
         toolbarHeight: 80,
-        leading: const Icon(
-          Icons.dashboard,
-          color: Color(0xFF0D47A1),
-          size: 32,
-        ),
+        leading: widget.showBackButton
+            ? IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Color(0xFF0D47A1),
+                  size: 24,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            : const Icon(
+                Icons.dashboard,
+                color: Color(0xFF0D47A1),
+                size: 32,
+              ),
         title: const Text(
           "Queue",
           style: TextStyle(
@@ -38,29 +72,23 @@ class _QueueContentState extends State<QueueContent> {
           ),
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 18),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Center(
-              child: Text(
-                "DORI\nDORI",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  height: 1.0,
+          const StoreProfileAvatar(radius: 20),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+            onPressed: () {
+              final orderService = context.read<OrderService>();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Provider.value(
+                    value: orderService,
+                    child: const NotificationScreen(),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.notifications_none, color: Colors.black, size: 30),
-          const SizedBox(width: 16),
         ],
       ),
 

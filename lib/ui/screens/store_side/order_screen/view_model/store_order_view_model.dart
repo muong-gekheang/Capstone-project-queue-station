@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
@@ -67,5 +68,22 @@ class StoreOrderViewModel extends ChangeNotifier {
 
   Future<Order?> getOrderDetailsById(String orderId) async {
     return await _orderService.getOrderDetailsById(orderId);
+  }
+
+  /// Accept all pending items for [queueEntry]'s order and send the customer
+  /// a notification with their queue position via a Cloud Function.
+  Future<void> acceptOrderAndNotifyCustomer(QueueEntry queueEntry) async {
+    if (queueEntry.orderId == null) return;
+
+    final callable = FirebaseFunctions.instance.httpsCallable(
+      'acceptOrderAndNotifyCustomer',
+    );
+
+    await callable.call({
+      'orderId': queueEntry.orderId,
+      'queueEntryId': queueEntry.id,
+      'restaurantId': queueEntry.restId,
+      'customerId': queueEntry.customerId,
+    });
   }
 }

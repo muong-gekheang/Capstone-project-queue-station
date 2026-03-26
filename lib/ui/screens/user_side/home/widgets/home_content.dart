@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/services/notification_provider.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/view_models/home_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_joined_tile.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/widgets/restaurant_tile.dart';
@@ -40,12 +42,54 @@ class HomeContent extends StatelessWidget {
                     },
                   ),
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.notifications_outlined,
-                    color: Colors.black,
-                  ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Builder(
+                        builder: (context) {
+                          final count = context
+                              .watch<NotificationProvider>()
+                              .unreadCount;
+                          if (count == 0) return const SizedBox.shrink();
+                          return Container(
+                            width: 16,
+                            height: 16,
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                count > 9 ? '9+' : '$count',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -31,9 +31,8 @@ import 'package:queue_station_app/ui/theme/app_theme.dart';
 import '../ui/screens/store_side/dashboard/dashboard_screen.dart';
 import '../ui/screens/store_side/settings/store_settings_screen.dart';
 import '../ui/widgets/store_side_bottom_nav.dart';
+import '../models/nav_tab.dart';
 import 'screens/store_side/store_management/manage_store/manage_store_screen.dart';
-
-enum NavTab { dashboard, analytics, queue, settings }
 
 class StoreMainScreen extends StatefulWidget {
   const StoreMainScreen({super.key});
@@ -106,7 +105,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 userRepository: context.read<UserRepository<StoreUser>>(),
               );
             }
-            prev.updateDependencies(userProvider);
             return prev;
           },
         ),
@@ -205,7 +203,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 children: [
                   DashboardScreen(onManageQueue: onManageQueue),
                   ManageStoreScreen(onManageQueue: onManageQueue),
-                  StoreQueueScreen(),
+                  StoreQueueScreen(isPushed: false),
                   StoreSettingsScreen(),
                 ],
               ),

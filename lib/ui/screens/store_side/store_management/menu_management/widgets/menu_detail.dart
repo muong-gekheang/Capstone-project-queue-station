@@ -154,7 +154,7 @@ class _MenuDetailState extends State<MenuDetail> {
               menu.name,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
             ),
-            Text(menu.category.name),
+            Text(menu.category!.name),
           ],
         ),
         Text(

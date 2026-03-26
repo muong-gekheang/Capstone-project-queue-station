@@ -2,6 +2,34 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:queue_station_app/data/repositories/queue_table/queue_table_repository.dart';
 import 'package:queue_station_app/models/restaurant/queue_table.dart';
 
+/// Mock list of queue tables used for legacy UI screens and testing.
+final List<QueueTable> mockTables = [
+  QueueTable(
+    id: 'table-1',
+    tableNum: 'T1',
+    restaurantId: 'rest-1',
+    tableCategoryId: 'cat-1',
+    tableStatus: TableStatus.available,
+    queueEntryIds: [],
+  ),
+  QueueTable(
+    id: 'table-2',
+    tableNum: 'T2',
+    restaurantId: 'rest-1',
+    tableCategoryId: 'cat-1',
+    tableStatus: TableStatus.available,
+    queueEntryIds: [],
+  ),
+  QueueTable(
+    id: 'table-3',
+    tableNum: 'T3',
+    restaurantId: 'rest-1',
+    tableCategoryId: 'cat-2',
+    tableStatus: TableStatus.available,
+    queueEntryIds: [],
+  ),
+];
+
 class QueueTableRepositoryMock implements QueueTableRepository {
   Map<String, QueueTable> queueTables = {};
 

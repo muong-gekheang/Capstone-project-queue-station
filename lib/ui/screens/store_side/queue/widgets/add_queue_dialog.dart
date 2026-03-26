@@ -6,7 +6,6 @@ import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';

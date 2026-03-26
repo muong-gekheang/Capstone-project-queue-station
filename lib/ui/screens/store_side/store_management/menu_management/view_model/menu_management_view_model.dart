@@ -209,7 +209,7 @@ class MenuManagementViewModel extends ChangeNotifier {
       (e) => e.id == menuItem.categoryId,
     );
     return _menuService.getMenuItemDetails(
-      menuItem.copyWith(category: category),
+      menuItem.copyWith(category: category, minPrice: null),
     );
   }
 }

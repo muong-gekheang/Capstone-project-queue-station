@@ -17,6 +17,7 @@ class OrderRepositoryImpl extends OrderRepository {
 
   Order? _currentOrder;
 
+  @override
   Order get currentOrder => _currentOrder ??= Order.empty();
 
   // Helper method to safely convert document to Order

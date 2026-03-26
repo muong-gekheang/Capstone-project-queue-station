@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/services/store/menu_service.dart';
 

@@ -1,9 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import 'menu_item.dart';
+
 part 'table_category.g.dart';
 
-var uuid = Uuid();
+final _uuid = Uuid();
 
 @JsonSerializable()
 class TableCategory {
@@ -41,8 +43,4 @@ class TableCategory {
       _$TableCategoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$TableCategoryToJson(this);
-
-  static TableCategory? get small => null;
-
-  static TableCategory? get standard => null;
 }

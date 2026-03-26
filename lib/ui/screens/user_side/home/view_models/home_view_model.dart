@@ -13,7 +13,7 @@ class HomeViewModel extends ChangeNotifier {
 
   List<Restaurant> _allRestaurants = [];
   List<Restaurant> _restaurants = [];
-  Map<String, int> _peopleWaiting = {};
+  final Map<String, int> _peopleWaiting = {};
   QueueEntry? _currentQueue;
 
   bool _isLoading = true;
@@ -131,8 +131,4 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

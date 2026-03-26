@@ -1,7 +1,12 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/user/user_repository.dart';
+import 'package:queue_station_app/models/user/store_user.dart';
+import 'package:queue_station_app/services/store/store_profile_service.dart';
+import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/auth/widgets/custom_text_field.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/view_model/edit_store_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
@@ -31,6 +36,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
   final TextEditingController _userEmailController = TextEditingController();
 
   File? _selectedImage;
+  Uint8List? _selectedImageBytes;
   final ImagePicker _picker = ImagePicker();
 
   void onSave() async {
@@ -150,85 +156,35 @@ class _EditStoreContentState extends State<EditStoreContent> {
                 children: [
                   Center(
                     child: GestureDetector(
-                      onTap: _pickImageFromGallery,
+                      onTap: pickImageFromGallery,
                       child: Stack(
                         children: [
                           Container(
                             width: 200,
                             height: 200,
                             decoration: BoxDecoration(
-                              color: _selectedImage == null
+                              color:
+                                  (_selectedImage == null &&
+                                      _selectedImageBytes == null)
                                   ? const Color(0xFF0D47A1)
                                   : Colors.transparent,
                               shape: BoxShape.circle,
-                              border: _selectedImage != null
+                              border:
+                                  (_selectedImage != null ||
+                                      _selectedImageBytes != null)
                                   ? Border.all(
                                       color: Colors.grey.shade300,
                                       width: 2,
                                     )
                                   : null,
                             ),
-                            child: _selectedImage != null
-                                ? ClipOval(
-                                    child: Image.file(
-                                      _selectedImage!,
-                                      width: 200,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "功夫",
-                                          style: TextStyle(
-                                            color: Color(0xFFFF6835),
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.2,
-                                          ),
-                                        ),
-                                        const Text(
-                                          "KUNGFU",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
-                                          ),
-                                        ),
-                                        const Text(
-                                          "KITCHEN",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        const Text(
-                                          "MODERN CHINESE CUISINE & HOT POT",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                            child: buildProfileImage(),
                           ),
-                          // Edit icon overlay
                           Positioned(
                             bottom: 0,
                             right: 0,
                             child: GestureDetector(
-                              onTap: _pickImageFromGallery,
+                              onTap: pickImageFromGallery,
                               child: Container(
                                 width: 40,
                                 height: 40,
@@ -254,7 +210,6 @@ class _EditStoreContentState extends State<EditStoreContent> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Form Fields with labels on left
                   _buildFormField(
                     label: "Name:",
                     child: TextField(
@@ -391,7 +346,6 @@ class _EditStoreContentState extends State<EditStoreContent> {
             ),
           ),
 
-          // Bottom Action Buttons
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -406,7 +360,6 @@ class _EditStoreContentState extends State<EditStoreContent> {
             ),
             child: Row(
               children: [
-                // Cancel Button
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
@@ -438,7 +391,6 @@ class _EditStoreContentState extends State<EditStoreContent> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Save Button
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onSave,
@@ -502,7 +454,7 @@ class _EditStoreContentState extends State<EditStoreContent> {
     );
   }
 
-  Future<void> _pickImageFromGallery() async {
+  Future<void> pickImageFromGallery() async {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -510,11 +462,19 @@ class _EditStoreContentState extends State<EditStoreContent> {
         maxHeight: 800,
         imageQuality: 85,
       );
-
       if (image != null) {
-        setState(() {
-          _selectedImage = File(image.path);
-        });
+        if (kIsWeb) {
+          final bytes = await image.readAsBytes();
+          setState(() {
+            _selectedImageBytes = bytes;
+            _selectedImage = null;
+          });
+        } else {
+          setState(() {
+            _selectedImage = File(image.path);
+            _selectedImageBytes = null;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -526,5 +486,59 @@ class _EditStoreContentState extends State<EditStoreContent> {
         );
       }
     }
+  }
+
+  Widget buildProfileImage() {
+    if (_selectedImage != null) {
+      return ClipOval(
+        child: Image.file(
+          _selectedImage!,
+          fit: BoxFit.cover,
+          width: 200,
+          height: 200,
+        ),
+      );
+    } else if (_selectedImageBytes != null) {
+      return ClipOval(
+        child: Image.memory(
+          _selectedImageBytes!,
+          fit: BoxFit.cover,
+          width: 200,
+          height: 200,
+        ),
+      );
+    } else {
+      return const Center(
+        child: Icon(
+          Icons.store,
+          size: 80,
+          color: Colors.white,
+        ),
+      );
+    }
+  }
+
+  void saveStoreProfile() {
+    final storeService = StoreProfileService(userProvider: UserProvider(), userRepository: context.read<UserRepository<StoreUser>>());
+    storeService.setStoreName(_storeNameController.text);
+
+    if (kIsWeb) {
+      if (_selectedImageBytes != null) {
+        storeService.setStoreProfileImageBytes(_selectedImageBytes);
+      }
+    } else {
+      if (_selectedImage != null) {
+        storeService.setStoreProfileImage(_selectedImage);
+      }
+    }
+
+    // Show success message and then pop
+    CustomSuccessSnackbar.show(context, "Store Updated Successfully");
+
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        Navigator.of(context).pop(); 
+      }
+    });
   }
 }

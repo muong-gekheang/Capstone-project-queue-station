@@ -1,7 +1,8 @@
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart'
+    show QueueEntry, QueueStatus, JoinedMethod;
 
 /// Example restaurant used in store-side history and ticket widgets.
 final Restaurant restaurant1 = Restaurant(
@@ -10,15 +11,13 @@ final Restaurant restaurant1 = Restaurant(
   address: 'BKK St.57',
   logoLink: '',
   biggestTableSize: 10,
-  phone: '012255007',
-);
+  phone: '012255007', subscriptionDate: DateTime.now(), openingTime: 8, closingTime: 22,);
 
 /// Minimal mock histories used across the app.
 final List<QueueEntry> mockHistories = [
   QueueEntry(
     id: 'hist-1',
     queueNumber: 'D0123',
-    restId: restaurant1.id,
     customerId: 'user-1',
     partySize: 4,
     joinTime: DateTime.now().subtract(const Duration(hours: 2, minutes: 30)),
@@ -27,12 +26,12 @@ final List<QueueEntry> mockHistories = [
     status: QueueStatus.completed,
     joinedMethod: JoinedMethod.remote,
     orderId: null,
-    tableNumber: 'T1',
+    expectedTableReadyAt: DateTime.now().add(const Duration(minutes: 15)),
+    assignedTableId: '', restId: 'rest-1',
   ),
   QueueEntry(
     id: 'hist-2',
     queueNumber: 'D0124',
-    restId: restaurant1.id,
     customerId: 'user-2',
     partySize: 2,
     joinTime: DateTime.now().subtract(const Duration(hours: 1, minutes: 45)),
@@ -40,8 +39,7 @@ final List<QueueEntry> mockHistories = [
     endedTime: DateTime.now().subtract(const Duration(minutes: 10)),
     status: QueueStatus.completed,
     joinedMethod: JoinedMethod.walkIn,
-    orderId: null,
-    tableNumber: 'T2',
+    orderId: null, expectedTableReadyAt: DateTime.now().add(const Duration(minutes: 15)), assignedTableId: '', restId: 'rest-1',
   ),
 ];
 

@@ -37,6 +37,10 @@ class ManageStoreViewModel extends ChangeNotifier {
 
   bool get isStoreOpen => _currentRest?.isOpen ?? false;
 
+  String get storeName => _currentRest?.name ?? '';
+
+  String get storeLogo => _currentRest?.logoLink ?? '';
+
   @override
   void dispose() {
     _streamSubscription?.cancel();

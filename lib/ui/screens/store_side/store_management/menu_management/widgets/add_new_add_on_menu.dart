@@ -21,7 +21,6 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final ImagePicker _imagePicker = ImagePicker();
   String? _selectedImage;
   Uint8List? pickedLogoBytes;
   // MenuItemCategory _selectedCategory = mockMenuCategories.firstWhere(

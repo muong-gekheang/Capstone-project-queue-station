@@ -39,7 +39,7 @@ class QueueValidationService {
       final status = _normalizeStatus(currentQueueEntry.status.name);
 
       if (status == 'waiting') {
-        final queueNumber = currentQueueEntry.queueNumber?.toString() ?? 'N/A';
+        final queueNumber = currentQueueEntry.queueNumber.toString() ?? 'N/A';
         _showErrorDialog(
           context,
           'Still in Queue!',

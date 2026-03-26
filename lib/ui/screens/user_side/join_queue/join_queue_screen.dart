@@ -9,8 +9,10 @@ import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/view_models/join_queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/join_queue_content.dart';
 
+
 class JoinQueueScreen extends StatelessWidget {
   final Restaurant rest;
+
   const JoinQueueScreen({super.key, required this.rest});
 
   @override

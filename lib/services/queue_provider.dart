@@ -62,7 +62,7 @@ class QueueProvider extends ChangeNotifier {
     return status == 'serving';
   }
 
-  String? get queueNumber => _currentQueueEntry?.queueNumber?.toString();
+  String? get queueNumber => _currentQueueEntry?.queueNumber.toString();
 
   @override
   void dispose() {

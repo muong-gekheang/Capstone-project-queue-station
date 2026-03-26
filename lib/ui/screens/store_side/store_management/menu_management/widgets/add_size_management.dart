@@ -8,13 +8,12 @@ import 'package:queue_station_app/ui/widgets/text_field_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class AddSizeScreen extends StatefulWidget {
-  final List<MenuSize> selectedMenuSizes;
   const AddSizeScreen({super.key, required this.selectedMenuSizes});
+  final List<MenuSize> selectedMenuSizes;
 
   @override
   State<AddSizeScreen> createState() => _AddSizeScreenState();
 }
-
 class _AddSizeScreenState extends State<AddSizeScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _sizeController = TextEditingController();
@@ -31,9 +30,8 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   String? _nullValidator(String? value) {
     if (value != null && value.trim().isEmpty) {
       return 'this field cannot be null';
-    } else {
-      return null;
     }
+    return null;
   }
 
   void onSave() {
@@ -44,7 +42,6 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
           content: Text("Please fill all required fields correctly"),
         ),
       );
-
       return;
     }
     final sizeName = _sizeController.text.trim();
@@ -56,6 +53,7 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
       SizeOption(name: sizeName, id: Uuid().v4(), restaurantId: ''),
     );
     _sizeController.clear();
+    return;
   }
 
   Widget existingSize() {
@@ -80,12 +78,12 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
                       selectedSizes.remove(globalMenuSize);
                     }
                   });
-                }, // checkbox also triggers parent
+                },
               ),
               Expanded(
                 child: Text(
                   globalMenuSize.name,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -119,24 +117,24 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
   Widget build(BuildContext context) {
     context.watch<MenuManagementViewModel>();
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          Text(
+          const Text(
             "Existing Size",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Expanded(child: existingSize()),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ButtonWidget(
             title: 'Add',
             onPressed: onAdd,
             backgroundColor: Theme.of(context).colorScheme.primary,
             textColor: Theme.of(context).colorScheme.surface,
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ExpansionTile(
             title: Text(
               'Add new size',
@@ -160,14 +158,13 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
                       validator: _nullValidator,
                       textController: _sizeController,
                     ),
-                    SizedBox(height: 10),
-
+                    const SizedBox(height: 10),
                     ButtonWidget(
                       title: 'Save',
                       onPressed: onSave,
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       textColor: Theme.of(context).colorScheme.surface,
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 40,
                         vertical: 5,
                       ),
@@ -178,9 +175,11 @@ class _AddSizeScreenState extends State<AddSizeScreen> {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );
   }
 }
+
+

@@ -7,7 +7,13 @@ import 'package:queue_station_app/ui/screens/store_side/queue/widgets/queue_cont
 
 class StoreQueueScreen extends StatelessWidget {
   final VoidCallback? onClose; // This is used to back to the parent screen
-  const StoreQueueScreen({super.key, this.onClose});
+  final bool isPushed; // Whether this screen was pushed via Navigator.push
+  
+  const StoreQueueScreen({
+    super.key,
+    this.onClose,
+    this.isPushed = false,
+  });
   @override
   Widget build(BuildContext context) {
     RestaurantService restaurantService = context.read<RestaurantService>();
@@ -17,7 +23,10 @@ class StoreQueueScreen extends StatelessWidget {
         restaurantService: restaurantService,
         queueService: queueService,
       ),
-      child: QueueContent(),
+      child: QueueContent(
+        showBackButton: isPushed,
+        onClose: onClose,
+      ),
     );
   }
 }

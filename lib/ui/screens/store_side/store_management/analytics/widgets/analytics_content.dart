@@ -2,7 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
+import 'package:queue_station_app/ui/widgets/dashboard_stat_card.dart';
+import 'package:queue_station_app/ui/widgets/store_profile_avatar.dart';
+import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 
 class AnalyticsContent extends StatefulWidget {
   const AnalyticsContent({super.key});
@@ -12,6 +16,16 @@ class AnalyticsContent extends StatefulWidget {
 }
 
 class _AnalyticsContentState extends State<AnalyticsContent> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _showTimeframeSelector(
     String chartType,
     TimeFrameOption currentTimeframe,
@@ -104,6 +118,24 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
             ),
           ],
         ),
+        actions: [
+          const StoreProfileAvatar(radius: 20),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+            onPressed: () {
+              final orderService = context.read<OrderService>();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Provider.value(
+                    value: orderService,
+                    child: const NotificationScreen(),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: vm.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -113,25 +145,29 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Stat Cards
-                  _buildStatCard(
-                    'People Waiting',
-                    '${vm.stats?.peopleWaiting ?? 0}',
-                    '',
+                  DashboardStatCard(
+                    label: 'People Waiting',
+                    value: '${vm.stats?.peopleWaiting ?? 0}',
+                    unit: '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Average Wait Time',
-                    '${vm.stats?.averageWaitTimeMinutes ?? 0}',
-                    'min',
+                  DashboardStatCard(
+                    label: 'Average Wait Time',
+                    value: '${vm.stats?.averageWaitTimeMinutes ?? 0}',
+                    unit: 'min',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Active Tables',
-                    '${vm.stats?.activeTables ?? 0}',
-                    '',
+                  DashboardStatCard(
+                    label: 'Active Tables',
+                    value: '${vm.stats?.activeTables ?? 0}',
+                    unit: '',
                   ),
                   const SizedBox(height: 12),
-                  _buildStatCard('Orders', '${vm.totalOrders}', 'orders'),
+                  DashboardStatCard(
+                    label: 'Orders',
+                    value: '${vm.totalOrders}',
+                    unit: 'orders',
+                  ),
                   const SizedBox(height: 24),
 
                   // Queue Length Chart
@@ -159,63 +195,6 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, String unit) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.05).toInt()),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0D47A1),
-                ),
-              ),
-              if (unit.isNotEmpty) ...[
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
-                    unit,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   // Widget _buildQueueLengthChart(AnalyticsViewModel vm) {
   //   return Container(

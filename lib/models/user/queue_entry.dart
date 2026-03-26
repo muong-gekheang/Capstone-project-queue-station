@@ -45,15 +45,12 @@ class QueueEntry {
     required this.status,
     required this.customerId,
     this.orderId,
-    this.joinedMethod = JoinedMethod.remote,
-    this.tableNumber,
-    required this.restId,
-    this.customerName,
+    required this.joinedMethod,
     this.phoneNumber,
     required this.expectedTableReadyAt,
     required this.assignedTableId,
     @JsonKey(includeFromJson: false, includeToJson: false)
-    this.order, // Added to constructor
+    this.order, required this.restId, this.tableNumber, this.customerName, // Added to constructor
   });
 
   const QueueEntry.walkIn({
@@ -115,7 +112,6 @@ class QueueEntry {
       phoneNumber: phoneNumber ?? this.phoneNumber,
     );
   }
-
   Duration? get waitingTime {
     if (servedTime == null) return null;
     return servedTime!.difference(joinTime);

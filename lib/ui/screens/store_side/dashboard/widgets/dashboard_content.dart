@@ -5,7 +5,6 @@ import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/dashboard_view_model.dart';
-import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 
 class DashboardContent extends StatefulWidget {
   const DashboardContent({super.key, required this.onManageQueue});

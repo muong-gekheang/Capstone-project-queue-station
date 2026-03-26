@@ -3,15 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
-import 'package:queue_station_app/services/store/analytics_service.dart';
-import 'package:queue_station_app/services/store/menu_service.dart';
-import 'package:queue_station_app/services/store/table_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/ui/screens/notification/notification_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/analytics_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/queue/store_queue_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/view_model/manage_store_view_model.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/table_management/table_management_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/menu_management_screen.dart';
-import 'package:queue_station_app/ui/screens/store_side/store_queue_history/store_queue_history_screen.dart';
+import 'package:queue_station_app/ui/screens/store_side/store_management/manage_store/view_model/manage_store_navigation_view_model.dart';
 
 class ManageStoreContent extends StatefulWidget {
   const ManageStoreContent({super.key, required this.onManageQueue});
@@ -21,6 +17,12 @@ class ManageStoreContent extends StatefulWidget {
 }
 
 class _ManageStoreContentState extends State<ManageStoreContent> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void _showCloseStoreDialog() {
     ManageStoreViewModel manageStoreViewModel = context
         .read<ManageStoreViewModel>();
@@ -99,12 +101,12 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
     context.watch<ManageStoreViewModel>();
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
-      appBar: _buildAppBar(),
-      body: _buildBody(),
+      appBar: buildAppBar(),
+      body: buildBody(),
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar buildAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -127,19 +129,19 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
         ],
       ),
       actions: [
-        // Store Profile Image - display only (set in settings)
-        _buildStoreProfileImage(),
-        // Notification Icon - toggleable
+        buildStoreProfileImage(),
         IconButton(
-          icon: Stack(
-            children: [
-              const Icon(Icons.notifications_outlined, color: Colors.black),
-            ],
-          ),
+          icon: const Icon(Icons.notifications_outlined, color: Colors.black),
           onPressed: () {
+            final orderService = context.read<OrderService>();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NotificationScreen()),
+              MaterialPageRoute(
+                builder: (_) => Provider.value(
+                  value: orderService,
+                  child: const NotificationScreen(),
+                ),
+              ),
             );
           },
         ),
@@ -147,13 +149,13 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
     );
   }
 
-  Widget _buildBody() {
+  Widget buildBody() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStoreStatus(),
+          buildStoreStatus(),
           const SizedBox(height: 24),
           const Text(
             'Quick Actions',
@@ -164,15 +166,15 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildQuickActions(),
+          buildQuickActions(),
           const SizedBox(height: 24),
-          _buildPrimaryButton(),
+          buildPrimaryButton(),
         ],
       ),
     );
   }
 
-  Widget _buildStoreStatus() {
+  Widget buildStoreStatus() {
     ManageStoreViewModel manageStoreViewModel = context
         .read<ManageStoreViewModel>();
     return Container(
@@ -227,7 +229,9 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget buildQuickActions() {
+    late ManageStoreNavigationViewModel navigationViewModel;
+    
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 16,
@@ -240,78 +244,39 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           'assets/icons/Manage_table.svg',
           'Manage\nTable',
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (newScreenContext) => MultiProvider(
-                  providers: [
-                    Provider.value(value: context.read<TableService>()),
-                    Provider.value(value: context.read<QueueService>()),
-                    Provider.value(value: context.read<OrderService>()),
-                  ],
-
-                  child: TableManagementScreen(),
-                ),
-              ),
-            );
+            navigationViewModel = ManageStoreNavigationViewModel(context: context);
+            navigationViewModel.navigateToTableManagement();
           },
         ),
         _SvgActionCard(
           'assets/icons/Manage_menu.svg',
           'Manage\nMenu',
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (newScreenContext) => Provider.value(
-                  value: context.read<MenuService>(),
-                  child: MenuManagementScreen(),
-                ),
-              ),
-            );
+            navigationViewModel = ManageStoreNavigationViewModel(context: context);
+            navigationViewModel.navigateToMenuManagement();
           },
         ),
         _SvgActionCard(
           'assets/icons/Queue_history.svg',
           'Queue\nhistory',
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (newScreenContext) => MultiProvider(
-                  providers: [
-                    Provider.value(value: context.read<QueueService>()),
-                    Provider.value(value: context.read<OrderService>()),
-                  ],
-
-                  child: StoreQueueHistoryScreen(),
-                ),
-              ),
-            );
+            navigationViewModel = ManageStoreNavigationViewModel(context: context);
+            navigationViewModel.navigateToQueueHistory();
           },
         ),
         _SvgActionCard(
           'assets/icons/Analytics_blue.svg',
           'Analytics',
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (newScreenContext) {
-                  return Provider.value(
-                    value: context.read<AnalyticsService>(),
-                    child: AnalyticsScreen(),
-                  );
-                },
-              ),
-            );
+            navigationViewModel = ManageStoreNavigationViewModel(context: context);
+            navigationViewModel.navigateToAnalytics();
           },
         ),
       ],
     );
   }
 
-  Widget _buildPrimaryButton() {
+  Widget buildPrimaryButton() {
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -324,7 +289,22 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
           ),
           elevation: 0,
         ),
-        onPressed: widget.onManageQueue,
+        onPressed: () {
+          final restaurantService = context.read<RestaurantService>();
+          final queueService = context.read<QueueService>();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MultiProvider(
+                providers: [
+                  Provider.value(value: restaurantService),
+                  Provider.value(value: queueService),
+                ],
+                child: const StoreQueueScreen(isPushed: true),
+              ),
+            ),
+          );
+        },
         child: const Text(
           'Manage Queue',
           style: TextStyle(
@@ -337,25 +317,38 @@ class _ManageStoreContentState extends State<ManageStoreContent> {
     );
   }
 
-  // Placeholder for store profile image widget
-  Widget _buildStoreProfileImage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+  Widget buildStoreProfileImage() {
+    final manageStoreViewModel = context.read<ManageStoreViewModel>();
+    final storeName = manageStoreViewModel.storeName;
+    final storeLogo = manageStoreViewModel.storeLogo;
+    
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
       child: CircleAvatar(
         radius: 18,
-        backgroundColor: Colors.grey[300],
-        child: const Icon(Icons.person, color: Colors.white),
+        backgroundColor: const Color(0xFFFF6835).withValues(alpha: 0.1),
+        backgroundImage: storeLogo.isNotEmpty 
+            ? NetworkImage(storeLogo)
+            : null,
+        child: storeLogo.isEmpty
+            ? Text(
+                storeName.isNotEmpty ? storeName[0].toUpperCase() : 'S',
+                style: const TextStyle(
+                  color: Color(0xFFFF6835),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              )
+            : null,
       ),
     );
   }
 }
 
-// Moved outside the state class
 class _SvgActionCard extends StatelessWidget {
   final String svgAsset;
   final String label;
   final VoidCallback? onTap;
-
   const _SvgActionCard(this.svgAsset, this.label, {this.onTap});
 
   @override

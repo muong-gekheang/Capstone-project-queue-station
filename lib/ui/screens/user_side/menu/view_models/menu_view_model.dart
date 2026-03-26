@@ -71,7 +71,7 @@ class MenuViewModel extends ChangeNotifier {
   QueueEntry? get currentQueueEntry => _currentQueueEntry;
 
   bool get isInQueue => _currentQueueEntry != null;
-  String? get queueNumber => _currentQueueEntry?.queueNumber?.toString();
+  String? get queueNumber => _currentQueueEntry?.queueNumber.toString();
 
   // ================= ORDER =================
   order_model.Order get currentOrder => orderRepository.currentOrder;
@@ -364,7 +364,7 @@ class MenuViewModel extends ChangeNotifier {
       final matchesCategory =
           _selectedCategory == null ||
           _selectedCategory!.isEmpty ||
-          item.category.id == _selectedCategory;
+          item.category?.id == _selectedCategory;
 
       return matchesSearch && matchesCategory;
     }).toList();

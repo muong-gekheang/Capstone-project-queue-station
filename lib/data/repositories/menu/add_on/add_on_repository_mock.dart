@@ -7,70 +7,39 @@ class AddOnRepositoryMock implements AddOnRepository {
   Map<String, AddOn> addOns = {};
 
   AddOnRepositoryMock() {
-    for (var addOn in mockMenuAddOns) {
+     for (var addOn in globalAddOns) { 
       addOns[addOn.id] = addOn;
     }
   }
-  @override
-  Future<void> create(AddOn addon) {
-    // TODO: implement create
-    throw UnimplementedError();
-  }
 
   @override
-  Future<void> delete(String addOnId) {
-    // TODO: implement delete
-    throw UnimplementedError();
-  }
-
+  Future<void> create(AddOn addon) => throw UnimplementedError();
   @override
-  Future<void> deleteMany(List<String> ids) {
-    // TODO: implement deleteMany
-    throw UnimplementedError();
-  }
-
+  Future<void> delete(String addOnId) => throw UnimplementedError();
   @override
-  Future<AddOn?> getAddOnById(String addOnId) async {
-    return addOns[addOnId];
-  }
-
+  Future<void> deleteMany(List<String> ids) => throw UnimplementedError();
   @override
-  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getAddOnsByMenuItemId(
+  Future<AddOn?> getAddOnById(String addOnId) async => addOns[addOnId];
+  @override
+  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)> getAddOnsByMenuItemId(
     String menuItemId,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
-  ) {
-    // TODO: implement getAddOnsByMenuItemId
-    throw UnimplementedError();
-  }
-
+  ) => throw UnimplementedError();
   @override
   Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
-  ) {
-    // TODO: implement getAll
-    throw UnimplementedError();
-  }
-
+  ) => throw UnimplementedError();
   @override
-  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getSearchAddOns(
+  Future<(List<AddOn>, DocumentSnapshot<Map<String, dynamic>>?)> getSearchAddOns(
     String query,
     int limit,
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
-  ) {
-    // TODO: implement getSearchAddOns
-    throw UnimplementedError();
-  }
-
+  ) => throw UnimplementedError();
   @override
-  Future<AddOn> update(AddOn addon) {
-    // TODO: implement update
-    throw UnimplementedError();
-  }
-
+  Future<AddOn> update(AddOn addon) => throw UnimplementedError();
+  @override
   @override
   Stream<List<AddOn>> watchAllAddOn(String restId) {
     // TODO: implement watchAllAddOn
@@ -78,8 +47,5 @@ class AddOnRepositoryMock implements AddOnRepository {
   }
 
   @override
-  Stream<AddOn> watchCurrentAddOn(String addOnId) {
-    // TODO: implement watchCurrentAddOn
-    throw UnimplementedError();
-  }
+  Stream<AddOn> watchCurrentAddOn(String addOnId) => throw UnimplementedError();
 }

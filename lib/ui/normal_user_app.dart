@@ -7,7 +7,6 @@ import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/account/account_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/menu/menu_screen.dart';
-import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/norml_user_buttom_nav.dart';
 
 enum NormalUserNavTab { home, map, foodOrdering, ticket, profile }
@@ -189,7 +188,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
 
       // Case 4: Joined (waiting) but not yet checked in
       if (status == QUEUE_STATUS_WAITING) {
-        final queueNumber = queueEntry.queueNumber?.toString() ?? 'N/A';
+        final queueNumber = queueEntry.queueNumber.toString();
         if (context.mounted) {
           await _showQueueErrorDialog(
             title: 'Still in queue',

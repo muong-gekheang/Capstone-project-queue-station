@@ -1,10 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:queue_station_app/models/restaurant/menu_size.dart';
-
+import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
+import 'package:uuid/uuid.dart';
 import 'add_on.dart';
-import 'menu_item_category.dart';
+import 'menu_size.dart';
 
 part 'menu_item.g.dart';
+
+final uuid = Uuid();
 
 @JsonSerializable(explicitToJson: true)
 class MenuItem {
@@ -15,6 +17,8 @@ class MenuItem {
   final String description;
   final int? minPrepTimeMinutes;
   final int? maxPrepTimeMinutes;
+
+  @JsonKey(name: 'categoryId')
   final String categoryId;
   final String restaurantId;
 
@@ -23,83 +27,75 @@ class MenuItem {
   @JsonKey(defaultValue: <String>[])
   final List<String> addOnIds;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final MenuItemCategory category;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<MenuSize> sizes;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<AddOn> addOns;
-
   bool isAvailable;
 
+  // Transient fields (mutable)
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  MenuItemCategory? category;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  List<MenuSize> sizes = [];
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  List<AddOn> addOns = [];
+
   MenuItem({
-    required this.id,
+    String? id,
     this.image,
     required this.name,
     required this.description,
     this.minPrepTimeMinutes,
     this.maxPrepTimeMinutes,
-    String? categoryId,
-    MenuItemCategory? category,
+    required this.minPrice,
+    required this.categoryId,
+    required this.restaurantId,
     List<String>? menuSizeOptionIds,
     List<String>? addOnIds,
+    this.isAvailable = true,
+    this.category,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
-    this.isAvailable = true,
-    required this.restaurantId,
-    required this.minPrice,
-  }) : categoryId = categoryId ?? category?.id ?? 'unknown_category',
-       category =
-           category ??
-           MenuItemCategory(
-             id: categoryId ?? 'unknown_category',
-             name: 'Unknown',
-           ),
-       sizes = sizes ?? [],
-       addOns = addOns ?? [],
-       menuSizeOptionIds =
-           menuSizeOptionIds ?? (sizes ?? []).map((s) => s.id).toList(),
-       addOnIds = addOnIds ?? (addOns ?? []).map((a) => a.id).toList();
+  })  : id = id ?? uuid.v4(),
+        menuSizeOptionIds = menuSizeOptionIds ?? [],
+        addOnIds = addOnIds ?? [],
+        sizes = sizes ?? [],
+        addOns = addOns ?? [];
 
   MenuItem copyWith({
-    String? id,
     String? image,
     String? name,
-    String? description,
     int? minPrepTimeMinutes,
     int? maxPrepTimeMinutes,
+    double? minPrice,
     String? categoryId,
     MenuItemCategory? category,
     List<String>? menuSizeOptionIds,
     List<String>? addOnIds,
+    bool? isAvailable,
     List<MenuSize>? sizes,
     List<AddOn>? addOns,
-    bool? isAvailable,
     String? restaurantId,
-    double? minPrice,
   }) {
     return MenuItem(
-      id: id ?? this.id,
+      id: id,
       image: image ?? this.image,
       name: name ?? this.name,
-      description: description ?? this.description,
+      description: description,
       minPrepTimeMinutes: minPrepTimeMinutes ?? this.minPrepTimeMinutes,
       maxPrepTimeMinutes: maxPrepTimeMinutes ?? this.maxPrepTimeMinutes,
-      categoryId: categoryId ?? this.categoryId,
-      category: category ?? this.category,
-      menuSizeOptionIds:
-          menuSizeOptionIds ?? List<String>.from(this.menuSizeOptionIds),
-      addOnIds: addOnIds ?? List<String>.from(this.addOnIds),
-      sizes: sizes ?? List<MenuSize>.from(this.sizes),
-      addOns: addOns ?? List<AddOn>.from(this.addOns),
-      isAvailable: isAvailable ?? this.isAvailable,
-      restaurantId: restaurantId ?? this.restaurantId,
       minPrice: minPrice ?? this.minPrice,
+      categoryId: categoryId ?? this.categoryId,
+      restaurantId: restaurantId ?? this.restaurantId,
+      menuSizeOptionIds: menuSizeOptionIds ?? this.menuSizeOptionIds,
+      addOnIds: addOnIds ?? this.addOnIds,
+      isAvailable: isAvailable ?? this.isAvailable,
+      category: category ?? this.category,
+      sizes: sizes ?? this.sizes,
+      addOns: addOns ?? this.addOns,
     );
   }
 
-  double cheapestPrice() {
-    if (sizes.isEmpty) return 0.0;
+  double cheapestPrice(List<MenuSize> sizes) {
     return sizes.map((s) => s.price).reduce((a, b) => a < b ? a : b);
   }
 

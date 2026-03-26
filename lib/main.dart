@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +44,8 @@ import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/restaurants_service.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
+import 'package:queue_station_app/services/notification_provider.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/auth/auth_screen.dart';
@@ -53,6 +56,7 @@ import 'package:queue_station_app/ui/screens/user_side/menu/menu_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/store_main_screen.dart';
 import 'package:queue_station_app/ui/normal_user_app.dart';
+import 'package:queue_station_app/services/navigation_service.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/theme/global_scroll_behavior.dart';
 
@@ -73,30 +77,11 @@ List<SingleChildWidget> dependencies = [
   Provider<OrderItemRepository>(create: (_) => OrderItemRepositoryImpl()),
   Provider<MenuSizeRepository>(create: (_) => MenuSizeRepositoryImpl()),
   Provider<ImageRepository>(create: (_) => ImageRepositoryImpl(),),
-  Provider<TableService>(
-    create: (context) => TableService(
-      queueTableRepository: context.read<QueueTableRepository>(), 
-      userProvider: context.read<UserProvider>(), 
-      tableCategoryRepository: context.read<TableCategoryRepository>()
-    )
-  ),
   Provider<RestaurantListService>(
     create: (context) => RestaurantListService(
-      context.read<RestaurantRepository>(), 
+      context.read<RestaurantRepository>(),
     ),
   ),
-  Provider<QueueService>(
-    create: (context) => QueueService(
-      userProvider: context.read<UserProvider>(),
-      queueEntryRepository: context.read<QueueEntryRepository>(),
-      tableService: context.read<TableService>(),
-    ),
-  ),
-  Provider<RestaurantListService>(
-    create: (context) =>
-        RestaurantListService(context.read<RestaurantRepository>()),
-  ),
-
 ];
 
 void main() async {
@@ -104,16 +89,46 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseAuth.instance.authStateChanges().first;
 
+  // Register background FCM handler before runApp
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   final userProvider = UserProvider();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<UserProvider>.value(value: userProvider),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(
           create: (_) => StoreOrderNotificationProvider(),
         ),
         ...dependencies,
+        ProxyProvider<UserProvider, TableService>(
+          update: (context, userProvider, prev) {
+            if (prev == null) {
+              return TableService(
+                queueTableRepository: context.read<QueueTableRepository>(),
+                userProvider: userProvider,
+                tableCategoryRepository: context.read<TableCategoryRepository>(),
+              );
+            }
+            prev.updateDependencies(userProvider);
+            return prev;
+          },
+        ),
+        ProxyProvider2<UserProvider, TableService, QueueService>(
+          update: (context, userProvider, tableService, prev) {
+            if (prev == null) {
+              return QueueService(
+                userProvider: userProvider,
+                queueEntryRepository: context.read<QueueEntryRepository>(),
+                tableService: tableService,
+              );
+            }
+            prev.updateDependencies(userProvider);
+            return prev;
+          },
+        ),
         ProxyProvider4<
           UserProvider,
           UserRepository<Customer>,
@@ -159,11 +174,15 @@ void main() async {
       child: Builder(
         builder: (context) {
           context.read<AuthService>().restoreSession();
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => NotificationService().init(),
+          );
           return MaterialApp.router(
             title: "Queue Station",
             scrollBehavior: GlobalScrollBehavior(),
             theme: AppTheme.lightTheme,
             debugShowCheckedModeBanner: false,
+            scaffoldMessengerKey: NavigationService.scaffoldMessengerKey,
             routerConfig: GoRouter(
               initialLocation: "/onboard",
               refreshListenable: userProvider,

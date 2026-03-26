@@ -173,9 +173,7 @@ final MenuItem classicBurger =
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/burger.png",
         isAvailable: true,
-        id: Uuid().v4(),
-        restaurantId: '',
-        minPrice: 0,
+        id: Uuid().v4(), minPrice: 1.0, categoryId: '', restaurantId: '',
       )
       ..sizes.addAll(burgerSizes)
       ..addOns.addAll([
@@ -194,9 +192,7 @@ final MenuItem cheeseBurger =
         maxPrepTimeMinutes: 12,
         category: mockMenuCategories[0], // Burger category
         image: "assets/images/cheeseburger.png",
-        isAvailable: true,
-        restaurantId: '',
-        minPrice: 0,
+        isAvailable: true, minPrice: 1.0, categoryId: '', restaurantId: '',
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([
@@ -216,9 +212,7 @@ final MenuItem pepperoniPizza =
         maxPrepTimeMinutes: 20,
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza.png",
-        isAvailable: true,
-        restaurantId: '',
-        minPrice: 0,
+        isAvailable: true, minPrice: 1.0, categoryId: '', restaurantId: '',
       )
       ..sizes.addAll(pizzaSizes)
       ..addOns.addAll([
@@ -238,9 +232,7 @@ final MenuItem margheritaPizza =
         maxPrepTimeMinutes: 18,
         category: mockMenuCategories[1], // Pizza category
         image: "assets/images/pizza(1).png",
-        isAvailable: true,
-        restaurantId: '',
-        minPrice: 0,
+        isAvailable: true, minPrice: 1.0, categoryId: '', restaurantId: '',
       )
       ..sizes.addAll([
         MenuSize(
@@ -270,9 +262,7 @@ final MenuItem cola =
         maxPrepTimeMinutes: 2,
         category: mockMenuCategories[2], // Drinks category
         image: "assets/images/energy-drink.png",
-        isAvailable: true,
-        restaurantId: '',
-        minPrice: 0,
+        isAvailable: true, minPrice: 1.0, categoryId: '', restaurantId: '', menuSizeOptionIds: [], addOnIds: [],
       )
       ..addOns.addAll([
         AddOn(
@@ -300,9 +290,7 @@ final MenuItem veggieWrap =
         category:
             mockMenuCategories[0], // Burger category (or you can create a new category 'Wraps')
         image: "assets/images/burger.png",
-        isAvailable: true,
-        restaurantId: '',
-        minPrice: 0,
+        isAvailable: true, minPrice: 1.0, categoryId: '', restaurantId: '', menuSizeOptionIds: [], addOnIds: [],
       )
       ..sizes.addAll(burgerMediumLarge)
       ..addOns.addAll([

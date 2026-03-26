@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
@@ -29,4 +30,6 @@ class StoreProfileService {
       _userRepository.update(storeUserTemp);
     }
   }
+
+  void setStoreProfileImageBytes(Uint8List? selectedImageBytes) {}
 }

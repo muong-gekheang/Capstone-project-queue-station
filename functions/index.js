@@ -8,6 +8,7 @@ const { logger } = require("firebase-functions");
 // 2. Firebase Admin - Core app and Firestore database
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getMessaging } = require("firebase-admin/messaging");
 
 // 3. Initialize (Top-level)
 initializeApp();
@@ -249,5 +250,207 @@ exports.deleteMenuOnCascade = onDocumentDeleted(
 
     const deletePromises = menusSnap.docs.map((doc) => doc.ref.delete());
     return Promise.all(deletePromises);
+  },
+);
+
+// ─────────────────────────────────────────
+// Notify store when customer confirms an order (new or updated)
+// Requires Firestore composite index: users(userType, restaurantId)
+// ─────────────────────────────────────────
+exports.sendOrderNotificationToStore = onDocumentUpdated(
+  "orders/{orderId}",
+  async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+
+    if (!after.lastConfirmedAt) return null;
+    if (before.lastConfirmedAt === after.lastConfirmedAt) return null;
+
+    const restaurantId = after.restaurantId;
+    if (!restaurantId) return null;
+
+    const itemCount = (after.orderedIds || []).length;
+    const isFirstConfirm = !before.lastConfirmedAt;
+
+    const usersSnap = await db
+      .collection("users")
+      .where("userType", "==", "store")
+      .where("restaurantId", "==", restaurantId)
+      .get();
+
+    const tokens = [];
+    usersSnap.forEach((doc) => {
+      const fcmToken = doc.data().fcmToken;
+      if (fcmToken) tokens.push(fcmToken);
+    });
+
+    if (tokens.length === 0) return null;
+
+    const title = isFirstConfirm ? "New Order" : "Order Updated";
+    const body = `${itemCount} item${itemCount === 1 ? "" : "s"} confirmed`;
+
+    try {
+      await getMessaging().sendEachForMulticast({
+        notification: { title, body },
+        data: {
+          type: isFirstConfirm ? "new_order" : "order_update",
+          orderId: event.params.orderId,
+          itemCount: String(itemCount),
+        },
+        tokens,
+      });
+    } catch (e) {
+      console.error("FCM send error:", e);
+    }
+
+    return null;
+  },
+);
+
+// ─────────────────────────────────────────
+// Accept all pending order items and notify the customer
+// Called by the store when they accept an order
+// ─────────────────────────────────────────
+exports.acceptOrderAndNotifyCustomer = onCall(async (request) => {
+  const { orderId, queueEntryId, restaurantId, customerId } = request.data;
+
+  if (!orderId || !queueEntryId || !restaurantId || !customerId) {
+    throw new HttpsError("invalid-argument", "Missing required fields.");
+  }
+
+  // 1. Batch-accept all pending order items
+  const itemsSnap = await db
+    .collection("order_items")
+    .where("orderId", "==", orderId)
+    .where("status", "==", "pending")
+    .get();
+
+  if (!itemsSnap.empty) {
+    const batch = db.batch();
+    itemsSnap.forEach((doc) => {
+      batch.update(doc.ref, {
+        status: "accepted",
+        acceptedAt: new Date().toISOString(),
+      });
+    });
+    await batch.commit();
+  }
+
+  // 2. Find customer FCM token (only for remote / app users)
+  const userDoc = await db.collection("users").doc(customerId).get();
+  if (!userDoc.exists) return { success: true };
+
+  const fcmToken = userDoc.data().fcmToken;
+  if (!fcmToken) return { success: true };
+
+  // 3. Determine queue position and queue number from waiting entries
+  const waitingSnap = await db
+    .collection("queue_entries")
+    .where("restId", "==", restaurantId)
+    .where("status", "==", "waiting")
+    .orderBy("joinTime")
+    .get();
+
+  const positionIndex = waitingSnap.docs.findIndex(
+    (doc) => doc.id === queueEntryId,
+  );
+  const position = positionIndex >= 0 ? String(positionIndex + 1) : "1";
+
+  // Extract queue number from the waiting results; fall back to a direct read
+  // if the entry has already moved out of the waiting state.
+  let queueNumber =
+    positionIndex >= 0
+      ? waitingSnap.docs[positionIndex].data().queueNumber || ""
+      : "";
+
+  if (!queueNumber) {
+    const entryDoc = await db
+      .collection("queue_entries")
+      .doc(queueEntryId)
+      .get();
+    queueNumber = entryDoc.exists ? entryDoc.data().queueNumber || "" : "";
+  }
+
+  // 5. Get the currently serving queue number
+  const servingSnap = await db
+    .collection("queue_entries")
+    .where("restId", "==", restaurantId)
+    .where("status", "==", "serving")
+    .orderBy("servedTime", "desc")
+    .limit(1)
+    .get();
+
+  const currentQueue =
+    servingSnap.docs.length > 0
+      ? servingSnap.docs[0].data().queueNumber || queueNumber
+      : queueNumber;
+
+  // 6. Send FCM to customer
+  try {
+    await getMessaging().send({
+      notification: {
+        title: "Order Accepted",
+        body: `Queue ${queueNumber} — Position ${position}`,
+      },
+      data: {
+        type: "order_accepted",
+        queueNumber,
+        position,
+        currentQueue,
+        restaurantId,
+      },
+      token: fcmToken,
+    });
+  } catch (e) {
+    console.error("FCM send error:", e);
+  }
+
+  return { success: true };
+});
+
+// ─────────────────────────────────────────
+// Notify customer when store moves them to "serving"
+// ─────────────────────────────────────────
+exports.sendQueueServedNotification = onDocumentUpdated(
+  "queue_entries/{entryId}",
+  async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+
+    if (before.status === after.status) return null;
+    if (after.status !== "serving") return null;
+
+    const customerId = after.customerId;
+    if (!customerId) return null;
+    if (after.joinedMethod === "walkIn") return null;
+
+    const userDoc = await db.collection("users").doc(customerId).get();
+    if (!userDoc.exists) return null;
+
+    const fcmToken = userDoc.data().fcmToken;
+    if (!fcmToken) return null;
+
+    const queueNumber = after.queueNumber || "";
+    const tableNumber = after.tableNumber || "";
+
+    try {
+      await getMessaging().send({
+        notification: {
+          title: "You're being served!",
+          body: `Queue ${queueNumber} — Table ${tableNumber} is ready`,
+        },
+        data: {
+          type: "queue_served",
+          queueNumber,
+          tableNumber,
+          restId: after.restId || "",
+        },
+        token: fcmToken,
+      });
+    } catch (e) {
+      console.error("FCM send error:", e);
+    }
+
+    return null;
   },
 );

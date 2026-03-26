@@ -173,10 +173,10 @@ class QueueService {
     if (_tableService == null) return;
     _queueEntryRepository.updateStatus(queueEntry.id, QueueStatus.serving);
 
-    final table = _tableService!.tables.firstWhere(
+    final table = _tableService.tables.firstWhere(
       (e) => e.id == queueEntry.assignedTableId,
     );
-    _tableService!.updateTableCustomers(table, queueEntry.id);
+    _tableService.updateTableCustomers(table, queueEntry.id);
   }
 
   void removeUserFromQueue(String queueEntryId) {
@@ -276,4 +276,6 @@ class QueueService {
     }
     return result;
   }
+
+  Future<void> getDashboardStats() async {}
 }

@@ -7,6 +7,9 @@ class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   /// Pushes a new named route onto the navigator.
   static Future<T?> pushNamed<T>(String routeName, {Object? arguments}) {
     return navigatorKey.currentState!.pushNamed<T>(

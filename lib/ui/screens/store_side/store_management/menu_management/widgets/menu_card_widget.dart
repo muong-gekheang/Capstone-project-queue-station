@@ -269,7 +269,7 @@ class _MenuCardWidgetState extends State<MenuCardWidget> {
                                 children: [
                                   Flexible(
                                     child: Text(
-                                      widget.menu.category.name,
+                                      widget.menu.category!.name,
                                       style: TextStyle(
                                         color: Colors.grey,
                                         fontSize: 12,

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/view_models/join_queue_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/widgets/custom_screen_view.dart';
@@ -45,7 +46,7 @@ class JoinQueueContent extends StatelessWidget {
                   children: [
                     SizedBox.square(
                       dimension: 160,
-                      child: rest.logoLink != null && rest.logoLink.isNotEmpty
+                      child: rest.logoLink.isNotEmpty
                           ? Image.network(
                               rest.logoLink,
                               fit: BoxFit.cover,
@@ -286,6 +287,16 @@ class JoinQueueContent extends StatelessWidget {
 
                 // Check if context is still mounted and entry was created
                 if (context.mounted && createdEntry != null) {
+                  // Trigger in-app notification for queue join
+                  NotificationService().notifyCustomerQueueJoined(
+                    createdEntry,
+                    restaurantName: rest.name,
+                    restaurantLogoUrl: rest.logoLink.isNotEmpty
+                        ? rest.logoLink
+                        : null,
+                    queuePosition: joinQueueVM.queueCount,
+                  );
+
                   // Navigate to ticket screen with the queue entry data
                   context.go(
                     "/ticket",

@@ -5,6 +5,7 @@ import 'package:queue_station_app/data/repositories/auth/auth_repository.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
+import 'package:queue_station_app/services/notification_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 
 class AuthService {
@@ -40,7 +41,7 @@ class AuthService {
     final status = await _authRepository.getSubscriptionStatus(
       userData['restaurantId'] as String,
     );
-    print('Auth Service: The subscription status is ${status}');
+    print('Auth Service: The subscription status is $status');
     return status!.toLowerCase() == 'active';
   }
 
@@ -66,6 +67,7 @@ class AuthService {
           Customer? customer = await _customerRepository.getUserById(user.uid);
           if (customer == null) return null;
           _userProvider.updateUser(customer);
+          NotificationService().saveTokenForUser(user.uid);
         }
         break;
       case "store":
@@ -75,10 +77,11 @@ class AuthService {
           );
           if (storeUser == null) return null;
           if (!status) {
-            print("Subscription expired");
+            debugPrint("Subscription expired");
             return null; // login fails gracefully
           }
           _userProvider.updateUser(storeUser);
+          NotificationService().saveTokenForUser(user.uid);
         }
         break;
     }
@@ -120,7 +123,7 @@ class AuthService {
     try {
       final firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser == null) {
-        _userProvider.setRestored();
+        Future.microtask(() => _userProvider.setRestored());
         return;
       }
 
@@ -150,7 +153,10 @@ class AuthService {
         Customer? customer = await _customerRepository.getUserById(
           firebaseUser.uid,
         );
-        if (customer != null) _userProvider.updateUser(customer);
+        if (customer != null) {
+          _userProvider.updateUser(customer);
+          NotificationService().saveTokenForUser(firebaseUser.uid);
+        }
         break;
       case "store":
         StoreUser? storeUser = await _storeUserRepository.getUserById(
@@ -159,12 +165,13 @@ class AuthService {
         if (storeUser == null) return;
 
         final bool isActive = await checkSubscriptionStatus(firebaseUser);
-        if(!isActive){
-          print("Subscription expired on restore, signing out...");
+        if (!isActive) {
+          debugPrint("Subscription expired on restore, signing out...");
           signOut();
           return;
         }
         _userProvider.updateUser(storeUser);
+        NotificationService().saveTokenForUser(firebaseUser.uid);
         break;
     }
   }

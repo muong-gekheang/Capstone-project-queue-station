@@ -10,18 +10,26 @@ class AuthViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool _isSubscriptionExpired = false;
+  bool _disposed = false;
 
   bool get isLoading => _isLoading;
   bool get isSubscriptionExpired => _isSubscriptionExpired;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 
   Future<bool> login({required String email, required String password}) async {
     _isLoading = true;
     _isSubscriptionExpired = false;
     notifyListeners();
     var user = await _authService.login(email, password);
+    if (_disposed) return false;
     if (user != null) {
       final isActive = await _authService.checkSubscriptionStatus(user);
-
+      if (_disposed) return false;
       if (!isActive) {
         _isLoading = false;
         _isSubscriptionExpired = true;
@@ -41,6 +49,7 @@ class AuthViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     var user = await _authService.register(customer, password);
+    if (_disposed) return false;
     _isLoading = false;
     notifyListeners();
     return user != null;

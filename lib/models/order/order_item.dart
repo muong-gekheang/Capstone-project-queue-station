@@ -1,7 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-
+import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import '../restaurant/menu_item.dart';
-import '../restaurant/menu_item_category.dart';
 import '../restaurant/size_option.dart';
 
 part 'order_item.g.dart';
@@ -100,8 +99,6 @@ MenuItem _placeholderMenuItem(String menuItemId) {
     id: menuItemId,
     name: 'Unknown item',
     description: '',
-    category: MenuItemCategory(id: 'unknown_category', name: 'Unknown'),
-    restaurantId: '',
-    minPrice: 0,
+    category: MenuItemCategory(id: 'unknown_category', name: 'Unknown'), categoryId: '', restaurantId: '', menuSizeOptionIds: [], addOnIds: [], minPrice: 0.0,
   );
 }

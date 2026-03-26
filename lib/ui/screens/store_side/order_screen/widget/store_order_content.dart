@@ -31,7 +31,7 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: queueEntry.orderId != null
+                    child: queueEntry.orderId == null
                         ? Text("No Order")
                         : FutureBuilder(
                             future: vm.getOrderDetailsById(queueEntry.orderId!),
@@ -90,12 +90,21 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
 
                                     ButtonWidget(
                                       title: 'Mark as accepted',
-                                      onPressed: () {
-                                        context
-                                            .read<
-                                              StoreOrderNotificationProvider
-                                            >()
-                                            .acceptAllIncomingOrder(queueEntry);
+                                      onPressed: () async {
+                                        // Persist to Firestore + notify customer
+                                        await vm.acceptOrderAndNotifyCustomer(
+                                          queueEntry,
+                                        );
+                                        // Update local UI state
+                                        if (context.mounted) {
+                                          context
+                                              .read<
+                                                StoreOrderNotificationProvider
+                                              >()
+                                              .acceptAllIncomingOrder(
+                                                queueEntry,
+                                              );
+                                        }
                                       },
                                       backgroundColor: AppTheme.primaryColor,
                                       textColor: AppTheme.naturalWhite,
