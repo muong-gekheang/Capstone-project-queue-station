@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/order_item/order_item_repository.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 
 class OrderItemRepositoryImpl implements OrderItemRepository {
   final FirebaseFirestore firestore;
@@ -47,4 +46,6 @@ class OrderItemRepositoryImpl implements OrderItemRepository {
     await orderItemRef.update(orderItem.toJson());
     return orderItem;
   }
+
+  
 }

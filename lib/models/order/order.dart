@@ -57,8 +57,10 @@ class Order {
     );
   }
 
-  static String orderItemRef(OrderItem item) =>
-      '${item.menuItemId}_${item.sizeName}_${item.quantity}';
+  static String orderItemRef(OrderItem item) {
+    final addOnsKey = item.addOns.keys.join('_');
+    return '${item.menuItemId}_${item.sizeName}_$addOnsKey';
+  }
       
   double calculateTotalPrice() {
     double totalPrice = 0;

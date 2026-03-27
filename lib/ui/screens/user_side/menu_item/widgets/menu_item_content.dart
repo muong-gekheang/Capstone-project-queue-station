@@ -269,7 +269,7 @@ class MenuItemContent extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            vm.cartItem == null ? "Add" : "Update",
+                            vm.existingCartItem == null ? "Add" : "Update",
                             style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(width: 10),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/cart/cart_screen.dart';
-import 'package:queue_station_app/ui/screens/user_side/menu/view_models/menu_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/menu_item/menu_item_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
 import 'package:queue_station_app/ui/widgets/menu_item_card.dart';
+import 'package:queue_station_app/ui/screens/user_side/menu/view_models/menu_view_model.dart';
 
 class MenuContent extends StatefulWidget {
   const MenuContent({super.key});
@@ -19,12 +19,8 @@ class _MenuContentState extends State<MenuContent> {
   @override
   void initState() {
     super.initState();
-
-    // Load menu data when screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final menuVM = context.read<MenuViewModel>();
-      menuVM.loadMenuCategories();
-      menuVM.loadMenuItems();
+      context.read<MenuViewModel>().initialize();
     });
   }
 
@@ -34,8 +30,6 @@ class _MenuContentState extends State<MenuContent> {
     super.dispose();
   }
 
-
-
   void _clearSearch(MenuViewModel vm) {
     _searchController.clear();
     vm.searchMenuItems('');
@@ -44,7 +38,7 @@ class _MenuContentState extends State<MenuContent> {
   @override
   Widget build(BuildContext context) {
     final menuVM = context.watch<MenuViewModel>();
-   
+    print(menuVM.currentOrder.id);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -54,32 +48,30 @@ class _MenuContentState extends State<MenuContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: menuVM.restaurant?.logoLink != null &&
-                        menuVM.restaurant!.logoLink.isNotEmpty
-                    ? Image.network(
-                        menuVM.restaurant!.logoLink,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
-                            Icons.store,
-                            color: Color(0xFFFF6835),
-                          );
-                        },
-                      )
-                    : const Icon(
-                        Icons.store,
-                        color: Color(0xFFFF6835),
-                      ),
-              ),
+              borderRadius: BorderRadius.circular(6),
+              child:
+                  menuVM.restaurant?.logoLink != null &&
+                      menuVM.restaurant!.logoLink.isNotEmpty
+                  ? Image.network(
+                      menuVM.restaurant!.logoLink,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.store,
+                          color: Color(0xFFFF6835),
+                        );
+                      },
+                    )
+                  : const Icon(Icons.store, color: Color(0xFFFF6835)),
+            ),
             const SizedBox(width: 12),
             Text(
               menuVM.restaurantName.isEmpty
                   ? "Restaurant"
                   : menuVM.restaurantName,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -128,12 +120,10 @@ class _MenuContentState extends State<MenuContent> {
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const OrderScreen()),
-                      );
-                    },
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const OrderScreen()),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0D47A1),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -143,9 +133,11 @@ class _MenuContentState extends State<MenuContent> {
                     ),
                     child: const Text(
                       "View Order",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                    )
-                    
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -202,7 +194,7 @@ class _MenuContentState extends State<MenuContent> {
             Expanded(
               child: menuVM.isMenuLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : menuVM.filteredMenuItems.isEmpty
+                  : menuVM.menuItems.isEmpty
                   ? _buildEmptyMenu()
                   : GridView.builder(
                       gridDelegate:
@@ -212,18 +204,16 @@ class _MenuContentState extends State<MenuContent> {
                             crossAxisSpacing: 12,
                             childAspectRatio: 0.75,
                           ),
-                      itemCount: menuVM.filteredMenuItems.length,
+                      itemCount: menuVM.menuItems.length,
                       itemBuilder: (context, index) {
-                        final item = menuVM.filteredMenuItems[index];
+                        final item = menuVM.menuItems[index];
                         return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MenuItemScreen(item: item),
-                              ),
-                            );
-                          },
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => MenuItemScreen(item: item),
+                            ),
+                          ),
                           child: MenuItemCard(item: item),
                         );
                       },
@@ -239,12 +229,10 @@ class _MenuContentState extends State<MenuContent> {
         children: [
           FloatingActionButton(
             backgroundColor: const Color(0xFFFF6835),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CartScreen()),
-              );
-            },
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartScreen()),
+            ),
             child: const Icon(Icons.shopping_cart_outlined),
           ),
           if (menuVM.totalCartItemsCount > 0)

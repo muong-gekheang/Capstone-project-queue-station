@@ -41,6 +41,7 @@ class FoodItemCard extends StatelessWidget {
     final addOnEntries = addons.entries.toList();
 
     return Card(
+      key: key,
       color: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -175,9 +176,7 @@ class FoodItemCard extends StatelessWidget {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: quantity > 1
-                                  ? const Color(0xFFFF6835)
-                                  : Colors.grey.shade300,
+                              color:const Color(0xFFFF6835),
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(8),
                                 bottomLeft: Radius.circular(8),

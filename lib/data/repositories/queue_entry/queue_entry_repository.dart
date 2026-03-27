@@ -43,7 +43,7 @@ abstract class QueueEntryRepository {
   Future<void> updateStatus(String queueId, QueueStatus newStatus);
   Stream<List<QueueEntry>> watchCurrentActiveQueue(String restId);
   Stream<List<QueueEntry>> watchAllActiveQueues();
-  Stream<QueueEntry?> watchCurrentHistory();
+  Stream<QueueEntry?> watchQueueEntry(String queueEntryId);
   Stream<List<QueueEntry>> watchAllHistory();
   Stream<List<QueueEntry>> watchCurrentInStore(String restId);
 }

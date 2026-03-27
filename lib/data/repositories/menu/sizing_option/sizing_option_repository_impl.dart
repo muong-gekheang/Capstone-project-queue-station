@@ -23,6 +23,29 @@ class SizingOptionRepositoryImpl implements SizingOptionRepository {
   }
 
   @override
+  Future<SizeOption?> getById(String sizeOptionId) async {
+    try {
+      final doc = await firestore
+          .collection('size_options')
+          .doc(sizeOptionId)
+          .get();
+
+      if (!doc.exists || doc.data() == null) {
+        return null;
+      }
+
+      final json = Map<String, dynamic>.from(doc.data()!);
+      // Ensure the ID is present in the JSON for the model factory
+      json['id'] ??= doc.id;
+
+      return SizeOption.fromJson(json);
+    } catch (e) {
+      debugPrint("Error fetching SizeOption $sizeOptionId: $e");
+      return null;
+    }
+  }
+
+  @override
   Stream<List<SizeOption>> watchAllSizeOptions(String restaurantId) {
     return firestore
         .collection('size_options')

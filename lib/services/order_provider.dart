@@ -1,87 +1,75 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:queue_station_app/data/repositories/order/order_repository.dart';
+
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 
 class OrderProvider extends ChangeNotifier {
-  final OrderRepository orderRepository;
+  final OrderService orderService;
   UserProvider userProvider;
 
-  Order _currentOrder;
+  Order? _currentOrder; // Source of truth from Firestore
+  Order? _localOrder; // Local working copy for optimistic updates
+  StreamSubscription<Order?>? _sub;
+  Timer? _saveDebouncer; // Debouncer to prevent too many saves
+  bool _isSaving = false; // Prevent concurrent saves
 
-  StreamSubscription<Order?>? _orderSubscription;
-  Timer? _debounce;
+  OrderProvider({required this.orderService, required this.userProvider}) {
+    _init();
+  }
 
-  bool _isSyncing = false;
-  bool _isConfirming = false;
+  // ---------------------------
+  // Init
+  // ---------------------------
+  void _init() {
+    final queueHistoryId = userProvider.asCustomer?.currentHistoryId;
 
-  OrderProvider({
-    required Order currentOrder,
-    required this.orderRepository,
-    required this.userProvider,
-  }) : _currentOrder = currentOrder;
+    if (queueHistoryId != null) {
+      orderService.listenToQueue(queueHistoryId);
+    }
+
+    _sub = orderService.streamCurrentOrder.listen((order) {
+      if (order != null) {
+        _currentOrder = order;
+        // Only update local order if we're not in the middle of an optimistic update
+        if (!_isSaving) {
+          _localOrder = order;
+        }
+        notifyListeners();
+      }
+    });
+  }
 
   // ---------------------------
   // Getters
   // ---------------------------
+  Order? get currentOrder => _localOrder ?? _currentOrder;
+  List<OrderItem> get items => currentOrder?.inCart ?? [];
 
-  Order get currentOrder => _currentOrder;
-
-  List<OrderItem> get items => List.unmodifiable(_currentOrder.inCart);
-
-  bool get isSyncing => _isSyncing;
-
-  bool get isConfirming => _isConfirming;
-
-  int get totalItemsCount {
-    return _currentOrder.inCart.fold(0, (sum, item) => sum + item.quantity);
-  }
+  int get totalItemsCount =>
+      currentOrder?.inCart.fold(0, (sum, i) => sum! + i.quantity) ?? 0;
 
   double get totalAmount {
-    return _currentOrder.inCart.fold(0.0, (sum, item) {
+    final order = currentOrder;
+    if (order == null) return 0;
+
+    return order.inCart.fold(0.0, (sum, item) {
       final addOnsTotal = item.addOns.values.fold(0.0, (a, b) => a + b);
       return sum + (item.menuItemPrice + addOnsTotal) * item.quantity;
     });
   }
 
   // ---------------------------
-  // Firestore Listener
+  // Cart Actions (Optimized with optimistic updates)
   // ---------------------------
 
-  void startOrderListener() {
-    final orderId = _currentOrder.id;
+  Future<void> addToCart(OrderItem newItem) async {
+    if (currentOrder == null) return;
 
-    if (orderId.isEmpty) return;
-
-    _orderSubscription?.cancel();
-
-    _orderSubscription = orderRepository.watchCurrentOrder(orderId).listen((
-      updatedOrder,
-    ) {
-      if (updatedOrder == null) return;
-
-      _mergeFirestoreOrder(updatedOrder);
-    });
-  }
-
-  void _mergeFirestoreOrder(Order firestoreOrder) {
-    _currentOrder = firestoreOrder.copyWith(
-      inCart: _currentOrder.inCart,
-      ordered: _currentOrder.ordered,
-    );
-
-    notifyListeners();
-  }
-
-  // ---------------------------
-  // Cart Operations
-  // ---------------------------
-
-  void addToCart(OrderItem newItem) {
-    final cart = [..._currentOrder.inCart];
+    // Update local copy immediately (optimistic update)
+    final cart = List<OrderItem>.from(currentOrder!.inCart);
 
     final index = cart.indexWhere(
       (item) =>
@@ -98,149 +86,134 @@ class OrderProvider extends ChangeNotifier {
       cart.add(newItem);
     }
 
-    _currentOrder = _currentOrder.copyWith(inCart: cart);
-
-    notifyListeners();
-
-    _scheduleSync();
+    _updateLocalOrder(cart);
+    _debounceSave();
   }
 
-  void removeItem(OrderItem target) {
-    final cart = _currentOrder.inCart
-        .where(
-          (item) =>
-              !(item.menuItemId == target.menuItemId &&
-                  item.size.name == target.size.name &&
-                  _mapEquals(item.addOns, target.addOns)),
-        )
-        .toList();
+  Future<void> updateCart(OrderItem updatedItem) async {
+    if (currentOrder == null) return;
 
-    _currentOrder = _currentOrder.copyWith(inCart: cart);
+    // Update local copy immediately
+    final cart = List<OrderItem>.from(currentOrder!.inCart);
 
-    notifyListeners();
-
-    _scheduleSync();
-  }
-
-  void updateCartItem(OrderItem oldItem, OrderItem updatedItem) {
-    final cart = [..._currentOrder.inCart];
-
-    final index = cart.indexOf(oldItem);
+    final index = cart.indexWhere(
+      (item) =>
+          item.menuItemId == updatedItem.menuItemId &&
+          item.size.name == updatedItem.size.name &&
+          _mapEquals(item.addOns, updatedItem.addOns),
+    );
 
     if (index != -1) {
       cart[index] = updatedItem;
-
-      _currentOrder = _currentOrder.copyWith(inCart: cart);
-
-      notifyListeners();
-
-      _scheduleSync();
+      _updateLocalOrder(cart);
+      _debounceSave();
     }
   }
 
-  void clearCart() {
-    _currentOrder = _currentOrder.copyWith(inCart: []);
+  Future<void> removeItem(OrderItem target) async {
+    if (currentOrder == null) return;
 
-    notifyListeners();
+    // Update local copy immediately
+    final cart = currentOrder!.inCart.where((item) {
+      return !(item.menuItemId == target.menuItemId &&
+          item.size.name == target.size.name &&
+          _mapEquals(item.addOns, target.addOns));
+    }).toList();
 
-    _scheduleSync();
+    _updateLocalOrder(cart);
+    _debounceSave();
   }
 
-  void updateUserProvider(UserProvider newUserProvider) {
-    userProvider = newUserProvider;
-
-    final historyId = userProvider.asCustomer?.currentHistoryId;
-
-    if (historyId != null) {
-      startOrderListener();
-    }
+  Future<void> clearCart() async {
+    if (currentOrder == null) return;
+    _updateLocalOrder([]);
+    _debounceSave();
   }
 
   // ---------------------------
-  // Confirm Order
+  // Helper Methods
   // ---------------------------
 
-  Future<void> confirmCurrentOrder() async {
-    if (_isConfirming) return;
+  void _updateLocalOrder(List<OrderItem> cart) {
+    if (currentOrder == null) return;
+    _localOrder = currentOrder!.copyWith(inCart: cart);
+    notifyListeners(); // UI updates instantly
+  }
 
-    if (_currentOrder.inCart.isEmpty || _currentOrder.id.isEmpty) return;
+  void _debounceSave() {
+    _saveDebouncer?.cancel();
+    _saveDebouncer = Timer(const Duration(milliseconds: 500), () async {
+      await _saveToFirestore();
+    });
+  }
 
-    _isConfirming = true;
-    notifyListeners();
+  Future<void> _saveToFirestore() async {
+    if (_localOrder == null || _isSaving) return;
+
+    _isSaving = true;
 
     try {
-      await orderRepository.confirmOrder(_currentOrder.id);
-
-      _currentOrder = _currentOrder.copyWith(
-        ordered: [..._currentOrder.ordered, ..._currentOrder.inCart],
-        inCart: [],
-      );
+      // Only save if local order differs from current order
+      if (_localOrder != _currentOrder) {
+        await orderService.saveOrder(_localOrder!);
+        // Update current order reference after successful save
+        _currentOrder = _localOrder;
+      }
     } catch (e) {
-      debugPrint("Confirm Error: $e");
+      debugPrint('Error saving order: $e');
+      // Optionally revert local order if save fails
+      if (_currentOrder != null) {
+        _localOrder = _currentOrder;
+        notifyListeners();
+      }
     } finally {
-      _isConfirming = false;
-      notifyListeners();
+      _isSaving = false;
     }
   }
 
+  bool _mapEquals(Map<String, double> a, Map<String, double> b) {
+    if (a.length != b.length) return false;
+    for (final key in a.keys) {
+      if (!b.containsKey(key) || b[key] != a[key]) return false;
+    }
+    return true;
+  }
+
   // ---------------------------
-  // Firestore Sync
+  // Update dependency
   // ---------------------------
+  void updateUserProvider(UserProvider newUserProvider) {
+    _saveDebouncer?.cancel();
+    _sub?.cancel();
 
-  void _scheduleSync() {
-    final queueId = userProvider.asCustomer?.currentHistoryId;
+    userProvider = newUserProvider;
+    _currentOrder = null;
+    _localOrder = null;
 
-    if (queueId == null) return;
+    final queueHistoryId = userProvider.asCustomer?.currentHistoryId;
 
-    _debounce?.cancel();
+    if (queueHistoryId != null) {
+      orderService.listenToQueue(queueHistoryId);
+    }
 
-    _debounce = Timer(const Duration(seconds: 2), () async {
-      try {
-        _isSyncing = true;
-        notifyListeners();
-
-        final newOrderId = await orderRepository.syncCart(
-          queueEntryId: queueId,
-          order: _currentOrder,
-        );
-
-        if (_currentOrder.id.isEmpty && newOrderId != null) {
-          _currentOrder = _currentOrder.copyWith(id: newOrderId);
-
-          startOrderListener();
+    _sub = orderService.streamCurrentOrder.listen((order) {
+      if (order != null) {
+        _currentOrder = order;
+        if (!_isSaving) {
+          _localOrder = order;
         }
-      } catch (e) {
-        debugPrint("Sync Error: $e");
-      } finally {
-        _isSyncing = false;
         notifyListeners();
       }
     });
   }
 
   // ---------------------------
-  // Utility
-  // ---------------------------
-
-  bool _mapEquals(Map<String, double> a, Map<String, double> b) {
-    if (a.length != b.length) return false;
-
-    for (final key in a.keys) {
-      if (!b.containsKey(key) || b[key] != a[key]) return false;
-    }
-
-    return true;
-  }
-
-  // ---------------------------
   // Dispose
   // ---------------------------
-
   @override
   void dispose() {
-    _orderSubscription?.cancel();
-    _debounce?.cancel();
-
+    _saveDebouncer?.cancel();
+    _sub?.cancel();
     super.dispose();
   }
 }

@@ -5,7 +5,6 @@ import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/menu_item/view_models/menu_item_view_model.dart';
 import 'package:queue_station_app/ui/screens/user_side/menu_item/widgets/menu_item_content.dart';
-import '../../../../../../data/repositories/queue_entry/queue_entry_repository.dart';
 
 class MenuItemScreen extends StatelessWidget {
   final MenuItem? item;
@@ -20,9 +19,8 @@ class MenuItemScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => MenuItemViewModel(
         menuItem: menuItem,
-        cartItem: cartItem,
+        existingCartItem: cartItem,
         orderProvider: context.read<OrderProvider>(),
-        queueEntryRepository: context.read<QueueEntryRepository>()
       ),
       child: const MenuItemContent(),
     );

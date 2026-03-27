@@ -155,8 +155,11 @@ class CartContent extends StatelessWidget {
                       itemCount: cartItems.length,
                       itemBuilder: (context, index) {
                         final item = cartItems[index];
+                        // ✅ Add a unique key based on item properties
                         return Slidable(
-                          key: ValueKey(item.hashCode),
+                          key: ValueKey(
+                            '${item.menuItemId}_${item.size.name}_${item.addOns.hashCode}',
+                          ),
                           endActionPane: ActionPane(
                             motion: const ScrollMotion(),
                             children: [
@@ -183,6 +186,9 @@ class CartContent extends StatelessWidget {
                             ],
                           ),
                           child: FoodItemCard(
+                            key: ValueKey(
+                              'card_${item.menuItemId}_${item.size.name}_${item.quantity}',
+                            ), // ✅ Add key to FoodItemCard
                             name: item.item.name,
                             item: item.item,
                             image: item.item.image,

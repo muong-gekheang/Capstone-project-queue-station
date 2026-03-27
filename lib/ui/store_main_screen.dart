@@ -168,7 +168,8 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 orderRepository: context.read<OrderRepository>(),
                 menuService: menuService,
                 orderItemRepository: context.read<OrderItemRepository>(),
-                userProvider: userProvider,
+                userProvider: userProvider, 
+                queueRepository: context.read<QueueEntryRepository>(),
               );
             }
             previous.updateDependencies(userProvider, menuService);

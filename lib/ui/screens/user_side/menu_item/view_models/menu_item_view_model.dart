@@ -4,19 +4,16 @@ import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/services/order_provider.dart';
-import '../../../../../../data/repositories/queue_entry/queue_entry_repository.dart';
 
 class MenuItemViewModel extends ChangeNotifier {
   final MenuItem menuItem;
-  final OrderItem? cartItem;
+  final OrderItem? existingCartItem;
   final OrderProvider orderProvider;
-  final QueueEntryRepository queueEntryRepository;
 
   MenuItemViewModel({
     required this.menuItem,
     required this.orderProvider,
-    this.cartItem,
-    required this.queueEntryRepository
+    this.existingCartItem,
   }) {
     _initialize();
   }
@@ -37,8 +34,8 @@ class MenuItemViewModel extends ChangeNotifier {
       _selectedAddOns[addOn.id] = false;
     }
 
-    if (cartItem != null) {
-      _loadFromCartItem(cartItem!);
+    if (existingCartItem != null) {
+      _loadFromCartItem(existingCartItem!);
     } else {
       _selectedSize = menuItem.sizes.isNotEmpty ? menuItem.sizes.first : null;
     }
@@ -110,8 +107,8 @@ class MenuItemViewModel extends ChangeNotifier {
     final addOnsMap = {for (final a in selectedAddOns) a.id: a.price};
 
     final orderItem = OrderItem(
-      id: Uuid().v4(),
-      orderId: orderProvider.currentOrder.id,
+      id: existingCartItem?.id ?? const Uuid().v4(),
+      orderId: orderProvider.currentOrder!.id,
       menuItemId: menuItem.id,
       item: menuItem,
       size: _selectedSize!.sizeOption,
@@ -122,10 +119,10 @@ class MenuItemViewModel extends ChangeNotifier {
       orderItemStatus: OrderItemStatus.pending,
     );
 
-    if (cartItem == null) {
+    if (existingCartItem == null) {
       orderProvider.addToCart(orderItem);
     } else {
-      orderProvider.updateCartItem(cartItem!, orderItem);
+      orderProvider.updateCart(orderItem);
     }
   }
 

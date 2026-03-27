@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/order/order_repository.dart';
 import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
@@ -12,58 +13,20 @@ class OrderRepositoryImpl extends OrderRepository {
   CollectionReference<Map<String, dynamic>> get _orderCol =>
       fireStore.collection('orders');
 
-  CollectionReference<Map<String, dynamic>> get _orderItemCol =>
+  CollectionReference<Map<String, dynamic>> get _itemCol =>
       fireStore.collection('order_items');
 
-  Order? _currentOrder;
+  // ---------------------------
+  // MAPPER
+  // ---------------------------
 
-  Order get currentOrder => _currentOrder ??= Order.empty();
+  Order? _map(DocumentSnapshot<Map<String, dynamic>> doc) {
+    if (!doc.exists || doc.data() == null) return null;
 
-  // Helper method to safely convert document to Order
-  // Helper method to safely convert document to Order
-  Order? _orderFromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     try {
-      final data = doc.data();
-      if (data == null) {
-        print('❌ Document ${doc.id} has null data');
-        return null;
-      }
-
-      // Log ALL fields to see what's actually in the document
-      print('📄 Document ID: ${doc.id}');
-      print('📄 Fields in document:');
-      data.forEach((key, value) {
-        print('   - $key: $value (${value.runtimeType})');
-      });
-
-      // Create a safe copy with the document ID
-      final safeData = Map<String, dynamic>.from(data);
-
-      // CRITICAL: Ensure id field exists
-      if (safeData['id'] == null || safeData['id'].toString().isEmpty) {
-        print('⚠️ Order ${doc.id} is missing id field, using document ID');
-        safeData['id'] = doc.id;
-        print('   Added id: ${safeData['id']}');
-      } else {
-        print('✅ id field exists: ${safeData['id']}');
-      }
-
-      // Check timestamp
-      if (safeData['timestamp'] == null) {
-        print('⚠️ Timestamp is missing, adding current time');
-        safeData['timestamp'] = DateTime.now().toIso8601String();
-      } else {
-        print('✅ timestamp exists: ${safeData['timestamp']}');
-      }
-
-      print('🔄 Attempting to parse Order with safeData: $safeData');
-      final order = Order.fromJson(safeData);
-      print('✅ Order parsed successfully: ${order.id}');
-
-      return order;
-    } catch (e, stackTrace) {
-      print('❌ Error converting order ${doc.id}: $e');
-      print('Stack trace: $stackTrace');
+      return Order.fromJson({...doc.data()!, 'id': doc.id});
+    } catch (e) {
+      debugPrint('❌ Parse Order ${doc.id}: $e');
       return null;
     }
   }
@@ -85,7 +48,7 @@ class OrderRepositoryImpl extends OrderRepository {
       for (final item in order.inCart) {
         final itemDocId = '${order.id}_${Order.orderItemRef(item)}';
         txn.set(
-          _orderItemCol.doc(itemDocId),
+          _orderCol.doc(itemDocId),
           item.toJson()..['orderId'] = order.id,
         );
       }
@@ -93,7 +56,7 @@ class OrderRepositoryImpl extends OrderRepository {
       for (final item in order.ordered) {
         final itemDocId = '${order.id}_${Order.orderItemRef(item)}';
         txn.set(
-          _orderItemCol.doc(itemDocId),
+          _orderCol.doc(itemDocId),
           item.toJson()..['orderId'] = order.id,
         );
       }
@@ -101,91 +64,82 @@ class OrderRepositoryImpl extends OrderRepository {
   }
 
   @override
-  Future<String?> syncCart({
+  Future<String> createEmptyOrder({
+    required String restaurantId,
     required String queueEntryId,
-    required Order order,
   }) async {
-    if (order.inCart.isEmpty && order.id.isEmpty) return null;
+    final orderRef = _orderCol.doc();
 
-    String? createdOrderId;
-
-    await fireStore.runTransaction((transaction) async {
-      String targetOrderId = order.id;
-      final queueRef = fireStore.collection('queue_entries').doc(queueEntryId);
-
-      if (targetOrderId.isEmpty) {
-        final newOrderRef = _orderCol.doc();
-        targetOrderId = newOrderRef.id;
-
-        createdOrderId = targetOrderId;
-
-        transaction.update(queueRef, {'orderId': targetOrderId});
-
-        // ✅ Include id field when creating
-        transaction.set(newOrderRef, {
-          'id': targetOrderId, // CRITICAL: Include the id field
-          'timestamp': DateTime.now().toIso8601String(),
-          'restaurantId': order.restaurantId,
-          'inCartIds': order.inCart.map(Order.orderItemRef).toList(),
-          'orderedIds': [],
-        });
-      } else {
-        final orderRef = _orderCol.doc(targetOrderId);
-
-        // ✅ Ensure id is preserved when updating
-        transaction.update(orderRef, {
-          'id': targetOrderId, // CRITICAL: Keep the id field
-          'inCartIds': order.inCart.map(Order.orderItemRef).toList(),
-        });
-      }
-
-      for (final item in order.inCart) {
-        final itemDocId = '${targetOrderId}_${Order.orderItemRef(item)}';
-
-        transaction.set(
-          _orderItemCol.doc(itemDocId),
-          item.toJson()..['orderId'] = targetOrderId,
-          SetOptions(merge: true),
-        );
-      }
-    });
-
-    return createdOrderId;
-  }
-
-  @override
-  Future<void> confirmOrder(String orderId) async {
-    final orderRef = _orderCol.doc(orderId);
-
-    await fireStore.runTransaction((transaction) async {
-      final snapshot = await transaction.get(orderRef);
-      if (!snapshot.exists) return;
-
-      final data = snapshot.data() as Map<String, dynamic>;
-      final List<dynamic> currentInCart = data['inCartIds'] ?? [];
-      final List<dynamic> currentOrdered = data['orderedIds'] ?? [];
-
-      transaction.update(orderRef, {
-        'id': orderId, // ✅ Preserve id field
+    await fireStore.runTransaction((txn) async {
+      txn.set(orderRef, {
+        'restaurantId': restaurantId,
+        'timestamp': FieldValue.serverTimestamp(),
         'inCartIds': [],
-        'orderedIds': [...currentOrdered, ...currentInCart],
-        'lastConfirmedAt': DateTime.now().toIso8601String(),
+        'orderedIds': [],
       });
 
-      for (String itemRef in currentInCart) {
-        final itemDocRef = _orderItemCol.doc('${orderId}_$itemRef');
-        transaction.update(itemDocRef, {
-          'status': 'ordered',
-          'confirmedAt': DateTime.now().toIso8601String(),
-        });
-      }
+      txn.update(fireStore.collection('queue_entries').doc(queueEntryId), {
+        'orderId': orderRef.id,
+      });
     });
+
+    return orderRef.id;
+  }
+
+  // ---------------------------
+  // SAVE / UPDATE ORDER
+  // ---------------------------
+
+  @override
+  Future<void> saveOrder(Order order) async {
+    final orderRef = _orderCol.doc(order.id);
+    final batch = fireStore.batch();
+
+    // ✅ Always use SAME ID STRATEGY
+    final inCartIds = order.inCart.map(Order.orderItemRef).toList();
+    final orderedIds = order.ordered.map(Order.orderItemRef).toList();
+
+    // 1. Save order doc
+    batch.set(orderRef, {
+      'restaurantId': order.restaurantId,
+      'timestamp': FieldValue.serverTimestamp(),
+      'inCartIds': inCartIds,
+      'orderedIds': orderedIds,
+    }, SetOptions(merge: true));
+
+    // 2. Save items
+    for (final item in [...order.inCart, ...order.ordered]) {
+      final docId = '${order.id}_${Order.orderItemRef(item)}';
+
+      batch.set(
+        _itemCol.doc(docId),
+        item.toJson()..['orderId'] = order.id,
+        SetOptions(merge: true),
+      );
+    }
+
+    final existingItemsSnap = await _itemCol
+        .where('orderId', isEqualTo: order.id)
+        .get();
+
+    final existingIds = existingItemsSnap.docs.map((d) => d.id).toSet();
+
+    final newIds = {
+      ...inCartIds.map((id) => '${order.id}_$id'),
+      ...orderedIds.map((id) => '${order.id}_$id'),
+    };
+
+    for (final docId in existingIds.difference(newIds)) {
+      batch.delete(_itemCol.doc(docId));
+    }
+
+    await batch.commit();
   }
 
   @override
   Future<OrderItem?> getOrderItemById(String orderId, String orderedId) async {
     final docId = '${orderId}_$orderedId';
-    final doc = await _orderItemCol.doc(docId).get();
+    final doc = await _itemCol.doc(docId).get();
 
     if (!doc.exists) return null;
     doc.data()!['id'] = docId;
@@ -194,176 +148,92 @@ class OrderRepositoryImpl extends OrderRepository {
   }
 
   @override
-  Future<void> addItemToCart(String orderId, OrderItem item) async {
-    final orderDoc = _orderCol.doc(orderId);
-
-    await fireStore.runTransaction((txn) async {
-      final snapshot = await txn.get(orderDoc);
-      if (!snapshot.exists) throw Exception("Order not found");
-
-      final data = snapshot.data()!;
-      final inCartIds = List<String>.from(data['inCartIds'] ?? []);
-
-      final itemRef = Order.orderItemRef(item);
-      inCartIds.add(itemRef);
-
-      txn.update(orderDoc, {
-        'id': orderId, // ✅ Preserve id field
-        'inCartIds': inCartIds,
-      });
-
-      final itemDocId = '${orderId}_$itemRef';
-      txn.set(
-        _orderItemCol.doc(itemDocId),
-        item.toJson()..['orderId'] = orderId,
-      );
-    });
+  Stream<List<OrderItem>> watchOrderItems(String orderId) {
+    return _itemCol
+        .where('orderId', isEqualTo: orderId)
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((doc) => OrderItem.fromJson({...doc.data(), 'id': doc.id}))
+              .toList(),
+        );
   }
 
   @override
-  Stream<List<Order>> watchAllOrder() {
-    return _orderCol.snapshots().map((snapshot) {
-      final orders = <Order>[];
-      for (final doc in snapshot.docs) {
-        final order = _orderFromDoc(doc);
-        if (order != null) {
-          orders.add(order);
-        }
+  Future<void> confirmOrder(String orderId) async {
+    final orderRef = _orderCol.doc(orderId);
+
+    await fireStore.runTransaction((txn) async {
+      final snap = await txn.get(orderRef);
+      if (!snap.exists) return;
+
+      final inCart = List<String>.from(snap.data()?['inCartIds'] ?? []);
+      final ordered = List<String>.from(snap.data()?['orderedIds'] ?? []);
+
+      txn.update(orderRef, {
+        'inCartIds': [],
+        'orderedIds': [...ordered, ...inCart],
+        'lastConfirmedAt': FieldValue.serverTimestamp(),
+      });
+
+      for (final ref in inCart) {
+        // Updates the status of the STABLE docId
+        txn.update(_itemCol.doc('${orderId}_$ref'), {'status': 'ordered'});
       }
-      return orders;
     });
   }
 
   @override
   Stream<Order?> watchOrderById(String orderId) {
-    return _orderCol.doc(orderId).snapshots().map((snapshot) {
-      if (!snapshot.exists) return null;
-      return _orderFromDoc(snapshot);
-    });
+    return _orderCol.doc(orderId).snapshots().map(_map);
   }
 
   @override
-  Future<Order?> getOrderById(String orderId) async {
-    try {
-      final doc = await _orderCol.doc(orderId).get();
-      if (!doc.exists) {
-        print('Order not found: $orderId');
-        return null;
-      }
-      return _orderFromDoc(doc);
-    } catch (e) {
-      print('Error getting order $orderId: $e');
-      return null;
-    }
-  }
-
-  @override
-  Stream<Order?> watchCurrentOrder(String orderId) {
-    return _orderCol.doc(orderId).snapshots().map((snapshot) {
-      if (!snapshot.exists) return null;
-      final order = _orderFromDoc(snapshot);
-      if (order != null) {
-        _currentOrder = order;
-      }
-      return order;
-    });
+  Stream<List<Order>> watchAllOrder() {
+    return _orderCol.snapshots().map(
+      (snap) => snap.docs.map(_map).whereType<Order>().toList(),
+    );
   }
 
   @override
   Stream<List<Order>> watchTodayOrders(String restId) {
-    final startOfToday = DateTime.now().copyWith(
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-      microsecond: 0,
+    final startOfDay = Timestamp.fromDate(
+      DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
     );
 
-    return fireStore
-        .collection('orders')
-        .where(
-          'restaurantId',
-          isEqualTo: restId,
-        ) // Fixed: was 'restId', should be 'restaurantId'
-        .where(
-          'timestamp',
-          isGreaterThanOrEqualTo: startOfToday.toIso8601String(),
-        ) // Fixed: use string for query
+    return _orderCol
+        .where('restaurantId', isEqualTo: restId)
+        .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
         .snapshots()
-        .map((snapshot) {
-          final orders = <Order>[];
-          for (final doc in snapshot.docs) {
-            final order = _orderFromDoc(doc);
-            if (order != null) {
-              orders.add(order);
-            }
-          }
-          return orders;
-        });
+        .map((snap) => snap.docs.map(_map).whereType<Order>().toList());
   }
 
+  @override
+  Future<Order?> getOrderById(String orderId) async {
+    final doc = await _orderCol.doc(orderId).get();
+    return _map(doc);
+  }
+  
   @override
   Future<void> delete(String orderId) {
     // TODO: implement delete
     throw UnimplementedError();
   }
-
+  
   @override
-  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(
-    int limit,
-    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
-  ) {
+  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)> getAll(int limit, DocumentSnapshot<Map<String, dynamic>>? lastDoc) {
     // TODO: implement getAll
     throw UnimplementedError();
   }
-
-  @override
-  Future<(List<Order>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getSearchOrders(
-    String query,
-    int limit,
-    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
-  ) {
-    // TODO: implement getSearchOrders
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> moveItemToOrdered(String orderId, OrderItem item) {
-    // TODO: implement moveItemToOrdered
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> removeItemFromCart(String orderId, OrderItem item) {
-    // TODO: implement removeItemFromCart
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> removeOrderedItem(String orderId, String menuItemId) {
-    // TODO: implement removeOrderedItem
-    throw UnimplementedError();
-  }
-
+  
   @override
   Future<Order> update(Order order) {
     // TODO: implement update
     throw UnimplementedError();
   }
-
+  
   @override
-  Future<void> updateCartItem(String orderId, OrderItem item) {
-    // TODO: implement updateCartItem
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> updateOrderedItemStatus(
-    String orderId,
-    String menuItemId,
-    OrderItemStatus status,
-  ) {
+  Future<void> updateOrderedItemStatus(String orderId, String menuItemId, OrderItemStatus status) {
     // TODO: implement updateOrderedItemStatus
     throw UnimplementedError();
   }

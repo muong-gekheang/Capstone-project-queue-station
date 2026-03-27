@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'restaurant_repository.dart';
 

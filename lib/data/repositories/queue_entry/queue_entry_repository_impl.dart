@@ -290,9 +290,28 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
   }
 
   @override
-  watchCurrentHistory() {
-    // TODO: implement watchCurrentHistory
-    throw UnimplementedError();
+  Stream<QueueEntry?> watchQueueEntry(String queueEntryId) {
+    return fireStore
+        .collection('queue_entries')
+        .doc(queueEntryId)
+        .snapshots()
+        .map((doc) {
+          // 1. Check if document exists and has data
+          final data = doc.data();
+          if (!doc.exists || data == null) return null;
+
+          try {
+            // 2. Create a copy of data and ensure the ID is present
+            final json = Map<String, dynamic>.from(data);
+            json['id'] = doc.id;
+
+            // 3. Parse into Model
+            return QueueEntry.fromJson(json);
+          } catch (e) {
+            debugPrint('❌ Error parsing QueueEntry $queueEntryId: $e');
+            return null;
+          }
+        });
   }
 
   @override

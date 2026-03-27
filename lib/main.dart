@@ -34,14 +34,15 @@ import 'package:queue_station_app/data/repositories/user/production/customer_rep
 import 'package:queue_station_app/data/repositories/user/production/store_user_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 import 'package:queue_station_app/firebase_options.dart';
-import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/order_provider.dart';
+import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/restaurants_service.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
+import 'package:queue_station_app/services/store/menu_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
@@ -149,11 +150,27 @@ void main() async {
         ),
         ChangeNotifierProxyProvider<UserProvider, OrderProvider>(
           create: (context) => OrderProvider(
-            currentOrder: Order.empty(),
-            orderRepository: context.read<OrderRepository>(),
-            userProvider: context.read<UserProvider>(),
+            userProvider: context.read<UserProvider>(), 
+            orderService: OrderService(
+              orderRepository: context.read<OrderRepository>(), 
+              menuService: MenuService(
+                menuItemRepository: context.read<MenuItemRepository>(), 
+                userProvider: userProvider, 
+                menuCategoryRepository: context.read<MenuCategoryRepository>(), 
+                addOnRepository: context.read<AddOnRepository>(), 
+                sizingOptionRepository: context.read<SizingOptionRepository>(), 
+                menuSizeRepository: context.read<MenuSizeRepository>(), 
+                imageRepository: context.read<ImageRepository>()
+              ), 
+              orderItemRepository: context.read<OrderItemRepository>(), 
+              userProvider: userProvider, 
+              queueRepository: context.read<QueueEntryRepository>()
+            ),
           ),
-          update: (_, user, order) => order!..updateUserProvider(user),
+          update: (context, userProvider, previous) {
+            previous?..updateUserProvider(userProvider);
+            return previous!;
+          },
         ),
       ],
       child: Builder(
