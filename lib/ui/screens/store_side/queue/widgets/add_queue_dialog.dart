@@ -11,6 +11,7 @@ import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class AddQueueDialog extends StatefulWidget {
   final ValueChanged<QueueEntry> onJoin;
@@ -59,7 +60,7 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
       widget.onJoin(
         QueueEntry.walkIn(
           expectedTableReadyAt: DateTime.now(),
-          id: uuid.v4(),
+          id: Uuid().v4(),
           queueNumber: "ABCDE",
           partySize: _guestCount,
           joinTime: DateTime.now(),

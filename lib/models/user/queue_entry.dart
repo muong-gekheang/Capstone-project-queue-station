@@ -76,6 +76,46 @@ class QueueEntry {
     this.order,
   });
 
+  QueueEntry copyWith({
+    String? id,
+    String? queueNumber,
+    String? customerId,
+    String? restId,
+    int? partySize,
+    DateTime? joinTime,
+    DateTime? servedTime,
+    DateTime? endedTime,
+    QueueStatus? status,
+    Order? order,
+    String? orderId,
+    JoinedMethod? joinedMethod,
+    String? tableNumber,
+    String? assignedTableId,
+    DateTime? expectedTableReadyAt,
+    String? customerName,
+    String? phoneNumber,
+  }) {
+    return QueueEntry(
+      id: id ?? this.id,
+      queueNumber: queueNumber ?? this.queueNumber,
+      customerId: customerId ?? this.customerId,
+      restId: restId ?? this.restId,
+      partySize: partySize ?? this.partySize,
+      joinTime: joinTime ?? this.joinTime,
+      servedTime: servedTime ?? this.servedTime,
+      endedTime: endedTime ?? this.endedTime,
+      status: status ?? this.status,
+      order: order ?? this.order,
+      orderId: orderId ?? this.orderId,
+      joinedMethod: joinedMethod ?? this.joinedMethod,
+      tableNumber: tableNumber ?? this.tableNumber,
+      assignedTableId: assignedTableId ?? this.assignedTableId,
+      expectedTableReadyAt: expectedTableReadyAt ?? this.expectedTableReadyAt,
+      customerName: customerName ?? this.customerName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+    );
+  }
+
   Duration? get waitingTime {
     if (servedTime == null) return null;
     return servedTime!.difference(joinTime);

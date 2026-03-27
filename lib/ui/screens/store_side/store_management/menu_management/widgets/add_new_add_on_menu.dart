@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
@@ -21,6 +23,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
   final TextEditingController _priceController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   String? _selectedImage;
+  Uint8List? pickedLogoBytes;
   // MenuItemCategory _selectedCategory = mockMenuCategories.firstWhere(
   //   (c) => c.name.toLowerCase().contains('Add-Ons'.toLowerCase()),
   // );
@@ -33,19 +36,19 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
     }
   }
 
-  Future<void> onEdit() async {
-    final XFile? pickedFile = await _imagePicker.pickImage(
-      source: ImageSource.gallery, // open gallery
-      maxHeight: 500,
-      maxWidth: 500,
-      imageQuality: 80, // compress image a bit
-    );
+  void onPickImage() async {
+    final ImagePicker picker = ImagePicker();
+    Uint8List? selectedImageBytes;
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = pickedFile.path;
-      });
-    }
+    final XFile? pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedImage == null) return;
+
+    selectedImageBytes = await pickedImage.readAsBytes();
+    setState(() {
+      pickedLogoBytes = selectedImageBytes;
+    });
   }
 
   void onSave() {
@@ -62,7 +65,7 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
         restaurantId: '',
       );
 
-      Navigator.pop(context, newAddOn);
+      Navigator.pop(context, (newAddOn, pickedLogoBytes));
     } else {
       print('Please fix the errors in the form');
     }
@@ -87,8 +90,10 @@ class _AddNewAddOnMenuState extends State<AddNewAddOnMenu> {
                   Container(
                     alignment: Alignment.center,
                     child: ProfileEditorWidget(
-                      onEdit: onEdit,
-                      imagePath: _selectedImage,
+                      image: pickedLogoBytes != null
+                          ? MemoryImage(pickedLogoBytes!)
+                          : null,
+                      onPickImage: onPickImage,
                     ),
                   ),
                   TextFieldWidget(

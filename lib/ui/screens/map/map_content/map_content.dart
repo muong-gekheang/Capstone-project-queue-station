@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -155,6 +156,11 @@ class _MapContentState extends State<MapContent> {
                     child: Container(color: Colors.transparent),
                   ),
                 ),
+              IconButton(
+                // onPressed: () => context.go('/'),
+                onPressed: () => context.go('/'),
+                icon: Icon(Icons.arrow_back, color: const Color(0xFFFF6835)),
+              ),
 
               _buildFloatingVerticalButton(context),
 

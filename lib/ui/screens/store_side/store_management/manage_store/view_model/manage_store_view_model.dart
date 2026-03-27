@@ -19,7 +19,7 @@ class ManageStoreViewModel extends ChangeNotifier {
   void _subscribe() {
     _streamSubscription = _restaurantService.streamRestaurant.listen(
       (restaurant) {
-        print("STATUS ${restaurant?.isOpen}");
+        print("IS OPEN STATUS ${restaurant?.isOpen}");
 
         if (isDisposed) return;
         _currentRest = restaurant;

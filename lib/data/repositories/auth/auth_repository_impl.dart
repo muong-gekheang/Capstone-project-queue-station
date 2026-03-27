@@ -58,7 +58,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception("No authenticated user found.");
       }
 
-      await AuthRepository.reauthenticate(oldPassword);
+      await _reauthenticate(oldPassword);
 
       // 3. Update Password
       await user.updatePassword(newPassword);
@@ -123,9 +123,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> changeEmail(String newEmail, String password) async {
     try {
-      debugPrint("Email ERROR: $password");
-
-      await AuthRepository.reauthenticate(password);
       final user = FirebaseAuth.instance.currentUser;
 
       // This is the modern replacement for updateEmail()
@@ -133,7 +130,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // UI: "Check your new email to confirm the switch!"
     } on FirebaseAuthException catch (e) {
-      debugPrint("Email ERROR: ${e.code}");
+      if (e.code == 'requires-recent-login') {
+        // Re-authenticate logic here
+        await _reauthenticate(password);
+      }
     }
   }
 
@@ -149,5 +149,36 @@ class AuthRepositoryImpl implements AuthRepository {
         print('The email address is not valid.');
       }
     }
+  }
+
+  @override
+  Future<String?> getSubscriptionStatus(String restaurantId) async {
+    final restaurantDoc = await _firestore
+        .collection('restaurants')
+        .doc(restaurantId)
+        .get();
+    if (!restaurantDoc.exists) return null;
+    final data = restaurantDoc.data() as Map<String, dynamic>;
+    print('subscription status is:${data['subscriptionStatus']}');
+    return data['subscriptionStatus'] as String?;
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserData(String uid) async {
+    final userDoc = await _firestore.collection('users').doc(uid).get();
+
+    if (!userDoc.exists) throw Exception("User not found");
+
+    return userDoc.data() as Map<String, dynamic>;
+  }
+
+  Future<void> _reauthenticate(String password) async {
+    final user = FirebaseAuth.instance.currentUser!;
+    AuthCredential credential = EmailAuthProvider.credential(
+      email: user.email!, // The current (potentially fake) email
+      password: password,
+    );
+
+    await user.reauthenticateWithCredential(credential);
   }
 }

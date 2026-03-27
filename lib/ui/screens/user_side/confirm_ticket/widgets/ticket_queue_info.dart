@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:queue_station_app/data/repositories/restaurant/restaurant_repository_mock.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/ticket_widget.dart';
 
 class TicketQueueInfo extends StatelessWidget {
-  const TicketQueueInfo({super.key, required this.queueEntry});
+  const TicketQueueInfo({
+    super.key,
+    required this.queueEntry,
+    required this.restaurant,
+    required this.queueEntriesCount,
+    required this.customerPosition,
+    required this.estimatedWaitTime, // Add estimated wait time
+  });
 
   final QueueEntry queueEntry;
+  final Restaurant restaurant;
+  final int queueEntriesCount;
+  final int customerPosition;
+  final Duration estimatedWaitTime; // Use Duration from QueueService
+
+  // Format the estimated wait time for display
+  String get formattedEstimatedWaitTime {
+    final minutes = estimatedWaitTime.inMinutes;
+
+    if (minutes <= 0) {
+      return "Calculating...";
+    } else if (minutes < 60) {
+      return "$minutes minute${minutes > 1 ? 's' : ''}";
+    } else {
+      final hours = minutes ~/ 60;
+      final remainingMinutes = minutes % 60;
+      if (remainingMinutes == 0) {
+        return "$hours hour${hours > 1 ? 's' : ''}";
+      } else {
+        return "$hours hour${hours > 1 ? 's' : ''} $remainingMinutes min";
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +49,23 @@ class TicketQueueInfo extends StatelessWidget {
             children: [
               SizedBox.square(
                 dimension: 70,
-                child: Image.asset("assets/home_screen/kungfu.png"),
+                child: SizedBox.square(
+                  dimension: 160,
+                  child: Image.network(
+                    restaurant.logoLink,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.restaurant,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
               Expanded(
                 child: Column(
@@ -27,8 +73,7 @@ class TicketQueueInfo extends StatelessWidget {
                   spacing: 10,
                   children: [
                     Text(
-                      queueEntry
-                          .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                      restaurant.name,
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -44,8 +89,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            queueEntry
-                                .restId, // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                            restaurant.address,
                             softWrap: true,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -60,7 +104,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           IntrinsicHeight(
             child: Row(
               children: [
@@ -90,7 +134,6 @@ class TicketQueueInfo extends StatelessWidget {
                   flex: 1,
                   child: VerticalDivider(thickness: 2, color: Colors.white),
                 ),
-
                 Expanded(
                   flex: 2,
                   child: Column(
@@ -103,7 +146,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "", // TODO: Use Repos in ViewModel to fetch the Restaurant Object
+                        '$queueEntriesCount',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,
@@ -135,7 +178,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -153,7 +196,7 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -171,25 +214,42 @@ class TicketQueueInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Estimated Waiting time",
+                "Estimated Waiting Time",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
-              Text(
-                "1h - 1:30h",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    formattedEstimatedWaitTime,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  if (queueEntriesCount > 0)
+                    Text(
+                      "Based on average wait time",
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimary.withOpacity(0.7),
+                        fontSize: 10,
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             "We reserve the right to skip the queue position in case of no show",
             softWrap: true,

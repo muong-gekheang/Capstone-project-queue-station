@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
@@ -18,8 +20,8 @@ class EditMenuContent extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: MenuForm(
           initialMenu: existingMenu, // not null because we are editing
-          onSubmit: (MenuItem updatedMenu) {
-            vm.updateMenuItem(updatedMenu, existingMenu);
+          onSubmit: (MenuItem updatedMenu, Uint8List? pickedLogoBytes) {
+            vm.updateMenuItem(updatedMenu, existingMenu, pickedLogoBytes);
             Navigator.pop(context); // close the page
           },
         ),

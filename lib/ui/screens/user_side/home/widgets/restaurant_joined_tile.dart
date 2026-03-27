@@ -1,13 +1,21 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:queue_station_app/models/user/customer.dart';
+import 'package:queue_station_app/models/restaurant/restaurant.dart';
+import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/ui/widgets/half_clipper.dart';
 
 class RestaurantJoinedTile extends StatefulWidget {
-  const RestaurantJoinedTile({super.key, required this.user});
+  const RestaurantJoinedTile({
+    super.key,
+    required this.queueEntry,
+    required this.restaurant,
+    this.peopleWaiting
+  });
 
-  final Customer user;
+  final QueueEntry queueEntry;
+  final Restaurant restaurant;
+  final int? peopleWaiting;
 
   @override
   State<RestaurantJoinedTile> createState() => _RestaurantJoinedTileState();
@@ -22,7 +30,6 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
 
   @override
   Widget build(BuildContext context) {
-    // final currentHistory = getHistoryById(widget.user.currentHistoryId);
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -47,11 +54,16 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                   children: [
                     SizedBox.square(
                       dimension: 75,
-                      child: Image.asset(
-                        "assets/home_screen/kungfu.png",
-                        fit: BoxFit.fitHeight,
-                      ),
+                      child: Image.network(
+                              widget.restaurant.logoLink,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // fallback if image fails to load
+                                return Icon(Icons.restaurant, size: 50, color: Colors.grey);
+                              },
+                            )
                     ),
+
                     const Spacer(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -63,7 +75,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                           ),
                         ),
                         Text(
-                          "D025",
+                          widget.queueEntry.queueNumber,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
@@ -133,7 +145,7 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                       ),
                     ),
                     Text(
-                      "-", // TODO: Use Repos in VM to fetch and create Rest obj (Current Wait)
+                      widget.peopleWaiting.toString(),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,

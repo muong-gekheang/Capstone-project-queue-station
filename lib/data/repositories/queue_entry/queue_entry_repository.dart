@@ -39,10 +39,10 @@ abstract class QueueEntryRepository {
   Future<void> create(QueueEntry queueEntry);
   Future<void> delete(QueueEntry queueEntry);
   Future<QueueEntry> update(QueueEntry queueEntry);
+  //Stream<QueueEntry?> watchCurrentHistory(String customerId);
   Future<void> updateStatus(String queueId, QueueStatus newStatus);
-
   Stream<List<QueueEntry>> watchCurrentActiveQueue(String restId);
-
+  Stream<List<QueueEntry>> watchAllActiveQueues();
   Stream<QueueEntry?> watchCurrentHistory();
   Stream<List<QueueEntry>> watchAllHistory();
 }

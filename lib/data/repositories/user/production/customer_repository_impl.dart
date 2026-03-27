@@ -8,12 +8,37 @@ class CustomerRepositoryImpl implements UserRepository<Customer> {
   CustomerRepositoryImpl({FirebaseFirestore? fireStore})
     : fireStore = fireStore ?? FirebaseFirestore.instance;
 
+  // Future<Customer?> _buildCustomerFromDoc(
+  //   DocumentSnapshot<Map<String, dynamic>> docSnap,
+  // ) async {
+  //   if (!docSnap.exists) return null;
+
+  //   final data = docSnap.data();
+  //   final type = data?['userType'];
+  //   if (data == null || type != 'customer') return null;
+
+  //   final customerJson = <String, dynamic>{
+  //     'id': docSnap.id,
+  //     'name': data['name'],
+  //     'email': data['email'],
+  //     'phone': data['phone'],
+  //     'historyIds': List<String>.from(data['historyIds'] ?? <String>[]),
+  //     'currentHistoryId': data['currentHistoryId'],
+  //   };
+
+  //   return Customer.fromJson(customerJson);
+  // }
+
   Future<Customer?> _buildCustomerFromDoc(
     DocumentSnapshot<Map<String, dynamic>> docSnap,
   ) async {
     if (!docSnap.exists) return null;
 
     final data = docSnap.data();
+    print('Data from Firestore: $data'); // DEBUG
+    print('historyIds value: ${data?['historyIds']}'); // DEBUG
+    print('historyIds type: ${data?['historyIds'].runtimeType}'); // DEBUG
+
     final type = data?['userType'];
     if (data == null || type != 'customer') return null;
 
@@ -22,10 +47,13 @@ class CustomerRepositoryImpl implements UserRepository<Customer> {
       'name': data['name'],
       'email': data['email'],
       'phone': data['phone'],
-      'historyIds': List<String>.from(data['historyIds'] ?? <String>[]),
+      'historyIds': data['historyIds'] == null
+          ? <String>[]
+          : List<String>.from(data['historyIds']),
       'currentHistoryId': data['currentHistoryId'],
     };
 
+    print('customerJson: $customerJson'); // DEBUG
     return Customer.fromJson(customerJson);
   }
 

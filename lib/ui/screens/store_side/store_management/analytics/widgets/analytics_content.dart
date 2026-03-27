@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:queue_station_app/services/store/store_profile_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/analytics/view_model/analytics_view_model.dart';
 
 class AnalyticsContent extends StatefulWidget {
@@ -773,9 +772,9 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                       cells: [
                         DataCell(
                           Text(
-                            DateFormat(
-                              DateFormat.HOUR24_MINUTE,
-                            ).format(order.time),
+                            DateFormat(DateFormat.HOUR24_MINUTE).format(
+                              order.time,
+                            ), 
                           ),
                         ),
                         DataCell(Text(order.tableNumber)),

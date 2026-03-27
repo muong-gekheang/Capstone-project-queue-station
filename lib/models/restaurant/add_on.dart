@@ -18,6 +18,22 @@ class AddOn {
     this.image,
   });
 
+  AddOn copyWith({
+    String? id,
+    String? name,
+    double? price,
+    String? restaurantId,
+    String? image,
+  }) {
+    return AddOn(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      restaurantId: restaurantId ?? this.restaurantId,
+      image: image ?? this.image,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

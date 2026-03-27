@@ -45,7 +45,7 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
         _$SubscriptionStatusEnumMap,
         json['subscriptionStatus'],
       ) ??
-      SubscriptionStatus.paid,
+      SubscriptionStatus.active,
   openingTime: (json['openingTime'] as num?)?.toInt() ?? 0,
   closingTime: (json['closingTime'] as num?)?.toInt() ?? 0,
   location: const LatLngConverter().fromJson(

@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/utils/nullable_timestamp_converter.dart';
-import 'package:queue_station_app/utils/timestamp_converter.dart';
 import 'package:uuid/uuid.dart';
 
 part 'queue_table.g.dart';

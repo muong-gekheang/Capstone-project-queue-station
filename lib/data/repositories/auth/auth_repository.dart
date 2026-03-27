@@ -13,7 +13,8 @@ abstract class AuthRepository {
     String oldPassword,
     String newPassword,
   );
-
+  Future<Map<String, dynamic>> getUserData(String uid);
+  Future<String?> getSubscriptionStatus(String restaurantId);
   static Future<void> reauthenticate(String password) async {
     final user = FirebaseAuth.instance.currentUser!;
     AuthCredential credential = EmailAuthProvider.credential(
@@ -26,4 +27,5 @@ abstract class AuthRepository {
       debugPrint("REAUTH: $e");
     }
   }
+  
 }

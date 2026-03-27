@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:queue_station_app/models/restaurant/restaurant_social.dart';
 
@@ -79,7 +78,7 @@ class Restaurant {
     this.isOpen = true,
     this.email = '',
     required this.subscriptionDate,
-    this.subscriptionStatus = SubscriptionStatus.paid,
+    this.subscriptionStatus = SubscriptionStatus.active,
     required this.openingTime,
     required this.closingTime,
     this.location,

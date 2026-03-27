@@ -9,7 +9,7 @@ part of 'order.dart';
 Order _$OrderFromJson(Map<String, dynamic> json) => Order(
   id: json['id'] as String,
   timestamp: const TimestampConverter().fromJson(json['timestamp']),
-  restaurantId: json['restaurantId'] as String,
+  restaurantId: json['restaurantId'] as String?,
   orderedIds:
       (json['orderedIds'] as List<dynamic>?)
           ?.map((e) => e as String)

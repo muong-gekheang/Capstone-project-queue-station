@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
@@ -23,7 +24,7 @@ class MenuManagementViewModel extends ChangeNotifier {
   List<MenuItemCategory> _allCategories = [];
   List<AddOn> _allAddOns = [];
   List<SizeOption> _sizingOptions = [];
-  int _selectedIndex = 0;
+  int _selectedIndex = -1;
   String _selectedCategoryId = '';
   String _searchQuery = '';
 
@@ -132,7 +133,9 @@ class MenuManagementViewModel extends ChangeNotifier {
   // --- Data Piping (State Setters) ---
   void updateSelectedIndex(int index) {
     _selectedIndex = index;
-    _selectedCategoryId = _allCategories[index].id;
+    if (index != -1) {
+      _selectedCategoryId = _allCategories[index].id;
+    }
     notifyListeners();
   }
 
@@ -144,40 +147,57 @@ class MenuManagementViewModel extends ChangeNotifier {
   // --- Logic Signatures (Piping to Service) ---
 
   List<MenuItem> getFilteredMenuList() {
-    return _allMenuItems
-        .where(
-          (e) =>
-              (e.name.toLowerCase().startsWith(_searchQuery)) &&
-              (e.categoryId == _selectedCategoryId),
-        )
-        .toList();
+    final bool isAllSelected = _selectedIndex == -1;
+    final bool isSearching = _searchQuery.isNotEmpty;
+
+    return _allMenuItems.where((e) {
+      final matchesSearch = e.name.toLowerCase().contains(
+        _searchQuery.toLowerCase(),
+      );
+      final matchesCategory = e.categoryId == _selectedCategoryId;
+
+      if (isSearching) {
+        return matchesSearch;
+      } else if (isAllSelected) {
+        return true;
+      } else {
+        return matchesCategory;
+      }
+    }).toList();
   }
 
-  void updateMenuItem(MenuItem newMenuItem, MenuItem oldMenuItem) {
-    _menuService.updateMenuItem(newMenuItem, oldMenuItem);
+  void updateMenuItem(
+    MenuItem newMenuItem,
+    MenuItem oldMenuItem,
+    Uint8List? pickedLogoBytes,
+  ) {
+    _menuService.updateMenuItem(newMenuItem, oldMenuItem, pickedLogoBytes);
   }
 
   void toggleMenuAvailability(MenuItem menu, bool isAvailable) {
     menu.isAvailable = isAvailable;
-    _menuService.updateMenuItem(menu, null);
+    _menuService.updateMenuItem(menu, null, null);
   }
 
   void removeMenuItem(MenuItem item) {
     _menuService.deleteMenuItem(item);
   }
 
-  void addMenuItem(MenuItem newItem) {
-    _menuService.addMenuItem(newItem);
+  void addMenuItem(MenuItem newItem, Uint8List? selectedImageBytes) {
+    _menuService.addMenuItem(newItem, selectedImageBytes);
   }
 
-  void addNewCategory(MenuItemCategory newCategory) {
-    _menuService.addMenuCategory(newCategory);
+  void addNewCategory(
+    MenuItemCategory newCategory,
+    Uint8List? selectedImageBytes,
+  ) {
+    _menuService.addMenuCategory(newCategory, selectedImageBytes);
     _selectedCategoryId = newCategory.id;
     notifyListeners();
   }
 
-  void addNewAddOn(AddOn newAddon) {
-    _menuService.addAddOn(newAddon);
+  void addNewAddOn(AddOn newAddon, Uint8List? selectedImageBytes) {
+    _menuService.addAddOn(newAddon, selectedImageBytes);
   }
 
   void addNewSizeOption(SizeOption newSizeOption) {

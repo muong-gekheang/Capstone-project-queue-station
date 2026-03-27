@@ -38,9 +38,9 @@ class DeleteMenuPopUp extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 image: menu.image != null
-                    ? DecorationImage(image: AssetImage(menu.image!))
+                    ? DecorationImage(image: NetworkImage(menu.image!))
                     : DecorationImage(
-                        image: AssetImage('assets/images/default_menu.jpg'),
+                        image: AssetImage('assets/images/default_menu_profile.jpg'),
                       ), // - will implement later
               ),
             ),

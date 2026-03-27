@@ -1,7 +1,5 @@
-import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository_mock.dart';
 import 'package:queue_station_app/models/user/abstracts/user.dart';
 import 'package:queue_station_app/models/user/customer.dart';
-import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:uuid/uuid.dart';
 

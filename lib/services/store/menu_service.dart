@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:queue_station_app/data/repositories/image/image_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/add_on/add_on_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_category/menu_category_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_item/menu_item_repository.dart';
 import 'package:queue_station_app/data/repositories/menu/menu_size/menu_size_repository.dart';
-import 'package:queue_station_app/data/repositories/menu/menu_size/menu_size_repository_impl.dart';
 import 'package:queue_station_app/data/repositories/menu/sizing_option/sizing_option_repository.dart';
-import 'package:queue_station_app/data/repositories/table_category/table_category_repository_mock.dart';
 import 'package:queue_station_app/models/restaurant/add_on.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
@@ -22,6 +23,7 @@ class MenuService {
   final MenuCategoryRepository _menuCategoryRepository;
   final SizingOptionRepository _sizingOptionRepository;
   final MenuSizeRepository _menuSizeRepository;
+  final ImageRepository _imageRepository;
   UserProvider _userProvider;
 
   final _addOnController = BehaviorSubject<List<AddOn>>.seeded([]);
@@ -47,11 +49,13 @@ class MenuService {
     required AddOnRepository addOnRepository,
     required SizingOptionRepository sizingOptionRepository,
     required MenuSizeRepository menuSizeRepository,
+    required ImageRepository imageRepository,
   }) : _userProvider = userProvider,
        _menuItemRepository = menuItemRepository,
        _menuCategoryRepository = menuCategoryRepository,
        _addOnRepository = addOnRepository,
        _sizingOptionRepository = sizingOptionRepository,
+       _imageRepository = imageRepository,
        _menuSizeRepository = menuSizeRepository {
     _initStream();
   }
@@ -158,7 +162,22 @@ class MenuService {
     return result;
   }
 
-  void addMenuItem(MenuItem newMenu) {
+  void addMenuItem(MenuItem newMenu, Uint8List? pickedLogoBytes) {
+    if (pickedLogoBytes != null && pickedLogoBytes.isNotEmpty) {
+      _imageRepository
+          .uploadLogo(pickedLogoBytes, 'menu_item_${newMenu.id}')
+          .then((imageUrl) {
+            final menuWithLogo = newMenu.copyWith(
+              image: imageUrl,
+              restaurantId: _restId,
+            );
+            _menuItemRepository.create(menuWithLogo);
+            for (var menuSize in newMenu.sizes) {
+              _menuSizeRepository.create(menuSize);
+            }
+          });
+      return;
+    }
     MenuItem menuToAdd = newMenu.copyWith(restaurantId: _restId);
     _menuItemRepository.create(menuToAdd);
     for (var menuSize in newMenu.sizes) {
@@ -169,23 +188,40 @@ class MenuService {
   Future<void> updateMenuItem(
     MenuItem newMenuItem,
     MenuItem? oldMenuItem,
+    Uint8List? pickedLogoBytes,
   ) async {
     newMenuItem = newMenuItem.copyWith(restaurantId: _restId);
     oldMenuItem = oldMenuItem?.copyWith(restaurantId: _restId);
+
+    Future<MenuItem> resolveImage() async {
+      if (pickedLogoBytes != null) {
+        if (oldMenuItem?.image != null) {
+          final uri = Uri.parse(oldMenuItem!.image!);
+          final fileName = uri.pathSegments.last.split('%2F').last;
+          await _imageRepository.deleteLogo(fileName);
+        }
+        final url = await _imageRepository.uploadLogo(
+          pickedLogoBytes,
+          'menu_item_${newMenuItem.id}',
+        );
+        return newMenuItem.copyWith(image: url);
+      }
+      return newMenuItem;
+    }
+
+    final resolvedMenuItem = await resolveImage();
+
     if (oldMenuItem != null) {
       final batch = FirebaseFirestore.instance.batch();
 
-      // 1. Get references instead of calling 'update' directly
       final itemRef = FirebaseFirestore.instance
           .collection('menu_items')
-          .doc(newMenuItem.id);
-      batch.set(itemRef, newMenuItem.toJson(), SetOptions(merge: true));
+          .doc(resolvedMenuItem.id);
+      batch.set(itemRef, resolvedMenuItem.toJson(), SetOptions(merge: true));
 
-      final newSizeSet = newMenuItem.sizes.toSet();
+      final newSizeSet = resolvedMenuItem.sizes.toSet();
       final oldSizeSet = oldMenuItem.sizes.toSet();
 
-      // 2. Add all operations to the SAME batch
-      // Create new ones
       for (var menuSize in newSizeSet.difference(oldSizeSet)) {
         final ref = FirebaseFirestore.instance
             .collection('sizes')
@@ -193,7 +229,6 @@ class MenuService {
         batch.set(ref, menuSize.toJson());
       }
 
-      // Delete removed ones
       for (var menuSize in oldSizeSet.difference(newSizeSet)) {
         final ref = FirebaseFirestore.instance
             .collection('sizes')
@@ -201,7 +236,6 @@ class MenuService {
         batch.delete(ref);
       }
 
-      // Update existing ones
       for (var menuSize in newSizeSet.intersection(oldSizeSet)) {
         final ref = FirebaseFirestore.instance
             .collection('sizes')
@@ -209,20 +243,45 @@ class MenuService {
         batch.update(ref, menuSize.toJson());
       }
 
-      // 3. The Atomic Commit
-      // Even if the phone dies RIGHT NOW, Firestore has this saved in its local cache.
       await batch.commit();
     } else {
-      _menuItemRepository.update(newMenuItem);
+      await _menuItemRepository.update(resolvedMenuItem);
     }
   }
 
-  void deleteMenuItem(MenuItem menuItem) {
-    _menuItemRepository.delete(menuItem.id);
+  void deleteMenuItem(MenuItem menuItem) async {
+    try {
+      if (menuItem.image != null) {
+        print("Deleting image: ${menuItem.image}");
+        await _imageRepository.deleteLogo(menuItem.image!);
+        print("image in storage is deleted");
+      }
+    } catch (e) {
+      print("Image delete failed: $e");
+    }
+    await _menuItemRepository.delete(menuItem.id);
   }
 
-  void addMenuCategory(MenuItemCategory newCategory) {
+  void addMenuCategory(
+    MenuItemCategory newCategory,
+    Uint8List? selectedImageBytes,
+  ) {
     newCategory.restaurantId = _restId;
+
+    print('=== addMenuCategory called ===');
+    print('selectedImageBytes: $selectedImageBytes');
+    print('selectedImageBytes isNull: ${selectedImageBytes == null}');
+    print('selectedImageBytes isEmpty: ${selectedImageBytes?.isEmpty}');
+
+    if (selectedImageBytes != null && selectedImageBytes.isNotEmpty) {
+      _imageRepository
+          .uploadLogo(selectedImageBytes, 'menu_category_${newCategory.id}')
+          .then((imageUrl) {
+            final categoryWithLogo = newCategory.copyWith(imageLink: imageUrl);
+            _menuCategoryRepository.create(categoryWithLogo);
+          });
+      return;
+    }
     _menuCategoryRepository.create(newCategory);
   }
 
@@ -235,9 +294,19 @@ class MenuService {
     _menuCategoryRepository.delete(menuCategory.id);
   }
 
-  void addAddOn(AddOn newAddOn) {
+  void addAddOn(AddOn newAddOn, Uint8List? selectedImageBytes) {
     newAddOn.restaurantId = _restId;
-    _addOnRepository.create(newAddOn);
+
+    if (selectedImageBytes != null && selectedImageBytes.isNotEmpty) {
+      _imageRepository
+          .uploadLogo(selectedImageBytes, 'add_on_${newAddOn.id}')
+          .then((imageUrl) {
+            AddOn newAddOnWithLogo = newAddOn.copyWith(image: imageUrl);
+            _addOnRepository.create(newAddOnWithLogo);
+          });
+    }else{
+      _addOnRepository.create(newAddOn);
+    }
   }
 
   void updateAddOn(AddOn newAddOn) {

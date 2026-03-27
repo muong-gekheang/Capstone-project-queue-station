@@ -13,7 +13,7 @@ class QueueService {
   final FirebaseFunctions functions = FirebaseFunctions.instance;
   UserProvider _userProvider;
   final QueueEntryRepository _queueEntryRepository;
-  final TableService _tableService;
+  final TableService? _tableService; // Make optional for customer view
 
   List<QueueEntry> queueHistory = [];
   List<QueueEntry> todayFinishedQueue = [];
@@ -34,21 +34,35 @@ class QueueService {
   List<QueueEntry> _selectedEntries = [];
   String? _watchingRestaurantId;
 
+  // For customer view - all active queues
+  StreamSubscription<List<QueueEntry>>? _allQueuesSubscription;
+  final _allQueuesStreamController = BehaviorSubject<List<QueueEntry>>.seeded(
+    [],
+  );
+
+  // Cache for restaurant-specific streams
+  final Map<String, StreamSubscription<List<QueueEntry>>>
+  _restaurantSubscriptions = {};
+  final Map<String, BehaviorSubject<List<QueueEntry>>> _restaurantControllers =
+      {};
+
   QueueService({
     required UserProvider userProvider,
     required QueueEntryRepository queueEntryRepository,
-    required TableService tableService,
+    TableService? tableService, // Make optional
   }) : _userProvider = userProvider,
        _queueEntryRepository = queueEntryRepository,
        _tableService = tableService {
     _initStream();
+    _listenToAllQueues(); // Add this for customer view
   }
 
   String get _restId => _userProvider.asStoreUser?.restaurantId ?? "";
 
   // ─── Owner stream init ───────────────────────────────────────────────────
   void _initStream() {
-    if (_restId.isNotEmpty) {
+    // Only listen to specific restaurant queues if user is a store user
+    if (_restId.isNotEmpty && _tableService != null) {
       _queueEntrySubscription = _queueEntryRepository
           .watchCurrentActiveQueue(_restId)
           .listen(
@@ -64,10 +78,67 @@ class QueueService {
     }
   }
 
+  // Listen to all active queues for customer view
+  void _listenToAllQueues() {
+    _allQueuesSubscription = _queueEntryRepository
+        .watchAllActiveQueues()
+        .listen(
+          (data) {
+            print("QueueService: Received ${data.length} active queues");
+            _allQueuesStreamController.add(data);
+          },
+          onError: (error) {
+            print("QueueService all queues error: $error");
+            _allQueuesStreamController.addError(error);
+          },
+        );
+  }
+
+  // NEW: Get stream for a specific restaurant
+  Stream<List<QueueEntry>> getQueueStreamForRestaurant(String restaurantId) {
+    print('QueueService: Getting queue stream for restaurant: $restaurantId');
+
+    // Check if we already have a controller for this restaurant
+    if (!_restaurantControllers.containsKey(restaurantId)) {
+      // Create a new controller
+      final controller = BehaviorSubject<List<QueueEntry>>.seeded([]);
+      _restaurantControllers[restaurantId] = controller;
+
+      // Subscribe to repository stream for this restaurant
+      final subscription = _queueEntryRepository
+          .watchCurrentActiveQueue(restaurantId)
+          .listen(
+            (data) {
+              print(
+                'QueueService: Restaurant $restaurantId has ${data.length} waiting entries',
+              );
+              controller.add(data);
+            },
+            onError: (error) {
+              print('QueueService: Error for restaurant $restaurantId: $error');
+              controller.addError(error);
+            },
+          );
+
+      _restaurantSubscriptions[restaurantId] = subscription;
+    }
+
+    return _restaurantControllers[restaurantId]!.stream;
+  }
+
+  void dispose() {
+    _queueEntrySubscription?.cancel();
+    _queueEntryStreamController.close();
+    _allQueuesSubscription?.cancel();
+    _allQueuesStreamController.close();
+    _selectedRestaurantSub?.cancel();
+    _selectedQueueController.close();
+  }
+
   void updateDependencies(UserProvider newUserProvider) {
     _userProvider = newUserProvider;
     final newId = newUserProvider.asStoreUser?.restaurantId ?? "";
-    if (newId != _restId && newId.isNotEmpty) {
+    if (newId != _restId && newId.isNotEmpty && _tableService != null) {
       _queueEntrySubscription?.cancel();
       _initStream();
     }
@@ -121,6 +192,10 @@ class QueueService {
   Stream<List<QueueEntry>> get streamQueueEntries =>
       _queueEntryStreamController.stream;
 
+  // For customer view - returns all active queues
+  Stream<List<QueueEntry>> get streamAllActiveQueues =>
+      _allQueuesStreamController.stream;
+
   List<QueueEntry> get currentEntries => List.unmodifiable(_currentEntries);
 
   int get peopleWaiting {
@@ -135,6 +210,8 @@ class QueueService {
   void addCustomerToQueue({required QueueEntry newQueue}) async {
     try {
       HttpsCallable callable = functions.httpsCallable('createQueue');
+
+      // 2. Call the function with your data Map
       final results = await callable.call({
         "customerId": newQueue.restId,
         "id": newQueue.id,
@@ -147,6 +224,8 @@ class QueueService {
         "joinTime": newQueue.joinTime.toIso8601String(),
         "queueNumber": newQueue.id.substring(0, 4),
       });
+
+      // 3. Handle the response (The data returned from your exports.createQueue)
       print("Success! Assigned Queue Number: ${results.data['queueNumber']}");
       print("Estimated Wait: ${results.data['expectedReadyAt']}");
     } on FirebaseFunctionsException catch (e) {
@@ -159,11 +238,13 @@ class QueueService {
   }
 
   void serveCustomer(QueueEntry queueEntry) {
+    if (_tableService == null) return;
     _queueEntryRepository.updateStatus(queueEntry.id, QueueStatus.serving);
-    final table = _tableService.tables.firstWhere(
+
+    final table = _tableService!.tables.firstWhere(
       (e) => e.id == queueEntry.assignedTableId,
     );
-    _tableService.updateTableCustomers(table, queueEntry.id);
+    _tableService!.updateTableCustomers(table, queueEntry.id);
   }
 
   void removeUserFromQueue(String queueEntryId) {
@@ -171,6 +252,8 @@ class QueueService {
   }
 
   Future<Duration> get avgWaitingTime async {
+    if (_restId.isEmpty) return Duration.zero;
+
     List<QueueEntry> todayHistory = [];
     if (retrieveAt != null &&
         retrieveAt!.difference(DateTime.now()).abs() <=
@@ -189,8 +272,10 @@ class QueueService {
 
     int avgMinutes = 0;
     for (var hist in todayHistory) {
-      Duration waitTime = hist.joinTime.difference(hist.servedTime!).abs();
-      avgMinutes += waitTime.inMinutes;
+      if (hist.servedTime != null) {
+        Duration waitTime = hist.joinTime.difference(hist.servedTime!).abs();
+        avgMinutes += waitTime.inMinutes;
+      }
     }
     if (todayHistory.isNotEmpty) {
       avgMinutes = (avgMinutes / todayHistory.length).round();
@@ -201,6 +286,8 @@ class QueueService {
   }
 
   Future<bool> retrieveNextQueueHistory() async {
+    if (_restId.isEmpty) return false;
+
     try {
       if (queueHistory.length >= 1000) {
         queueHistory.removeRange(0, 100);
@@ -219,6 +306,8 @@ class QueueService {
   }
 
   Future<void> retrieveQueueHistory(TimeFrameOption timeFrame) async {
+    if (_restId.isEmpty) return;
+
     int limit = (timeFrame == TimeFrameOption.today) ? 100 : 500;
     try {
       final result = await _queueEntryRepository.getQueueHistory(
@@ -236,13 +325,5 @@ class QueueService {
     } catch (e) {
       print("History Fetch Error: $e");
     }
-  }
-
-  // ─── Dispose ──────────────────────────────────────────────────────────────
-  void dispose() {
-    _queueEntrySubscription?.cancel();
-    _queueEntryStreamController.close();
-    _selectedRestaurantSub?.cancel();
-    _selectedQueueController.close();
   }
 }

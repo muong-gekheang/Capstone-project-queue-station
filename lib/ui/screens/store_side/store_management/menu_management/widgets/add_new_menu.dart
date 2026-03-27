@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/restaurant/menu_item.dart';
@@ -19,8 +21,8 @@ class AddNewMenu extends StatelessWidget {
           value: vm,
           child: MenuForm(
             initialMenu: null, // null = we are adding
-            onSubmit: (MenuItem newMenu) {
-              vm.addMenuItem(newMenu);
+            onSubmit: (MenuItem newMenu, Uint8List? selectedImageBytes) {
+              vm.addMenuItem(newMenu, selectedImageBytes);
               Navigator.pop(context); // close the page
             },
           ),
