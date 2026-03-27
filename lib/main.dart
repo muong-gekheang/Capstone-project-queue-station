@@ -66,25 +66,26 @@ List<SingleChildWidget> dependencies = [
   Provider<MenuItemRepository>(create: (_) => MenuItemRepositoryImpl()),
   Provider<QueueEntryRepository>(create: (_) => QueueEntryRepositoryImpl()),
   Provider<QueueTableRepository>(create: (_) => QueueTableRepositoryImpl()),
-  Provider<TableCategoryRepository>(create: (_) => TableCategoryRepositoryImpl()),
+  Provider<TableCategoryRepository>(
+    create: (_) => TableCategoryRepositoryImpl(),
+  ),
   Provider<UserRepository<Customer>>(create: (_) => CustomerRepositoryImpl()),
   Provider<UserRepository<StoreUser>>(create: (_) => StoreUserRepositoryImpl()),
   Provider<SizingOptionRepository>(create: (_) => SizingOptionRepositoryImpl()),
   Provider<OrderRepository>(create: (_) => OrderRepositoryImpl()),
   Provider<OrderItemRepository>(create: (_) => OrderItemRepositoryImpl()),
   Provider<MenuSizeRepository>(create: (_) => MenuSizeRepositoryImpl()),
-  Provider<ImageRepository>(create: (_) => ImageRepositoryImpl(),),
+  Provider<ImageRepository>(create: (_) => ImageRepositoryImpl()),
   Provider<TableService>(
     create: (context) => TableService(
-      queueTableRepository: context.read<QueueTableRepository>(), 
-      userProvider: context.read<UserProvider>(), 
-      tableCategoryRepository: context.read<TableCategoryRepository>()
-    )
+      queueTableRepository: context.read<QueueTableRepository>(),
+      userProvider: context.read<UserProvider>(),
+      tableCategoryRepository: context.read<TableCategoryRepository>(),
+    ),
   ),
   Provider<RestaurantListService>(
-    create: (context) => RestaurantListService(
-      context.read<RestaurantRepository>(), 
-    ),
+    create: (context) =>
+        RestaurantListService(context.read<RestaurantRepository>()),
   ),
   Provider<QueueService>(
     create: (context) => QueueService(
@@ -97,7 +98,6 @@ List<SingleChildWidget> dependencies = [
     create: (context) =>
         RestaurantListService(context.read<RestaurantRepository>()),
   ),
-
 ];
 
 void main() async {
@@ -111,9 +111,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<UserProvider>.value(value: userProvider),
-        ChangeNotifierProvider(
-          create: (_) => StoreOrderNotificationProvider(),
-        ),
+        ChangeNotifierProvider(create: (_) => StoreOrderNotificationProvider()),
         ...dependencies,
         ProxyProvider4<
           UserProvider,
@@ -150,21 +148,21 @@ void main() async {
         ),
         ChangeNotifierProxyProvider<UserProvider, OrderProvider>(
           create: (context) => OrderProvider(
-            userProvider: context.read<UserProvider>(), 
+            userProvider: context.read<UserProvider>(),
             orderService: OrderService(
-              orderRepository: context.read<OrderRepository>(), 
+              orderRepository: context.read<OrderRepository>(),
               menuService: MenuService(
-                menuItemRepository: context.read<MenuItemRepository>(), 
-                userProvider: userProvider, 
-                menuCategoryRepository: context.read<MenuCategoryRepository>(), 
-                addOnRepository: context.read<AddOnRepository>(), 
-                sizingOptionRepository: context.read<SizingOptionRepository>(), 
-                menuSizeRepository: context.read<MenuSizeRepository>(), 
-                imageRepository: context.read<ImageRepository>()
-              ), 
-              orderItemRepository: context.read<OrderItemRepository>(), 
-              userProvider: userProvider, 
-              queueRepository: context.read<QueueEntryRepository>()
+                menuItemRepository: context.read<MenuItemRepository>(),
+                userProvider: userProvider,
+                menuCategoryRepository: context.read<MenuCategoryRepository>(),
+                addOnRepository: context.read<AddOnRepository>(),
+                sizingOptionRepository: context.read<SizingOptionRepository>(),
+                menuSizeRepository: context.read<MenuSizeRepository>(),
+                imageRepository: context.read<ImageRepository>(),
+              ),
+              orderItemRepository: context.read<OrderItemRepository>(),
+              userProvider: userProvider,
+              queueRepository: context.read<QueueEntryRepository>(),
             ),
           ),
           update: (context, userProvider, previous) {
@@ -204,7 +202,9 @@ void main() async {
                   path: '/',
                   builder: (context, state) {
                     User user = context.read<UserProvider>().currentUser!;
-                    return user is Customer ? NormalUserApp() : StoreMainScreen();
+                    return user is Customer
+                        ? NormalUserApp()
+                        : StoreMainScreen();
                   },
                 ),
                 GoRoute(
@@ -213,7 +213,10 @@ void main() async {
                 ),
                 GoRoute(
                   path: '/menu',
-                  builder: (context, state) => const MenuScreen(),
+                  builder: (_, state) => Provider.value(
+                    value: context.read<UserRepository<Customer>>(),
+                    child: const MenuScreen(),
+                  ),
                 ),
                 GoRoute(
                   path: '/order',

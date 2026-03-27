@@ -27,45 +27,42 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
       body: queueEntry != null
           ? Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: queueEntry.orderId == null
-                        ? Text("No Order")
-                        : FutureBuilder(
-                            future: vm.getOrderDetailsById(queueEntry.orderId!),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
+              child: queueEntry.orderId == null
+                  ? Text("No Order")
+                  : FutureBuilder(
+                      future: vm.getOrderDetailsById(queueEntry.orderId!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                              List<OrderItem> pendingItems =
-                                  snapshot.data?.ordered
-                                      .where(
-                                        (e) =>
-                                            e.orderItemStatus ==
-                                            OrderItemStatus.pending,
-                                      )
-                                      .toList() ??
-                                  [];
+                        List<OrderItem> pendingItems =
+                            snapshot.data?.ordered
+                                .where(
+                                  (e) =>
+                                      e.orderItemStatus ==
+                                      OrderItemStatus.pending,
+                                )
+                                .toList() ??
+                            [];
 
-                              List<OrderItem> acceptedItems =
-                                  snapshot.data?.ordered
-                                      .where(
-                                        (e) =>
-                                            e.orderItemStatus ==
-                                            OrderItemStatus.accepted,
-                                      )
-                                      .toList() ??
-                                  [];
+                        List<OrderItem> acceptedItems =
+                            snapshot.data?.ordered
+                                .where(
+                                  (e) =>
+                                      e.orderItemStatus ==
+                                      OrderItemStatus.accepted,
+                                )
+                                .toList() ??
+                            [];
 
-                              debugPrint("Order: ${snapshot.data}");
+                        debugPrint("Order: ${snapshot.data}");
 
-                              return ListView(
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: ListView(
                                 children: [
                                   HeaderTile(title: 'New Order'),
                                   const SizedBox(height: 10),
@@ -89,13 +86,11 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                                     const SizedBox(height: 10),
 
                                     ButtonWidget(
-                                      title: 'Mark as accepted',
+                                      title: vm.isLoading
+                                          ? 'Processing'
+                                          : 'Mark as accepted',
                                       onPressed: () {
-                                        context
-                                            .read<
-                                              StoreOrderNotificationProvider
-                                            >()
-                                            .acceptAllIncomingOrder(queueEntry);
+                                        vm.acceptAllOrderItems(pendingItems);
                                       },
                                       backgroundColor: AppTheme.primaryColor,
                                       textColor: AppTheme.naturalWhite,
@@ -137,20 +132,24 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                                   else
                                     InfoBadge(text: 'No Accepted Orders'),
                                 ],
-                              );
-                            },
-                          ),
-                  ),
-                  ButtonWidget(
-                    title: 'Total',
-                    trailingText: '\$${10}',
-                    onPressed: () {},
-                    backgroundColor: AppTheme.primaryColor,
-                    textColor: AppTheme.naturalWhite,
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-                  ),
-                ],
-              ),
+                              ),
+                            ),
+                            ButtonWidget(
+                              title: 'Total',
+                              trailingText:
+                                  '\$${acceptedItems.fold(0.0, (previousValue, element) => previousValue + element.menuItemPrice)}',
+                              onPressed: () {},
+                              backgroundColor: AppTheme.primaryColor,
+                              textColor: AppTheme.naturalWhite,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 25,
+                                vertical: 5,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
             )
           : Center(child: Text("No Customer is in the table.")),
     );

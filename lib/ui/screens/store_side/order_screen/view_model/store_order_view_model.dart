@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/models/order/order.dart';
+import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/order_service.dart';
 import 'package:queue_station_app/services/queue_service.dart';
@@ -58,6 +59,19 @@ class StoreOrderViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   List<QueueEntry> get currentInStore => _currentInStore;
+
+  void acceptAllOrderItems(List<OrderItem> orderItems) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      await _orderService.updateOrderItems(orderItems);
+    } catch (err) {
+      debugPrint("$err");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   QueueEntry? getQueueEntryById(String id) {
     try {

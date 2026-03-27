@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
+import 'package:queue_station_app/data/repositories/user/user_repository.dart';
+import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/order_provider.dart';
 import 'package:queue_station_app/services/user_provider.dart';
@@ -9,33 +12,36 @@ class CartViewModel extends ChangeNotifier {
   final OrderProvider orderProvider;
   final UserProvider userProvider;
   final QueueEntryRepository queueEntryRepository;
+  final UserRepository<Customer> userRepository;
 
   CartViewModel({
     required this.orderProvider,
     required this.userProvider,
     required this.queueEntryRepository,
+    required this.userRepository,
   }) {
-    _fetchQueueDetails();
+    _init();
     // ✅ Add listener to update UI when order changes
     orderProvider.addListener(_onOrderProviderChanged);
   }
 
-  void _onOrderProviderChanged() {
-    notifyListeners();
-  }
-
+  Order? _detailedOrder; // Stores the order with MenuItem details
   QueueEntry? _currentQueue;
+  bool _isLoading = false;
+  bool _isDisposed = false;
+
+  // ---------------------------
+  // Getters
+  // ---------------------------
+  bool get isLoading => _isLoading;
   QueueEntry? get currentQueue => _currentQueue;
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  /// Returns items with full details if available, otherwise falls back to provider items
+  List<OrderItem> get items => _detailedOrder?.inCart ?? orderProvider.items;
 
-  // Cart (unconfirmed items currently in the 'inCart' list)
-  List<OrderItem> get items => orderProvider.items;
-
-  // Confirmed orders (items already sent to the kitchen)
+  /// Returns confirmed items already sent to the kitchen
   List<OrderItem> get confirmedItems =>
-      orderProvider.currentOrder?.ordered ?? [];
+      _detailedOrder?.ordered ?? (orderProvider.currentOrder?.ordered ?? []);
 
   double get totalAmount => orderProvider.totalAmount;
   String get tableNumber => _currentQueue?.tableNumber ?? "--";
@@ -50,28 +56,53 @@ class CartViewModel extends ChangeNotifier {
     return "$hour:${date.minute.toString().padLeft(2, '0')} $period";
   }
 
-  Future<void> _fetchQueueDetails() async {
+  // ---------------------------
+  // Initialization & Sync
+  // ---------------------------
+
+  Future<void> _init() async {
     final queueId = userProvider.asCustomer?.currentHistoryId;
-    if (queueId != null) {
-      _isLoading = true;
-      notifyListeners();
-      try {
-        _currentQueue = await queueEntryRepository.getQueueEntryById(queueId);
-      } catch (e) {
-        debugPrint("Error fetching queue: $e");
-        _currentQueue = null;
-      } finally {
+    if (queueId == null) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Fetch details and queue info in parallel for speed
+      final results = await Future.wait([
+        orderProvider.currentOrderInDetails,
+        queueEntryRepository.getQueueEntryById(queueId),
+      ]);
+
+      _detailedOrder = results[0] as Order?;
+      _currentQueue = results[1] as QueueEntry?;
+    } catch (e) {
+      debugPrint("Error fetching cart details: $e");
+    } finally {
+      if (!_isDisposed) {
         _isLoading = false;
         notifyListeners();
       }
     }
   }
 
+  /// When OrderProvider updates (optimistic update), we re-fetch the details
+  /// to ensure the UI has the MenuItem objects for names/images.
+  void _onOrderProviderChanged() async {
+    if (_isDisposed) return;
+
+    final updatedDetails = await orderProvider.currentOrderInDetails;
+
+    if (!_isDisposed) {
+      _detailedOrder = updatedDetails;
+      notifyListeners();
+    }
+  }
+
   // ---------------------------
-  // Actions (Fixed)
+  // Cart Actions
   // ---------------------------
 
-  /// Increases quantity and syncs to Firestore
   Future<void> increaseItem(OrderItem item) async {
     try {
       final updatedItem = item.copyWith(quantity: item.quantity + 1);
@@ -81,14 +112,12 @@ class CartViewModel extends ChangeNotifier {
     }
   }
 
-  /// Decreases quantity (min 1) and syncs to Firestore
   Future<void> decreaseItem(OrderItem item) async {
     try {
       if (item.quantity > 1) {
         final updatedItem = item.copyWith(quantity: item.quantity - 1);
         await orderProvider.updateCart(updatedItem);
       } else {
-        // Remove item if quantity is 1
         await removeItem(item);
       }
     } catch (e) {
@@ -96,20 +125,17 @@ class CartViewModel extends ChangeNotifier {
     }
   }
 
-  /// Removes the item entirely from the cart
   Future<void> removeItem(OrderItem item) async {
     try {
-      // ✅ Use await and let orderProvider handle the save
       await orderProvider.removeItem(item);
     } catch (e) {
       debugPrint('Error removing item: $e');
     }
   }
 
-  /// Edit item (remove old, add new)
   Future<void> editItem(OrderItem oldItem, OrderItem newItem) async {
     try {
-      // ✅ Make this async and let orderProvider handle saves
+      // Perform both actions; the debouncer in OrderProvider will handle the sync
       await orderProvider.removeItem(oldItem);
       await orderProvider.addToCart(newItem);
     } catch (e) {
@@ -119,50 +145,89 @@ class CartViewModel extends ChangeNotifier {
 
   /// Confirms the current 'inCart' items and moves them to 'ordered'
   Future<void> confirmOrder(BuildContext context) async {
-    if (orderProvider.currentOrder == null || items.isEmpty) return;
+    final currentOrderSnapshot = orderProvider.currentOrder;
+    if (currentOrderSnapshot == null || items.isEmpty) return;
 
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Move items from inCart to ordered
-      final updatedOrdered = List<OrderItem>.from(
-        orderProvider.currentOrder!.ordered,
-      )..addAll(items);
+      // 1. Prepare the updated ordered list
+      final updatedOrdered = List<OrderItem>.from(currentOrderSnapshot.ordered)
+        ..addAll(items);
 
-      // Clear the cart and update ordered list
-      final confirmedOrder = orderProvider.currentOrder!.copyWith(
+      // 2. Create the confirmed state
+      final confirmedOrder = currentOrderSnapshot.copyWith(
         inCart: [],
         ordered: updatedOrdered,
       );
 
-      // Save to Firestore
+      // 3. Save directly to service to ensure the order is placed
       await orderProvider.orderService.saveOrder(confirmedOrder);
 
-      // Clear local cart state
+      // 4. Clear the optimistic cart in the provider
       await orderProvider.clearCart();
 
+      // 5. Refresh local details to reflect empty cart
+      _detailedOrder = await orderProvider.currentOrderInDetails;
+
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Order confirmed!")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Order confirmed!")));
         Navigator.pop(context);
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to confirm: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed to confirm: $e")));
       }
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        _isLoading = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  // ---------------------------
+  // Session Actions
+  // ---------------------------
+
+  Future<void> checkout() async {
+    if (_currentQueue == null) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Update Queue Status
+      await queueEntryRepository.update(
+        _currentQueue!.copyWith(status: QueueStatus.completed),
+      );
+
+      // Update Local User State
+      final updatedUser = userProvider.asCustomer!.copyWith(
+        currentHistoryId: null,
+      );
+      userProvider.updateUser(updatedUser);
+
+      // Sync User to Repository
+      await userRepository.update(updatedUser);
+    } catch (err) {
+      debugPrint("Checkout Error: $err");
+    } finally {
+      if (!_isDisposed) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
   @override
   void dispose() {
-    //Clean up listener
+    _isDisposed = true;
     orderProvider.removeListener(_onOrderProviderChanged);
     super.dispose();
   }

@@ -322,7 +322,7 @@ class JoinQueueViewModel extends ChangeNotifier {
         id: customer.id,
         historyIds: [...customer.historyIds, queueEntryId],
         currentHistoryId: queueEntryId,
-        profileLink: customer.profileLink
+        profileLink: customer.profileLink,
       );
 
       await customerRepository.update(updatedCustomer);

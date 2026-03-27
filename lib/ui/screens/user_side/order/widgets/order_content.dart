@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/cart/view_model/cart_view_model.dart';
 import 'package:queue_station_app/ui/widgets/food_item_card.dart';
 
-class OrderContent extends StatelessWidget {
+class OrderContent extends StatefulWidget {
   const OrderContent({super.key});
 
+  @override
+  State<OrderContent> createState() => _OrderContentState();
+}
+
+class _OrderContentState extends State<OrderContent> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<CartViewModel>();
@@ -184,6 +190,15 @@ class OrderContent extends StatelessWidget {
           ],
         ),
         actions: [
+          FilledButton(
+            onPressed: () {
+              var vm = context.read<CartViewModel>();
+              vm.checkout();
+              Navigator.pop(context);
+              context.go('/');
+            },
+            child: Text("Leave the store"),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);

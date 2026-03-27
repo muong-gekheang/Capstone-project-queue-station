@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:queue_station_app/data/repositories/user/user_repository.dart';
+import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/ui/screens/user_side/cart/cart_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/menu_item/menu_item_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/order/order_screen.dart';
@@ -231,7 +233,12 @@ class _MenuContentState extends State<MenuContent> {
             backgroundColor: const Color(0xFFFF6835),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const CartScreen()),
+              MaterialPageRoute(
+                builder: (_) => Provider.value(
+                  value: context.read<UserRepository<Customer>>(),
+                  child: CartScreen(),
+                ),
+              ),
             ),
             child: const Icon(Icons.shopping_cart_outlined),
           ),

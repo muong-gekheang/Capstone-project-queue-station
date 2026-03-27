@@ -55,6 +55,7 @@ class MenuItemRepositoryImpl implements MenuItemRepository {
           .collection('menu_items')
           .doc(menuItemId)
           .get();
+      debugPrint("MenuItem: ${doc.exists} from $menuItemId");
       if (!doc.exists) return null;
 
       final json = Map<String, dynamic>.from(doc.data()!);

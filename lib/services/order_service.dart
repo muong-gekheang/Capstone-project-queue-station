@@ -18,7 +18,8 @@ class OrderService {
   MenuService _menuService;
   final QueueEntryRepository _queueRepository;
 
-  final StreamController<List<Order>> _orderController = BehaviorSubject<List<Order>>.seeded([]);
+  final StreamController<List<Order>> _orderController =
+      BehaviorSubject<List<Order>>.seeded([]);
   StreamSubscription<List<Order>>? _orderSubscription;
   final _currentOrderController = BehaviorSubject<Order?>();
   StreamSubscription<Order?>? _orderSub;
@@ -125,28 +126,13 @@ class OrderService {
   void _subscribeToOrder(String orderId) {
     _orderSub?.cancel();
 
-    _orderSub =
-        Rx.combineLatest2<Order?, List<OrderItem>, Order?>(
-              _orderRepository.watchOrderById(orderId),
-              _orderRepository.watchOrderItems(orderId),
-              (order, items) {
-                if (order == null) return null;
-
-                final inCartSet = order.inCartIds.toSet();
-                final orderedSet = order.orderedIds.toSet();
-
-                return order.copyWith(
-                  inCart: items
-                      .where((i) => inCartSet.contains(Order.orderItemRef(i)))
-                      .toList(),
-                  ordered: items
-                      .where((i) => orderedSet.contains(Order.orderItemRef(i)))
-                      .toList(),
-                );
-              },
-            )
-            .distinct(_areOrdersEqual)
-            .listen(_emit, onError: _currentOrderController.addError);
+    _orderSub = _orderRepository.watchOrderById(orderId).listen((data) async {
+      if (data != null) {
+        _currentOrderController.add(await getOrderDetailsById(data.id));
+      } else {
+        _currentOrderController.add(null);
+      }
+    });
   }
 
   // ---------------------------
@@ -154,6 +140,18 @@ class OrderService {
   // ---------------------------
   Future<void> saveOrder(Order order) async {
     await _orderRepository.saveOrder(order);
+  }
+
+  Future<void> updateOrderItems(List<OrderItem> orderItems) async {
+    for (var item in orderItems) {
+      try {
+        _orderItemRepository.update(
+          item.copyWith(orderItemStatus: OrderItemStatus.accepted),
+        );
+      } catch (err) {
+        rethrow;
+      }
+    }
   }
 
   // ---------------------------
@@ -200,17 +198,18 @@ class OrderService {
       MenuItem? menuItem = _menuService.menuItemsMap[item.menuItemId];
 
       menuItem ??= await _menuService.getMenuItemById(item.menuItemId);
+      debugPrint("Order: MenuItem ${menuItem?.name} from ${item.menuItemId}");
       filledOrderItems.add(item.copyWith(menuItem: menuItem));
     }
     debugPrint(
-      "Order: Copy ${initOrder.copyWith(ordered: filledOrderItems).id}",
+      "Order: Copy ${initOrder.copyWith(ordered: filledOrderItems).ordered}",
     );
     return initOrder.copyWith(ordered: filledOrderItems);
   }
 
   List<Order> todayOrder = [];
 
-   bool _mapEquals(Map<String, double> a, Map<String, double> b) {
+  bool _mapEquals(Map<String, double> a, Map<String, double> b) {
     if (a.length != b.length) return false;
     for (final key in a.keys) {
       if (!b.containsKey(key) || b[key] != a[key]) return false;
