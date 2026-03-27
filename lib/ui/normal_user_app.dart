@@ -377,7 +377,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       const HomeScreen(),
-      const Placeholder(), // MAP
+      const MapScreen(), // MAP
       const MenuScreen(),
       const Placeholder(), // TICKET
       const Account(),

@@ -91,24 +91,6 @@ class _MapContentState extends State<MapContent> {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              vm.isStore ? "Store View" : "User View",
-              style: const TextStyle(fontSize: 16),
-            ),
-            actions: [
-              IconButton(
-                onPressed: vm.toggleUserMode,
-                icon: const Icon(Icons.swap_horiz),
-              ),
-              IconButton(
-                onPressed: () {
-                  vm.getDirectionsToRestaurant(vm.myStore!);
-                },
-                icon: const Icon(Icons.navigation),
-              ),
-            ],
-          ),
           body: Stack(
             children: [
               IgnorePointer(
