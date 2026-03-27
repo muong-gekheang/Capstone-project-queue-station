@@ -185,12 +185,19 @@ class _DashboardContentState extends State<DashboardContent> {
   }
 
   Widget _buildStoreProfileImage() {
+    final imageUrl = context.watch<DashboardViewModel>().restaurantLogoLink;
+    print('Store image profile url : ${imageUrl}');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: CircleAvatar(
         radius: 18,
         backgroundColor: Colors.grey[300],
-        child: const Icon(Icons.person, color: Colors.white),
+        backgroundImage: imageUrl != null && imageUrl.isNotEmpty
+            ? NetworkImage(imageUrl)
+            : null,
+        child: imageUrl == null || imageUrl.isEmpty
+            ? const Icon(Icons.person, color: Colors.white)
+            : null,
       ),
     );
   }

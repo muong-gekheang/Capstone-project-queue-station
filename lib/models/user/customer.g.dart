@@ -15,6 +15,7 @@ Customer _$CustomerFromJson(Map<String, dynamic> json) => Customer(
       .map((e) => e as String)
       .toList(),
   currentHistoryId: json['currentHistoryId'] as String?,
+  profileLink: json['profileLink'] as String?,
 );
 
 Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
@@ -25,4 +26,5 @@ Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
   'userType': instance.userType,
   'historyIds': instance.historyIds,
   'currentHistoryId': instance.currentHistoryId,
+  'profileLink': instance.profileLink,
 };

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 import 'package:queue_station_app/ui/screens/store_side/dashboard/view_model/dashboard_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/dashboard/widgets/dashboard_content.dart';
@@ -16,7 +17,8 @@ class DashboardScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => DashboardViewModel(
         queueService: queueService,
-        tableService: tableService,
+        tableService: tableService, 
+        restaurantService: context.read<RestaurantService>(),
       ),
       child: DashboardContent(onManageQueue: onManageQueue),
     );

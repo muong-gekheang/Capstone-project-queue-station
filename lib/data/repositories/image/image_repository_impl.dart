@@ -35,10 +35,17 @@ class ImageRepositoryImpl implements ImageRepository {
     await ref.delete();
   }
 
+  @override
+  Future<String> uploadProfileImage(Uint8List bytes, String userId) async {
+    final ref = firebaseStorage.ref('profile_images/$userId');
+    await ref.putData(bytes);
+    final url = await ref.getDownloadURL();
+    return url;
+  }
 
-
-
-
-
-
+  @override
+  Future<void> saveProfileImageUrl(String imageUrl, String userId) async {
+    final docRef = fireStore.collection('users').doc(userId);
+    await docRef.update({'profileLink': imageUrl});
+  }
 }

@@ -100,7 +100,8 @@ class AuthRepositoryImpl implements AuthRepository {
         email: customer.email,
         phone: customer.phone,
         id: uid,
-        historyIds: customer.historyIds,
+        historyIds: customer.historyIds, 
+        profileLink: customer.profileLink,
       );
 
       await _firestore

@@ -44,7 +44,8 @@ class AuthService {
         email: email,
         phone: phoneNumber,
         id: '', // Will be set by the repository after Firebase Auth creates the user
-        historyIds: [],
+        historyIds: [], 
+        profileLink: '',
       );
 
       final firebaseUser = await _authRepository.register(newUser, password);

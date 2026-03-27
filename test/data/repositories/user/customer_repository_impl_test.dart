@@ -23,7 +23,8 @@ void main() {
         email: 'lina@example.com',
         phone: '012345678',
         historyIds: const ['q1'],
-        currentHistoryId: 'q1',
+        currentHistoryId: 'q1', 
+        profileLink: '',
       );
 
       await repository.create(user);
@@ -112,7 +113,8 @@ void main() {
         email: 'new@example.com',
         phone: '088888888',
         historyIds: const ['q10', 'q11'],
-        currentHistoryId: 'q11',
+        currentHistoryId: 'q11', 
+        profileLink: '',
       );
 
       await repository.update(updated);

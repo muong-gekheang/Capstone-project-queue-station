@@ -8,6 +8,7 @@ class Customer extends User {
   final String userType = 'customer';
   final List<String> historyIds;
   final String? currentHistoryId;
+  final String? profileLink; 
 
   Customer({
     required super.name,
@@ -15,7 +16,8 @@ class Customer extends User {
     required super.phone,
     required super.id,
     required this.historyIds,
-    this.currentHistoryId,
+    this.currentHistoryId, 
+    required this.profileLink,
   });
 
   Customer copyWith({
@@ -26,6 +28,7 @@ class Customer extends User {
     List<String>? historyIds,
     String? currentHistoryId,
     bool? noQueue,
+    String? profileLink,
   }) {
     return Customer(
       name: name ?? super.name,
@@ -35,7 +38,8 @@ class Customer extends User {
       historyIds: historyIds ?? this.historyIds,
       currentHistoryId: (noQueue ?? false)
           ? null
-          : currentHistoryId ?? this.currentHistoryId,
+          : currentHistoryId ?? this.currentHistoryId, 
+      profileLink: profileLink ?? this.profileLink,
     );
   }
 

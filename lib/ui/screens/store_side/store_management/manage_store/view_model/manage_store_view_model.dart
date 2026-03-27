@@ -36,6 +36,8 @@ class ManageStoreViewModel extends ChangeNotifier {
   }
 
   bool get isStoreOpen => _currentRest?.isOpen ?? false;
+  String? get restaurantLogoLink => _currentRest?.logoLink;
+
 
   @override
   void dispose() {

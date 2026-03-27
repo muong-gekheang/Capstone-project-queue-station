@@ -6,4 +6,6 @@ abstract class ImageRepository {
   // saveLogoUrl is for saving the url link in the firestore.
   Future<void> saveLogoUrl(String logoUrl, String restaurantId);
   Future<void> deleteLogo(String imageUrl);
+  Future<String> uploadProfileImage(Uint8List bytes, String userId);
+  Future<void> saveProfileImageUrl(String imageUrl, String userId);
 }

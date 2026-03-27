@@ -40,6 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         phone: phoneNumber,
         id: '',
         historyIds: [],
+        profileLink: '',
       ),
       password: password,
     );

@@ -6,11 +6,15 @@ import 'package:queue_station_app/models/restaurant/queue_table.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/services/queue_service.dart';
+import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/table_service.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   final TableService _tableService;
   final QueueService _queueService;
+  final RestaurantService _restaurantService;
+
+  Restaurant? _restaurant;
   bool _isDisposed = false;
 
   bool _isLoading = true;
@@ -26,10 +30,13 @@ class DashboardViewModel extends ChangeNotifier {
   DashboardViewModel({
     required QueueService queueService,
     required TableService tableService,
+    required RestaurantService restaurantService,
   }) : _queueService = queueService,
-       _tableService = tableService {
+       _tableService = tableService,
+       _restaurantService = restaurantService {
     _subscribeToQueueEntries();
     _subscribeToQueueTable();
+    _subscribeToRestaurant();
     init();
   }
 
@@ -68,6 +75,16 @@ class DashboardViewModel extends ChangeNotifier {
     );
   }
 
+  void _subscribeToRestaurant() {
+    _restaurantSubscription = _restaurantService.streamRestaurant.listen((
+      restaurant,
+    ) {
+      if (_isDisposed) return;
+      _restaurant = restaurant;
+      notifyListeners();
+    });
+  }
+
   void init() async {
     _avgWaitTime = await _queueService.avgWaitingTime;
   }
@@ -104,4 +121,6 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   Duration get avgWaitTime => _avgWaitTime;
+
+  String? get restaurantLogoLink => _restaurant?.logoLink;
 }
