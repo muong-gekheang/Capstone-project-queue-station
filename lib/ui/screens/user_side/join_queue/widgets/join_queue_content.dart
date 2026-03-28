@@ -15,7 +15,6 @@ class JoinQueueContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final joinQueueVM = context.watch<JoinQueueViewModel>();
 
     return CustomScreenView(
@@ -45,7 +44,7 @@ class JoinQueueContent extends StatelessWidget {
                   children: [
                     SizedBox.square(
                       dimension: 160,
-                      child: rest.logoLink != null && rest.logoLink.isNotEmpty
+                      child: rest.logoLink.isNotEmpty
                           ? Image.network(
                               rest.logoLink,
                               fit: BoxFit.cover,
@@ -219,7 +218,6 @@ class JoinQueueContent extends StatelessWidget {
                 onTap: joinQueueVM.setNumPeople,
               );
             }),
-              
           ),
           const SizedBox(height: 16),
           const Text("Number of Guest(s)", style: TextStyle(fontSize: 16)),
@@ -229,7 +227,9 @@ class JoinQueueContent extends StatelessWidget {
             spacing: 19,
             children: [
               IconButton(
-                onPressed: joinQueueVM.numPeople == 0 ? null : joinQueueVM.decrPeople,
+                onPressed: joinQueueVM.numPeople == 0
+                    ? null
+                    : joinQueueVM.decrPeople,
                 color: Colors.white,
                 disabledColor: Colors.white,
                 style: IconButton.styleFrom(

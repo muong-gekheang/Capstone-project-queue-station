@@ -12,7 +12,7 @@ import 'package:queue_station_app/ui/screens/user_side/confirm_ticket/widgets/co
 class ConfirmTicketScreen extends StatelessWidget {
   final String queueEntryId;
 
-  const ConfirmTicketScreen({required this.queueEntryId});
+  const ConfirmTicketScreen({super.key, required this.queueEntryId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class ConfirmTicketScreen extends StatelessWidget {
         restaurantRepository: context.read<RestaurantRepository>(),
         userProvider: context.read<UserProvider>(),
         customerRepository: context.read<CustomerRepositoryImpl>(),
-        queueService: context.read<QueueService>()
+        queueService: context.read<QueueService>(),
       ),
       child: ConfirmTicketContent(queueEntryId: queueEntryId),
     );

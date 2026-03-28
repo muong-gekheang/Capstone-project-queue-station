@@ -8,7 +8,6 @@ import 'package:queue_station_app/models/restaurant/menu_item.dart';
 import 'package:queue_station_app/models/restaurant/menu_item_category.dart';
 import 'package:queue_station_app/models/restaurant/menu_size.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/view_model/menu_management_view_model.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_new_category.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/menu_management/widgets/add_ons_management.dart';
@@ -141,8 +140,8 @@ class _MenuFormState extends State<MenuForm> {
             image: pickedLogoBytes != null
                 ? MemoryImage(pickedLogoBytes!)
                 : (selectedImageFile != null && selectedImageFile!.isNotEmpty)
-                  ? NetworkImage(selectedImageFile!) as ImageProvider
-                  : null,
+                ? NetworkImage(selectedImageFile!) as ImageProvider
+                : null,
             onPickImage: onPickImage,
           ),
           Form(
@@ -181,7 +180,7 @@ class _MenuFormState extends State<MenuForm> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          (vm.allCategories.length > 1 &&
+                          (vm.allCategories.isNotEmpty &&
                                   selectedCategory != null)
                               ? DropdownButtonFormField<MenuItemCategory>(
                                   initialValue: selectedCategory,
@@ -254,7 +253,7 @@ class _MenuFormState extends State<MenuForm> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      "Add at least 2 categories",
+                                      "Add at least 1 category",
                                       style: TextStyle(
                                         color: Theme.of(
                                           context,
@@ -272,8 +271,7 @@ class _MenuFormState extends State<MenuForm> {
                                           onPressed: () async {
                                             final result =
                                                 await showModalBottomSheet<
-                                                  (MenuItemCategory,
-                                                  Uint8List?)
+                                                  (MenuItemCategory, Uint8List?)
                                                 >(
                                                   context: context,
                                                   builder: (context) => Padding(
@@ -289,7 +287,19 @@ class _MenuFormState extends State<MenuForm> {
                                               final newCategory = result.$1;
                                               final selectedImageBytes =
                                                   result.$2;
-                                              vm.addNewCategory(newCategory, selectedImageBytes);
+
+                                              try {
+                                                vm.addNewCategory(
+                                                  newCategory,
+                                                  selectedImageBytes,
+                                                );
+                                                setState(() {
+                                                  selectedCategory =
+                                                      newCategory;
+                                                });
+                                              } catch (err) {
+                                                debugPrint("$err");
+                                              }
                                             }
                                           },
                                           backgroundColor: Color.fromRGBO(

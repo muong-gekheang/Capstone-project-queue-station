@@ -203,16 +203,18 @@ class CartViewModel extends ChangeNotifier {
 
     try {
       // Update Queue Status
-      await queueEntryRepository.update(
-        _currentQueue!.copyWith(status: QueueStatus.completed),
+      await queueEntryRepository.updateStatus(
+        _currentQueue!.id,
+        QueueStatus.completed,
       );
 
       // Update Local User State
       final updatedUser = userProvider.asCustomer!.copyWith(
         currentHistoryId: null,
+        noQueue: true,
       );
       userProvider.updateUser(updatedUser);
-
+      debugPrint("Checkout Error: ${updatedUser.currentHistoryId}");
       // Sync User to Repository
       await userRepository.update(updatedUser);
     } catch (err) {

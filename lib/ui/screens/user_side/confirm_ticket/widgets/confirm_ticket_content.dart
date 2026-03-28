@@ -111,6 +111,15 @@ class _ConfirmTicketContentState extends State<ConfirmTicketContent> {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
+          if (!isWaiting)
+            FilledButton(
+              onPressed: () async {
+                final result = await vm.leaveStore();
+                if (result && context.mounted) Navigator.pop(context);
+                debugPrint("Leave store tap");
+              },
+              child: Text("Leave Store"),
+            ),
         ],
       ),
       bottomNavigationBar: FullWidthFilledButton(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:queue_station_app/services/store/auth_service.dart';
 import 'package:queue_station_app/services/store/restaurant_service.dart';
 import 'package:queue_station_app/services/store/store_profile_service.dart';
+import 'package:queue_station_app/ui/screens/store_side/settings/subscreens/store_change_password_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/subscreens/store_subscription_screen.dart';
 import 'package:queue_station_app/ui/screens/store_side/settings/view_model/store_settings_view_model.dart';
 import 'package:queue_station_app/ui/screens/store_side/store_management/edit_store/edit_store_screen.dart';
@@ -76,7 +77,7 @@ class _StoreSettingsContentState extends State<StoreSettingsContent> {
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider.value(
           value: context.read<StoreSettingsViewModel>(),
-          child: ChangePasswordScreen(),
+          child: StoreChangePasswordScreen(),
         ),
       ),
     );

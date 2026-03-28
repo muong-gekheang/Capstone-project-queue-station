@@ -43,7 +43,7 @@ class AuthService {
     final status = await _authRepository.getSubscriptionStatus(
       userData['restaurantId'] as String,
     );
-    print('Auth Service: The subscription status is ${status}');
+    print('Auth Service: The subscription status is $status');
     return status!.toLowerCase() == 'active';
   }
 
@@ -162,7 +162,7 @@ class AuthService {
         if (storeUser == null) return;
 
         final bool isActive = await checkSubscriptionStatus(firebaseUser);
-        if(!isActive){
+        if (!isActive) {
           print("Subscription expired on restore, signing out...");
           signOut();
           return;

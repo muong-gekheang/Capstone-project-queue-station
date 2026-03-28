@@ -22,6 +22,7 @@ class TableSearchResult extends StatelessWidget {
       return const Center(
         child: Text(
           "No Tables have Found",
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: AppTheme.primaryColor,
             fontSize: AppTheme.displayText2,

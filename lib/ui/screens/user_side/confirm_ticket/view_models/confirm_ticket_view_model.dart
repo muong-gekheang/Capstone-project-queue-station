@@ -1,12 +1,14 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
-import 'package:queue_station_app/services/queue_service.dart';
-import '../../../../../data/repositories/restaurant/restaurant_repository.dart';
-import '../../../../../data/repositories/user/production/customer_repository_impl.dart';
 import 'package:queue_station_app/models/restaurant/restaurant.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
+import 'package:queue_station_app/services/queue_service.dart';
 import 'package:queue_station_app/services/user_provider.dart';
+
+import '../../../../../data/repositories/restaurant/restaurant_repository.dart';
+import '../../../../../data/repositories/user/production/customer_repository_impl.dart';
 
 class ConfirmTicketViewModel extends ChangeNotifier {
   final QueueEntryRepository queueRepository;
@@ -61,14 +63,16 @@ class ConfirmTicketViewModel extends ChangeNotifier {
   }
 
   int get customerPosition {
-    if (ticket == null) {
-      print('No ticket found for position');
-      return 0;
-    }
-    final index = currentRestaurantQueue.indexWhere((q) => q.id == ticket!.id);
-    final position = index != -1 ? index + 1 : 0;
-    print('Customer position: $position (ticket ID: ${ticket!.id})');
-    return position;
+    if (ticket == null) return 0;
+
+    // Find your zero-based index
+    final index = currentRestaurantQueue.indexWhere((q) => q.id == ticket?.id);
+
+    // If not found, return 0; otherwise, the index IS the count of people ahead
+    final count = index != -1 ? index : 0;
+
+    debugPrint('People ahead of you: $count');
+    return count;
   }
 
   QueueEntry? _ticket;
@@ -145,6 +149,49 @@ class ConfirmTicketViewModel extends ChangeNotifier {
     );
 
     return Duration(minutes: waitTimeInMinutes);
+  }
+
+  Future<bool> leaveStore() async {
+    final customer = userProvider.asCustomer;
+    if (customer == null || _ticket == null) {
+      debugPrint('Leave failed: customer or ticket is null');
+      return false;
+    }
+
+    try {
+      final updatedTicket = _ticket!.copyWith(status: QueueStatus.completed);
+      await queueRepository.updateStatus(
+        updatedTicket.id,
+        QueueStatus.completed,
+      );
+      debugPrint('Queue entry status updated to completed');
+
+      await restaurantRepository.removeQueueEntryFromRestaurant(
+        _ticket!.restId,
+        _ticket!.id,
+      );
+      debugPrint('Queue entry removed from restaurant');
+
+      final updatedCustomer = customer.copyWith(
+        currentHistoryId: null,
+        noQueue: true,
+      );
+      await customerRepository.update(updatedCustomer);
+      debugPrint('Customer updated in Firestore');
+
+      userProvider.updateUser(updatedCustomer);
+      debugPrint('UserProvider updated');
+
+      _ticket = updatedTicket;
+      notifyListeners();
+
+      return true;
+    } catch (e) {
+      debugPrint('Error cancelling queue: $e');
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> cancelQueue() async {

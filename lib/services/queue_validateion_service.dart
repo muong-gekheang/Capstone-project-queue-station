@@ -44,7 +44,7 @@ class QueueValidationService {
     // Case 2: joined (waiting) and not yet checked in
     if (currentQueueEntry != null) {
       final status = _normalizeStatus(currentQueueEntry.status.name);
-      final queueNumber = currentQueueEntry.queueNumber?.toString() ?? 'N/A';
+      final queueNumber = currentQueueEntry.queueNumber.toString() ?? 'N/A';
 
       if (status == STATUS_WAITING) {
         _showWaitingDialog(context, queueNumber: queueNumber, feature: feature);
@@ -151,7 +151,7 @@ class QueueValidationService {
       }
 
       final status = _normalizeStatus(queueEntry.status.name);
-      final queueNumber = queueEntry.queueNumber?.toString() ?? 'N/A';
+      final queueNumber = queueEntry.queueNumber.toString() ?? 'N/A';
 
       if (status == STATUS_WAITING) {
         if (context.mounted) {
@@ -234,7 +234,8 @@ class QueueValidationService {
     );
   }
 
-  static void _showWaitingDialog(BuildContext context, {
+  static void _showWaitingDialog(
+    BuildContext context, {
     required String queueNumber,
     required String feature,
   }) {

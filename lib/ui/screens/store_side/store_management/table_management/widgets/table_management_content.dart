@@ -264,52 +264,112 @@ class _TableManagementContentState extends State<TableManagementContent> {
               ),
             SizedBox(
               width: double.infinity,
-              child: Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                runSpacing: 10,
-                children: [
-                  Text(
-                    "Category: ${vm.currentSelectedCategory?.type ?? ""}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppTheme.heading2,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withOpacity(
+                    0.05,
+                  ), // Light themed background
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppTheme.primaryColor.withOpacity(0.1),
+                  ),
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runSpacing: 12,
+                  children: [
+                    // --- Category Section ---
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "SELECTED CATEGORY",
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.grey[600],
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          vm.currentSelectedCategory?.type ?? "None",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppTheme.heading2,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.table_restaurant_rounded,
-                        size: AppTheme.iconSizeL,
-                        color: AppTheme.primaryColor,
-                      ),
-                      const SizedBox(width: AppTheme.spacingXS),
-                      Text(
-                        ": ${vm.filteredTable.length} table(s)  |",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.heading2,
+
+                    // --- Stats Section ---
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Table Count
+                        Icon(
+                          Icons.table_restaurant_rounded,
+                          size: AppTheme.iconSizeM,
+                          color: AppTheme.primaryColor,
                         ),
-                      ),
-                      const SizedBox(width: AppTheme.spacingS),
-                      const Icon(
-                        Icons.chair,
-                        size: AppTheme.iconSizeL,
-                        color: AppTheme.secondaryColor,
-                      ),
-                      const SizedBox(width: AppTheme.spacingXS),
-                      Text(
-                        ": ${vm.currentSelectedCategory?.seatAmount ?? ""} seat(s)",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.heading2,
+                        const SizedBox(width: 6),
+                        Text(
+                          "${vm.filteredTable.length}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppTheme.heading2,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        Text(
+                          " tables",
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 14,
+                          ),
+                        ),
+
+                        // Vertical Divider
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Container(
+                            width: 1,
+                            height: 20,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+
+                        // Seat Count
+                        Icon(
+                          Icons.chair_rounded,
+                          size: AppTheme.iconSizeM,
+                          color: AppTheme.secondaryColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "${vm.currentSelectedCategory?.seatAmount ?? 0}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppTheme.heading2,
+                          ),
+                        ),
+                        Text(
+                          " seats",
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             Expanded(

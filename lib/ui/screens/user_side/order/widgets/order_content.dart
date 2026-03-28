@@ -195,6 +195,7 @@ class _OrderContentState extends State<OrderContent> {
               var vm = context.read<CartViewModel>();
               vm.checkout();
               Navigator.pop(context);
+              Navigator.pop(context);
               context.go('/');
             },
             child: Text("Leave the store"),

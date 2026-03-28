@@ -60,6 +60,7 @@ class TableManagementViewModel extends ChangeNotifier {
     _tableCategorySubscription = _tableService.streamTableCategories.listen(
       (categories) {
         if (_isDisposed) return;
+        debugPrint("Stream cat: $categories");
         _tableCategories = categories;
         _isLoading = false;
         if (currentSelectedCategory == null && _tableCategories.isNotEmpty) {

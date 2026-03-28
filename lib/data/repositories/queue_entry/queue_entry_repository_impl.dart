@@ -284,8 +284,7 @@ class QueueEntryRepositoryImpl implements QueueEntryRepository {
     }
     await fireStore.collection('queue_entries').doc(id).update({
       'status': newStatus.name,
-      if (fieldToUpdate != null)
-        fieldToUpdate: DateTime.now().toIso8601String(),
+      ?fieldToUpdate: Timestamp.now(),
     });
   }
 

@@ -100,7 +100,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: customer.email,
         phone: customer.phone,
         id: uid,
-        historyIds: customer.historyIds, 
+        historyIds: customer.historyIds,
         profileLink: customer.profileLink,
       );
 
@@ -138,6 +138,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
   Future<void> sendResetLink(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);

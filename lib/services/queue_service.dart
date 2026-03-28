@@ -180,19 +180,28 @@ class QueueService {
       print("Code: ${e.code}");
       print("Message: ${e.message}");
       print("Details: ${e.details}");
+      rethrow;
     } catch (e) {
       print("General Error: $e");
+      rethrow;
     }
   }
 
   void serveCustomer(QueueEntry queueEntry) {
     if (_tableService == null) return;
-    _queueEntryRepository.updateStatus(queueEntry.id, QueueStatus.serving);
-
-    final table = _tableService!.tables.firstWhere(
-      (e) => e.id == queueEntry.assignedTableId,
+    _queueEntryRepository.updateStatus(
+      queueEntry.id,
+      queueEntry.joinedMethod == JoinedMethod.remote
+          ? QueueStatus.serving
+          : QueueStatus.completed,
     );
-    _tableService!.updateTableCustomers(table, queueEntry.id);
+
+    if (queueEntry.joinedMethod != JoinedMethod.walkIn) {
+      final table = _tableService.tables.firstWhere(
+        (e) => e.id == queueEntry.assignedTableId,
+      );
+      _tableService.updateTableCustomers(table, queueEntry.id);
+    }
   }
 
   void removeUserFromQueue(String queueEntryId) {

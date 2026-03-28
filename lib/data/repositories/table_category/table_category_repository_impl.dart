@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:queue_station_app/data/repositories/table_category/table_category_repository.dart';
 import 'package:queue_station_app/models/restaurant/table_category.dart';
 
@@ -175,9 +178,13 @@ class TableCategoryRepositoryImpl implements TableCategoryRepository {
           (snap) => snap.docs.map((doc) {
             final json = Map<String, dynamic>.from(doc.data());
             json['id'] ??= doc.id;
-            return TableCategory.fromJson(json);
+            debugPrint("Table Cat JSON: $json");
+            final result = TableCategory.fromJson(json);
+            debugPrint("Table Cat Result: $result");
+            return result;
           }).toList(),
-        );
+        )
+        .handleError((err) => debugPrint("Stream table cat error: $err"));
   }
 
   @override

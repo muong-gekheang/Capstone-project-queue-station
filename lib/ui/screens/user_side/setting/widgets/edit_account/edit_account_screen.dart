@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/ui/screens/user_side/setting/widgets/edit_account/edit_account_view_model.dart';
 import 'package:queue_station_app/ui/widgets/profile_editor_widget.dart';
@@ -14,7 +11,6 @@ class EditAccountScreen extends StatefulWidget {
 }
 
 class _EditAccountScreenState extends State<EditAccountScreen> {
-
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<EditAccountViewModel>();
@@ -37,10 +33,10 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
               const SizedBox(height: 16),
               ProfileEditorWidget(
                 image: vm.pickedImageBytes != null
-                 ? MemoryImage(vm.pickedImageBytes!)
-                 : (vm.profileLink != null && vm.profileLink!.isNotEmpty)
-                  ? NetworkImage(vm.profileLink!)
-                  : null,
+                    ? MemoryImage(vm.pickedImageBytes!)
+                    : (vm.profileLink != null && vm.profileLink!.isNotEmpty)
+                    ? NetworkImage(vm.profileLink!)
+                    : null,
                 onPickImage: vm.pickAvatar,
               ),
               const SizedBox(height: 32),

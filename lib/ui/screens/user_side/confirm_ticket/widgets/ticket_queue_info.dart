@@ -146,7 +146,7 @@ class TicketQueueInfo extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$queueEntriesCount',
+                        '$customerPosition',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 40,

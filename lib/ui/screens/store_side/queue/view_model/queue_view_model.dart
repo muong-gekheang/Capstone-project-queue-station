@@ -25,7 +25,6 @@ class QueueViewModel extends ChangeNotifier {
   String get restId => _restaurantService.restId;
   String? get restaurantLogoLink => _currentRestaurant?.logoLink;
 
-
   QueueViewModel({
     required RestaurantService restaurantService,
     required QueueService queueService,
@@ -115,8 +114,11 @@ class QueueViewModel extends ChangeNotifier {
   }
 
   void addQueue(QueueEntry newQueue) {
-    _queueService.addCustomerToQueue(newQueue: newQueue);
-    notifyListeners();
+    try {
+      _queueService.addCustomerToQueue(newQueue: newQueue);
+    } catch (err) {
+      rethrow;
+    }
   }
 
   void serveQueue(QueueEntry queueEntry) {

@@ -51,7 +51,7 @@ class MenuViewModel extends ChangeNotifier {
 
   QueueEntry? get currentQueueEntry => _currentQueueEntry;
   bool get isInQueue => _currentQueueEntry != null;
-  String? get queueNumber => _currentQueueEntry?.queueNumber?.toString();
+  String? get queueNumber => _currentQueueEntry?.queueNumber.toString();
 
   Order get currentOrder => orderProvider.currentOrder!;
   int get totalCartItemsCount => orderProvider.totalItemsCount;
@@ -90,6 +90,7 @@ class MenuViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      if (selectedCategory == null) _selectedCategory = _menuCategories[0].name;
       final (items, nextDoc) = await menuService.getMenuItems(
         restId,
         categoryId: _selectedCategory,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
-import 'package:queue_station_app/services/store_order_notification_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/order_screen/view_model/store_order_view_model.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/appbar_widget.dart';
@@ -73,6 +72,7 @@ class _StoreOrderContentState extends State<StoreOrderContent> {
                                           bottom: 10,
                                         ),
                                         child: FoodItemCard(
+                                          image: orderItem.item.image,
                                           name: orderItem.item.name,
                                           item: orderItem.item,
                                           addons: orderItem.addOns,

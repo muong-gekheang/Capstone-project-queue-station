@@ -41,8 +41,7 @@ class CustomerMenuService {
   }
 
   /// Get paginated and enriched menu items
-  Future<(List<dynamic>, DocumentSnapshot<Map<String, dynamic>>?)>
-  getMenuItems(
+  Future<(List<dynamic>, DocumentSnapshot<Map<String, dynamic>>?)> getMenuItems(
     String restaurantId, {
     String? categoryId,
     String? searchQuery,
@@ -104,7 +103,7 @@ class CustomerMenuService {
       ]);
 
       final sizes = results[0] as List<MenuSize>;
-      final addOns = results[1] as List;
+      final addOns = results[1];
 
       // Logic for price display: find the lowest price among sizes
       final minPrice = sizes.isNotEmpty

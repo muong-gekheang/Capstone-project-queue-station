@@ -123,11 +123,7 @@ class HomeContent extends StatelessWidget {
                           child: RestaurantJoinedTile(
                             queueEntry: viewModel.currentQueueEntry!,
                             restaurant: viewModel.currentRestaurant!,
-                            peopleWaiting:
-                                viewModel.peopleWaitingPerRestaurant[viewModel
-                                    .currentRestaurant!
-                                    .id] ??
-                                0,
+                            peopleWaiting: viewModel.currentQueuePosition,
                           ),
                         ),
                       ),

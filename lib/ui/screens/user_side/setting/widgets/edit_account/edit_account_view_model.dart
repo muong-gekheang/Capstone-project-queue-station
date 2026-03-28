@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,11 +7,9 @@ import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
 
 class EditAccountViewModel extends ChangeNotifier {
-
   final UserRepository<Customer> userRepository;
   final UserProvider userProvider;
   final ImageRepository imageRepository;
-
 
   EditAccountViewModel({
     required this.userRepository,
@@ -59,9 +56,7 @@ class EditAccountViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<bool> saveProfile() async {
-
     if (!formKey.currentState!.validate()) {
       return false;
     }
@@ -85,7 +80,7 @@ class EditAccountViewModel extends ChangeNotifier {
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
-        profileLink: uploadedUrl ?? _user!.profileLink, 
+        profileLink: uploadedUrl ?? _user!.profileLink,
       );
 
       await userRepository.update(updatedUser);
@@ -96,11 +91,9 @@ class EditAccountViewModel extends ChangeNotifier {
       _user = updatedUser;
 
       return true;
-
     } catch (e) {
       debugPrint("Update user error: $e");
       return false;
-
     } finally {
       _isSaving = false;
       notifyListeners();

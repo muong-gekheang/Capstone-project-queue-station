@@ -145,6 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onSaved: (newValue) {
                           password = newValue;
                         },
+                        obscureText: true,
                       ),
                       const SizedBox(height: 18),
                       CustomTextFormField(
@@ -152,6 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onSaved: (newValue) {
                           confirmPassword = newValue;
                         },
+                        obscureText: true,
                       ),
 
                       const SizedBox(height: 20),

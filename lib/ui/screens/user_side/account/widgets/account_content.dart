@@ -62,7 +62,7 @@ class AccountContent extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              customer?.name ?? "Unknown",
+              customer.name ?? "Unknown",
               style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,

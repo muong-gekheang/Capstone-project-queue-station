@@ -6,10 +6,10 @@ import 'package:queue_station_app/models/user/queue_entry.dart';
 import 'package:queue_station_app/models/user/store_user.dart';
 import 'package:queue_station_app/services/user_provider.dart';
 import 'package:queue_station_app/ui/screens/store_side/queue/view_model/queue_view_model.dart';
-import 'package:queue_station_app/ui/screens/user_side/home/home_screen.dart';
 import 'package:queue_station_app/ui/screens/user_side/join_queue/widgets/table_type_widget.dart';
 import 'package:queue_station_app/ui/theme/app_theme.dart';
 import 'package:queue_station_app/ui/widgets/button_widget.dart';
+import 'package:queue_station_app/ui/widgets/custom_dialog.dart';
 import 'package:queue_station_app/ui/widgets/guests_counter_widget.dart';
 import 'package:uuid/uuid.dart';
 
@@ -53,27 +53,39 @@ class _AddQueueDialogState extends State<AddQueueDialog> {
     });
   }
 
-  void onJoinTap() {
+  void onJoinTap() async {
     if (_formKey.currentState!.validate()) {
       StoreUser user = context.read<UserProvider>().asStoreUser!;
       QueueViewModel vm = context.read<QueueViewModel>();
-      widget.onJoin(
-        QueueEntry.walkIn(
-          expectedTableReadyAt: DateTime.now(),
-          id: Uuid().v4(),
-          queueNumber: "ABCDE",
-          partySize: _guestCount,
-          joinTime: DateTime.now(),
-          status: QueueStatus.waiting,
-          customerId: user.id,
-          joinedMethod: JoinedMethod.walkIn,
-          restId: vm.restId,
-          customerName: nameController.text,
-          phoneNumber: phoneController.text,
-          assignedTableId: '',
-        ),
-      );
-      Navigator.pop(context);
+      try {
+        widget.onJoin(
+          QueueEntry.walkIn(
+            expectedTableReadyAt: DateTime.now(),
+            id: Uuid().v4(),
+            queueNumber: "ABCDE",
+            partySize: _guestCount,
+            joinTime: DateTime.now(),
+            status: QueueStatus.waiting,
+            customerId: user.id,
+            joinedMethod: JoinedMethod.walkIn,
+            restId: vm.restId,
+            customerName: nameController.text,
+            phoneNumber: phoneController.text,
+            assignedTableId: '',
+          ),
+        );
+      } catch (err) {
+        debugPrint("ERROR: $err");
+        await showDialog(
+          context: context,
+          builder: (context) => CustomDialog(
+            title: "Add Queue Error",
+            content: Text("$err"),
+            actions: [],
+          ),
+        );
+      }
+      if (mounted) Navigator.pop(context);
     }
   }
 

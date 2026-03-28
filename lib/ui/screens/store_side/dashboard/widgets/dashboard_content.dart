@@ -186,7 +186,7 @@ class _DashboardContentState extends State<DashboardContent> {
 
   Widget _buildStoreProfileImage() {
     final imageUrl = context.watch<DashboardViewModel>().restaurantLogoLink;
-    print('Store image profile url : ${imageUrl}');
+    print('Store image profile url : $imageUrl');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: CircleAvatar(

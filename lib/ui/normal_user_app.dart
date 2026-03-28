@@ -62,14 +62,10 @@ class _NormalUserAppState extends State<NormalUserApp> {
         );
 
         if (canAccess && context.mounted) {
-          if (!_hasSeenFoodInstruction) {
-            setState(() {
-              selectedTab = NormalUserNavTab.foodOrdering;
-              _hasSeenFoodInstruction = true;
-            });
-          } else {
-            context.go("/menu");
-          }
+          setState(() {
+            selectedTab = NormalUserNavTab.foodOrdering;
+            _hasSeenFoodInstruction = true;
+          });
         }
       }
     } catch (e) {

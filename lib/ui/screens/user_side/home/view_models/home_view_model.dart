@@ -13,7 +13,8 @@ class HomeViewModel extends ChangeNotifier {
 
   List<Restaurant> _allRestaurants = [];
   List<Restaurant> _restaurants = [];
-  Map<String, int> _peopleWaiting = {};
+  final Map<String, int> _peopleWaiting = {};
+  int currentQueuePosition = 0;
   QueueEntry? _currentQueue;
 
   bool _isLoading = true;
@@ -21,6 +22,7 @@ class HomeViewModel extends ChangeNotifier {
 
   List<Restaurant> get restaurants => _restaurants;
   Map<String, int> get peopleWaitingPerRestaurant => _peopleWaiting;
+
   QueueEntry? get currentQueueEntry => _currentQueue;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -56,11 +58,18 @@ class HomeViewModel extends ChangeNotifier {
     queueService.streamAllActiveQueues.listen(
       (data) {
         debugPrint('HomeViewModel: Received ${data.length} queue entries');
-
+        currentQueuePosition = 0;
         // Update waiting counts per restaurant
         _peopleWaiting.clear();
+        bool isQueueFound = false;
         for (var q in data) {
           _peopleWaiting[q.restId] = (_peopleWaiting[q.restId] ?? 0) + 1;
+          if (q.restId == currentQueueEntry?.restId) {
+            if (isQueueFound) currentQueuePosition = currentQueuePosition + 1;
+            if (q.id == currentQueueEntry?.id) {
+              isQueueFound = true;
+            }
+          }
         }
 
         // Find current user's queue entry
@@ -129,10 +138,5 @@ class HomeViewModel extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 500));
     _isLoading = false;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

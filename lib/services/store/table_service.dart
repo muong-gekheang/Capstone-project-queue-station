@@ -54,6 +54,7 @@ class TableService {
           .watchAllCategory(restId)
           .listen(
             (data) {
+              debugPrint("Stream cat service $data");
               _tableCategoryController.add(data);
               _tableCategories = data;
             },

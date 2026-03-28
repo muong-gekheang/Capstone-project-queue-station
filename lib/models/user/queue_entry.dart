@@ -117,8 +117,7 @@ class QueueEntry {
   }
 
   Duration? get waitingTime {
-    if (servedTime == null) return null;
-    return servedTime!.difference(joinTime);
+    return DateTime.now().difference(joinTime);
   }
 
   String get waitingTimeText {

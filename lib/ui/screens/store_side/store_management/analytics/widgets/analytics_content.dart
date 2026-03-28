@@ -95,7 +95,7 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
             Icon(Icons.bar_chart, color: Color(0xFF0D47A1)),
             SizedBox(width: 8),
             Text(
-              'Analytic',
+              'Today Analytic',
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
@@ -105,55 +105,59 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
           ],
         ),
       ),
-      body: vm.isLoading
+      body: (vm.stats == null && vm.isLoading)
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Stat Cards
-                  _buildStatCard(
-                    'People Waiting',
-                    '${vm.stats?.peopleWaiting ?? 0}',
-                    '',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Average Wait Time',
-                    '${vm.stats?.averageWaitTimeMinutes ?? 0}',
-                    'min',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStatCard(
-                    'Active Tables',
-                    '${vm.stats?.activeTables ?? 0}',
-                    '',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStatCard('Orders', '${vm.totalOrders}', 'orders'),
-                  const SizedBox(height: 24),
+          : RefreshIndicator(
+              onRefresh: () => vm.loadAllData(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Stat Cards
+                    _buildStatCard(
+                      'People Waiting',
+                      '${vm.stats?.peopleWaiting ?? 0}',
+                      '',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                      'Average Wait Time',
+                      '${vm.stats?.averageWaitTimeMinutes ?? 0}',
+                      'min',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                      'Active Tables',
+                      '${vm.stats?.activeTables ?? 0}',
+                      '',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatCard('Orders', '${vm.totalOrders}', 'orders'),
+                    const SizedBox(height: 24),
 
-                  // Queue Length Chart
-                  // _buildQueueLengthChart(vm),
-                  // const SizedBox(height: 24),
+                    // Queue Length Chart
+                    // _buildQueueLengthChart(vm),
+                    // const SizedBox(height: 24),
 
-                  // Table Occupancy Chart
-                  // _buildTableOccupancyChart(vm),
-                  // const SizedBox(height: 24),
+                    // Table Occupancy Chart
+                    // _buildTableOccupancyChart(vm),
+                    // const SizedBox(height: 24),
 
-                  // Average Order Value Chart
-                  // _buildAverageOrderValueChart(vm),
-                  // const SizedBox(height: 24),
+                    // Average Order Value Chart
+                    // _buildAverageOrderValueChart(vm),
+                    // const SizedBox(height: 24),
 
-                  // Orders Line Chart
-                  _buildOrdersLineChart(vm),
-                  const SizedBox(height: 24),
+                    // Orders Line Chart
+                    _buildOrdersLineChart(vm),
+                    const SizedBox(height: 24),
 
-                  // Order Summary Table
-                  _buildOrderSummaryTable(vm),
-                  const SizedBox(height: 24),
-                ],
+                    // Order Summary Table
+                    _buildOrderSummaryTable(vm),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
     );
@@ -656,18 +660,19 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
-                onTap: () => _showTimeframeSelector(
-                  'orders',
-                  vm.ordersTimeframe,
-                  (v) => setState(() => vm.ordersTimeframe = v),
-                ),
+                onTap: null,
+                // onTap: () => _showTimeframeSelector(
+                //   'orders',
+                //   vm.ordersTimeframe,
+                //   (v) => setState(() => vm.ordersTimeframe = v),
+                // ),
                 child: Row(
                   children: [
                     Text(
                       vm.ordersTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    // const Icon(Icons.arrow_drop_down, color: Colors.grey),
                   ],
                 ),
               ),
@@ -730,21 +735,22 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                 ),
               ),
               GestureDetector(
-                onTap: () => _showTimeframeSelector(
-                  'orderSummary',
-                  vm.orderSummaryTimeframe,
-                  (value) {
-                    vm.orderSummaryTimeframe = value;
-                    vm.loadAllData();
-                  },
-                ),
+                onTap: null,
+                // onTap: () => _showTimeframeSelector(
+                //   'orderSummary',
+                //   vm.orderSummaryTimeframe,
+                //   (value) {
+                //     vm.orderSummaryTimeframe = value;
+                //     vm.loadAllData();
+                //   },
+                // ),
                 child: Row(
                   children: [
                     Text(
                       vm.orderSummaryTimeframe.label,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    // const Icon(Icons.arrow_drop_down, color: Colors.grey),
                   ],
                 ),
               ),
@@ -772,9 +778,9 @@ class _AnalyticsContentState extends State<AnalyticsContent> {
                       cells: [
                         DataCell(
                           Text(
-                            DateFormat(DateFormat.HOUR24_MINUTE).format(
-                              order.time,
-                            ), 
+                            DateFormat(
+                              DateFormat.HOUR24_MINUTE,
+                            ).format(order.time),
                           ),
                         ),
                         DataCell(Text(order.tableNumber)),

@@ -166,7 +166,7 @@ void main() async {
             ),
           ),
           update: (context, userProvider, previous) {
-            previous?..updateUserProvider(userProvider);
+            previous?.updateUserProvider(userProvider);
             return previous!;
           },
         ),

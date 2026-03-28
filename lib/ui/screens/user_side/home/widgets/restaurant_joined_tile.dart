@@ -10,7 +10,7 @@ class RestaurantJoinedTile extends StatefulWidget {
     super.key,
     required this.queueEntry,
     required this.restaurant,
-    this.peopleWaiting
+    this.peopleWaiting,
   });
 
   final QueueEntry queueEntry;
@@ -42,7 +42,9 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
+            color: widget.peopleWaiting == 0
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.secondary,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -54,14 +56,22 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                   children: [
                     SizedBox.square(
                       dimension: 75,
-                      child: Image.network(
-                              widget.restaurant.logoLink,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                // fallback if image fails to load
-                                return Icon(Icons.restaurant, size: 50, color: Colors.grey);
-                              },
-                            )
+                      child: ClipRRect(
+                        borderRadius: BorderRadiusGeometry.circular(12),
+                        child: Image.network(
+                          widget.restaurant.logoLink,
+                          fit: BoxFit.cover,
+
+                          errorBuilder: (context, error, stackTrace) {
+                            // fallback if image fails to load
+                            return Icon(
+                              Icons.restaurant,
+                              size: 50,
+                              color: Colors.grey,
+                            );
+                          },
+                        ),
+                      ),
                     ),
 
                     const Spacer(),
@@ -139,19 +149,23 @@ class _RestaurantJoinedTileState extends State<RestaurantJoinedTile> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Wait",
+                      widget.peopleWaiting != 0
+                          ? "Wait"
+                          : "Please Check In at store",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
-                    Text(
-                      widget.peopleWaiting.toString(),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 48,
+                    if (widget.peopleWaiting != 0)
+                      Text(
+                        widget.peopleWaiting.toString(),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 48,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
