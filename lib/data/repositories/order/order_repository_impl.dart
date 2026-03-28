@@ -41,24 +41,16 @@ class OrderRepositoryImpl extends OrderRepository {
         'id': order.id,
         'timestamp': order.timestamp.toIso8601String(),
         'restaurantId': order.restaurantId,
-        'inCartIds': order.inCart.map(Order.orderItemRef).toList(),
-        'orderedIds': order.ordered.map(Order.orderItemRef).toList(),
+        'inCartIds': order.inCart.map((item) => item.id).toList(),
+        'orderedIds': order.ordered.map((item) => item.id).toList(),
       });
 
       for (final item in order.inCart) {
-        final itemDocId = '${order.id}_${Order.orderItemRef(item)}';
-        txn.set(
-          _orderCol.doc(itemDocId),
-          item.toJson()..['orderId'] = order.id,
-        );
+        txn.set(_itemCol.doc(item.id), item.toJson()..['orderId'] = order.id);
       }
 
       for (final item in order.ordered) {
-        final itemDocId = '${order.id}_${Order.orderItemRef(item)}';
-        txn.set(
-          _orderCol.doc(itemDocId),
-          item.toJson()..['orderId'] = order.id,
-        );
+        txn.set(_itemCol.doc(item.id), item.toJson()..['orderId'] = order.id);
       }
     });
   }
@@ -95,9 +87,8 @@ class OrderRepositoryImpl extends OrderRepository {
     final orderRef = _orderCol.doc(order.id);
     final batch = fireStore.batch();
 
-    // ✅ Always use SAME ID STRATEGY
-    final inCartIds = order.inCart.map(Order.orderItemRef).toList();
-    final orderedIds = order.ordered.map(Order.orderItemRef).toList();
+    final inCartIds = order.inCart.map((item) => item.id).toList();
+    final orderedIds = order.ordered.map((item) => item.id).toList();
 
     // 1. Save order doc
     batch.set(orderRef, {
@@ -109,10 +100,10 @@ class OrderRepositoryImpl extends OrderRepository {
 
     // 2. Save items
     for (final item in [...order.inCart, ...order.ordered]) {
-      final docId = '${order.id}_${Order.orderItemRef(item)}';
+     // final docId = '${order.id}_${Order.orderItemRef(item)}';
 
       batch.set(
-        _itemCol.doc(docId),
+        _itemCol.doc(item.id),
         item.toJson()..['orderId'] = order.id,
         SetOptions(merge: true),
       );
@@ -124,10 +115,7 @@ class OrderRepositoryImpl extends OrderRepository {
 
     final existingIds = existingItemsSnap.docs.map((d) => d.id).toSet();
 
-    final newIds = {
-      ...inCartIds.map((id) => '${order.id}_$id'),
-      ...orderedIds.map((id) => '${order.id}_$id'),
-    };
+    final newIds = {...inCartIds, ...orderedIds};
 
     for (final docId in existingIds.difference(newIds)) {
       batch.delete(_itemCol.doc(docId));
@@ -137,14 +125,11 @@ class OrderRepositoryImpl extends OrderRepository {
   }
 
   @override
-  Future<OrderItem?> getOrderItemById(String orderId, String orderedId) async {
-    final docId = '${orderId}_$orderedId';
-    final doc = await _itemCol.doc(docId).get();
+  Future<OrderItem?> getOrderItemById(String orderId, String itemId) async {
+    final doc = await _itemCol.doc(itemId).get();
 
     if (!doc.exists) return null;
-    doc.data()!['id'] = docId;
-
-    return OrderItem.fromJson(doc.data()!);
+    return OrderItem.fromJson({...doc.data()!, 'id': doc.id});
   }
 
   @override
@@ -176,9 +161,8 @@ class OrderRepositoryImpl extends OrderRepository {
         'lastConfirmedAt': FieldValue.serverTimestamp(),
       });
 
-      for (final ref in inCart) {
-        // Updates the status of the STABLE docId
-        txn.update(_itemCol.doc('${orderId}_$ref'), {'status': 'ordered'});
+      for (final itemId in inCart) {
+        txn.update(_itemCol.doc(itemId), {'orderItemStatus': 'ordered'});
       }
     });
   }

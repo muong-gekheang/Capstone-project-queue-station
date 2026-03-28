@@ -104,7 +104,7 @@ class MenuItemViewModel extends ChangeNotifier {
         .where((a) => _selectedAddOns[a.id] == true)
         .toList();
 
-    final addOnsMap = {for (final a in selectedAddOns) a.id: a.price};
+    final addOnsMap = {for (final a in selectedAddOns) a.name: a.price};
 
     final orderItem = OrderItem(
       id: existingCartItem?.id ?? const Uuid().v4(),

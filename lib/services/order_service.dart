@@ -190,21 +190,34 @@ class OrderService {
 
     debugPrint("Order:  ${initOrder.id}");
 
-    List<OrderItem> orderItems = await _orderItemRepository
-        .getOrderItemByOrderId(orderId);
-
-    List<OrderItem> filledOrderItems = [];
-    for (var item in orderItems) {
-      MenuItem? menuItem = _menuService.menuItemsMap[item.menuItemId];
-
-      menuItem ??= await _menuService.getMenuItemById(item.menuItemId);
-      debugPrint("Order: MenuItem ${menuItem?.name} from ${item.menuItemId}");
-      filledOrderItems.add(item.copyWith(menuItem: menuItem));
-    }
-    debugPrint(
-      "Order: Copy ${initOrder.copyWith(ordered: filledOrderItems).ordered}",
+    // FIX: Load ALL items (both ordered and inCart)
+    List<OrderItem> allItems = await _orderItemRepository.getOrderItemByOrderId(
+      orderId,
     );
-    return initOrder.copyWith(ordered: filledOrderItems);
+
+    // Separate items into ordered and inCart based on IDs
+    List<OrderItem> orderedItems = [];
+    List<OrderItem> cartItems = [];
+
+    for (var item in allItems) {
+      MenuItem? menuItem = _menuService.menuItemsMap[item.menuItemId];
+      menuItem ??= await _menuService.getMenuItemById(item.menuItemId);
+
+      final filledItem = item.copyWith(menuItem: menuItem);
+
+      if (initOrder.orderedIds.contains(item.id)) {
+        orderedItems.add(filledItem);
+      }
+      if (initOrder.inCartIds.contains(item.id)) {
+        cartItems.add(filledItem);
+      }
+    }
+
+    debugPrint(
+      "Order: Ordered items: ${orderedItems.length}, Cart items: ${cartItems.length}",
+    );
+
+    return initOrder.copyWith(ordered: orderedItems, inCart: cartItems);
   }
 
   List<Order> todayOrder = [];

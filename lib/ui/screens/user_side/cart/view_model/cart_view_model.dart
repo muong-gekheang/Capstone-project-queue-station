@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queue_station_app/data/repositories/queue_entry/queue_entry_repository.dart';
 import 'package:queue_station_app/data/repositories/user/user_repository.dart';
-import 'package:queue_station_app/models/order/order.dart';
 import 'package:queue_station_app/models/order/order_item.dart';
 import 'package:queue_station_app/models/user/customer.dart';
 import 'package:queue_station_app/models/user/queue_entry.dart';
@@ -14,6 +13,10 @@ class CartViewModel extends ChangeNotifier {
   final QueueEntryRepository queueEntryRepository;
   final UserRepository<Customer> userRepository;
 
+  QueueEntry? _currentQueue;
+  bool _isLoading = false;
+  bool _isDisposed = false;
+
   CartViewModel({
     required this.orderProvider,
     required this.userProvider,
@@ -21,29 +24,20 @@ class CartViewModel extends ChangeNotifier {
     required this.userRepository,
   }) {
     _init();
-    // ✅ Add listener to update UI when order changes
-    orderProvider.addListener(_onOrderProviderChanged);
+    // ✅ ONLY listen for UI refresh, NOT for fetching details
+    orderProvider.addListener(_onCartChanged);
   }
 
-  Order? _detailedOrder; // Stores the order with MenuItem details
-  QueueEntry? _currentQueue;
-  bool _isLoading = false;
-  bool _isDisposed = false;
-
-  // ---------------------------
-  // Getters
-  // ---------------------------
   bool get isLoading => _isLoading;
-  QueueEntry? get currentQueue => _currentQueue;
 
-  /// Returns items with full details if available, otherwise falls back to provider items
-  List<OrderItem> get items => _detailedOrder?.inCart ?? orderProvider.items;
+  // ✅ Use orderProvider.items directly - no delay!
+  List<OrderItem> get items => orderProvider.items;
 
-  /// Returns confirmed items already sent to the kitchen
   List<OrderItem> get confirmedItems =>
-      _detailedOrder?.ordered ?? (orderProvider.currentOrder?.ordered ?? []);
+      orderProvider.currentOrder?.ordered ?? [];
 
   double get totalAmount => orderProvider.totalAmount;
+
   String get tableNumber => _currentQueue?.tableNumber ?? "--";
 
   String get startTime {
@@ -56,10 +50,6 @@ class CartViewModel extends ChangeNotifier {
     return "$hour:${date.minute.toString().padLeft(2, '0')} $period";
   }
 
-  // ---------------------------
-  // Initialization & Sync
-  // ---------------------------
-
   Future<void> _init() async {
     final queueId = userProvider.asCustomer?.currentHistoryId;
     if (queueId == null) return;
@@ -68,16 +58,10 @@ class CartViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Fetch details and queue info in parallel for speed
-      final results = await Future.wait([
-        orderProvider.currentOrderInDetails,
-        queueEntryRepository.getQueueEntryById(queueId),
-      ]);
-
-      _detailedOrder = results[0] as Order?;
-      _currentQueue = results[1] as QueueEntry?;
+      // ✅ Only fetch queue info once
+      _currentQueue = await queueEntryRepository.getQueueEntryById(queueId);
     } catch (e) {
-      debugPrint("Error fetching cart details: $e");
+      debugPrint("Error fetching queue: $e");
     } finally {
       if (!_isDisposed) {
         _isLoading = false;
@@ -86,64 +70,32 @@ class CartViewModel extends ChangeNotifier {
     }
   }
 
-  /// When OrderProvider updates (optimistic update), we re-fetch the details
-  /// to ensure the UI has the MenuItem objects for names/images.
-  void _onOrderProviderChanged() async {
-    if (_isDisposed) return;
-
-    final updatedDetails = await orderProvider.currentOrderInDetails;
-
+  // ✅ Just refresh UI, don't fetch from Firestore
+  void _onCartChanged() {
     if (!_isDisposed) {
-      _detailedOrder = updatedDetails;
-      notifyListeners();
+      notifyListeners(); // Simple UI refresh - instant!
     }
   }
 
-  // ---------------------------
-  // Cart Actions
-  // ---------------------------
-
+  // Cart actions - these are already instant
   Future<void> increaseItem(OrderItem item) async {
-    try {
-      final updatedItem = item.copyWith(quantity: item.quantity + 1);
-      await orderProvider.updateCart(updatedItem);
-    } catch (e) {
-      debugPrint('Error increasing item: $e');
-    }
+    final updatedItem = item.copyWith(quantity: item.quantity + 1);
+    await orderProvider.updateCart(updatedItem); // UI updates instantly
   }
 
   Future<void> decreaseItem(OrderItem item) async {
-    try {
-      if (item.quantity > 1) {
-        final updatedItem = item.copyWith(quantity: item.quantity - 1);
-        await orderProvider.updateCart(updatedItem);
-      } else {
-        await removeItem(item);
-      }
-    } catch (e) {
-      debugPrint('Error decreasing item: $e');
+    if (item.quantity > 1) {
+      final updatedItem = item.copyWith(quantity: item.quantity - 1);
+      await orderProvider.updateCart(updatedItem);
+    } else {
+      await removeItem(item);
     }
   }
 
   Future<void> removeItem(OrderItem item) async {
-    try {
-      await orderProvider.removeItem(item);
-    } catch (e) {
-      debugPrint('Error removing item: $e');
-    }
+    await orderProvider.removeItem(item);
   }
 
-  Future<void> editItem(OrderItem oldItem, OrderItem newItem) async {
-    try {
-      // Perform both actions; the debouncer in OrderProvider will handle the sync
-      await orderProvider.removeItem(oldItem);
-      await orderProvider.addToCart(newItem);
-    } catch (e) {
-      debugPrint('Error editing item: $e');
-    }
-  }
-
-  /// Confirms the current 'inCart' items and moves them to 'ordered'
   Future<void> confirmOrder(BuildContext context) async {
     final currentOrderSnapshot = orderProvider.currentOrder;
     if (currentOrderSnapshot == null || items.isEmpty) return;
@@ -152,24 +104,15 @@ class CartViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. Prepare the updated ordered list
       final updatedOrdered = List<OrderItem>.from(currentOrderSnapshot.ordered)
         ..addAll(items);
 
-      // 2. Create the confirmed state
       final confirmedOrder = currentOrderSnapshot.copyWith(
         inCart: [],
         ordered: updatedOrdered,
       );
 
-      // 3. Save directly to service to ensure the order is placed
       await orderProvider.orderService.saveOrder(confirmedOrder);
-
-      // 4. Clear the optimistic cart in the provider
-      await orderProvider.clearCart();
-
-      // 5. Refresh local details to reflect empty cart
-      _detailedOrder = await orderProvider.currentOrderInDetails;
 
       if (context.mounted) {
         ScaffoldMessenger.of(
@@ -191,10 +134,6 @@ class CartViewModel extends ChangeNotifier {
     }
   }
 
-  // ---------------------------
-  // Session Actions
-  // ---------------------------
-
   Future<void> checkout() async {
     if (_currentQueue == null) return;
 
@@ -202,20 +141,16 @@ class CartViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Update Queue Status
       await queueEntryRepository.updateStatus(
         _currentQueue!.id,
         QueueStatus.completed,
       );
 
-      // Update Local User State
       final updatedUser = userProvider.asCustomer!.copyWith(
         currentHistoryId: null,
         noQueue: true,
       );
       userProvider.updateUser(updatedUser);
-      debugPrint("Checkout Error: ${updatedUser.currentHistoryId}");
-      // Sync User to Repository
       await userRepository.update(updatedUser);
     } catch (err) {
       debugPrint("Checkout Error: $err");
@@ -230,7 +165,7 @@ class CartViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _isDisposed = true;
-    orderProvider.removeListener(_onOrderProviderChanged);
+    orderProvider.removeListener(_onCartChanged);
     super.dispose();
   }
 }

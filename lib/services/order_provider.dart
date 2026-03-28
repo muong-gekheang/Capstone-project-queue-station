@@ -9,13 +9,9 @@ class OrderProvider extends ChangeNotifier {
   final OrderService orderService;
   UserProvider userProvider;
 
-  Order? _currentOrder; // Source of truth from Firestore
-  Order? _localOrder; // Local working copy (Optimistic)
+  Order? _currentOrder;
+  Order? _localOrder;
   StreamSubscription<Order?>? _sub;
-  Timer? _saveDebouncer;
-
-  // Track how many updates are "in flight" to prevent ghosting
-  int _pendingActions = 0;
 
   OrderProvider({required this.orderService, required this.userProvider}) {
     _init();
@@ -33,15 +29,14 @@ class OrderProvider extends ChangeNotifier {
       orderService.listenToQueue(queueHistoryId);
     }
 
-    _sub = orderService.streamCurrentOrder.listen((order) {
+    _sub = orderService.streamCurrentOrder.listen((order) async {
       if (order != null) {
-        _currentOrder = order;
+        // ✅ Load full order with menu items
+        final fullOrder = await orderService.getOrderDetailsById(order.id);
 
-        // CRITICAL: Only overwrite local state if no saves are pending.
-        // This prevents the "Ghost Update" where the stream returns
-        // old data while the server is still processing your newest change.
-        if (_pendingActions == 0) {
-          _localOrder = order;
+        if (fullOrder != null) {
+          _currentOrder = fullOrder;
+          _localOrder = fullOrder;
           notifyListeners();
         }
       }
@@ -52,18 +47,14 @@ class OrderProvider extends ChangeNotifier {
   // Getters
   // ---------------------------
 
-  // Always prefer the local copy if it exists
   Order? get currentOrder => _localOrder ?? _currentOrder;
 
-  /// Returns detailed order, but merges in the local optimistic cart
-  /// so the user doesn't see "ghost" old data in the details view.
   Future<Order?> get currentOrderInDetails async {
     final id = _localOrder?.id ?? _currentOrder?.id;
     if (id == null || id.isEmpty) return null;
 
     final detailedOrder = await orderService.getOrderDetailsById(id);
 
-    // Merge local cart into the details if we have pending changes
     if (detailedOrder != null && _localOrder != null) {
       return detailedOrder.copyWith(inCart: _localOrder!.inCart);
     }
@@ -85,7 +76,7 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // ---------------------------
-  // Cart Actions
+  // Cart Actions - Immediate Save
   // ---------------------------
 
   Future<void> addToCart(OrderItem newItem) async {
@@ -102,7 +93,7 @@ class OrderProvider extends ChangeNotifier {
       cart.add(newItem);
     }
 
-    _applyOptimisticUpdate(cart);
+    await _saveOrder(cart);
   }
 
   Future<void> updateCart(OrderItem updatedItem) async {
@@ -113,7 +104,7 @@ class OrderProvider extends ChangeNotifier {
 
     if (index != -1) {
       cart[index] = updatedItem;
-      _applyOptimisticUpdate(cart);
+      await _saveOrder(cart);
     }
   }
 
@@ -124,55 +115,40 @@ class OrderProvider extends ChangeNotifier {
         .where((item) => !_isSameItem(item, target))
         .toList();
 
-    _applyOptimisticUpdate(cart);
+    await _saveOrder(cart);
   }
 
   Future<void> clearCart() async {
     if (currentOrder == null) return;
-    _applyOptimisticUpdate([]);
+    await _saveOrder([]);
   }
 
   // ---------------------------
-  // Internal Logic
+  // Save Logic
   // ---------------------------
 
-  void _applyOptimisticUpdate(List<OrderItem> cart) {
+  Future<void> _saveOrder(List<OrderItem> cart) async {
+    // Update UI immediately
     _localOrder = currentOrder!.copyWith(inCart: cart);
-    _pendingActions++; // Block incoming stream overwrites
     notifyListeners();
-    _debounceSave();
-  }
 
-  void _debounceSave() {
-    _saveDebouncer?.cancel();
-    _saveDebouncer = Timer(const Duration(milliseconds: 500), () async {
-      await _saveToFirestore();
-    });
-  }
-
-  Future<void> _saveToFirestore() async {
-    if (_localOrder == null) return;
-
+    // Save to Firestore
     try {
       await orderService.saveOrder(_localOrder!);
       _currentOrder = _localOrder;
     } catch (e) {
       debugPrint('Error saving order: $e');
-      // On failure, revert to the last known good server state
+      // Revert on error
       _localOrder = _currentOrder;
       notifyListeners();
-    } finally {
-      // Small delay after save to let the Firestore stream "catch up"
-      Future.delayed(const Duration(milliseconds: 300), () {
-        _pendingActions = 0;
-      });
     }
   }
 
   bool _isSameItem(OrderItem a, OrderItem b) {
     return a.menuItemId == b.menuItemId &&
         a.size.name == b.size.name &&
-        _mapEquals(a.addOns, b.addOns);
+        _mapEquals(a.addOns, b.addOns) &&
+        a.note == b.note;
   }
 
   bool _mapEquals(Map<String, double> a, Map<String, double> b) {
@@ -184,17 +160,14 @@ class OrderProvider extends ChangeNotifier {
   }
 
   void updateUserProvider(UserProvider newUserProvider) {
-    _saveDebouncer?.cancel();
     userProvider = newUserProvider;
     _currentOrder = null;
     _localOrder = null;
-    _pendingActions = 0;
     _setupStream();
   }
 
   @override
   void dispose() {
-    _saveDebouncer?.cancel();
     _sub?.cancel();
     super.dispose();
   }

@@ -40,7 +40,6 @@ class _MenuContentState extends State<MenuContent> {
   @override
   Widget build(BuildContext context) {
     final menuVM = context.watch<MenuViewModel>();
-    print(menuVM.currentOrder.id);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

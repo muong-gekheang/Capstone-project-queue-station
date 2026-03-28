@@ -20,7 +20,7 @@ class NormalUserApp extends StatefulWidget {
 
 class _NormalUserAppState extends State<NormalUserApp> {
   NormalUserNavTab selectedTab = NormalUserNavTab.home;
-  bool _hasSeenFoodInstruction = false;
+  //bool _hasSeenFoodInstruction = false;
   bool _isNavigating = false;
 
   Future<void> onTabSelected(NormalUserNavTab tab) async {
@@ -64,7 +64,7 @@ class _NormalUserAppState extends State<NormalUserApp> {
         if (canAccess && context.mounted) {
           setState(() {
             selectedTab = NormalUserNavTab.foodOrdering;
-            _hasSeenFoodInstruction = true;
+           // _hasSeenFoodInstruction = true;
           });
         }
       }

@@ -19,7 +19,7 @@ class FoodItemCard extends StatelessWidget {
   const FoodItemCard({
     super.key,
     required this.name,
-    required this.item, 
+    required this.item,
     required this.addons,
     required this.price,
     required this.quantity,
@@ -34,10 +34,6 @@ class FoodItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final addOnLookup = {
-      for (var addOn in item.addOns) addOn.id: addOn
-    };
-
     final addOnEntries = addons.entries.toList();
 
     return Card(
@@ -46,10 +42,7 @@ class FoodItemCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Colors.grey.shade100,
-          width: 1,
-        ),
+        side: BorderSide(color: Colors.grey.shade100, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,17 +64,15 @@ class FoodItemCard extends StatelessWidget {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                width: 100,
-                                height: 100,
                                 color: Colors.grey[200],
                                 child: Icon(
                                   Icons.restaurant,
-                                  size: 48,
+                                  size: 40,
                                   color: Colors.grey[400],
                                 ),
                               );
                             },
-                          )
+                          ),
                         )
                       : Icon(Icons.restaurant, color: Colors.grey[400]),
                 ),
@@ -107,7 +98,7 @@ class FoodItemCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Size:',
                               style: TextStyle(
                                 fontSize: 14,
@@ -117,12 +108,8 @@ class FoodItemCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${size!.name} ',
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              size!.name,
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
@@ -130,7 +117,7 @@ class FoodItemCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Quantity:',
                               style: TextStyle(
                                 fontSize: 14,
@@ -141,11 +128,7 @@ class FoodItemCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               '$quantity',
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
@@ -175,9 +158,9 @@ class FoodItemCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            decoration: BoxDecoration(
-                              color:const Color(0xFFFF6835),
-                              borderRadius: const BorderRadius.only(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFF6835),
+                              borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(8),
                                 bottomLeft: Radius.circular(8),
                               ),
@@ -225,14 +208,15 @@ class FoodItemCard extends StatelessWidget {
             ),
           ),
 
-          if (addons.isNotEmpty || (note != null && note!.isNotEmpty)) ...[
+          // ADD-ONS + NOTE
+          if (addons.isNotEmpty || (note != null && note!.isNotEmpty))
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (addons.isNotEmpty) ...[
-                    Text(
+                    const Text(
                       "Add-ons:",
                       style: TextStyle(
                         fontSize: 14,
@@ -240,22 +224,21 @@ class FoodItemCard extends StatelessWidget {
                         color: Color(0xFF0D47A1),
                       ),
                     ),
-                    
-                    Column(
 
+                    const SizedBox(height: 6),
+
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: List.generate(addOnEntries.length, (index) {
-                        final addOnId = addOnEntries[index].key;
+                        final addOnName = addOnEntries[index].key;
                         final addOnPrice = addOnEntries[index].value;
-
-                        final addOnModel = addOnLookup[addOnId];
 
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("${index + 1}. ${addOnModel?.name ?? 'Unknown'}"),
+                              Text("${index + 1}. $addOnName"),
                               Text(
                                 '+\$${addOnPrice.toStringAsFixed(2)}',
                                 style: const TextStyle(
@@ -272,7 +255,7 @@ class FoodItemCard extends StatelessWidget {
 
                   if (note != null && note!.isNotEmpty) ...[
                     const SizedBox(height: 12),
-                    Text(
+                    const Text(
                       "Note:",
                       style: TextStyle(
                         fontSize: 14,
@@ -280,15 +263,11 @@ class FoodItemCard extends StatelessWidget {
                         color: Color(0xFF0D47A1),
                       ),
                     ),
-                    Text(
-                      "$note",
-                      style: TextStyle(fontSize: 14),
-                    ),
+                    Text(note!, style: const TextStyle(fontSize: 14)),
                   ],
                 ],
               ),
             ),
-          ],
         ],
       ),
     );

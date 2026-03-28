@@ -24,7 +24,10 @@ class MenuViewModel extends ChangeNotifier {
     required this.queueEntryRepository,
     required this.userProvider,
     required this.restaurantRepository,
-  });
+  }) {
+    // ✅ Listen to OrderProvider changes
+    orderProvider.addListener(_onOrderProviderChanged);
+  }
 
   // ================= STATE =================
   List<MenuItem> _menuItems = [];
@@ -53,7 +56,7 @@ class MenuViewModel extends ChangeNotifier {
   bool get isInQueue => _currentQueueEntry != null;
   String? get queueNumber => _currentQueueEntry?.queueNumber.toString();
 
-  Order get currentOrder => orderProvider.currentOrder!;
+  Order? get currentOrder => orderProvider.currentOrder!;
   int get totalCartItemsCount => orderProvider.totalItemsCount;
   double get totalCartAmount => orderProvider.totalAmount;
 
@@ -63,6 +66,10 @@ class MenuViewModel extends ChangeNotifier {
     if (_restaurant != null) {
       await Future.wait([loadMenuCategories(), loadMenuItems()]);
     }
+  }
+
+  void _onOrderProviderChanged() {
+    notifyListeners();
   }
 
   Future<void> _loadQueueAndRestaurant() async {

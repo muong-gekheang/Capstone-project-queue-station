@@ -32,8 +32,9 @@ class Order {
     List<OrderItem>? inCart,
   }) : ordered = ordered ?? [],
        inCart = inCart ?? [],
-       orderedIds = orderedIds ?? (ordered ?? []).map(orderItemRef).toList(),
-       inCartIds = inCartIds ?? (inCart ?? []).map(orderItemRef).toList();
+       orderedIds =
+        orderedIds ?? (ordered ?? []).map((item) => item.id).toList(),
+       inCartIds = inCartIds ?? (inCart ?? []).map((item) => item.id).toList();
 
     Order.empty() : this(id: '', timestamp: DateTime.now());
 
@@ -57,10 +58,10 @@ class Order {
     );
   }
 
-  static String orderItemRef(OrderItem item) {
-    final addOnsKey = item.addOns.keys.join('_');
-    return '${item.menuItemId}_${item.sizeName}_$addOnsKey';
-  }
+  // static String orderItemRef(OrderItem item) {
+  //   final addOnsKey = item.addOns.keys.join('_');
+  //   return '${item.menuItemId}_${item.sizeName}_$addOnsKey';
+  // }
       
   double calculateTotalPrice() {
     double totalPrice = 0;
